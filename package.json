@@ -1,0 +1,15 @@
+{
+  "name": "Botje",
+  "version": "1.2.0",
+  "description": "a discord bot",
+  "main": "bot.js",
+  "author": "Mick",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "moment": "^2.24.0",
+    "node-emoji": "^1.8.1",
+    "request": "^2.81.0",
+    "sqlite3": "^4.0.6",
+    "winston": "^2.3.1"
+  }
+}
