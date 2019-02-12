@@ -82,7 +82,6 @@ bot.on('message', message => {
     }
 })
 
-
 async function ping(channel, message)
 {
     const m = await message.channel.send("Ping?");
