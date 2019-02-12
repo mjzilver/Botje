@@ -25,16 +25,12 @@ var logger = new (winston.Logger)({
 });
 
 // Initialize Discord Bot
-var bot =  new Discord.Client({autoReconnect:true});
+var bot = new Discord.Client({autoReconnect:true});
+bot.commands = new Discord.Collection();
 
 bot.on('ready', () => {
     logger.info('Connected');
     logger.info(`Logged in as: ${bot.user.username} - ${bot.user.id}`);
-	/*
-	logger.log('debug', 'debug test');
-	logger.log('warn', 'debug test');
-	logger.log('error', 'debug test');
-	*/
 });
 
 bot.login(auth.token);
@@ -54,8 +50,8 @@ bot.on('message', message => {
 
         switch(cmd) {
             case 'help':
-                channel.send(helpMessage);
-            break;
+				channel.send(helpMessage);
+			break;
 			case 'image':
                 getImage(channel, args[0]);
             break;
@@ -74,6 +70,9 @@ bot.on('message', message => {
 			case 'rep':
 				reputation(message);
 			break;
+			case 'ping':
+				ping(channel, message);
+			break;
 			case 'delete':
 				bot.user.lastMessage.delete().then(logger.log('warn', "deleted: " + bot.user.lastMessage.content));
 			break;
@@ -83,14 +82,12 @@ bot.on('message', message => {
     }
 })
 
-bot.on('disconnect', () => {
-    logger.warn('Bot has disconnect');
-});
 
-bot.on('disconnected', () => {
-    logger.warn('Bot has disconnected');
-});
-
+async function ping(channel, message)
+{
+    const m = await message.channel.send("Ping?");
+    m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(bot.ping)}ms`);
+}
 
 function getDogPicture(channel)
 {
@@ -328,4 +325,6 @@ var helpMessage = `:robot: Current commands: :robot:
 \`b!rep\`: check how much reputation you have
 \`b!rep @[person]\`: give reputation to a person
 \`b!submit\`: submit an idea for a new feature 
+\`b!delete \`:deletes the last message from you
+\`b!ping\`: prints the current ping of the bot and the API
 \`Current Version\`: ` + package.version;
