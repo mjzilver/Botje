@@ -1,0 +1,18 @@
+CREATE TABLE `reputation` (
+	`date`	INTEGER NOT NULL DEFAULT (datetime(current_timestamp)),
+	`user_id`		INTEGER NOT NULL,
+	`target_user_id`	INTEGER NOT NULL,
+	PRIMARY KEY(`date`,`user_id`)
+);
+
+CREATE TABLE `images` (
+	`link`	TEXT NOT NULL UNIQUE,
+	`sub`	TEXT NOT NULL,
+	PRIMARY KEY(`link`)
+);
+
+CREATE TABLE `idea` (
+	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`user`	TEXT NOT NULL,
+	`idea`	TEXT NOT NULL
+);

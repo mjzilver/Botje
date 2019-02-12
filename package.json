@@ -1,34 +1,15 @@
 {
-  "name": "botje",
-  "version": "2.0.0",
-  "description": "Versatile & fun Discord bot.",
-  "main": "start.js",
-  "author": "Mick Jari",
-  "email": "4ilverj@gmail.com",
-  "license": "GPL 3.0",
-  "repository": "https://github.com/mjzilver/botje",
-  "private": true,
+  "name": "Botje",
+  "version": "1.2.0",
+  "description": "a discord bot",
+  "main": "bot.js",
+  "author": "Mick",
   "dependencies": {
-    "axios": "^1.13.5",
-    "discord.js": "^14.25.1",
-    "jimp": "^0.22.12",
-    "pg": "^8.12.0",
-    "pg-format": "^1.0.4",
-    "winston": "^3.2.1"
-  },
-  "scripts": {
-    "start": "node start.js",
-    "dev": "nodemon start.js -e js",
-    "beta": "nodemon start.js --beta -e js",
-    "lint": "eslint .",
-    "lint-fix": "eslint . --fix"
-  },
-  "nodemonConfig": {
-    "signal": "SIGINT"
-  },
-  "devDependencies": {
-    "eslint": "^8.39.0",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-json-files": "^2.1.0"
+    "discord.js": "^11.4.2",
+    "moment": "^2.24.0",
+    "node-emoji": "^1.8.1",
+    "request": "^2.81.0",
+    "sqlite3": "^4.0.6",
+    "winston": "^2.3.1"
   }
 }
