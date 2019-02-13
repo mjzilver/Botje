@@ -9,6 +9,10 @@ var auth = require('./auth.json');
 var package = require('./package.json');
 var emoji = require('./emoji.json');
 var db = new sqlite3.Database("./discord.db")
+const { prefix } = require('./config.json');
+
+// person as key -> message as value
+var imagesSent = [];
 
 // Configure logger settings
 var logger = new (winston.Logger)({
@@ -36,30 +40,28 @@ bot.on('ready', () => {
 bot.login(auth.token);
 
 bot.on('message', message => {
-	var content = message.content;
-	var user = message.author.username;
-	var channel = message.channel;
+	var channel = message.channel
 	
     // look for the b! meaning bot command
-    if (content.substring(0, 2) == 'b!') {
-        var args = content.substring(2).split(' '); // remove the b!
-        var cmd = args[0];
-        args = args.splice(1);
+    if (message.content.match(new RegExp(prefix,"i"))) {
+		message.content = message.content.replace(new RegExp(prefix,"i"), '');
+       	const args = message.content.split(' ');
+		const command = args.shift().toLowerCase();
 		
-		logger.log('debug', user + ' requested ' + cmd + ' with arguments ' + args);
+		logger.log('debug', message.author.username + ' requested ' + command + ' with arguments ' + args);
 
-        switch(cmd) {
+        switch(command) {
             case 'help':
 				channel.send(helpMessage);
 			break;
 			case 'image':
-                getImage(channel, args[0]);
+                getImage(message.author.username, channel, args[0]);
             break;
 			case 'dog':
 				getDogPicture(channel);
             break;
 			case 'submit':
-				submitIdea(user, channel, args);
+				submitIdea(message.author.username, channel, args);
             break;
 			case 'emoji':
 				turnIntoEmoji(channel, args);
@@ -74,10 +76,10 @@ bot.on('message', message => {
 				ping(channel, message);
 			break;
 			case 'delete':
-				bot.user.lastMessage.delete().then(logger.log('warn', "deleted: " + bot.user.lastMessage.content));
+				prune(message.author.username);
 			break;
             default:
-                channel.send('Unknown command.');
+			break;
         }
     }
 })
@@ -238,10 +240,16 @@ function reputation(message)
 	}
 }
 
-function prune(amount = 1)
-{}
+function prune(user, amount = 1)
+{
+	if(imagesSent[user])
+	{
+		imagesSent[user].delete().then(logger.log('warn', "deleted: " + imagesSent[user].content));
+		delete imagesSent[user];
+	}
+}
 
-function getImage(channel, sub, page = 1)
+function getImage(user, channel, sub, page = 1)
 {
 	const options = {
 		//https://api.imgur.com/3/gallery/r/{{subreddit}}/{{sort}}/{{window}}/{{page}}
@@ -259,7 +267,7 @@ function getImage(channel, sub, page = 1)
 			let selectSQL = 'SELECT * FROM images WHERE sub = "' + sub + '"';
 			var foundImages = {};
  
-			db.all(selectSQL, [], (err, rows) => {
+			db.all(selectSQL, [], async (err, rows) => {
 				if (err) {
 					throw err;
 				}
@@ -282,7 +290,7 @@ function getImage(channel, sub, page = 1)
 					
 					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
 					
-					channel.send(link);
+					imagesSent[user] = await channel.send(link);
 					
 					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
 					
@@ -300,7 +308,7 @@ function getImage(channel, sub, page = 1)
 					if(body.data.length > 0)
 					{
 						logger.debug(page + ' page of images used');
-						getImage(channel,sub,++page);
+						getImage(user, channel, sub, ++page);
 					} else 
 					{
 						channel.send("I have ran out of images to show you <:feelssad:445577555857113089>");
@@ -316,14 +324,14 @@ function getImage(channel, sub, page = 1)
 }
 
 var helpMessage = `:robot: Current commands: :robot:  
-\`b!help\`: displays all commands publically available <:hmmm:445579256609767425>
-\`b!dog\`: displays a random image of a dog
-\`b!image [subreddit]\`: gets a random picture from the given subreddit <:soy:445575719964114945> 
-\`b!emoji\`: turns your message into emojis 
-\`b!react\`: reacts to your post with emojis using the text you posted
-\`b!rep\`: check how much reputation you have
-\`b!rep @[person]\`: give reputation to a person
-\`b!submit\`: submit an idea for a new feature 
-\`b!delete \`:deletes the last message from you
-\`b!ping\`: prints the current ping of the bot and the API
+\`help\`: displays all commands publically available <:hmmm:445579256609767425>
+\`dog\`: displays a random image of a dog
+\`image [subreddit]\`: gets a random picture from the given subreddit <:soy:445575719964114945> 
+\`emoji\`: turns your message into emojis 
+\`react\`: reacts to your post with emojis using the text you posted
+\`rep\`: check how much reputation you have
+\`rep @[person]\`: give reputation to a person
+\`submit\`: submit an idea for a new feature 
+\`delete \`:deletes the last message from you
+\`ping\`: prints the current ping of the bot and the API
 \`Current Version\`: ` + package.version;
