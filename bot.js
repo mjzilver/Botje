@@ -52,15 +52,20 @@ bot.on('message', message => {
 
         switch(command) {
             case 'help':
+            case 'assist':
 				channel.send(helpMessage);
 			break;
 			case 'image':
+			case 'reddit':
+			case 'sub':
+			case 'subreddit':
                 getImage(message.author.username, channel, args[0]);
             break;
 			case 'dog':
 				getDogPicture(channel);
             break;
 			case 'submit':
+			case 'idea':
 				submitIdea(message.author.username, channel, args);
             break;
 			case 'emoji':
@@ -70,18 +75,28 @@ bot.on('message', message => {
 				reactTo(message, args.join(" "));
 			break;
 			case 'rep':
+			case 'reputate':
+			case 'reputation':
 				reputation(message);
 			break;
 			case 'ping':
+			case 'latency':
 				ping(channel, message);
 			break;
 			case 'delete':
+			case 'remove':
+			case 'prune':
 				prune(message.author.username);
 			break;
             default:
 			break;
         }
     }
+	
+	if(message.content.match(/.*\b(thanks?|ty|good job|well done|love).*\bbot\b.*/i))
+	{
+		message.react("💗");
+	}
 })
 
 async function ping(channel, message)
