@@ -247,6 +247,8 @@ function harvestfarm(message)
 			
 			var time = row['time'];
 			var yield = row['yield'];
+			var tier = row['tier']
+			var points = row['points']
 			var growth = timepassed.asMilliseconds()/time;
 			growth = Math.floor(growth)
 			
@@ -267,14 +269,16 @@ function harvestfarm(message)
 			
 			if(growth !== 0)
 			{
+				var gain = growth * (tier + 1);
+				
 				message.channel.send('Your good boy point farm before: ')
 				message.channel.send(result)
 				message.channel.send('Your good boy point farm after: ')
 				message.channel.send(afterresult)
-				message.channel.send('You gained ' + growth + ' good boy point(s)')
+				message.channel.send('You gained ' + gain + ' good boy point(s)')
 				
 				var currenttime = new Date();
-				var editfarm = db.prepare('UPDATE farm SET planted_at = ?, points = points + ? WHERE user_id = ?', [currenttime, growth, message.author.id]);
+				var editfarm = db.prepare('UPDATE farm SET planted_at = ?, points = points + ? WHERE user_id = ?', [currenttime, gain, message.author.id]);
 
 				editfarm.run(function(err){				
 					if(err)
@@ -378,7 +382,7 @@ function upgradefarm(message)
 		if(row)
 		{
 			var costs = Math.pow(row['tier'] + 1, 2);
-			if(row['points'] < costs && row['tier'] < 10)
+			if(row['points'] < costs && row['tier'] < 20)
 			{
 				message.channel.send('You dont have the required ' + costs + ' point(s) to upgrade your farm');
 			}
