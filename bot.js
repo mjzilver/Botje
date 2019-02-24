@@ -39,6 +39,14 @@ bot.on('ready', () => {
 
 bot.login(auth.token);
 
+bot.on('error', function (error) {
+	logger.error(error);
+});
+
+process.on('uncaughtException', function (error) {
+   logger.error(error);
+});
+
 bot.on('message', message => {
 	var channel = message.channel
 	
@@ -52,20 +60,15 @@ bot.on('message', message => {
 
         switch(command) {
             case 'help':
-            case 'assist':
 				channel.send(helpMessage);
 			break;
 			case 'image':
-			case 'reddit':
-			case 'sub':
-			case 'subreddit':
                 getImage(message.author.username, channel, args[0]);
             break;
 			case 'dog':
-				getDogPicture(channel);
+				getDogPicture(channel, args[0]);
             break;
 			case 'submit':
-			case 'idea':
 				submitIdea(message.author.username, channel, args);
             break;
 			case 'emoji':
@@ -75,28 +78,20 @@ bot.on('message', message => {
 				reactTo(message, args.join(" "));
 			break;
 			case 'rep':
-			case 'reputate':
-			case 'reputation':
 				reputation(message);
 			break;
 			case 'ping':
-			case 'latency':
 				ping(channel, message);
 			break;
 			case 'delete':
-			case 'remove':
-			case 'prune':
 				prune(message.author.username);
+			break;
+			case 'farm':
 			break;
             default:
 			break;
         }
     }
-	
-	if(message.content.match(/.*\b(thanks?|ty|good job|well done|love).*\bbot\b.*/i))
-	{
-		message.react("💗");
-	}
 })
 
 async function ping(channel, message)
@@ -105,12 +100,22 @@ async function ping(channel, message)
     m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(bot.ping)}ms`);
 }
 
-function getDogPicture(channel)
+function getDogPicture(channel, breed = "")
 {
-	request('https://dog.ceo/api/breeds/image/random', { json: true }, (err, res, body) => {
-	if (err) { return logger.info(err) }
-	  	channel.send(body.message);
-	});
+	if(breed == "")
+	{
+		request('https://dog.ceo/api/breeds/image/random', { json: true }, (err, res, body) => {
+		if (err) { return logger.info(err) }
+			channel.send(body.message);
+		});
+	} 
+	else 
+	{
+		request(`https://dog.ceo/api/breed/${breed}/images/random`, { json: true }, (err, res, body) => {
+		if (err) { return logger.info(err) }
+			channel.send(body.message);
+		});
+	}
 }
 
 function submitIdea(user, channel, idea)
@@ -165,7 +170,8 @@ function reactTo(message, sentence)
 				{
 					reactTo(message, sentence.substring(1));
 				}, 500));
-			} else 
+			} 
+			else 
 			{
 				reactTo(message, sentence.substring(1));
 			}
@@ -264,7 +270,7 @@ function prune(user, amount = 1)
 	}
 }
 
-function getImage(user, channel, sub, page = 1)
+function getImage(user, channel, sub, page = 0)
 {
 	const options = {
 		//https://api.imgur.com/3/gallery/r/{{subreddit}}/{{sort}}/{{window}}/{{page}}
@@ -295,17 +301,24 @@ function getImage(user, channel, sub, page = 1)
 				for(var i = 0; i < body.data.length; i ++)
 				{
 					if(!(body.data[i].link in foundImages))
-						filteredImages.push(body.data[i].link);
+						filteredImages.push(body.data[i]);
 				}
 				
 				if(filteredImages.length > 0)
 				{
 					var chosen = Math.floor(Math.random()* filteredImages.length);
-					var link = filteredImages[chosen];
-					
+					var link = filteredImages[chosen].link;
+
 					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
 					
-					imagesSent[user] = await channel.send(link);
+					if(filteredImages[chosen].nsfw)
+						imagesSent[user] = await channel.send('||' + link + '||');
+					else
+						imagesSent[user] = await channel.send(link);
+					
+					if(filteredImages[chosen].is_album)
+						logger.info(filteredImages[chosen])
+
 					
 					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
 					
@@ -318,13 +331,15 @@ function getImage(user, channel, sub, page = 1)
 						else
 							logger.log('debug', "inserted: " + link);
 					});
-				} else 
+				} 
+				else 
 				{
 					if(body.data.length > 0)
 					{
 						logger.debug(page + ' page of images used');
 						getImage(user, channel, sub, ++page);
-					} else 
+					} 
+					else 
 					{
 						channel.send("I have ran out of images to show you <:feelssad:445577555857113089>");
 					}
@@ -339,13 +354,15 @@ function getImage(user, channel, sub, page = 1)
 }
 
 var helpMessage = `:robot: Current commands: :robot:  
-\`help\`: displays all commands publically available <:hmmm:445579256609767425>
-\`dog\`: displays a random image of a dog
-\`image [subreddit]\`: gets a random picture from the given subreddit <:soy:445575719964114945> 
+\`image [subreddit]\`: gets a random picture from the given subreddit 
 \`emoji\`: turns your message into emojis 
 \`react\`: reacts to your post with emojis using the text you posted
-\`rep\`: check how much reputation you have
-\`rep @[person]\`: give reputation to a person
+\`points\`: check how much good boy points you have acquired
+\`award @[person]\`: gives good boy points to a person
+\`farm\`: shows how your good boy point farm is doing
+\`farm harvest\`: harvest your good boy points
+\`farm upgrade\`: give 1 good boy point to make your farm produce 10% faster
+\`farm seed\`: give 1 good boy point to make your farm produce 10% more points
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
