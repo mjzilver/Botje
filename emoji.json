@@ -38,6 +38,17 @@
 	"heart" : "❤️",
 	"dot" : "⚬",
 	"corn" : "🌽",
+	"farm_tier_0" : "🌽",
+	"farm_tier_1" : "🥔",
+	"farm_tier_2" : "🥒",
+	"farm_tier_3" : "🥕",
+	"farm_tier_4" : "🍏",
+	"farm_tier_5" : "🍎",
+	"farm_tier_6" : "🍇",
+	"farm_tier_7" : "🍐",
+	"farm_tier_8" : "🍊",
+	"farm_tier_9" : "🍒",
+	"farm_tier_10" : "🍓",
 	"seedling" : "🌱",
 	"cry" : "😢"
 }
