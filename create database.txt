@@ -16,3 +16,11 @@ CREATE TABLE `idea` (
 	`user`	TEXT NOT NULL,
 	`idea`	TEXT NOT NULL
 );
+
+CREATE TABLE "farm" (
+	"used_id"	INTEGER NOT NULL UNIQUE,
+	"yield"	INTEGER NOT NULL,
+	"time"	INTEGER NOT NULL,
+	"planted_at"	INTEGER NOT NULL,
+	PRIMARY KEY("used_id")
+);
