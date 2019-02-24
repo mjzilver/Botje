@@ -77,8 +77,8 @@ bot.on('message', message => {
 			case 'react':
 				reactTo(message, args.join(" "));
 			break;
-			case 'rep':
-				reputation(message);
+			case 'points':
+				checkPoints(message);
 			break;
 			case 'ping':
 				ping(channel, message);
@@ -87,6 +87,7 @@ bot.on('message', message => {
 				prune(message.author.username);
 			break;
 			case 'farm':
+				farm(message, args);
 			break;
             default:
 			break;
@@ -179,86 +180,301 @@ function reactTo(message, sentence)
 	}
 }
 
-function reputation(message)
-{
+function checkPoints(message)
+{	
 	var mentioned_user = message.mentions.users.first();
-	var user = message.author;
-	var channel = message.channel;
     var member = message.guild.member(mentioned_user);
+
+	var checkrepfor = 0;
 	
 	if(member)
-	{
-		if(mentioned_user.bot)
-		{
-			channel.send('Bots do not deserve reputation.');
-		}
-		else if(mentioned_user.id == user.id)
-		{
-			channel.send('You cannot give reputation to yourself');
-		}
-		else 
-		{
-			let selectSQL = 'SELECT date FROM reputation WHERE user_id = ' + user.id + ' ORDER BY date DESC';
-						
-			logger.info(selectSQL);
-						
-			db.get(selectSQL, [], (err, row) => {
-				if (err) {
-					throw err;
-				}
-				
-				if(row)
-				{
-					var lastrep = moment(row["date"]);
-					hourspassed = moment.duration(moment().diff(lastrep));
-				}
-				
-				if(!row || hourspassed.asHours() > 24)
-				{
-					var currenttime = new Date();
-					
-					currenttime.setHours(currenttime.getHours() + 1);
-				
-					var insert = db.prepare('INSERT INTO reputation (user_id, target_user_id, date) VALUES (?, ?, ?)', [user.id, mentioned_user.id, currenttime]);
+		checkrepfor = mentioned_user;
+	else
+		checkrepfor = message.author
 
-					logger.info(insert);							
-							
-					insert.run(function(err){				
+	let selectSQL = 'SELECT points FROM farm WHERE user_id = ' + checkrepfor.id;
+	
+	db.get(selectSQL, [], (err, row) => {
+		if (err) {
+			throw err;
+		}
+		
+		if(row["points"] == null)
+			message.channel.send('You dont have any good boy points');
+		else
+			message.channel.send(checkrepfor.username + ' has ' + row["points"] + ' good boy points');
+	})
+}
+
+function farm(message, arguments)
+{
+	switch(arguments[0]) {
+		case 'harvest':
+			harvestfarm(message)
+		break;
+		case 'seed':
+			seedfarm(message)
+		break;
+		case 'upgrade':
+			upgradefarm(message)
+		break;
+		default:
+			printfarm(message)
+		break;
+	}
+}
+
+function harvestfarm(message)
+{
+	let selectSQL = 'SELECT * FROM farm WHERE user_id = ' + message.author.id;
+						
+	logger.info(selectSQL);
+				
+	db.get(selectSQL, [], (err, row) => {
+		if (err) {
+			throw err;
+		}
+		
+		if(!row)
+		{
+			message.channel.send('You do not have a farm. Create a farm with command farm ');
+		}
+		
+		if(row)
+		{			
+			var planted_at = moment(row["planted_at"]);
+			timepassed = moment.duration(moment().diff(planted_at));
+			
+			var time = row['time'];
+			var yield = row['yield'];
+			var growth = timepassed.asMilliseconds()/time;
+			growth = Math.floor(growth)
+			
+			if(growth > yield)
+			{
+				growth = yield;
+			}
+			var ungrown = yield - growth;
+			
+			var result = "[";
+			var afterresult = "["
+			
+			result += emoji['farm_tier_' + tier].repeat(growth);
+			result += emoji.seedling.repeat(ungrown);
+			afterresult += emoji.seedling.repeat(yield);
+			result += ']';
+			afterresult += ']';
+			
+			if(growth !== 0)
+			{
+				message.channel.send('Your good boy point farm before: ')
+				message.channel.send(result)
+				message.channel.send('Your good boy point farm after: ')
+				message.channel.send(afterresult)
+				message.channel.send('You gained ' + growth + ' good boy point(s)')
+				
+				var currenttime = new Date();
+				var editfarm = db.prepare('UPDATE farm SET planted_at = ?, points = points + ? WHERE user_id = ?', [currenttime, growth, message.author.id]);
+
+				editfarm.run(function(err){				
+					if(err)
+					{
+						logger.error("failed to update: farm for user " + message.author.username);
+						logger.error(err);
+					}
+					else
+					{
+						logger.log('debug', "updated: farm for user " + message.author.username);   
+					}
+				});
+			} 
+			else 
+			{
+				message.channel.send('Your good boy point farm: ')
+				message.channel.send(result)
+			}
+		}
+	});
+}
+
+function seedfarm(message)
+{
+	let selectSQL = 'SELECT * FROM farm WHERE user_id = ' + message.author.id;
+						
+	logger.info(selectSQL);
+				
+	db.get(selectSQL, [], (err, row) => {
+		if (err) {
+			throw err;
+		}
+		
+		if(!row)
+		{
+			message.channel.send('You do not have a farm. Create a farm with command farm ');
+		}
+		
+		if(row)
+		{
+			var costs = Math.pow(row['yield']-2, 2);
+			if(row['points'] < costs)
+			{
+				message.channel.send('You dont have the required ' + costs + ' point(s) to seed your farm');
+			}
+			else 
+			{
+				var yield = row['yield']
+				var currenttime = new Date();
+
+				var editfarm = db.prepare('UPDATE farm SET yield = ?, points = points - ? WHERE user_id = ?', [++yield, costs, message.author.id]);
+
+				editfarm.run(function(err){				
+				if(err)
+				{
+					logger.error("failed to update: farm for user " + message.author.username);
+					logger.error(err);
+				}
+				else
+				{
+					logger.log('debug', "updated: farm for user " + message.author.username); 
+					message.channel.send('You spend ' + costs + ' point and seeded your farm');
+					printfarm(message);
+					
+					var insertrep = db.prepare('DELETE reputation (user_id, target_user_id, date) VALUES (?, ?, ?)', [bot.user.id, message.author.id, currenttime]);
+			
+					insertrep.run(function(err){				
 						if(err)
 						{
-							logger.error("failed to insert: reputation for user " + mentioned_user.username);
+							logger.error("failed to insert: good boy points for user " + message.author.username);
 							logger.error(err);
 						}
 						else
 						{
-							logger.log('debug', "inserted: reputation for user " + mentioned_user.username);   
-							channel.send('You gave reputation to <\@' + mentioned_user.id + '>');
+							logger.log('debug', "inserted: good boy points for user " + message.author.username);   
 						}
 					});
-				} 
-				else 
-				{
-					var datetimepassed = moment(lastrep);
-					datetimepassed.add(1, 'days');
-					channel.send('You have already given reputation, you can vote ' + datetimepassed.endOf('hour').fromNow());
 				}
-			})
-		}
-	} 
-	else 
-	{
-		var reputation = 0;
-		
-		let selectSQL = 'SELECT COUNT(*) AS count FROM reputation WHERE target_user_id = ' + user.id;
-		
-		db.get(selectSQL, [], (err, row) => {
-			if (err) {
-				throw err;
+				});
 			}
+		}
+	});
+}
+
+function upgradefarm(message)
+{
+	let selectSQL = 'SELECT * FROM farm WHERE user_id = ' + message.author.id;
+						
+	logger.info(selectSQL);
+				
+	db.get(selectSQL, [], (err, row) => {
+		if (err) {
+			throw err;
+		}
+		
+		if(!row)
+		{
+			message.channel.send('You do not have a farm. Create a farm with command farm ');
+		}
+		
+		if(row)
+		{
+			var costs = Math.pow(row['tier'] + 1, 2);
+			if(row['points'] < costs && row['tier'] < 10)
+			{
+				message.channel.send('You dont have the required ' + costs + ' point(s) to upgrade your farm');
+			}
+			else 
+			{
+				var editfarm = db.prepare('UPDATE farm SET tier = tier + 1, points = points - ? WHERE user_id = ?', [costs, message.author.id]);
+
+				editfarm.run(function(err){				
+				if(err)
+				{
+					logger.error("failed to update: farm for user " + message.author.username);
+					logger.error(err);
+				}
+				else
+				{
+					logger.log('debug', "updated: farm for user " + message.author.username); 
+					message.channel.send('You spend ' + costs + ' point and upgrade your farm');
+					printfarm(message);
+					
+					var insertrep = db.prepare('DELETE reputation (user_id, target_user_id, date) VALUES (?, ?, ?)', [bot.user.id, message.author.id, currenttime]);
 			
-			channel.send('You have have ' + row["count"] + ' reputation');
-		})
-	}
+					insertrep.run(function(err){				
+						if(err)
+						{
+							logger.error("failed to insert: good boy points for user " + message.author.username);
+							logger.error(err);
+						}
+						else
+						{
+							logger.log('debug', "inserted: good boy points for user " + message.author.username);   
+						}
+					});
+				}
+				});
+			}
+		}
+	});
+}
+
+function printfarm(message)
+{
+	let selectSQL = 'SELECT * FROM farm WHERE user_id = ' + message.author.id;
+						
+	logger.info(selectSQL);
+				
+	db.get(selectSQL, [], (err, row) => {
+		if (err) {
+			throw err;
+		}
+		
+		if(!row)
+		{
+			var insert = db.prepare('INSERT INTO farm (user_id, yield, time, planted_at) VALUES (?,?,?,?)', message.author.id, 3, 5 * 60 * 1000, new Date())
+			
+			insert.run(function(err){				
+				if(err)
+				{
+					logger.error("failed to insert: farm for user " + message.author.username);
+					logger.error(err);
+				}
+				else
+				{
+					logger.log('debug', "inserted: farm for user " + message.author.username);   
+					printfarm(message);
+				}
+			});
+		}
+		
+		if(row)
+		{
+			var planted_at = moment(row["planted_at"]);
+			timepassed = moment.duration(moment().diff(planted_at));
+			
+			var time = row['time'];
+			var yield = row['yield'];
+			var tier = row['tier']
+			
+			var growth = timepassed.asMilliseconds()/time;
+			growth = Math.floor(growth)
+			
+			if(growth > yield)
+			{
+				growth = yield;
+			}
+			var ungrown = yield - growth;
+			
+			var result = "[";
+			
+			result += emoji['farm_tier_' + tier].repeat(growth);
+			result += emoji.seedling.repeat(ungrown);
+			result += ']';
+			
+			message.channel.send('Your good boy point farm: ')
+			message.channel.send(result)
+		}
+	});
 }
 
 function prune(user, amount = 1)
@@ -358,11 +574,11 @@ var helpMessage = `:robot: Current commands: :robot:
 \`emoji\`: turns your message into emojis 
 \`react\`: reacts to your post with emojis using the text you posted
 \`points\`: check how much good boy points you have acquired
-\`award @[person]\`: gives good boy points to a person
+\`award @[person]\`: gives good boy points to a person (does not cost points)
 \`farm\`: shows how your good boy point farm is doing
 \`farm harvest\`: harvest your good boy points
-\`farm upgrade\`: give 1 good boy point to make your farm produce 10% faster
-\`farm seed\`: give 1 good boy point to make your farm produce 10% more points
+\`farm upgrade\`: give 1 good boy point to make your farm produce 20% faster
+\`farm seed\`: give 1 good boy point to make your farm produce twice as much
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API

@@ -1,10 +1,3 @@
-CREATE TABLE `reputation` (
-	`date`	INTEGER NOT NULL DEFAULT (datetime(current_timestamp)),
-	`user_id`		INTEGER NOT NULL,
-	`target_user_id`	INTEGER NOT NULL,
-	PRIMARY KEY(`date`,`user_id`)
-);
-
 CREATE TABLE `images` (
 	`link`	TEXT NOT NULL UNIQUE,
 	`sub`	TEXT NOT NULL,
@@ -18,9 +11,11 @@ CREATE TABLE `idea` (
 );
 
 CREATE TABLE "farm" (
-	"used_id"	INTEGER NOT NULL UNIQUE,
-	"yield"	INTEGER NOT NULL,
-	"time"	INTEGER NOT NULL,
-	"planted_at"	INTEGER NOT NULL,
-	PRIMARY KEY("used_id")
+	"user_id"	INTEGER NOT NULL UNIQUE,
+	"yield"	INTEGER,
+	"tier"	INTEGER,
+	"time"	INTEGER,
+	"points"	INTEGER,
+	"planted_at"	INTEGER,
+	PRIMARY KEY("user_id")
 );
