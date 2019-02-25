@@ -16,7 +16,7 @@ module.exports = {
 function Farm(message) {
 	let selectSQL = 'SELECT * FROM farm WHERE user_id = ' + message.author.id;
 	
-	this.user = message.author;
+	this.owner = message.author;
 						
 	logger.info(selectSQL);
 	
@@ -146,21 +146,12 @@ Farm.prototype.harvest = async function(message) {
 		message.channel.send('Your good boy point farm after: ')
 		message.channel.send(afterresult)
 		message.channel.send('You gained ' + gain + ' good boy point(s)')
-		
-		var currenttime = new Date();
-		var editfarm = db.prepare('UPDATE farm SET planted_at = ?, points = points + ? WHERE user_id = ?', [currenttime, gain, message.author.id]);
 
-		editfarm.run(function(err){				
-			if(err)
-			{
-				logger.error("failed to update: farm for user " + message.author.username);
-				logger.error(err);
-			}
-			else
-			{
-				logger.log('debug', "updated: farm for user " + message.author.username);   
-			}
-		});
+		this.points += gain;
+		this.growth = 0;
+		this.ungrown = this.cropyield
+		this.planted_at = new Date();
+		this.save(true);
 	} 
 	else 
 	{
@@ -178,52 +169,58 @@ Farm.prototype.seed = async function(message) {
 	}
 	else 
 	{
-		var currenttime = new Date();
-
-		var editfarm = db.prepare('UPDATE farm SET yield = ?, points = points - ? WHERE user_id = ?', [++this.cropyield, this.seedcost, message.author.id]);
-
-		editfarm.run(function(err){				
-			if(err)
-			{
-				logger.error("failed to update: farm for user " + message.author.username);
-				logger.error(err);
-			}
-			else
-			{
-				logger.log('debug', "updated: farm for user " + message.author.username); 
-				message.channel.send('You spend ' + this.seedcost + ' point(s) and seeded your farm');
-				this.print(message);
-			}
-		}.bind(this));
+		this.cropyield++;
+		this.points -= this.seedcost;
+		
+		this.save();
+		this.print(message);
 	}
 }
 
 Farm.prototype.upgrade = async function(message) {
 	await this.promise;
 	
-	if(this.points < this.upgradecost && this.tier < 20)
+	if(this.points < this.upgradecost)
 	{
 		message.channel.send('You dont have the required ' + this.upgradecost + ' point(s) to upgrade your farm');
 	}
+	else if(this.tier > 20)
+	{
+		message.channel.send('Your farm is fully upgraded');
+	}
 	else 
 	{
-		var editfarm = db.prepare('UPDATE farm SET tier = tier + 1, points = points - ? WHERE user_id = ?', [this.upgradecost, message.author.id]);
-
-		editfarm.run(function(err){				
-			if(err)
-			{
-				logger.error("failed to update: farm for user " + message.author.username);
-				logger.error(err);
-			}
-			else
-			{
-				logger.log('debug', "updated: farm for user " + message.author.username); 
-				message.channel.send('You spend ' + this.upgradecost + ' point and upgrade your farm');
-				this.print(message);
-			}
-		}.bind(this));
+		this.tier++;
+		this.points -= this.upgradecost;
+		
+		this.save();
+		this.print(message);
 	}
 }
+
+Farm.prototype.save = async function(set_planted = false) {
+	await this.promise;
+	
+	var editfarm;
+	
+	if(!set_planted)
+		editfarm = db.prepare('UPDATE farm SET yield = ?, tier = ?, points = ? WHERE user_id = ?', [this.cropyield, this.tier, this.points, this.owner.id]);
+	else
+		editfarm = db.prepare('UPDATE farm SET yield = ?, tier = ?, points = ?, planted_at = ? WHERE user_id = ?', [this.cropyield, this.tier, this.points, this.planted_at, this.owner.id]);
+
+	editfarm.run(function(err){				
+		if(err)
+		{
+			logger.error("failed to update: farm for user " + this.owner.username);
+			logger.error(err);
+		}
+		else
+		{
+			logger.log('debug', "updated: farm for user " + this.owner.username); 
+		}
+	}.bind(this));
+}
+
 
 // Farm.prototype.func_name = async function(message) {
 //	await this.promise;
