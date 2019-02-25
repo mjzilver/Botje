@@ -225,26 +225,3 @@ Farm.prototype.save = async function(set_planted = false) {
 // Farm.prototype.func_name = async function(message) {
 //	await this.promise;
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
