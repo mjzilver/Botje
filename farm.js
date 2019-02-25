@@ -122,7 +122,8 @@ Farm.prototype.info = async function(message) {
 	message.channel.send(`Time to grow 1 crop: ${timeinmin}min
 Tier: ${this.tier} ${emoji['farm_tier_' + this.tier]}
 Cost to upgade: ${this.upgradecost} point(s)
-Cost to seed: ${this.seedcost} point(s)`)
+Cost to seed: ${this.seedcost} point(s)
+Your total: ${this.points} point(s)`)
 };
 
 Farm.prototype.harvest = async function(message) {
@@ -167,12 +168,17 @@ Farm.prototype.seed = async function(message) {
 	{
 		message.channel.send('You dont have the required ' + this.seedcost + ' point(s) to seed your farm');
 	}
+	else if(this.cropyield > 30)
+	{
+		message.channel.send('Your farm is fully seeded');
+	}
 	else 
 	{
 		this.cropyield++;
 		this.points -= this.seedcost;
 		
 		this.save();
+		message.channel.send(`You spend ${this.seedcost} point(s) and now have ${this.cropyield} amount of crops`)
 		this.print(message);
 	}
 }
@@ -194,6 +200,7 @@ Farm.prototype.upgrade = async function(message) {
 		this.points -= this.upgradecost;
 		
 		this.save();
+		message.channel.send(`You spend ${this.upgradecost} point(s) and now have tier ${this.tier} crops`)
 		this.print(message);
 	}
 }
