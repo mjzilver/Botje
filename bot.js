@@ -210,24 +210,36 @@ function checkPoints(message)
 
 function farm(message, arguments)
 {
-	var selectedfarm = Farm.init(message);
+	var mentioned_user = message.mentions.users.first();
+    var member = message.guild.member(mentioned_user);
+	
+	if(!member)
+	{
+		var selectedfarm = Farm.init(message.author);
+		
+		var channel = message.channel
 
-	switch(arguments[0]) {
-		case 'harvest':
-			selectedfarm.harvest(message)
-		break;
-		case 'seed':
-			selectedfarm.seed(message)
-		break;
-		case 'upgrade':
-			selectedfarm.upgrade(message)
-		break;
-		case 'info':
-			selectedfarm.info(message)
-		break;
-		default:
-			selectedfarm.print(message)
-		break;
+		switch(arguments[0]) {
+			case 'harvest':
+				selectedfarm.harvest(channel)
+			break;
+			case 'seed':
+				selectedfarm.seed(channel)
+			break;
+			case 'upgrade':
+				selectedfarm.upgrade(channel)
+			break;
+			case 'info':
+				selectedfarm.info(channel)
+			break;
+			default:
+				selectedfarm.print(channel)
+			break;
+		}
+	} 
+	else 
+	{
+
 	}
 }
 
