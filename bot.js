@@ -215,19 +215,10 @@ function farm(message, arguments)
 		case 'upgrade':
 			upgradefarm(message)
 		break;
-		case 'display':
-			displayfarm(message)
-		break;
 		default:
 			printfarm(message)
 		break;
 	}
-}
-
-function displayfarm(message)
-{
-	var farm = new Farm(message);
-	logger.info(farm.print());
 }
 
 function harvestfarm(message)
