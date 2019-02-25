@@ -11,6 +11,11 @@ var emoji = require('./emoji.json');
 var db = new sqlite3.Database("./discord.db")
 const { prefix } = require('./config.json');
 
+var Farm = require("./farm")
+
+// person as key -> message as value
+var imagesSent = [];
+
 // Configure logger settings
 var logger = new (winston.Logger)({
     transports: [
@@ -215,10 +220,78 @@ function farm(message, arguments)
 		case 'upgrade':
 			upgradefarm(message)
 		break;
+		case 'display':
+			displayfarm(message)
+		break;
+		case 'info':
+			infofarm(message)
+		break;
 		default:
 			printfarm(message)
 		break;
 	}
+}
+
+
+function displayfarm(message)
+{
+	var selectedfarm = Farm.init(message);
+	selectedfarm.print(message);
+}
+
+function infofarm(message)
+{
+	let selectSQL = 'SELECT * FROM farm WHERE user_id = ' + message.author.id;
+						
+	logger.info(selectSQL);
+				
+	db.get(selectSQL, [], (err, row) => {
+		if (err) {
+			throw err;
+		}
+		
+		if(!row)
+		{
+			message.channel.send('You do not have a farm. Create a farm with command farm ');
+		}
+		
+		if(row)
+		{
+			var planted_at = moment(row["planted_at"]);
+			var timepassed = moment.duration(moment().diff(planted_at));
+			
+			var time = row['time'];
+			var yield = row['yield'];
+			var tier = row['tier']
+			
+			var growth = timepassed.asMilliseconds()/time;
+			growth = Math.floor(growth)
+			
+			if(growth > yield)
+			{
+				growth = yield;
+			}
+			var ungrown = yield - growth;
+			
+			var result = "[";
+			
+			result += emoji['farm_tier_' + tier].repeat(growth);
+			result += emoji.seedling.repeat(ungrown);
+			result += ']';
+			
+			var timeinmin = moment.duration(time).asMinutes()
+			
+			var seedcost = Math.pow(yield-2, 2);
+			var upgradecost = Math.pow(tier + 1, 2);
+
+			message.channel.send('Your good boy point farm: ')
+			message.channel.send(result)
+			message.channel.send(`Time to grow 1 crop: ${timeinmin}min
+Tier: ${tier} ${emoji['farm_tier_' + tier]}
+Cost to upgade: ${upgradecost} point(s)
+Cost to seed: ${seedcost} point(s)`)
+		}
+	});
 }
 
 function harvestfarm(message)
@@ -329,31 +402,17 @@ function seedfarm(message)
 				var editfarm = db.prepare('UPDATE farm SET yield = ?, points = points - ? WHERE user_id = ?', [++yield, costs, message.author.id]);
 
 				editfarm.run(function(err){				
-				if(err)
-				{
-					logger.error("failed to update: farm for user " + message.author.username);
-					logger.error(err);
-				}
-				else
-				{
-					logger.log('debug', "updated: farm for user " + message.author.username); 
-					message.channel.send('You spend ' + costs + ' point and seeded your farm');
-					printfarm(message);
-					
-					var insertrep = db.prepare('DELETE reputation (user_id, target_user_id, date) VALUES (?, ?, ?)', [bot.user.id, message.author.id, currenttime]);
-			
-					insertrep.run(function(err){				
-						if(err)
-						{
-							logger.error("failed to insert: good boy points for user " + message.author.username);
-							logger.error(err);
-						}
-						else
-						{
-							logger.log('debug', "inserted: good boy points for user " + message.author.username);   
-						}
-					});
-				}
+					if(err)
+					{
+						logger.error("failed to update: farm for user " + message.author.username);
+						logger.error(err);
+					}
+					else
+					{
+						logger.log('debug', "updated: farm for user " + message.author.username); 
+						message.channel.send('You spend ' + costs + ' point(s) and seeded your farm');
+						printfarm(message);
+					}
 				});
 			}
 		}
@@ -388,31 +447,18 @@ function upgradefarm(message)
 				var editfarm = db.prepare('UPDATE farm SET tier = tier + 1, points = points - ? WHERE user_id = ?', [costs, message.author.id]);
 
 				editfarm.run(function(err){				
-				if(err)
-				{
-					logger.error("failed to update: farm for user " + message.author.username);
-					logger.error(err);
-				}
-				else
-				{
-					logger.log('debug', "updated: farm for user " + message.author.username); 
-					message.channel.send('You spend ' + costs + ' point and upgrade your farm');
-					printfarm(message);
-					
-					var insertrep = db.prepare('DELETE reputation (user_id, target_user_id, date) VALUES (?, ?, ?)', [bot.user.id, message.author.id, currenttime]);
-			
-					insertrep.run(function(err){				
-						if(err)
-						{
-							logger.error("failed to insert: good boy points for user " + message.author.username);
-							logger.error(err);
-						}
-						else
-						{
-							logger.log('debug', "inserted: good boy points for user " + message.author.username);   
-						}
-					});
-				}
+					if(err)
+					{
+						logger.error("failed to update: farm for user " + message.author.username);
+						logger.error(err);
+					}
+					else
+					{
+						logger.log('debug', "updated: farm for user " + message.author.username); 
+						message.channel.send('You spend ' + costs + ' point and upgrade your farm');
+						printfarm(message);
+						
+					}
 				});
 			}
 		}
@@ -579,6 +625,7 @@ var helpMessage = `:robot: Current commands: :robot:
 \`farm harvest\`: harvest your good boy points
 \`farm upgrade\`: give some points to upgrade your plants to produce one more point per plant
 \`farm seed\`: give some points to plant an extra plant on your farm
+\`farm info\`: displays information about your farm including upgrade costs and grow time
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
