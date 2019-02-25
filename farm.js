@@ -7,16 +7,16 @@ var db = new sqlite3.Database("./discord.db")
 
 
 module.exports = {
-    init: function(message) {
-        var farm = new Farm(message)
+    init: function(user) {
+        var farm = new Farm(user)
         return farm
     }
 }
 
-function Farm(message) {
-	let selectSQL = 'SELECT * FROM farm WHERE user_id = ' + message.author.id;
+function Farm(user) {
+	let selectSQL = 'SELECT * FROM farm WHERE user_id = ' + user.id;
 	
-	this.owner = message.author;
+	this.owner = user;
 						
 	logger.info(selectSQL);
 	
@@ -29,7 +29,7 @@ function Farm(message) {
 			
 			if(!row)
 			{
-				create(message);
+				create(user);
 				
 				resolve();
 			}
@@ -37,24 +37,11 @@ function Farm(message) {
 			if(row)
 			{
 				this.planted_at = moment(row["planted_at"]);
-				var timepassed = moment.duration(moment().diff(this.planted_at));
 				
 				this.time = row['time'];
 				this.cropyield = row['yield'];
 				this.tier = row['tier']
 				this.points = row['points']
-				
-				this.growth = timepassed.asMilliseconds()/this.time;
-				this.growth = Math.floor(this.growth)
-				
-				if(this.growth > this.cropyield)
-				{
-					this.growth = this.cropyield;
-				}
-				this.ungrown = this.cropyield - this.growth;	
-				
-				this.seedcost = Math.pow(this.cropyield-2, 2);
-				this.upgradecost = Math.pow(this.tier + 1, 2);
 				
 				resolve();
 			}
@@ -62,146 +49,162 @@ function Farm(message) {
 	});
 }
 
-Farm.prototype.create = function(message) {
-	var insert = db.prepare('INSERT INTO farm (user_id, yield, time, planted_at) VALUES (?,?,?,?)', message.author.id, 3, 5 * 60 * 1000, new Date())
+Farm.prototype.seedcost = function(message) {
+	return Math.pow(this.cropyield - 2, 2);
+}
+
+Farm.prototype.upgradecost = function(message) {
+	return Math.pow(this.tier + 1, 2)
+}
+
+Farm.prototype.growth = function(message) {
+	var timepassed = moment.duration(moment().diff(this.planted_at));
+	var grownplants = timepassed.asMilliseconds()/this.time;
+	
+	grownplants = Math.floor(grownplants)
+				
+	if(grownplants > this.cropyield)
+	{
+		grownplants = this.cropyield;
+	}
+	return grownplants;
+}
+
+Farm.prototype.ungrown = function(message) {
+	return this.cropyield - this.growth();
+}
+
+
+Farm.prototype.create = function(user) {
+	var insert = db.prepare('INSERT INTO farm (user_id, yield, time, planted_at) VALUES (?,?,?,?)', user.id, 3, 5 * 60 * 1000, new Date())
 
 	insert.run(function(err){				
 		if(err)
 		{
-			logger.error("failed to insert: farm for user " + message.author.username);
+			logger.error("failed to insert: farm for user " + user.username);
 			logger.error(err);
 		}
 		else
 		{
-			logger.log('debug', "inserted: farm for user " + message.author.username);   
+			logger.log('debug', "inserted: farm for user " + user.username);   
 			
 			
 			this.planted_at = new Date();
-			var timepassed = moment.duration(moment().diff(this.planted_at));
 			
 			this.time = 5 * 60 * 1000
 			this.cropyield = 3
 			this.tier = 0
-			
-			this.growth = timepassed.asMilliseconds()/this.time;
-			this.growth = 0
-			this.ungrown = this.cropyield
-			
-			this.seedcost = Math.pow(this.cropyield-2, 2);
-			this.upgradecost = Math.pow(this.tier + 1, 2);
 		}
 	});
 }
 
-Farm.prototype.print = async function(message) {
+Farm.prototype.print = async function(channel) {
 	await this.promise;
 	
 	var result = "[";
 	
-	result += emoji['farm_tier_' + this.tier].repeat(this.growth);
-	result += emoji.seedling.repeat(this.ungrown);
+	result += emoji['farm_tier_' + this.tier].repeat(this.growth());
+	result += emoji.seedling.repeat(this.ungrown());
 	result += ']';
 	
-	message.channel.send('Your good boy point farm: ')
-	message.channel.send(result)
+	channel.send('Your good boy point farm: ')
+	channel.send(result)
 };
 
-Farm.prototype.info = async function(message) {
+Farm.prototype.info = async function(channel) {
 	await this.promise;
 	
 	var result = "[";
 	
-	result += emoji['farm_tier_' + this.tier].repeat(this.growth);
-	result += emoji.seedling.repeat(this.ungrown);
+	result += emoji['farm_tier_' + this.tier].repeat(this.growth());
+	result += emoji.seedling.repeat(this.ungrown());
 	result += ']';
 	
 	var timeinmin = moment.duration(this.time).asMinutes()
 
-	message.channel.send('Your good boy point farm: ')
-	message.channel.send(result)
-	message.channel.send(`Time to grow 1 crop: ${timeinmin}min
+	channel.send('Your good boy point farm: ')
+	channel.send(result)
+	channel.send(`Time to grow 1 crop: ${timeinmin}min
 Tier: ${this.tier} ${emoji['farm_tier_' + this.tier]}
-Cost to upgade: ${this.upgradecost} point(s)
-Cost to seed: ${this.seedcost} point(s)
+Cost to upgade: ${this.upgradecost()} point(s)
+Cost to seed: ${this.seedcost()} point(s)
 Your total: ${this.points} point(s)`)
 };
 
-Farm.prototype.harvest = async function(message) {
+Farm.prototype.harvest = async function(channel) {
 	await this.promise;
 	
 	var result = "[";
 	var afterresult = "["
 	
-	result += emoji['farm_tier_' + this.tier].repeat(this.growth);
-	result += emoji.seedling.repeat(this.ungrown);
+	result += emoji['farm_tier_' + this.tier].repeat(this.growth());
+	result += emoji.seedling.repeat(this.ungrown());
 	afterresult += emoji.seedling.repeat(this.cropyield);
 	result += ']';
 	afterresult += ']';
 	
-	if(this.growth !== 0)
+	if(this.growth() !== 0)
 	{
-		var gain = this.growth * (this.tier + 1);
+		var gain = this.growth() * (this.tier + 1);
 		
-		message.channel.send('Your good boy point farm before: ')
-		message.channel.send(result)
-		message.channel.send('Your good boy point farm after: ')
-		message.channel.send(afterresult)
-		message.channel.send('You gained ' + gain + ' good boy point(s)')
+		channel.send('Your good boy point farm before: ')
+		channel.send(result)
+		channel.send('Your good boy point farm after: ')
+		channel.send(afterresult)
+		channel.send('You gained ' + gain + ' good boy point(s)')
 
 		this.points += gain;
-		this.growth = 0;
-		this.ungrown = this.cropyield
 		this.planted_at = new Date();
 		this.save(true);
 	} 
 	else 
 	{
-		message.channel.send('Your good boy point farm: ')
-		message.channel.send(result)
+		channel.send('Your good boy point farm: ')
+		channel.send(result)
 	}
 }
 
-Farm.prototype.seed = async function(message) {
+Farm.prototype.seed = async function(channel) {
 	await this.promise;
 	
-	if(this.points < this.seedcost)
+	if(this.points < this.seedcost())
 	{
-		message.channel.send('You dont have the required ' + this.seedcost + ' point(s) to seed your farm');
+		channel.send('You dont have the required ' + this.seedcost() + ' point(s) to seed your farm');
 	}
 	else if(this.cropyield > 30)
 	{
-		message.channel.send('Your farm is fully seeded');
+		channel.send('Your farm is fully seeded');
 	}
 	else 
 	{
 		this.cropyield++;
-		this.points -= this.seedcost;
+		this.points -= this.seedcost();
 		
 		this.save();
-		message.channel.send(`You spend ${this.seedcost} point(s) and now have ${this.cropyield} amount of crops`)
-		this.print(message);
+		channel.send(`You spend ${this.seedcost()} point(s) and now have ${this.cropyield} crop growing`)
+		this.print(channel);
 	}
 }
 
-Farm.prototype.upgrade = async function(message) {
+Farm.prototype.upgrade = async function(channel) {
 	await this.promise;
 	
-	if(this.points < this.upgradecost)
+	if(this.points < this.upgradecost())
 	{
-		message.channel.send('You dont have the required ' + this.upgradecost + ' point(s) to upgrade your farm');
+		channel.send('You dont have the required ' + this.upgradecost() + ' point(s) to upgrade your farm');
 	}
 	else if(this.tier > 20)
 	{
-		message.channel.send('Your farm is fully upgraded');
+		channel.send('Your farm is fully upgraded');
 	}
 	else 
 	{
 		this.tier++;
-		this.points -= this.upgradecost;
+		this.points -= this.upgradecost();
 		
 		this.save();
-		message.channel.send(`You spend ${this.upgradecost} point(s) and now have tier ${this.tier} crops`)
-		this.print(message);
+		channel.send(`You spend ${this.upgradecost()} point(s) and now have tier ${this.tier} crops`)
+		this.print(channel);
 	}
 }
 
@@ -228,7 +231,7 @@ Farm.prototype.save = async function(set_planted = false) {
 	}.bind(this));
 }
 
-
+// easy to copy for extra functions
 // Farm.prototype.func_name = async function(message) {
 //	await this.promise;
 // }
