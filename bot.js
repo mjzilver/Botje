@@ -11,9 +11,6 @@ var emoji = require('./emoji.json');
 var db = new sqlite3.Database("./discord.db")
 const { prefix } = require('./config.json');
 
-// person as key -> message as value
-var imagesSent = [];
-
 // Configure logger settings
 var logger = new (winston.Logger)({
     transports: [
@@ -218,10 +215,19 @@ function farm(message, arguments)
 		case 'upgrade':
 			upgradefarm(message)
 		break;
+		case 'display':
+			displayfarm(message)
+		break;
 		default:
 			printfarm(message)
 		break;
 	}
+}
+
+function displayfarm(message)
+{
+	var farm = new Farm(message);
+	logger.info(farm.print());
 }
 
 function harvestfarm(message)
@@ -243,7 +249,7 @@ function harvestfarm(message)
 		if(row)
 		{			
 			var planted_at = moment(row["planted_at"]);
-			timepassed = moment.duration(moment().diff(planted_at));
+			var timepassed = moment.duration(moment().diff(planted_at));
 			
 			var time = row['time'];
 			var yield = row['yield'];
@@ -454,7 +460,7 @@ function printfarm(message)
 		if(row)
 		{
 			var planted_at = moment(row["planted_at"]);
-			timepassed = moment.duration(moment().diff(planted_at));
+			var timepassed = moment.duration(moment().diff(planted_at));
 			
 			var time = row['time'];
 			var yield = row['yield'];
@@ -578,11 +584,10 @@ var helpMessage = `:robot: Current commands: :robot:
 \`emoji\`: turns your message into emojis 
 \`react\`: reacts to your post with emojis using the text you posted
 \`points\`: check how much good boy points you have acquired
-\`award @[person]\`: gives good boy points to a person (does not cost points)
 \`farm\`: shows how your good boy point farm is doing
 \`farm harvest\`: harvest your good boy points
-\`farm upgrade\`: give 1 good boy point to make your farm produce 20% faster
-\`farm seed\`: give 1 good boy point to make your farm produce twice as much
+\`farm upgrade\`: give some points to upgrade your plants to produce one more point per plant
+\`farm seed\`: give some points to plant an extra plant on your farm
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
