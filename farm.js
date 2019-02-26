@@ -128,7 +128,7 @@ Farm.prototype.create = function(user) {
 	});
 }
 
-Farm.prototype.print = async function(channel, isowner = true) {
+Farm.prototype.print = async function(channel) {
 	await this.promise;
 	
 	var result = "[";
