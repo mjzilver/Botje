@@ -213,12 +213,12 @@ function farm(message, arguments)
 	var mentioned_user = message.mentions.users.first();
     var member = message.guild.member(mentioned_user);
 	
+	var channel = message.channel
+	
 	if(!member)
 	{
 		var selectedfarm = Farm.init(message.author);
 		
-		var channel = message.channel
-
 		switch(arguments[0]) {
 			case 'harvest':
 				selectedfarm.harvest(channel)
@@ -232,6 +232,9 @@ function farm(message, arguments)
 			case 'info':
 				selectedfarm.info(channel)
 			break;
+			case 'rename':
+				selectedfarm.editnickname(channel, arguments.slice(1).join(' '))
+			break;
 			default:
 				selectedfarm.print(channel)
 			break;
@@ -239,7 +242,8 @@ function farm(message, arguments)
 	} 
 	else 
 	{
-
+		var selectedfarm = Farm.init(mentioned_user);
+		selectedfarm.print(channel, false)
 	}
 }
 
