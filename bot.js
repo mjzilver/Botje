@@ -243,7 +243,7 @@ function farm(message, arguments)
 	else 
 	{
 		var selectedfarm = Farm.init(mentioned_user);
-		selectedfarm.print(channel, false)
+		selectedfarm.print(channel)
 	}
 }
 
