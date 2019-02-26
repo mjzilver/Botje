@@ -29,7 +29,7 @@ function Farm(user) {
 			
 			if(!row)
 			{
-				create(user);
+				this.create(user);
 				
 				resolve();
 			}
@@ -42,6 +42,12 @@ function Farm(user) {
 				this.cropyield = row['yield'];
 				this.tier = row['tier']
 				this.points = row['points']
+				this.farmname = row['farmname']
+								
+				if(!this.farmname)
+					this.farmname = "good boy points"
+				
+				logger.info(`Accessed Farm ::: user ${this.owner.username}, farm name ${this.farmname}, points ${this.points}, tier ${this.tier}, yield ${this.cropyield}, `)
 				
 				resolve();
 			}
@@ -49,15 +55,15 @@ function Farm(user) {
 	});
 }
 
-Farm.prototype.seedcost = function(message) {
+Farm.prototype.seedcost = function() {
 	return Math.pow(this.cropyield - 2, 2);
 }
 
-Farm.prototype.upgradecost = function(message) {
+Farm.prototype.upgradecost = function() {
 	return Math.pow(this.tier + 1, 2)
 }
 
-Farm.prototype.growth = function(message) {
+Farm.prototype.growth = function() {
 	var timepassed = moment.duration(moment().diff(this.planted_at));
 	var grownplants = timepassed.asMilliseconds()/this.time;
 	
@@ -70,10 +76,34 @@ Farm.prototype.growth = function(message) {
 	return grownplants;
 }
 
-Farm.prototype.ungrown = function(message) {
+Farm.prototype.ungrown = function() {
 	return this.cropyield - this.growth();
 }
 
+Farm.prototype.editnickname = async function(channel, name) {
+	await this.promise;
+	
+	if(name)
+	{
+		if(name.length > 30)
+		{
+			channel.send(`You chosen name is too long`)
+		}
+		else 
+		{
+			var oldname = this.farmname
+			this.farmname = name
+			
+			channel.send(`Changed your farm's name from: ${oldname} to ${this.farmname}`)
+			
+			this.save();
+		}
+	} 
+	else 
+	{
+		channel.send(`You need to input a name`)
+	}
+}
 
 Farm.prototype.create = function(user) {
 	var insert = db.prepare('INSERT INTO farm (user_id, yield, time, planted_at) VALUES (?,?,?,?)', user.id, 3, 5 * 60 * 1000, new Date())
@@ -98,7 +128,7 @@ Farm.prototype.create = function(user) {
 	});
 }
 
-Farm.prototype.print = async function(channel) {
+Farm.prototype.print = async function(channel, isowner = true) {
 	await this.promise;
 	
 	var result = "[";
@@ -107,7 +137,7 @@ Farm.prototype.print = async function(channel) {
 	result += emoji.seedling.repeat(this.ungrown());
 	result += ']';
 	
-	channel.send('Your good boy point farm: ')
+	channel.send(`${this.owner.username}'s ${this.farmname} farm: `)
 	channel.send(result)
 };
 
@@ -122,11 +152,11 @@ Farm.prototype.info = async function(channel) {
 	
 	var timeinmin = moment.duration(this.time).asMinutes()
 
-	channel.send('Your good boy point farm: ')
+	channel.send(`${this.owner.username}'s ${this.farmname} farm: `)
 	channel.send(result)
 	channel.send(`Time to grow 1 crop: ${timeinmin}min
 Tier: ${this.tier} ${emoji['farm_tier_' + this.tier]}
-Cost to upgade: ${this.upgradecost()} point(s)
+Cost to upgrade: ${this.upgradecost()} point(s)
 Cost to seed: ${this.seedcost()} point(s)
 Your total: ${this.points} point(s)`)
 };
@@ -147,11 +177,11 @@ Farm.prototype.harvest = async function(channel) {
 	{
 		var gain = this.growth() * (this.tier + 1);
 		
-		channel.send('Your good boy point farm before: ')
+		channel.send(`${this.owner.username}'s ${this.farmname} farm before: `)
 		channel.send(result)
-		channel.send('Your good boy point farm after: ')
+		channel.send(`${this.owner.username}'s ${this.farmname} farm after: `)
 		channel.send(afterresult)
-		channel.send('You gained ' + gain + ' good boy point(s)')
+		channel.send(`You gained ${gain} good boy point(s)`)
 
 		this.points += gain;
 		this.planted_at = new Date();
@@ -159,7 +189,7 @@ Farm.prototype.harvest = async function(channel) {
 	} 
 	else 
 	{
-		channel.send('Your good boy point farm: ')
+		channel.send(`${this.owner.username}'s ${this.farmname} farm: `)
 		channel.send(result)
 	}
 }
@@ -177,12 +207,13 @@ Farm.prototype.seed = async function(channel) {
 	}
 	else 
 	{
-		this.cropyield++;
 		this.points -= this.seedcost();
 		
-		this.save();
-		channel.send(`You spend ${this.seedcost()} point(s) and now have ${this.cropyield} crop growing`)
+		channel.send(`You spend ${this.seedcost()} point(s) and now have ${this.cropyield + 1} crop growing`)
+		
 		this.print(channel);
+		this.cropyield++;
+		this.save();
 	}
 }
 
@@ -199,24 +230,27 @@ Farm.prototype.upgrade = async function(channel) {
 	}
 	else 
 	{
-		this.tier++;
 		this.points -= this.upgradecost();
 		
-		this.save();
-		channel.send(`You spend ${this.upgradecost()} point(s) and now have tier ${this.tier} crops`)
+		channel.send(`You spend ${this.upgradecost()} point(s) and now have tier ${this.tier + 1} crops`)
+		
 		this.print(channel);
+		this.tier++;
+		this.save();
 	}
 }
 
 Farm.prototype.save = async function(set_planted = false) {
 	await this.promise;
 	
+	logger.info(`Updated Farm ::: user ${this.owner.username}, farm name ${this.farmname}, points ${this.points}, tier ${this.tier}, yield ${this.cropyield}, `)
+
 	var editfarm;
 	
 	if(!set_planted)
-		editfarm = db.prepare('UPDATE farm SET yield = ?, tier = ?, points = ? WHERE user_id = ?', [this.cropyield, this.tier, this.points, this.owner.id]);
+		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ? WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.owner.id]);
 	else
-		editfarm = db.prepare('UPDATE farm SET yield = ?, tier = ?, points = ?, planted_at = ? WHERE user_id = ?', [this.cropyield, this.tier, this.points, this.planted_at, this.owner.id]);
+		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ?, planted_at = ? WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.planted_at, this.owner.id]);
 
 	editfarm.run(function(err){				
 		if(err)
@@ -235,3 +269,20 @@ Farm.prototype.save = async function(set_planted = false) {
 // Farm.prototype.func_name = async function(message) {
 //	await this.promise;
 // }
+
+/*
+ TODO features:
+ 
+ Raiding: steal from others
+ Guard: hire a guard to repel thiefs
+ 
+ Natural disaster proc chance (every hour? 5 minutes?)
+ 
+ Someway to reward more harvest per time
+ 
+ Events: - 
+ 
+ Farm animals: eat crops but produce more?
+ Farm hands: harvest crops?
+
+*/
