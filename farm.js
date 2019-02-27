@@ -1,10 +1,43 @@
-var logger = require('winston');
 var moment = require('moment');
 const sqlite3 = require('sqlite3');
 
 var emoji = require('./emoji.json');
 var db = new sqlite3.Database("./discord.db")
+var FarmEvent = require("./farmevent")
 
+// Configure logger settings
+var winston = require('winston');
+
+var logger = new (winston.Logger)({
+    transports: [
+        new (winston.transports.Console)({
+            colorize: true,
+            level: 'debug'
+        }),
+        new (winston.transports.File)({
+            filename: 'bot.log',
+            level: 'debug'
+        })
+    ]
+});
+
+var fence_left = {
+	"0" : ":",
+	"1" : "|",
+	"2" : "<",
+	"3" : "(",
+	"4" : "{",
+	"5" : "["
+}
+
+var fence_right = {
+	"0" : ":",
+	"1" : "|",
+	"2" : ">",
+	"3" : ")",
+	"4" : "}",
+	"5" : "]"
+}
 
 module.exports = {
     init: function(user) {
@@ -38,16 +71,20 @@ function Farm(user) {
 			{
 				this.planted_at = moment(row["planted_at"]);
 				
+				this.id = row['id'];
+				this.user_tag = user.tag
+				this.user_id = BigInt(row['user_id'])
 				this.time = row['time'];
 				this.cropyield = row['yield'];
 				this.tier = row['tier']
 				this.points = row['points']
 				this.farmname = row['farmname']
+				this.fence_tier = row['fence_tier']
 								
 				if(!this.farmname)
 					this.farmname = "good boy points"
 				
-				logger.info(`Accessed Farm ::: user ${this.owner.username}, farm name ${this.farmname}, points ${this.points}, tier ${this.tier}, yield ${this.cropyield}, `)
+				logger.info(`Accessed Farm ::: user ${this.owner.username}, farm name ${this.farmname}, points ${this.points}, tier ${this.tier}, yield ${this.cropyield}, fence tier ${this.fence_tier}`)
 				
 				resolve();
 			}
@@ -61,6 +98,17 @@ Farm.prototype.seedcost = function() {
 
 Farm.prototype.upgradecost = function() {
 	return Math.pow(this.tier + 1, 2)
+}
+
+Farm.prototype.fencecost = function() {
+	return (this.fence_tier+1) * 25;
+}
+
+Farm.prototype.getseed = function() {
+	if(this.tier <= 20)
+		return emoji.seedling
+	else if (this.tier > 20)
+		return emoji.egg
 }
 
 Farm.prototype.growth = function() {
@@ -128,69 +176,98 @@ Farm.prototype.create = function(user) {
 	});
 }
 
-Farm.prototype.print = async function(channel) {
+Farm.prototype.print = async function(channel, extramessage = "") {
 	await this.promise;
 	
-	var result = "[";
+	var result = fence_left[this.fence_tier];
 	
 	result += emoji['farm_tier_' + this.tier].repeat(this.growth());
-	result += emoji.seedling.repeat(this.ungrown());
-	result += ']';
+	result += this.getseed().repeat(this.ungrown());
+	result += fence_right[this.fence_tier];
 	
-	channel.send(`${this.owner.username}'s ${this.farmname} farm: `)
+	channel.send(`${this.owner.username}'s ${this.farmname} farm${extramessage}: `)
 	channel.send(result)
 };
 
 Farm.prototype.info = async function(channel) {
 	await this.promise;
 	
-	var result = "[";
+	await this.print(channel);
 	
-	result += emoji['farm_tier_' + this.tier].repeat(this.growth());
-	result += emoji.seedling.repeat(this.ungrown());
-	result += ']';
-	
-	var timeinmin = moment.duration(this.time).asMinutes()
+	var timeinmin = this.time / 60 / 1000;
 
-	channel.send(`${this.owner.username}'s ${this.farmname} farm: `)
-	channel.send(result)
 	channel.send(`Time to grow 1 crop: ${timeinmin}min
 Tier: ${this.tier} ${emoji['farm_tier_' + this.tier]}
+Fence protection: ${this.fence_tier * 10}% protection
 Cost to upgrade: ${this.upgradecost()} point(s)
 Cost to seed: ${this.seedcost()} point(s)
-Your total: ${this.points} point(s)`)
+Cost to upgrade fence: ${this.fencecost()} point(s)
+Total: ${this.points} point(s)`)
+};
+
+Farm.prototype.hire = async function(channel, amount) {
+	await this.promise;
+	
+	if(!amount || isNaN(amount))
+	{
+		channel.send('You need to enter an amount')
+	} else 
+	{
+		if(this.points < amount * 10)
+		{
+			channel.send(`You dont have the required ${amount * 10} point(s) to hire a farmhand for ${amount} of harvests`);
+		} 
+		else 
+		{
+			var farmevent = FarmEvent.init("hire", this.user_id, this.user_id, amount, 1)
+			channel.send(`You hired a farmhand on your ${this.farmname} farm for ${amount} of harvests`)
+		}
+	}
 };
 
 Farm.prototype.harvest = async function(channel) {
 	await this.promise;
 	
-	var result = "[";
-	var afterresult = "["
-	
-	result += emoji['farm_tier_' + this.tier].repeat(this.growth());
-	result += emoji.seedling.repeat(this.ungrown());
-	afterresult += emoji.seedling.repeat(this.cropyield);
-	result += ']';
-	afterresult += ']';
+	await this.print(channel, " before");
 	
 	if(this.growth() !== 0)
 	{
 		var gain = this.growth() * (this.tier + 1);
 		
-		channel.send(`${this.owner.username}'s ${this.farmname} farm before: `)
-		channel.send(result)
-		channel.send(`${this.owner.username}'s ${this.farmname} farm after: `)
-		channel.send(afterresult)
-		channel.send(`You gained ${gain} good boy point(s)`)
-
 		this.points += gain;
 		this.planted_at = new Date();
-		this.save(true);
+		await this.save(true);
+		await this.print(channel, " after");
+		
+		channel.send(`You gained ${gain} good boy point(s)`)
 	} 
 	else 
 	{
 		channel.send(`${this.owner.username}'s ${this.farmname} farm: `)
 		channel.send(result)
+	}
+}
+
+Farm.prototype.upgradefence = async function(channel) {
+	await this.promise;
+	
+	if(this.points < this.fencecost())
+	{
+		channel.send(`You dont have the required ${this.fencecost()} point(s) to upgrade your farm's fence`);
+	}
+	else if(this.fence_tier >= 5)
+	{
+		channel.send('Your fence is fully upgraded');
+	}
+	else 
+	{
+		this.points -= this.fencecost();
+		
+		channel.send(`You spend ${this.fencecost()} point(s) and now a ${this.fence_tier + 1} tier fence`)
+		
+		this.print(channel);
+		this.fence_tier++;
+		this.save();
 	}
 }
 
@@ -201,7 +278,7 @@ Farm.prototype.seed = async function(channel) {
 	{
 		channel.send('You dont have the required ' + this.seedcost() + ' point(s) to seed your farm');
 	}
-	else if(this.cropyield > 30)
+	else if(this.cropyield > 50)
 	{
 		channel.send('Your farm is fully seeded');
 	}
@@ -224,7 +301,7 @@ Farm.prototype.upgrade = async function(channel) {
 	{
 		channel.send('You dont have the required ' + this.upgradecost() + ' point(s) to upgrade your farm');
 	}
-	else if(this.tier > 20)
+	else if(this.tier > 75)
 	{
 		channel.send('Your farm is fully upgraded');
 	}
@@ -243,14 +320,14 @@ Farm.prototype.upgrade = async function(channel) {
 Farm.prototype.save = async function(set_planted = false) {
 	await this.promise;
 	
-	logger.info(`Updated Farm ::: user ${this.owner.username}, farm name ${this.farmname}, points ${this.points}, tier ${this.tier}, yield ${this.cropyield}, `)
+	logger.info(`Updated Farm ::: user ${this.owner.username}, farm name ${this.farmname}, points ${this.points}, tier ${this.tier}, yield ${this.cropyield}, fence tier ${this.fence_tier}`)
 
 	var editfarm;
 	
 	if(!set_planted)
-		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ? WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.owner.id]);
+		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ?, fence_tier = ?, user_tag = ? WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.fence_tier, this.user_tag, this.owner.id]);
 	else
-		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ?, planted_at = ? WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.planted_at, this.owner.id]);
+		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ?, planted_at = ?, fence_tier = ?, user_tag = ?  WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.planted_at, this.fence_tier, this.user_tag, this.owner.id]);
 
 	editfarm.run(function(err){				
 		if(err)
@@ -281,8 +358,4 @@ Farm.prototype.save = async function(set_planted = false) {
  Someway to reward more harvest per time
  
  Events: - 
- 
- Farm animals: eat crops but produce more?
- Farm hands: harvest crops?
-
 */
