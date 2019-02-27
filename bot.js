@@ -1,5 +1,4 @@
 var Discord = require('discord.js');
-var winston = require('winston');
 var fs = require('fs');
 var request = require('request');
 var moment = require('moment');
@@ -17,6 +16,8 @@ var Farm = require("./farm")
 var imagesSent = [];
 
 // Configure logger settings
+var winston = require('winston');
+
 var logger = new (winston.Logger)({
     transports: [
         new (winston.transports.Console)({
@@ -62,7 +63,7 @@ bot.on('message', message => {
 
         switch(command) {
             case 'help':
-				channel.send(helpMessage);
+				helpFunction(channel, args[0])
 			break;
 			case 'image':
                 getImage(message.author.username, channel, args[0]);
@@ -96,6 +97,18 @@ bot.on('message', message => {
         }
     }
 })
+
+function helpFunction(channel, arg)
+{
+	switch(arg) {
+		case 'farm':
+			channel.send(farmHelpMessage)
+		break;
+		default:
+			channel.send(helpMessage)
+		break;
+	}
+}
 
 async function ping(channel, message)
 {
@@ -229,6 +242,9 @@ function farm(message, arguments)
 			case 'upgrade':
 				selectedfarm.upgrade(channel)
 			break;
+			case 'fence':
+				selectedfarm.upgradefence(channel)
+			break;
 			case 'info':
 				selectedfarm.info(channel)
 			break;
@@ -243,7 +259,15 @@ function farm(message, arguments)
 	else 
 	{
 		var selectedfarm = Farm.init(mentioned_user);
-		selectedfarm.print(channel)
+		
+		switch(arguments[1]) {
+			case 'info':
+				selectedfarm.info(channel)
+			break;
+			default:
+				selectedfarm.print(channel)
+			break;
+		}
 	}
 }
 
@@ -344,12 +368,26 @@ var helpMessage = `:robot: Current commands: :robot:
 \`emoji\`: turns your message into emojis 
 \`react\`: reacts to your post with emojis using the text you posted
 \`points\`: check how much good boy points you have acquired
-\`farm\`: shows how your good boy point farm is doing
-\`farm harvest\`: harvest your good boy points
-\`farm upgrade\`: give some points to upgrade your plants to produce one more point per plant
-\`farm seed\`: give some points to plant an extra plant on your farm
-\`farm info\`: displays information about your farm including upgrade costs and grow time
+\`help farm \`: shows help for farm commands
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
 \`Current Version\`: ` + package.version;
+
+var farmHelpMessage = `:seedling: Current commands for farming: :seedling:  
+\`farm\`: shows how your good boy point farm is doing
+\`farm @person\`: shows how @person's good boy point farm is doing
+\`farm harvest\`: harvest your good boy points
+\`farm upgrade\`: give some points to upgrade your plants to produce one more point per plant
+\`farm seed\`: give some points to plant an extra plant on your farm
+\`farm info\`: displays information about your farm including upgrade costs and grow time
+\`farm rename\`: renames your farm (format "[username]'s [farm name] farm")
+\`farm fence\`: upgrades your fencing to a higher level
+\`Current Version\`: ` + package.version;
+
+
+/*
+\`farm hire [amount]\`: hires a farmhand to harvest your crop 
+		Active every 10 minutes for [amount] times
+		Costs 10 points per [amount] and takes 75% of the profit
+		*/
