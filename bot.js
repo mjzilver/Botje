@@ -1,5 +1,4 @@
 var Discord = require('discord.js');
-var winston = require('winston');
 var fs = require('fs');
 var request = require('request');
 var moment = require('moment');
@@ -12,11 +11,14 @@ var db = new sqlite3.Database("./discord.db")
 const { prefix } = require('./config.json');
 
 var Farm = require("./farm")
+var FarmEvent = require("./farmevent")
 
 // person as key -> message as value
 var imagesSent = [];
 
 // Configure logger settings
+var winston = require('winston');
+
 var logger = new (winston.Logger)({
     transports: [
         new (winston.transports.Console)({
@@ -37,6 +39,8 @@ bot.commands = new Discord.Collection();
 bot.on('ready', () => {
     logger.info('Connected');
     logger.info(`Logged in as: ${bot.user.username} - ${bot.user.id}`);
+	
+	//setInterval(farmEvents, 1 * 60 * 1000)
 });
 
 bot.login(auth.token);
@@ -62,7 +66,7 @@ bot.on('message', message => {
 
         switch(command) {
             case 'help':
-				channel.send(helpMessage);
+				helpFunction(channel, args[0])
 			break;
 			case 'image':
                 getImage(message.author.username, channel, args[0]);
@@ -97,10 +101,27 @@ bot.on('message', message => {
     }
 })
 
+function helpFunction(channel, arg)
+{
+	switch(arg) {
+		case 'farm':
+			channel.send(farmHelpMessage)
+		break;
+		default:
+			channel.send(helpMessage)
+		break;
+	}
+}
+
 async function ping(channel, message)
 {
     const m = await message.channel.send("Ping?");
     m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(bot.ping)}ms`);
+
+	logger.info(message.author.tag);
+	
+	farmEvents()
+
 }
 
 function getDogPicture(channel, breed = "")
@@ -229,8 +250,14 @@ function farm(message, arguments)
 			case 'upgrade':
 				selectedfarm.upgrade(channel)
 			break;
+			case 'fence':
+				selectedfarm.upgradefence(channel)
+			break;
 			case 'info':
 				selectedfarm.info(channel)
+			break;
+			case 'hire':
+				selectedfarm.hire(channel, arguments[1])
 			break;
 			case 'rename':
 				selectedfarm.editnickname(channel, arguments.slice(1).join(' '))
@@ -243,8 +270,53 @@ function farm(message, arguments)
 	else 
 	{
 		var selectedfarm = Farm.init(mentioned_user);
-		selectedfarm.print(channel)
+		
+		switch(arguments[1]) {
+			case 'info':
+				selectedfarm.info(channel)
+			break;
+			case 'raid':
+				/// ???
+			break;
+			default:
+				selectedfarm.print(channel)
+			break;
+		}
 	}
+}
+
+/*
+CREATE TABLE "farm_events" (
+	"target_farm_id"	INTEGER,
+	"author_farm_id"	INTEGER,
+	"type"	TEXT NOT NULL,
+	"amount"	INTEGER,
+	"started_at"	INTEGER,
+	"time"	INTEGER,
+	"repeating"	INTEGER DEFAULT 0,
+	"completed"	INTEGER DEFAULT 0,
+	PRIMARY KEY("target_farm_id","type")
+)
+*/
+
+function farmEvents()
+{
+	logger.info(`Events :: starting 10 minute farm events ::`)
+	
+	let selectSQL = 'SELECT * FROM farm_events';
+	
+	db.all(selectSQL, [], (err, rows) => {
+		if (err) {
+			throw err;
+		}
+		
+		rows.forEach(async (row) =>
+		{	
+			var farmevent = FarmEvent.init(row['type'], row['target_id'], row['author_id'], row['amount'], row['repeating'], false)
+				
+			farmevent.execute();
+		});
+	});
 }
 
 function prune(user, amount = 1)
@@ -344,12 +416,26 @@ var helpMessage = `:robot: Current commands: :robot:
 \`emoji\`: turns your message into emojis 
 \`react\`: reacts to your post with emojis using the text you posted
 \`points\`: check how much good boy points you have acquired
-\`farm\`: shows how your good boy point farm is doing
-\`farm harvest\`: harvest your good boy points
-\`farm upgrade\`: give some points to upgrade your plants to produce one more point per plant
-\`farm seed\`: give some points to plant an extra plant on your farm
-\`farm info\`: displays information about your farm including upgrade costs and grow time
+\`help farm \`: shows help for farm commands
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
 \`Current Version\`: ` + package.version;
+
+var farmHelpMessage = `:seedling: Current commands for farming: :seedling:  
+\`farm\`: shows how your good boy point farm is doing
+\`farm @person\`: shows how @person's good boy point farm is doing
+\`farm harvest\`: harvest your good boy points
+\`farm upgrade\`: give some points to upgrade your plants to produce one more point per plant
+\`farm seed\`: give some points to plant an extra plant on your farm
+\`farm info\`: displays information about your farm including upgrade costs and grow time
+\`farm rename\`: renames your farm (format "[username]'s [farm name] farm")
+\`farm fence\`: upgrades your fencing to a higher level
+\`Current Version\`: ` + package.version;
+
+
+/*
+\`farm hire [amount]\`: hires a farmhand to harvest your crop 
+		Active every 10 minutes for [amount] times
+		Costs 10 points per [amount] and takes 75% of the profit
+		*/
