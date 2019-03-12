@@ -38,6 +38,7 @@ bot.commands = new Discord.Collection();
 bot.on('ready', () => {
     logger.info('Connected');
     logger.info(`Logged in as: ${bot.user.username} - ${bot.user.id}`);
+	initializeDatabase();
 });
 
 bot.login(auth.token);
@@ -97,6 +98,13 @@ bot.on('message', message => {
         }
     }
 })
+
+function initializeDatabase()
+{
+	db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
+	db.run(`CREATE TABLE IF NOT EXISTS idea (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, idea TEXT)`)
+	db.run(`CREATE TABLE IF NOT EXISTS farm (user_id TEXT PRIMARY KEY UNIQUE, yield INTEGER, tier INTEGER, fence_tier INTEGER, time INTEGER, points INTEGER, planted_at INTEGER)`)
+}
 
 function helpFunction(channel, arg)
 {
