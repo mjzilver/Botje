@@ -257,7 +257,7 @@ Farm.prototype.seed = async function(channel) {
 	{
 		channel.send('You dont have the required ' + this.seedcost() + ' point(s) to seed your farm');
 	}
-	else if(this.cropyield > 50)
+	else if(this.cropyield >= 50)
 	{
 		channel.send('Your farm is fully seeded');
 	}
@@ -280,7 +280,7 @@ Farm.prototype.upgrade = async function(channel) {
 	{
 		channel.send('You dont have the required ' + this.upgradecost() + ' point(s) to upgrade your farm');
 	}
-	else if(this.tier > 75)
+	else if(this.tier >= 75)
 	{
 		channel.send('Your farm is fully upgraded');
 	}
@@ -304,9 +304,9 @@ Farm.prototype.save = async function(set_planted = false) {
 	var editfarm;
 	
 	if(!set_planted)
-		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ?, fence_tier = ?, user_tag = ? WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.fence_tier, this.user_tag, this.owner.id]);
+		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ?, fence_tier = ? WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.fence_tier, this.owner.id]);
 	else
-		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ?, planted_at = ?, fence_tier = ?, user_tag = ?  WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.planted_at, this.fence_tier, this.user_tag, this.owner.id]);
+		editfarm = db.prepare('UPDATE farm SET farmname = ?, yield = ?, tier = ?, points = ?, planted_at = ?, fence_tier = ? WHERE user_id = ?', [this.farmname, this.cropyield, this.tier, this.points, this.planted_at, this.fence_tier, this.owner.id]);
 
 	editfarm.run(function(err){				
 		if(err)
