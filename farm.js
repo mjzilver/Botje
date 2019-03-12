@@ -153,7 +153,7 @@ Farm.prototype.editnickname = async function(channel, name) {
 }
 
 Farm.prototype.create = function(user) {
-	var insert = db.prepare('INSERT INTO farm (user_id, yield, time, planted_at) VALUES (?,?,?,?)', user.id, 3, 5 * 60 * 1000, new Date())
+	var insert = db.prepare('INSERT INTO farm (user_id, points, tier, fence_tier, yield, time, planted_at) VALUES (?,?,?,?,?,?,?)', user.id, 1, 1, 1, 3, 5 * 60 * 1000, new Date())
 
 	insert.run(function(err){				
 		if(err)
@@ -171,6 +171,8 @@ Farm.prototype.create = function(user) {
 			this.time = 5 * 60 * 1000
 			this.cropyield = 3
 			this.tier = 0
+			this.points = 0
+			this.fence_tier = 0
 		}
 	});
 }
