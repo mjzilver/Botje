@@ -65,7 +65,7 @@ typings/
 
 
 # dont include the database
-discord.db
+# discord.db
 
 # dont include the log
 bot.log
