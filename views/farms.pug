@@ -11,6 +11,7 @@ block content
                 th(scope='col') Yield
                 th(scope='col') Tier
                 th(scope='col') Fence
+                th(scope='col') Points
             each val in list.length ? list : ['No Farms were found']
                 tr
                     td= val.owner.username + "'s " + val.farmname + " farm"
@@ -18,3 +19,4 @@ block content
                     td= val.cropyield
                     td= val.tier
                     td= val.fence_tier
+                    td= val.points
