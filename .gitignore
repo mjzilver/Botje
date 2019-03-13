@@ -65,7 +65,10 @@ typings/
 
 
 # dont include the database
-# discord.db
+discord.db
 
 # dont include the log
 bot.log
+
+# dont include the token
+auth.json
