@@ -19,8 +19,7 @@ var Farm = require("./farm")
 var imagesSent = [];
 
 // Initialize Discord Bot
-var bot = new Discord.Client({autoReconnect:true});
-bot.commands = new Discord.Collection();
+var bot = global.bot
 
 bot.on('ready', () => {
     logger.info('Connected');
@@ -32,10 +31,6 @@ bot.login(config.token);
 
 bot.on('error', function (error) {
 	logger.error(error);
-});
-
-process.on('uncaughtException', function (error) {
-   logger.error(error);
 });
 
 bot.on('message', message => {

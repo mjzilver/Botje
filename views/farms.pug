@@ -1,0 +1,20 @@
+extends layout
+
+block content
+    div(class='jumbotron')
+        h3 Farms
+    <br/>
+    table(class='table table-striped')
+            thead(class='thead-light')
+                th(scope='col') Farm name
+                th(scope='col') Overview
+                th(scope='col') Yield
+                th(scope='col') Tier
+                th(scope='col') Fence
+            each val in list.length ? list : ['No Farms were found']
+                tr
+                    td= val.owner.username + "'s " + val.farmname + " farm"
+                    td= val.display()
+                    td= val.cropyield
+                    td= val.tier
+                    td= val.fence_tier
