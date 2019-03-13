@@ -3,11 +3,17 @@ var request = require('request');
 const sqlite3 = require('sqlite3');
 var logger = require('winston').loggers.get('logger');
 
-var auth = require('./auth.json');
+var dev = true;
+var config;
+
+if(dev)
+	config = require('./devconfig.json');
+else 
+	config = require('./config.json');
+
 var package = require('./package.json');
 var emoji = require('./emoji.json');
 var db = new sqlite3.Database("./discord.db")
-const { prefix } = require('./config.json');
 
 var Farm = require("./farm")
 
@@ -24,7 +30,7 @@ bot.on('ready', () => {
 	initializeDatabase();
 });
 
-bot.login(auth.token);
+bot.login(config.token);
 
 bot.on('error', function (error) {
 	logger.error(error);
@@ -38,8 +44,8 @@ bot.on('message', message => {
 	var channel = message.channel
 	
     // look for the b! meaning bot command
-    if (message.content.match(new RegExp(prefix,"i"))) {
-		message.content = message.content.replace(new RegExp(prefix,"i"), '');
+    if (message.content.match(new RegExp(config.prefix,"i"))) {
+		message.content = message.content.replace(new RegExp(config.prefix,"i"), '');
        	const args = message.content.split(' ');
 		const command = args.shift().toLowerCase();
 		
@@ -277,7 +283,7 @@ function getImage(user, channel, sub, page = 0)
 		//https://api.imgur.com/3/gallery/r/{{subreddit}}/{{sort}}/{{window}}/{{page}}
 		url: 'https://api.imgur.com/3/gallery/r/'+sub+'/hot/day/' + page,
 		headers: {
-			'Authorization': 'Client-ID ' + auth.imgur
+			'Authorization': 'Client-ID ' + config.imgur
 		},
 		json: true
 	};
@@ -363,6 +369,7 @@ var helpMessage = `:robot: Current commands: :robot:
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
+\`http://128.199.52.87:1500/\`: visit Botje's website (no domain-name that costs money)
 \`Current Version\`: ` + package.version;
 
 var farmHelpMessage = `:seedling: Current commands for farming: :seedling:  
