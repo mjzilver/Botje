@@ -60,16 +60,5 @@ typings/
 # next.js build output
 .next
 
-
-
-
-
-# dont include the database
-discord.db
-
 # dont include the log
 bot.log
-
-# dont include the token
-auth.json
-config.json
