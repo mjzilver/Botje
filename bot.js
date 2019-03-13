@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3');
 var logger = require('winston').loggers.get('logger');
 
 var dev = false;
+var dev = true;
 if(dev)
 	var config = require('./devconfig.json');
 else 
@@ -362,7 +363,7 @@ var helpMessage = `:robot: Current commands: :robot:
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
-\`http://128.199.52.87:1500/\`: visit Botje's website (no domain-name that costs money)
+\`http://botje.ga/\`: visit Botje's website 
 \`Current Version\`: ` + package.version;
 
 var farmHelpMessage = `:seedling: Current commands for farming: :seedling:  
