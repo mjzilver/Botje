@@ -72,3 +72,4 @@ bot.log
 
 # dont include the token
 auth.json
+config.json
