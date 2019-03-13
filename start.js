@@ -1,3 +1,7 @@
+var Discord = require('discord.js');
+
+global.bot = new Discord.Client({autoReconnect:true})
+
 // Configure logger settings
 const { format, loggers, transports } = require('winston')
 
@@ -13,6 +17,12 @@ loggers.add('logger', {
             level: 'debug',
         })
     ]
+});
+
+var logger = require('winston').loggers.get('logger');
+
+process.on('uncaughtException', function (error) {
+    logger.error(error);
 });
 
 require('./bot.js');
