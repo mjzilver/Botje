@@ -58,8 +58,7 @@ function Farm(user) {
 				this.planted_at = moment(row["planted_at"]);
 				
 				this.id = row['id'];
-				this.user_tag = user.tag
-				this.user_id = BigInt(row['user_id'])
+				this.user_id = row['user_id']
 				this.time = row['time'];
 				this.cropyield = row['yield'];
 				this.tier = row['tier']
@@ -164,14 +163,21 @@ Farm.prototype.create = function(user) {
 	});
 }
 
-Farm.prototype.print = async function(channel, extramessage = "") {
-	await this.promise;
-	
+Farm.prototype.display = function() {
 	var result = fence_left[this.fence_tier];
 	
 	result += emoji['farm_tier_' + this.tier].repeat(this.growth());
 	result += this.getseed().repeat(this.ungrown());
 	result += fence_right[this.fence_tier];
+
+	return result;
+}
+
+
+Farm.prototype.print = async function(channel, extramessage = "") {
+	await this.promise;
+	
+	var result = this.display()
 	
 	channel.send(`${this.owner.username}'s ${this.farmname} farm${extramessage}: `)
 	channel.send(result)
@@ -284,6 +290,11 @@ Farm.prototype.upgrade = async function(channel) {
 		this.save();
 	}
 }
+Farm.prototype.toJSON = async function() {
+	await this.promise;
+	return this;
+}
+
 
 Farm.prototype.save = async function(set_planted = false) {
 	await this.promise;
