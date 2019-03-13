@@ -3,13 +3,11 @@ var request = require('request');
 const sqlite3 = require('sqlite3');
 var logger = require('winston').loggers.get('logger');
 
-var dev = true;
-var config;
-
+var dev = false;
 if(dev)
-	config = require('./devconfig.json');
+	var config = require('./devconfig.json');
 else 
-	config = require('./config.json');
+	var config = require('./config.json');
 
 var package = require('./package.json');
 var emoji = require('./emoji.json');

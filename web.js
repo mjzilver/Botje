@@ -4,7 +4,7 @@ var app = express();
 app.set('view engine', 'pug')
 
 var server = require('http').createServer(app)
-var port = 1500
+var port = 80
 
 // views folder is static so that it wont get to middleware
 app.use(express.static(__dirname + '/views'));
