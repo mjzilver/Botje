@@ -1,8 +1,7 @@
 var Discord = require('discord.js');
-var fs = require('fs');
 var request = require('request');
-var moment = require('moment');
 const sqlite3 = require('sqlite3');
+var logger = require('winston').loggers.get('logger');
 
 var auth = require('./auth.json');
 var package = require('./package.json');
@@ -14,22 +13,6 @@ var Farm = require("./farm")
 
 // person as key -> message as value
 var imagesSent = [];
-
-// Configure logger settings
-var winston = require('winston');
-
-var logger = new (winston.Logger)({
-    transports: [
-        new (winston.transports.Console)({
-            colorize: true,
-            level: 'debug'
-        }),
-        new (winston.transports.File)({
-            filename: 'bot.log',
-            level: 'debug'
-        })
-    ]
-});
 
 // Initialize Discord Bot
 var bot = new Discord.Client({autoReconnect:true});

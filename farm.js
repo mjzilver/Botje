@@ -5,20 +5,7 @@ var emoji = require('./emoji.json');
 var db = new sqlite3.Database("./discord.db")
 
 // Configure logger settings
-var winston = require('winston');
-
-var logger = new (winston.Logger)({
-    transports: [
-        new (winston.transports.Console)({
-            colorize: true,
-            level: 'debug'
-        }),
-        new (winston.transports.File)({
-            filename: 'bot.log',
-            level: 'debug'
-        })
-    ]
-});
+var logger = require('winston').loggers.get('logger');
 
 var fence_left = {
 	"0" : ":",
