@@ -23,7 +23,7 @@ app.use('/chat', function(req, res) {
 });
 
 app.use('/farms', function(req, res) {
-    let selectSQL = 'SELECT * FROM farm ORDER BY tier DESC, yield DESC, points DESC';
+    let selectSQL = 'SELECT * FROM farm ORDER BY tier + yield + fence_tier DESC';
     db.all(selectSQL, [], async (err, rows) => {
         let farms = [];
         for (var i = 0; i < rows.length; i++) {
