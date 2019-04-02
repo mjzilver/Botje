@@ -1,0 +1,19 @@
+extends layout
+
+block content
+    <script src="/JS/pixels.js"></script>
+    div(class='jumbotron')
+        h3 Drawboard
+    <br/>
+    <div>
+        <label for="body">Color</label>
+        <input type="color" id="color" name="color" value="#f6b73c">
+    </div>
+    table(style='border: 1px solid black;')
+            thead(class='thead-light')
+            each pixelrow in pixels.length ? pixels : ['No Pixels']
+                <tr>
+                each pixel in pixelrow.length ? pixelrow : ['No Row']
+                    <td id="!{pixel.x}-!{pixel.y}" style='padding:0;width:5px;height:5px;background-color: rgb(!{pixel.red}, !{pixel.green}, !{pixel.blue}) !important;' onclick='pixelClick(!{pixel.x}, !{pixel.y})'> 
+                    </td>
+                </tr>

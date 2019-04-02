@@ -22,7 +22,8 @@ loggers.add('logger', {
 var logger = require('winston').loggers.get('logger');
 
 process.on('uncaughtException', function (error) {
-    logger.error(error);
+    console.log('error caught')
+    logger.error(error.stack);
 });
 
 require('./bot.js');
