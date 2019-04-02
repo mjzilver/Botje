@@ -292,6 +292,7 @@ function draw(message, arguments)
 				else
 				{
 					logger.info("Inserted pixel at " + x + "-" + y);
+					global.io.emit('pixelChanged', {x: x, y: y, red: red, green: green, blue: blue});
 					renderImage(message)
 				}
 			});
@@ -325,7 +326,6 @@ function renderImage(message)
 
 		image.writeImage('./images/image.png', function (err) {
 			if (err) throw err;
-			console.log('Written to the file');
 	
 			message.channel.send("Current image", { files: ["./images/image.png"] });
 		});
