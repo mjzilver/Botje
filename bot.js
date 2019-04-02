@@ -1,4 +1,5 @@
 var Discord = require('discord.js');
+var PNGImage = require('pngjs-image');
 var request = require('request');
 const sqlite3 = require('sqlite3');
 var logger = require('winston').loggers.get('logger');
@@ -17,6 +18,8 @@ var Farm = require("./farm")
 
 // person as key -> message as value
 var imagesSent = [];
+
+var maxImageSize = 250;
 
 // Initialize Discord Bot
 var bot = global.bot
@@ -75,6 +78,9 @@ bot.on('message', message => {
 			case 'farm':
 				farm(message, args);
 			break;
+			case 'draw':
+				draw(message, args);
+			break;	
             default:
 			break;
         }
@@ -86,6 +92,7 @@ function initializeDatabase()
 	db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
 	db.run(`CREATE TABLE IF NOT EXISTS idea (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, idea TEXT)`)
 	db.run(`CREATE TABLE IF NOT EXISTS farm (user_id TEXT PRIMARY KEY UNIQUE, yield INTEGER, tier INTEGER, fence_tier INTEGER, time INTEGER, points INTEGER, planted_at INTEGER)`)
+	db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER,y INTEGER,red INTEGER,green INTEGER,blue INTEGER,PRIMARY KEY(x,y))`)
 }
 
 function helpFunction(channel, arg)
@@ -209,6 +216,120 @@ function checkPoints(message)
 		else
 			message.channel.send(checkrepfor.username + ' has ' + row["points"] + ' good boy points');
 	})
+}
+
+
+function draw(message, arguments)
+{
+	if(arguments.length == 3)
+	{
+		var x = arguments[0];
+		var y = arguments[1];
+		var color = arguments[2]
+		var red = 0;
+		var green = 0;
+		var blue = 0;
+		var validcolor = true;
+
+		switch (color) {
+			case "white":
+				red = 255;
+				green = 255;
+				blue = 255;
+			break;
+			case "gray":
+				red = 128;
+				green = 128;
+				blue = 128;
+			break;
+			case "purple":
+				red = 128;
+				blue = 128;
+			break;
+			case "pink":
+				red = 255;
+				green = 20;
+				blue = 147;
+			break;
+			case "brown":
+				red = 139;
+				green = 69;
+				blue = 19;
+			break;
+			case "orange":
+				red = 255;
+				green = 140;
+			break;
+			case "black":
+				// normal values are already black
+			break;
+			case "red":
+				red = 255;
+			break;
+			case "yellow":
+				red = 255;
+				green = 255;
+			break;
+			case "green":
+				green = 255;
+			break;
+			case "blue":
+				blue = 255;
+			break;
+		
+			default:
+				validcolor = false;
+			break;
+		}
+
+		if(x < maxImageSize && y < maxImageSize && validcolor)
+		{
+			var insert = db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [x, y, red, green, blue]);
+							
+			insert.run(function(err){				
+				if(err)
+					logger.error("failed to insert pixel at " + x + "-" + y);
+				else
+				{
+					logger.info("Inserted pixel at " + x + "-" + y);
+					renderImage(message)
+				}
+			});
+		} else
+		{
+			if(!validcolor)
+				message.channel.send('Invalid color');
+			else
+				message.channel.send('Invalid pixel');
+		}
+	}
+	else{
+		renderImage(message)
+	}
+}
+
+function renderImage(message)
+{
+	var image = PNGImage.createImage(maxImageSize, maxImageSize);
+	image.fillRect(0, 0, maxImageSize, maxImageSize, { red:255, green:255, blue:255, alpha:255 })
+
+	let selectSQL = 'SELECT * FROM colors';
+
+	db.all(selectSQL, [], async (err, rows) => {
+		if (err) {
+			throw err;
+		}
+		for (var i = 0; i < rows.length; i++) {
+			image.setAt(rows[i].x, rows[i].y, { red:rows[i].red, green:rows[i].green, blue:rows[i].blue, alpha:255 });
+		}
+
+		image.writeImage('./images/image.png', function (err) {
+			if (err) throw err;
+			console.log('Written to the file');
+	
+			message.channel.send("Current image", { files: ["./images/image.png"] });
+		});
+	});
 }
 
 function farm(message, arguments)
@@ -362,6 +483,8 @@ var helpMessage = `:robot: Current commands: :robot:
 \`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
+\`draw\`: prints the current drawing board
+\`draw [x] [y] [color]\`: draws a pixel on the drawing board at [x][y] with the color (only the 12 basic colors)
 \`http://botje.ga/\`: visit Botje's website 
 \`Current Version\`: ` + package.version;
 
@@ -375,10 +498,3 @@ var farmHelpMessage = `:seedling: Current commands for farming: :seedling:
 \`farm rename\`: renames your farm (format "[username]'s [farm name] farm")
 \`farm fence\`: upgrades your fencing to a higher level
 \`Current Version\`: ` + package.version;
-
-
-/*
-\`farm hire [amount]\`: hires a farmhand to harvest your crop 
-		Active every 10 minutes for [amount] times
-		Costs 10 points per [amount] and takes 75% of the profit
-		*/
