@@ -325,8 +325,11 @@ function renderImage(message)
 		}
 
 		image.writeImage('./images/image.png', function (err) {
-			if (err) throw err;
-	
+			if (err) 
+			{
+				throw err;
+			}
+			logger.info('written image')	
 			message.channel.send("Current image", { files: ["./images/image.png"] });
 		});
 	});
