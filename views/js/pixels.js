@@ -35,3 +35,10 @@ function zoomOut()
 {
     $('style').remove();
 }
+
+socket.on('disconnect', (reason) => {
+    if (reason === 'io server disconnect') {
+      $("#errorlabel").text('You got kicked');
+    }
+    // else the socket will automatically try to reconnect
+  });
