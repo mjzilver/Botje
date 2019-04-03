@@ -204,7 +204,7 @@ function renderImage(message)
 			throw err;
 		}
 		for (var i = 0; i < rows.length; i++) {
-			if(rows[i].x > 0 && rows[i].x < imageSize && rows[i].y > 0 && rows[i].y < imageSize)
+			if(rows[i].x >= 0 && rows[i].x < imageSize && rows[i].y >= 0 && rows[i].y < imageSize)
 			{
 				image.fillRect(rows[i].x*2, rows[i].y*2, 2, 2, { red:rows[i].red, green:rows[i].green, blue:rows[i].blue, alpha:255 });
 			}
