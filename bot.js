@@ -194,8 +194,8 @@ function checkPoints(message)
 
 function renderImage(message)
 {
-	var image = PNGImage.createImage(imageSize, imageSize);
-	image.fillRect(0, 0, imageSize, imageSize, { red:255, green:255, blue:255, alpha:255 })
+	var image = PNGImage.createImage(imageSize*2, imageSize*2);
+	image.fillRect(0, 0, imageSize*2, imageSize*2, { red:255, green:255, blue:255, alpha:255 })
 
 	let selectSQL = 'SELECT * FROM colors';
 
@@ -206,7 +206,7 @@ function renderImage(message)
 		for (var i = 0; i < rows.length; i++) {
 			if(rows[i].x > 0 && rows[i].x < imageSize && rows[i].y > 0 && rows[i].y < imageSize)
 			{
-				image.setAt(rows[i].x, rows[i].y, { red:rows[i].red, green:rows[i].green, blue:rows[i].blue, alpha:255 });
+				image.fillRect(rows[i].x*2, rows[i].y*2, 2, 2, { red:rows[i].red, green:rows[i].green, blue:rows[i].blue, alpha:255 });
 			}
 		}
 
