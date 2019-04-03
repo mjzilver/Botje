@@ -37,8 +37,6 @@ function Farm(user) {
 	
 	this.owner = user;
 						
-	logger.info(selectSQL);
-	
 	this.promise = new Promise((resolve, reject) => {	
 		db.get(selectSQL, [], (err, row) => {
 			if (err) {

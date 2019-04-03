@@ -56,9 +56,6 @@ bot.on('message', message => {
 			case 'dog':
 				getDogPicture(channel, args[0]);
             break;
-			case 'submit':
-				submitIdea(message.author.username, channel, args);
-            break;
 			case 'emoji':
 				turnIntoEmoji(channel, args);
 			break;
@@ -78,7 +75,7 @@ bot.on('message', message => {
 				farm(message, args);
 			break;
 			case 'draw':
-				draw(message, args);
+				renderImage(message)
 			break;	
             default:
 			break;
@@ -126,28 +123,6 @@ function getDogPicture(channel, breed = "")
 		request(`https://dog.ceo/api/breed/${breed}/images/random`, { json: true }, (err, res, body) => {
 		if (err) { return logger.info(err) }
 			channel.send(body.message);
-		});
-	}
-}
-
-function submitIdea(user, channel, idea)
-{
-	idea = idea.join(' ');
-	if(idea.length > 0)
-	{
-		var insert = db.prepare('INSERT INTO idea (user, idea) VALUES (?, ?)', [user, idea]);
-						
-		insert.run(function(err){				
-			if(err)
-			{
-				logger.error("failed to insert: " + idea);
-				logger.error(err);
-			}
-			else
-			{
-				logger.log('debug', "inserted: " + idea);               
-				channel.send('Thanks for submitting your idea <:feelsgoodman:445570504720646145>');
-			}
 		});
 	}
 }
@@ -217,97 +192,6 @@ function checkPoints(message)
 	})
 }
 
-
-function draw(message, arguments)
-{
-	if(arguments.length == 3)
-	{
-		var x = arguments[0];
-		var y = arguments[1];
-		var color = arguments[2]
-		var red = 0;
-		var green = 0;
-		var blue = 0;
-		var validcolor = true;
-
-		switch (color) {
-			case "white":
-				red = 255;
-				green = 255;
-				blue = 255;
-			break;
-			case "gray":
-				red = 128;
-				green = 128;
-				blue = 128;
-			break;
-			case "purple":
-				red = 128;
-				blue = 128;
-			break;
-			case "pink":
-				red = 255;
-				green = 20;
-				blue = 147;
-			break;
-			case "brown":
-				red = 139;
-				green = 69;
-				blue = 19;
-			break;
-			case "orange":
-				red = 255;
-				green = 140;
-			break;
-			case "black":
-				// normal values are already black
-			break;
-			case "red":
-				red = 255;
-			break;
-			case "yellow":
-				red = 255;
-				green = 255;
-			break;
-			case "green":
-				green = 255;
-			break;
-			case "blue":
-				blue = 255;
-			break;
-		
-			default:
-				validcolor = false;
-			break;
-		}
-
-		if(x < imageSize && y < imageSize && validcolor)
-		{
-			var insert = db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [x, y, red, green, blue]);
-							
-			insert.run(function(err){				
-				if(err)
-					logger.error("failed to insert pixel at " + x + "-" + y);
-				else
-				{
-					logger.info("Inserted pixel at " + x + "-" + y);
-					global.io.emit('pixelChanged', {x: x, y: y, red: red, green: green, blue: blue});
-					renderImage(message)
-				}
-			});
-		} else
-		{
-			if(!validcolor)
-				message.channel.send('Invalid color');
-			else
-				message.channel.send('Invalid pixel');
-		}
-	}
-	else{
-		renderImage(message)
-	}
-}
-
 function renderImage(message)
 {
 	var image = PNGImage.createImage(imageSize, imageSize);
@@ -326,8 +210,8 @@ function renderImage(message)
 			}
 		}
 
-		image.writeImage('./images/image.png', function (err) {
-			message.channel.send("Current image", { files: ["./images/image.png"] });
+		image.writeImage('./views/images/image.png', function (err) {
+			message.channel.send("Current image", { files: ["./views/images/image.png"] });
 		});
 	});
 }
@@ -480,11 +364,10 @@ var helpMessage = `:robot: Current commands: :robot:
 \`react\`: reacts to your post with emojis using the text you posted
 \`points\`: check how much good boy points you have acquired
 \`help farm \`: shows help for farm commands
-\`submit\`: submit an idea for a new feature 
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
-\`draw\`: prints the current drawing board
-\`draw [x] [y] [color]\`: draws a pixel on the drawing board at [x][y] with the color (only the 12 basic colors)
+\`draw\`: prints the current drawing board 
+\`draw\`: draw on the board here http://botje.ga/draw
 \`http://botje.ga/\`: visit Botje's website 
 \`Current Version\`: ` + package.version;
 
