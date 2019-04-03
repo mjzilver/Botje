@@ -18,8 +18,7 @@ var Farm = require("./farm")
 
 // person as key -> message as value
 var imagesSent = [];
-
-var maxImageSize = 250;
+var imageSize = config.imageSize
 
 // Initialize Discord Bot
 var bot = global.bot
@@ -282,7 +281,7 @@ function draw(message, arguments)
 			break;
 		}
 
-		if(x < maxImageSize && y < maxImageSize && validcolor)
+		if(x < imageSize && y < imageSize && validcolor)
 		{
 			var insert = db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [x, y, red, green, blue]);
 							
@@ -311,8 +310,8 @@ function draw(message, arguments)
 
 function renderImage(message)
 {
-	var image = PNGImage.createImage(maxImageSize, maxImageSize);
-	image.fillRect(0, 0, maxImageSize, maxImageSize, { red:255, green:255, blue:255, alpha:255 })
+	var image = PNGImage.createImage(imageSize, imageSize);
+	image.fillRect(0, 0, imageSize, imageSize, { red:255, green:255, blue:255, alpha:255 })
 
 	let selectSQL = 'SELECT * FROM colors';
 
@@ -321,15 +320,13 @@ function renderImage(message)
 			throw err;
 		}
 		for (var i = 0; i < rows.length; i++) {
-			image.setAt(rows[i].x, rows[i].y, { red:rows[i].red, green:rows[i].green, blue:rows[i].blue, alpha:255 });
+			if(rows[i].x > 0 && rows[i].x < imageSize && rows[i].y > 0 && rows.y < imageSize)
+			{
+				image.setAt(rows[i].x, rows[i].y, { red:rows[i].red, green:rows[i].green, blue:rows[i].blue, alpha:255 });
+			}
 		}
 
 		image.writeImage('./images/image.png', function (err) {
-			if (err) 
-			{
-				throw err;
-			}
-			logger.info('written image')	
 			message.channel.send("Current image", { files: ["./images/image.png"] });
 		});
 	});

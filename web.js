@@ -8,6 +8,8 @@ var io = require('socket.io').listen(server)
 global.io = io;
 var port = 1500
 
+var imageSize = require('./config.json').imageSize;
+
 const sqlite3 = require('sqlite3');
 var db = new sqlite3.Database("./discord.db")
 
@@ -21,11 +23,10 @@ app.use(express.static(__dirname + '/views'));
 
 app.use('/draw', function(req, res) {
     let selectSQL = 'SELECT * FROM colors ORDER BY y, x ASC';
-    var row = 0;
 
-    var pixels = new Array(250);
+    var pixels = new Array(imageSize);
     for (var i = 0; i < pixels.length; i++) {
-        pixels[i] = new Array(250);
+        pixels[i] = new Array(imageSize);
         for (var j = 0; j < pixels[i].length; j++) {
             pixels[i][j] = {y: i, x: j, red: 255, green: 255, blue: 255};
         }
@@ -34,7 +35,11 @@ app.use('/draw', function(req, res) {
     db.all(selectSQL, [], async (err, rows) => {
         for (let i = 0; i < rows.length; i++) {
             const element = rows[i];
-            pixels[element.y][element.x] = {y: element.y, x: element.x, red: element.red, green: element.green, blue: element.blue};
+            
+            if(element.x > 0 && element.x < imageSize && element.y > 0 && element.y < imageSize)
+            {
+                pixels[element.y][element.x] = {y: element.y, x: element.x, red: element.red, green: element.green, blue: element.blue};
+            }
         }
         res.render('pixels', {pixels: pixels});
     })
