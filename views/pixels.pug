@@ -3,11 +3,13 @@ extends layout
 block content
     <script src="/js/pixels.js"></script>
     <br/>
-    <div class='drawboard-header'>
-        <label for="color">Color: </label>
-        <input type="color" id="color" name="color" value="#f6b73c">
-    </div>
     table(class='drawboard')
+        <tr>
+            <th colspan='9000' class='drawboard-header'> 
+                <label for="color">Color: </label>
+                <input type="color" id="color" name="color" value="#f6b73c">
+            </th>
+        </tr>
             each pixelrow in pixels.length ? pixels : ['No Pixels']
                 <tr>
                 each pixel in pixelrow.length ? pixelrow : ['No Row']

@@ -36,7 +36,7 @@ app.use('/draw', function(req, res) {
         for (let i = 0; i < rows.length; i++) {
             const element = rows[i];
             
-            if(element.x > 0 && element.x < imageSize && element.y > 0 && element.y < imageSize)
+            if(element.x >= 0 && element.x < imageSize && element.y >= 0 && element.y < imageSize)
             {
                 pixels[element.y][element.x] = {y: element.y, x: element.x, red: element.red, green: element.green, blue: element.blue};
             }
@@ -64,18 +64,22 @@ app.use('/', function(req, res) {
 
 io.on('connection', function(socket){
     socket.on('pixelChange', function(pixel){
-        var insert = db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue]);
-							
-        insert.run(function(err){				
-            if(err)
-            {
-                logger.info("failed to insert pixel");
-            }
-            else
-            {
-                io.emit('pixelChanged', pixel);
-            }
-        });
+
+        if(pixel.x >= 0 && pixel.x < imageSize && pixel.y >= 0 && pixel.y < imageSize)
+        {
+            var insert = db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue]);
+                                
+            insert.run(function(err){				
+                if(err)
+                {
+                    logger.info("failed to insert pixel");
+                }
+                else
+                {
+                    io.emit('pixelChanged', pixel);
+                }
+            });
+        }
     });
 });
 
