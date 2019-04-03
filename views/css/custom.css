@@ -4,17 +4,17 @@ body {
 
 .icon img {
     border-radius: 50%;
-    border:3px groove  darkslategray;
+    border: 3px groove darkslategray;
 }
 
 #farms {
-    border-collapse:separate;
-    border-radius:6px;
-    border:3px groove  darkslategray;
+    border-collapse: separate;
+    border-radius: 6px;
+    border: 3px groove darkslategray;
     background-color: whitesmoke;
 }
 
-#pageDiv{
+#pageDiv {
     padding: 2rem 1rem !important;
 }
 
@@ -24,5 +24,21 @@ body {
 }
 
 .drawboard {
-    border:3px groove  darkslategray;
+    border: 3px groove darkslategray;
+}
+
+.drawboard-header {
+    border: 3px groove darkslategray;
+    border-bottom: 0;
+    width: 753px;
+    background-color: lightgray;
+    display: inline-block;
+    vertical-align: bottom;
+    line-height: 5px;
+}
+
+.pixel {
+    padding: 0;
+    width: 5px;
+    height: 5px;
 }
