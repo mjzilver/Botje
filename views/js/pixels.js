@@ -4,7 +4,6 @@ console.log( "ready!" );
 
 function pixelClick(x, y)
 {
-    console.log(`clicked pixel ${x} - ${y}`)
     var colorHex = $(`#color`).val();
     var colorRGB = hexToRgb(colorHex)
     socket.emit('pixelChange', {x: x, y: y, red: colorRGB.r, green: colorRGB.g, blue: colorRGB.b});
@@ -12,7 +11,6 @@ function pixelClick(x, y)
 
 socket.on('pixelChanged', function(pixel)
 {
-    console.log('pixel update' + pixel)
     $(`#${pixel.x}-${pixel.y}`).attr("style", ""); 
     $(`#${pixel.x}-${pixel.y}`).attr("style", `background-color: rgb(${pixel.red}, ${pixel.green}, ${pixel.blue}) !important;`); 
 })

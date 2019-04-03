@@ -28,11 +28,7 @@ body {
 }
 
 .drawboard-header {
-    border: 3px groove darkslategray;
-    border-bottom: 0;
-    width: 753px;
     background-color: lightgray;
-    display: inline-block;
     vertical-align: bottom;
     line-height: 5px;
 }
