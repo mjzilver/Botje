@@ -17,6 +17,7 @@ var logger = require('winston').loggers.get('logger');
 
 var bot = global.bot;
 var Farm = require("./farm")
+var moment = require('moment');
 
 // views folder is static so that it wont get to middleware
 app.use(express.static(__dirname + '/views'));
@@ -62,10 +63,17 @@ app.use('/', function(req, res) {
     res.render('index') 
 });
 
+var editPerPerson = []
+
 io.on('connection', function(socket){
     socket.on('pixelChange', function(pixel){
+        var last_edit = moment(editPerPerson[socket.id]);
+        var time_passed = moment.duration(moment().diff(last_edit)).asMilliseconds();
+        console.log(last_edit)
+        console.log(time_passed)
 
-        if(pixel.x >= 0 && pixel.x < imageSize && pixel.y >= 0 && pixel.y < imageSize)
+        if((editPerPerson[socket.id] == undefined || time_passed > 200) 
+        && (pixel.x >= 0 && pixel.x < imageSize && pixel.y >= 0 && pixel.y < imageSize))
         {
             var insert = db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue]);
                                 
@@ -73,12 +81,17 @@ io.on('connection', function(socket){
                 if(err)
                 {
                     logger.info("failed to insert pixel");
+                    socket.disconnect(); // you get kicked
                 }
                 else
                 {
                     io.emit('pixelChanged', pixel);
+                    editPerPerson[socket.id] = new Date();
                 }
             });
+        } else 
+        {
+            socket.disconnect(); // you get kicked
         }
     });
 });
