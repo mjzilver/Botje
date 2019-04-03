@@ -29,8 +29,8 @@ body {
 
 .drawboard-header {
     background-color: lightgray;
-    vertical-align: bottom;
-    line-height: 5px;
+    vertical-align: middle;    
+    line-height: 10px;
 }
 
 .pixel {

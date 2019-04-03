@@ -8,6 +8,13 @@ block content
             <th colspan='9000' class='drawboard-header'> 
                 <label for="color">Color: </label>
                 <input type="color" id="color" name="color" value="#f6b73c">
+                <label for="zoom">Zoom: </label>
+                <button onclick="zoomIn()">
+                    <span class="octicon octicon-plus"></span>
+                </button>
+                <button onclick="zoomOut()">
+                    <span class="octicon octicon-dash"></span>
+                </button>
             </th>
         </tr>
             each pixelrow in pixels.length ? pixels : ['No Pixels']
