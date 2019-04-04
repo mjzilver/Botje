@@ -127,6 +127,10 @@ io.on('connection', function (socket) {
             socket.disconnect(); // user gets kicked
         }
     });
+
+    socket.on('disconnect', function() {
+        delete editPerPerson[socket.id];
+    })
 });
 
 // start server both
