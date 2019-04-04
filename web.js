@@ -1,52 +1,66 @@
 var express = require('express');
 var app = express();
-
 app.set('view engine', 'pug')
 
+var moment = require('moment');
+var logger = require('winston').loggers.get('logger');
+
+// set the IO server
 var server = require('http').createServer(app)
 var io = require('socket.io').listen(server)
 global.io = io;
 var port = 1500
 
-var imageSize = require('./config.json').imageSize;
-
+// load in the database
 const sqlite3 = require('sqlite3');
 var db = new sqlite3.Database("./discord.db")
 
-var logger = require('winston').loggers.get('logger');
-
-var bot = global.bot;
+// load local files
+var imageSize = require('./config.json').imageSize;
 var Farm = require("./farm")
-var moment = require('moment');
+var bot = global.bot;
 
 // views folder is static so that it wont get to middleware
 app.use(express.static(__dirname + '/views'));
 
-app.use('/draw', function(req, res) {
+app.use('/draw', function (req, res) {
     let selectSQL = 'SELECT * FROM colors ORDER BY y, x ASC';
 
     var pixels = new Array(imageSize);
     for (var i = 0; i < pixels.length; i++) {
         pixels[i] = new Array(imageSize);
         for (var j = 0; j < pixels[i].length; j++) {
-            pixels[i][j] = {y: i, x: j, red: 255, green: 255, blue: 255};
+            pixels[i][j] = {
+                y: i,
+                x: j,
+                red: 255,
+                green: 255,
+                blue: 255
+            };
         }
     }
 
     db.all(selectSQL, [], async (err, rows) => {
         for (let i = 0; i < rows.length; i++) {
             const element = rows[i];
-            
-            if(element.x >= 0 && element.x < imageSize && element.y >= 0 && element.y < imageSize)
-            {
-                pixels[element.y][element.x] = {y: element.y, x: element.x, red: element.red, green: element.green, blue: element.blue};
+
+            if (element.x >= 0 && element.x < imageSize && element.y >= 0 && element.y < imageSize) {
+                pixels[element.y][element.x] = {
+                    y: element.y,
+                    x: element.x,
+                    red: element.red,
+                    green: element.green,
+                    blue: element.blue
+                };
             }
         }
-        res.render('pixels', {pixels: pixels});
+        res.render('pixels', {
+            pixels: pixels
+        });
     })
 });
 
-app.use('/farms', function(req, res) {
+app.use('/farms', function (req, res) {
     let selectSQL = 'SELECT * FROM farm ORDER BY tier + yield + fence_tier DESC';
     db.all(selectSQL, [], async (err, rows) => {
         let farms = [];
@@ -55,48 +69,67 @@ app.use('/farms', function(req, res) {
             let farm = await Farm.init(user).toJSON();
             farms[i] = farm
         }
-        res.render('farms', { list: farms })
+        res.render('farms', {
+            list: farms
+        })
     })
 });
 
-app.use('/', function(req, res) { 
-    res.render('index') 
+app.use('/', function (req, res) {
+    res.render('index')
 });
 
+// logs the edits per peron
 var editPerPerson = []
 
-io.on('connection', function(socket){
-    socket.on('pixelChange', function(pixel){
-        var last_edit = moment(editPerPerson[socket.id]);
-        var time_passed = moment.duration(moment().diff(last_edit)).asMilliseconds();
-        console.log(last_edit)
-        console.log(time_passed)
+function spamChecker(id) {
+    if (editPerPerson[id] == undefined)
+        return true
+    else {
+        if (editPerPerson[id].length >= 10) {
+            delete editPerPerson[id];
+            return true;
+        } else {
+            var count = 0;
+            for (const index in editPerPerson[id]) {
+                var edited_at = moment(editPerPerson[id][index]);
+                var time_passed = moment.duration(moment().diff(edited_at)).asMilliseconds();
 
-        if((editPerPerson[socket.id] == undefined || time_passed > 200) 
-        && (pixel.x >= 0 && pixel.x < imageSize && pixel.y >= 0 && pixel.y < imageSize))
-        {
+                if (time_passed < 200)
+                    count++;
+            }
+            if (count >= 3)
+                return false
+        }
+        return true;
+    }
+}
+
+io.on('connection', function (socket) {
+    socket.on('pixelChange', function (pixel) {
+        if (spamChecker(socket.id) && (pixel.x >= 0 && pixel.x < imageSize && pixel.y >= 0 && pixel.y < imageSize)) {
             var insert = db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue]);
-                                
-            insert.run(function(err){				
-                if(err)
-                {
+
+            insert.run(function (err) {
+                if (err) {
                     logger.info("failed to insert pixel");
-                    socket.disconnect(); // you get kicked
-                }
-                else
-                {
+                    socket.disconnect(); // user gets kicked
+                } else {
                     io.emit('pixelChanged', pixel);
-                    editPerPerson[socket.id] = new Date();
+                    if (editPerPerson[socket.id] == undefined)
+                        editPerPerson[socket.id] = [new Date()]
+                    else
+                        editPerPerson[socket.id].push(new Date())
                 }
             });
-        } else 
-        {
-            socket.disconnect(); // you get kicked
+        } else {
+            logger.warn("User kicked for invalid emit");
+            socket.disconnect(); // user gets kicked
         }
     });
 });
 
 // start server both
 server.listen(port, () => {
-	logger.info('App running on port ' + port)
+    logger.info('App running on port ' + port)
 });
