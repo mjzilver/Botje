@@ -1,18 +1,24 @@
-var Discord = require('discord.js');
+var discord = require('discord.js');
 
-global.bot = new Discord.Client({autoReconnect:true})
+global.bot = new discord.Client({
+    autoReconnect: true
+})
 
 // Configure logger settings
-const { format, loggers, transports } = require('winston')
+const {
+    format,
+    loggers,
+    transports
+} = require('winston')
 
 loggers.add('logger', {
     format: format.json(),
     transports: [
-        new (transports.Console)({
+        new(transports.Console)({
             colorize: true,
             level: 'debug'
         }),
-        new (transports.File)({
+        new(transports.File)({
             filename: 'bot.log',
             level: 'debug',
         })
@@ -21,9 +27,9 @@ loggers.add('logger', {
 
 var logger = require('winston').loggers.get('logger');
 
+// catches all errors
 process.on('uncaughtException', function (error) {
-    console.log('error caught')
-    logger.error(error.stack);
+    logger.error(error.message);
 });
 
 require('./bot.js');
