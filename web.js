@@ -105,7 +105,11 @@ function spamChecker(id) {
     }
 }
 
+var connectCounter = 0;
+
 io.on('connection', function (socket) {
+    io.emit('connectCounter', ++connectCounter);
+
     socket.on('pixelChange', function (pixel) {
         if (spamChecker(socket.id) && (pixel.x >= 0 && pixel.x < imageSize && pixel.y >= 0 && pixel.y < imageSize)) {
             var insert = db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue]);
@@ -129,6 +133,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function() {
+        io.emit('connectCounter', --connectCounter);
         delete editPerPerson[socket.id];
     })
 });
