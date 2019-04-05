@@ -35,6 +35,6 @@ body {
 
 .pixel {
     padding: 0;
-    width: 5px;
-    height: 5px;
+    width: 0.25vw;
+    height: 0.25vw;
 }

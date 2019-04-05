@@ -24,7 +24,7 @@ function hexToRgb(hex) {
 
 function zoomIn()
 {
-    var styleTag = $('<style> .pixel {padding: 0;width: 10px !important;height: 10px !important;}</style>')
+    var styleTag = $('<style> .pixel {padding: 0;width: 0.5vw !important;height: 0.5vw !important;}</style>')
     $('html > head').append(styleTag);
 }
 
