@@ -33,6 +33,10 @@ function zoomOut()
     $('style').remove();
 }
 
+socket.on('connectCounter', function(connectCounter) {
+    $("#connectCounter").text(connectCounter);
+})
+
 socket.on('disconnect', (reason) => {
     if (reason === 'io server disconnect') {
       $("#errorlabel").text('You got kicked');
