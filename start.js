@@ -1,5 +1,6 @@
 var discord = require('discord.js');
 
+global.discord = discord;
 global.bot = new discord.Client({
     autoReconnect: true
 })
