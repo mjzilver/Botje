@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3');
 var logger = require('winston').loggers.get('logger');
 
 // get the right configuration
+var dev = false;
 if (dev)
 	var config = require('./devconfig.json');
 else
