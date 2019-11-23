@@ -346,18 +346,24 @@ function getImage(user, channel, sub, page = 0) {
 const snekfetch = require('snekfetch');
 
 async function getRedditImage(user, channel, sub, page = 0) {
-	const { body } = await snekfetch
-	.get('https://www.reddit.com/r/' + sub + '.json?sort=top&t=week')
-	.query({ limit: 800 });
-	
-	const randomnumber = Math.floor(Math.random() *  body.data.children.length)
-	
-	
-	const embed = new discord.RichEmbed()
-	.setTitle(body.data.children[randomnumber].data.title)
-	.setImage(body.data.children[randomnumber].data.url)
-	
-	channel.send(embed)
+	try{
+		const { body } = await snekfetch
+		.get('https://www.reddit.com/r/' + sub + '.json?sort=top&t=week')
+		.query({ limit: 800 });
+		
+		const randomnumber = Math.floor(Math.random() *  body.data.children.length)
+		
+		
+		const embed = new discord.RichEmbed()
+		.setTitle(body.data.children[randomnumber].data.title)
+		.setImage(body.data.children[randomnumber].data.url)
+		
+		channel.send(embed)
+	}
+	catch{
+		channel.send('Nothing was found :feelsdumb:')
+
+	}
 }
 
 
