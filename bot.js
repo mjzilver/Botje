@@ -364,7 +364,8 @@ async function getRedditImage(user, channel, sub, page = 0) {
 
 
 var helpMessage = `:robot: Current commands: :robot:  
-\`image [subreddit]\`: gets a random picture from the given subreddit 
+\`image [subreddit]\`: gets a random imgur picture from the given subreddit 
+\`reddit [subreddit]\`: gets a random link from the given subreddit 
 \`emoji\`: turns your message into emojis 
 \`react\`: reacts to your post with emojis using the text you posted
 \`points\`: check how much good boy points you have acquired
