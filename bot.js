@@ -354,7 +354,7 @@ async function getRedditImage(user, channel, sub, page = 0) {
 		
 		const randomnumber = Math.floor(Math.random() *  body.data.children.length)
 		
-		channel.send(body.data.children[randomnumber].data.title + " - " + body.data.children[randomnumber].data.url)
+		channel.send(body.data.children[randomnumber].data.title + "\n " + body.data.children[randomnumber].data.url)
 	}
 	catch{
 		channel.send('Nothing was found :feelsdumb:')
