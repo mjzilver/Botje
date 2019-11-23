@@ -354,12 +354,7 @@ async function getRedditImage(user, channel, sub, page = 0) {
 		
 		const randomnumber = Math.floor(Math.random() *  body.data.children.length)
 		
-		
-		const embed = new discord.RichEmbed()
-		.setTitle(body.data.children[randomnumber].data.title)
-		.setImage(body.data.children[randomnumber].data.url)
-		
-		channel.send(embed)
+		channel.send(body.data.children[randomnumber].data.title + " - " + body.data.children[randomnumber].data.url)
 	}
 	catch{
 		channel.send('Nothing was found :feelsdumb:')
