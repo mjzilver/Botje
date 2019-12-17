@@ -20,6 +20,11 @@ var Farm = require("./farm")
 var imagesSent = [];
 var imageSize = config.imageSize
 
+// person as key -> time as value
+var lastRequest = [];
+// adding the timer (so the timeout stacks)
+var lastRequestTimer = [];
+
 // Initialize Discord Bot
 var bot = global.bot
 
@@ -43,45 +48,77 @@ bot.on('message', message => {
 		message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
 		const args = message.content.split(' ');
 		const command = args.shift().toLowerCase();
+		
+		var allowed = true;
+		
+		currentTimestamp = new Date();
+		
+		if(!(message.author.username in lastRequest)) {
+			lastRequest[message.author.username] = currentTimestamp;
+		} else {
+			// set timer
+			lastRequestTimer[message.author.username] = (message.author.username in lastRequestTimer) ? lastRequestTimer[message.author.username]: 5;
+			currentTimer = lastRequestTimer[message.author.username];
+			
+			if((currentTimestamp - lastRequest[message.author.username] < (currentTimer * 1000)))
+			{
+				lastRequestTimer[message.author.username] = currentTimer + 5;
+				
+				var diff = new Date(currentTimestamp.getTime() - lastRequest[message.author.username].getTime());
+				if(currentTimer == 5)
+					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds <:genoeg1:445570292023296022>')
+				else 
+					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait <:genoeg2:445570451859570688>')
 
+				allowed = false;
+			}
+			else {
+				lastRequestTimer[message.author.username] = 5;
+				lastRequest[message.author.username] = currentTimestamp;
+			}
+		}
+		
 		logger.log('debug', message.author.username + ' requested ' + command + ' with arguments ' + args);
 
-		switch (command) {
-			case 'help':
-				helpFunction(channel, args[0])
-				break;
-			case 'image':
-				getImage(message.author.username, channel, args[0]);
-				break;
-			case 'reddit':
-				getRedditImage(message.author.username, channel, args[0]);
-				break;
-			case 'dog':
-				getDogPicture(channel, args[0]);
-				break;
-			case 'emoji':
-				turnIntoEmoji(channel, args);
-				break;
-			case 'react':
-				reactTo(message, args.join(" "));
-				break;
-			case 'points':
-				checkPoints(message);
-				break;
-			case 'ping':
-				ping(channel, message);
-				break;
-			case 'delete':
-				prune(message.author.username);
-				break;
-			case 'farm':
-				farm(message, args);
-				break;
-			case 'draw':
-				renderImage(message)
-				break;
-			default:
-				break;
+		if(allowed)
+		{
+			switch (command) {
+				case 'help':
+					helpFunction(channel, args[0])
+					break;
+				case 'image':
+					getImage(message.author.username, channel, args[0]);
+					break;
+				case 'reddit':
+					getRedditImage(message.author.username, channel, args[0]);
+					break;
+				case 'dog':
+					getDogPicture(channel, args[0]);
+					break;
+				case 'emoji':
+					turnIntoEmoji(channel, args);
+					break;
+				case 'react':
+					reactTo(message, args.join(" "));
+					break;
+				case 'points':
+					checkPoints(message);
+					break;
+				case 'ping':
+					ping(channel, message);
+					break;
+				case 'delete':
+					prune(message.author.username);
+					break;
+				case 'farm':
+					farm(message, args);
+					break;
+				case 'draw':
+					renderImage(message)
+					break;
+				default:
+					break;
+			}
 		}
 	}
 })
@@ -357,7 +394,7 @@ async function getRedditImage(user, channel, sub, page = 0) {
 		channel.send(body.data.children[randomnumber].data.title + "\n " + body.data.children[randomnumber].data.url)
 	}
 	catch{
-		channel.send('Nothing was found :feelsdumb:')
+		channel.send('Nothing was found <:feelsdumb:445570808472141834>')
 
 	}
 }
