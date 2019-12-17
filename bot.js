@@ -116,10 +116,13 @@ bot.on('message', message => {
 				case 'draw':
 					renderImage(message)
 					break;
+				case 'purge':
+					purge(message);
+					break;
 				default:
 					break;
 			}
-		}
+		} 
 	}
 })
 
@@ -137,6 +140,21 @@ function helpFunction(channel, arg) {
 		default:
 			channel.send(helpMessage)
 			break;
+	}
+}
+
+async function purge(message)
+{
+	if (message.member.hasPermission("ADMINISTRATOR"))
+	{
+		logger.log('warn', 'Admin has initiated purge')
+
+		var fetched = await message.channel.fetchMessages({limit: 100});
+		while(fetched.size >= 1)
+		{
+			fetched = await message.channel.fetchMessages({limit: 100});
+			message.channel.bulkDelete(fetched);
+		}
 	}
 }
 
