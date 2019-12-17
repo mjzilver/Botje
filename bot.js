@@ -53,7 +53,7 @@ bot.on('message', message => {
 		
 		currentTimestamp = new Date();
 		
-		if(!(message.author.username in lastRequest)) {
+		if(!(message.author.username in lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
 			lastRequest[message.author.username] = currentTimestamp;
 		} else {
 			// set timer
@@ -149,12 +149,16 @@ async function purge(message)
 	{
 		logger.log('warn', 'Admin has initiated purge')
 
-		var fetched = await message.channel.fetchMessages({limit: 100});
-		while(fetched.size >= 1)
-		{
-			fetched = await message.channel.fetchMessages({limit: 100});
-			message.channel.bulkDelete(fetched);
-		}
+		message.channel.fetchMessages()
+		.then(messages => messages.array().forEach(
+			(message) => {
+				if(message.author.equals(bot.user) || message.content.match(new RegExp(config.prefix, "i")))
+				{
+					logger.log('debug', 'Purging message: ' + message.content);
+					message.delete()
+				}
+			}
+		));
 	}
 }
 
