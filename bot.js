@@ -410,10 +410,53 @@ async function getRedditImage(user, channel, sub, page = 0) {
 		const { body } = await snekfetch
 		.get('https://www.reddit.com/r/' + sub + '.json?sort=top&t=week')
 		.query({ limit: 800 });
-		
-		const randomnumber = Math.floor(Math.random() *  body.data.children.length)
-		
-		channel.send(body.data.children[randomnumber].data.title + "\n " + body.data.children[randomnumber].data.url)
+				
+		if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined') {
+			let selectSQL = 'SELECT * FROM images WHERE sub = "' + sub + '"';
+			var foundImages = {};
+
+			db.all(selectSQL, [], async (err, rows) => {
+				if (err) {
+					throw err;
+				}
+				for (var i = 0; i < rows.length; i++) {
+					foundImages[rows[i].link] = true;
+				}
+
+				var filteredImages = [];
+
+				for (var i = 0; i < body.data.children.length; i++) {
+					if (!(body.data.children[i].data.url in foundImages))
+						filteredImages.push(body.data.children[i]);
+				}
+
+				if (filteredImages.length > 0) {
+					var chosen = Math.floor(Math.random() * filteredImages.length);
+					var link = filteredImages[chosen].data.url;
+					var title = filteredImages[chosen].data.title;
+
+					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
+
+					imagesSent[user] = await channel.send(title + "\n " + link)
+
+					if (filteredImages[chosen].is_album)
+						logger.info(filteredImages[chosen])
+
+
+					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
+
+					insert.run(function (err) {
+						if (err) {
+							logger.error("failed to insert: " + link + ' - ' + sub);
+							logger.error(err);
+						} else
+							logger.log('debug', "inserted: " + link + ' - ' + sub);
+					});
+				} else {
+					channel.send("I have ran out of images to show you <:feelssad:445577555857113089>");
+				}
+			});
+		}
 	}
 	catch{
 		channel.send('Nothing was found <:feelsdumb:445570808472141834>')
