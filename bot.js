@@ -370,14 +370,7 @@ function getImage(user, channel, sub, page = 0) {
 
 					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
 
-					if (filteredImages[chosen].nsfw)
-						imagesSent[user] = await channel.send('||' + link + '||');
-					else
-						imagesSent[user] = await channel.send(link);
-
-					if (filteredImages[chosen].is_album)
-						logger.info(filteredImages[chosen])
-
+					imagesSent[user] = await channel.send(link);
 
 					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
 
@@ -403,13 +396,16 @@ function getImage(user, channel, sub, page = 0) {
 	});
 }
 
-const snekfetch = require('snekfetch');
+async function getRedditImage(user, channel, sub, last = '') {
+	const options = {
+		url: 'https://www.reddit.com/r/' + sub + '.json?sort=top&t=week&limit=100&after=' + last,
+		json: true
+	};
 
-async function getRedditImage(user, channel, sub, page = 0) {
-	try{
-		const { body } = await snekfetch
-		.get('https://www.reddit.com/r/' + sub + '.json?sort=top&t=week')
-		.query({ limit: 800 });
+	request(options, (err, res, body) => {		
+		if (err) {
+			return logger.info(err)
+		}
 				
 		if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined') {
 			let selectSQL = 'SELECT * FROM images WHERE sub = "' + sub + '"';
@@ -437,15 +433,11 @@ async function getRedditImage(user, channel, sub, page = 0) {
 
 					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
 
-					imagesSent[user] = await channel.send(title + "\n " + link)
-
-					if (filteredImages[chosen].is_album)
-						logger.info(filteredImages[chosen])
-
+					imagesSent[user] = await channel.send(title + "\n" + link)
 
 					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
 
-					insert.run(function (err) {
+					var query = insert.run(function (err) {
 						if (err) {
 							logger.error("failed to insert: " + link + ' - ' + sub);
 							logger.error(err);
@@ -453,17 +445,17 @@ async function getRedditImage(user, channel, sub, page = 0) {
 							logger.log('debug', "inserted: " + link + ' - ' + sub);
 					});
 				} else {
-					channel.send("I have ran out of images to show you <:feelssad:445577555857113089>");
+					if (body.data.children.length > 0) {
+						logger.debug('Finding posts before post ' + body.data.children[body.data.children.length-1].data.title);
+						getRedditImage(user, channel, sub, body.data.children[body.data.children.length-1].data.name);
+					} else {
+						channel.send("I have ran out of images to show you <:feelssad:445577555857113089>");
+					}
 				}
 			});
 		}
-	}
-	catch{
-		channel.send('Nothing was found <:feelsdumb:445570808472141834>')
-
-	}
+	})
 }
-
 
 var helpMessage = `:robot: Current commands: :robot:  
 \`image [subreddit]\`: gets a random imgur picture from the given subreddit 
