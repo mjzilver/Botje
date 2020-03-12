@@ -28,6 +28,8 @@ var lastRequestTimer = [];
 // Initialize Discord Bot
 var bot = global.bot
 
+var fs = require('fs');
+
 bot.on('ready', () => {
 	logger.info('Connected');
 	logger.info(`Logged in as: ${bot.user.username} - ${bot.user.id}`);
@@ -119,6 +121,12 @@ bot.on('message', message => {
 				case 'purge':
 					purge(message);
 					break;
+				case 'catalog':
+					catalog(message);
+					break;
+				case 'speak':
+					speak(message);
+					break;
 				default:
 					break;
 			}
@@ -160,6 +168,86 @@ async function purge(message)
 			}
 		));
 	}
+}
+
+function catalog(message)
+{
+	// markov chain
+	var chain = {};
+	
+	logger.log('warn', 'Admin has initiated a cataloging')
+
+	var itemsProcessed = 0; 
+
+	message.channel.fetchMessages()
+	.then(messages => messages.array().forEach(
+		(message) => {
+			if(!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
+			{
+				const words = message.content.split(' ')
+				var prevWord = "";
+
+				for(var i = 0; i < words.length; i++)
+				{
+					var word = words[i];
+					word = word.toLowerCase()
+					var reg = new RegExp()
+					word = word.replace(new RegExp('/[^a-z0-9]/', 'ig'), ' ')
+					
+					if(word.length >= 2)
+					{							
+						if (!chain[prevWord])
+						{
+							chain[prevWord] = [word]
+						} else 
+						{
+							chain[prevWord].push(word)
+						}
+						prevWord = word;
+					}
+				}
+				itemsProcessed++;
+
+				if(itemsProcessed === messages.array().length)
+				{						
+					logger.log('warn', "Items processed!")
+					fs.writeFile("chain.json", JSON.stringify(chain), err => {})
+				}
+			} else 
+			{
+				itemsProcessed++;
+			}
+		}
+	));
+}
+
+function speak(message)
+{
+	catalog(message)
+	var chain = JSON.parse(fs.readFileSync('chain.json'));
+	var sentence = "";
+	var sentenceLength = Math.floor(Math.random() * 10) + 7
+	
+	if(chain[""])
+	{
+		var previousWord = chain[""][Math.floor(Math.random() * chain[""].length)]
+		sentence += previousWord
+		
+		for(i = 0; i < sentenceLength-1; i++)
+		{				
+			if(!chain[previousWord])
+			{
+				var currentWord = chain[""][Math.floor(Math.random() * chain[""].length)]
+			} else {				
+				var currentWord = chain[previousWord][Math.floor(Math.random() * chain[previousWord].length)]
+			}
+			
+			sentence += " " + currentWord
+			previousWord = currentWord
+		}
+			
+		message.channel.send(sentence);
+	} 
 }
 
 async function ping(channel, message) {
@@ -407,7 +495,7 @@ async function getRedditImage(user, channel, sub, last = '') {
 			return logger.info(err)
 		}
 				
-		if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined') {
+		if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined' && typeof (body.data.children) !== 'undefined') {
 			let selectSQL = 'SELECT * FROM images WHERE sub = "' + sub + '"';
 			var foundImages = {};
 
@@ -453,6 +541,8 @@ async function getRedditImage(user, channel, sub, last = '') {
 					}
 				}
 			});
+		} else {
+			channel.send("No images were found <:feelsdumb:445570808472141834>");
 		}
 	})
 }
