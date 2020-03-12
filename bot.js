@@ -28,6 +28,9 @@ var lastRequestTimer = [];
 // Initialize Discord Bot
 var bot = global.bot
 
+// markov chain
+var chain = {};
+
 var fs = require('fs');
 
 bot.on('ready', () => {
@@ -121,11 +124,11 @@ bot.on('message', message => {
 				case 'purge':
 					purge(message);
 					break;
-				case 'catalog':
-					catalog(message);
-					break;
 				case 'speak':
 					speak(message);
+					break;
+				case 'catalog':
+					catalog(message);
 					break;
 				default:
 					break;
@@ -170,18 +173,45 @@ async function purge(message)
 	}
 }
 
-function catalog(message)
+function speak(message)
 {
-	// markov chain
-	var chain = {};
+	var chain = JSON.parse(fs.readFileSync("json/" + message.channel.id +".json"));
+	var sentence = "";
+	var sentenceLength = Math.floor(Math.random() * 10) + 7
 	
-	logger.log('warn', 'Admin has initiated a cataloging')
+	if(chain[""])
+	{
+		var previousWord = chain[""][Math.floor(Math.random() * chain[""].length)]
+		sentence += previousWord
+		
+		for(i = 0; i < sentenceLength-1; i++)
+		{				
+			if(!chain[previousWord])
+			{
+				var currentWord = chain[""][Math.floor(Math.random() * chain[""].length)]
+			} else {				
+				var currentWord = chain[previousWord][Math.floor(Math.random() * chain[previousWord].length)]
+			}
+			
+			sentence += " " + currentWord
+			previousWord = currentWord
+		}
+			
+		message.channel.send(sentence);
+	} 
+}
+
+function catalog(message, loop = 0)
+{	
+	if(loop == 0)
+		message.delete()
 
 	var itemsProcessed = 0; 
 
-	message.channel.fetchMessages()
+	message.channel.fetchMessages({ limit: 100 })
 	.then(messages => messages.array().forEach(
 		(message) => {
+			
 			if(!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
 			{
 				const words = message.content.split(' ')
@@ -210,8 +240,16 @@ function catalog(message)
 
 				if(itemsProcessed === messages.array().length)
 				{						
-					logger.log('warn', "Items processed!")
-					fs.writeFile("chain.json", JSON.stringify(chain), err => {})
+					logger.log('warn', itemsProcessed + " - items processed!")
+					
+					if(itemsProcessed == 100 && loop <= 99)
+					{
+						logger.log('warn', "Reached 100, redoing - " + loop + " times")
+						catalog(message, ++loop);
+					} else 
+					{
+						fs.writeFile("json/" + message.channel.id +".json", JSON.stringify(chain), err => {})
+					}
 				}
 			} else 
 			{
@@ -219,35 +257,6 @@ function catalog(message)
 			}
 		}
 	));
-}
-
-function speak(message)
-{
-	catalog(message)
-	var chain = JSON.parse(fs.readFileSync('chain.json'));
-	var sentence = "";
-	var sentenceLength = Math.floor(Math.random() * 10) + 7
-	
-	if(chain[""])
-	{
-		var previousWord = chain[""][Math.floor(Math.random() * chain[""].length)]
-		sentence += previousWord
-		
-		for(i = 0; i < sentenceLength-1; i++)
-		{				
-			if(!chain[previousWord])
-			{
-				var currentWord = chain[""][Math.floor(Math.random() * chain[""].length)]
-			} else {				
-				var currentWord = chain[previousWord][Math.floor(Math.random() * chain[previousWord].length)]
-			}
-			
-			sentence += " " + currentWord
-			previousWord = currentWord
-		}
-			
-		message.channel.send(sentence);
-	} 
 }
 
 async function ping(channel, message) {
