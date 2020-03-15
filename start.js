@@ -12,8 +12,14 @@ const {
     transports
 } = require('winston')
 
+const { combine, timestamp, json } = format;
+
 loggers.add('logger', {
-    format: format.json(),
+    format: combine(
+    timestamp({
+      format: 'DD-MM-YYYY HH:mm:ss'
+    }),
+    json()),
     transports: [
         new(transports.Console)({
             colorize: true,
