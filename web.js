@@ -20,8 +20,42 @@ var imageSize = require('./config.json').imageSize;
 var Farm = require("./farm")
 var bot = global.bot;
 
+// handle files
+var fs = require('fs')
+
 // views folder is static so that it wont get to middleware
 app.use(express.static(__dirname + '/views'));
+
+app.use('/log', function (req, res) {
+	const options = {
+		from: new Date() - (24 * 60 * 60 * 1000),
+		until: new Date(),
+		limit: 1000,
+		start: 0,
+		order: 'asc',
+	};
+	
+	logger.query(options, function (err, results) {
+		if (err) 
+			logger.warn('Error in query' + err)
+		
+		var logs = []
+				
+		if(req.query.level)
+			for(var i = 0; i < results.file.length; i++)
+			{
+				if(results.file[i].level == req.query.level)
+					logs.push(results.file[i])
+			}
+		else 
+			logs = results.file
+
+		res.render('log', {
+            list: logs
+        })
+	});
+});
+
 
 app.use('/draw', function (req, res) {
     let selectSQL = 'SELECT * FROM colors ORDER BY y, x ASC';

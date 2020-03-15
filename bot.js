@@ -31,6 +31,8 @@ var bot = global.bot
 // markov chain
 var chain = {};
 
+var maxMarkov = 1000000
+
 var fs = require('fs');
 
 bot.on('ready', () => {
@@ -177,7 +179,7 @@ function speak(message)
 {
 	var chain = JSON.parse(fs.readFileSync("json/" + message.channel.id +".json"));
 	var sentence = "";
-	var sentenceLength = Math.floor(Math.random() * 10) + 7
+	var sentenceLength = Math.floor(Math.random() * 3) + 2
 	
 	if(chain[""])
 	{
@@ -208,52 +210,56 @@ function catalog(message, loop = 0)
 
 	var itemsProcessed = 0; 
 
-	message.channel.fetchMessages({ limit: 100 })
+	message.channel.fetchMessages({ limit: 100, before: message.id })
 	.then(messages => messages.array().forEach(
 		(message) => {
-			
+			itemsProcessed++;
+
 			if(!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
 			{
 				const words = message.content.split(' ')
 				var prevWord = "";
 
-				for(var i = 0; i < words.length; i++)
+				for(var i = 0; i < words.length; i += 3)
 				{
-					var word = words[i];
-					word = word.toLowerCase()
-					var reg = new RegExp()
-					word = word.replace(new RegExp('/[^a-z0-9]/', 'ig'), ' ')
-					
-					if(word.length >= 2)
-					{							
+					if(words[i] !== undefined && words[i+1] !== undefined && words[i+2] !== undefined)
+					{
+						var word = words[i] +" "+ words[i+1] +" "+ words[i+2];
+						word = word.toLowerCase()
+											
 						if (!chain[prevWord])
 						{
+							i == words.length+1;
 							chain[prevWord] = [word]
 						} else 
 						{
 							chain[prevWord].push(word)
 						}
 						prevWord = word;
+					} else if (chain[prevWord] && prevWord.length >= 2)
+					{
+						var word = words[i];
+						if(words[i+1] !== undefined)	
+							word += words[i+1]
+						
+						i == words.length+1;
+						chain[prevWord] = [word]
 					}
 				}
-				itemsProcessed++;
+			} 
+			
+			if(itemsProcessed === messages.array().length)
+			{											
+				if(itemsProcessed == 100 && loop <= maxMarkov/100)
+				{
+					logger.log('debug', "100 messages scanned - total ~" + loop*100 + " messages")
+					catalog(message, ++loop);
+				} else 
+				{
+					logger.log('debug', "End reached ~" + loop * 100 + " messages catalogged")
 
-				if(itemsProcessed === messages.array().length)
-				{						
-					logger.log('warn', itemsProcessed + " - items processed!")
-					
-					if(itemsProcessed == 100 && loop <= 99)
-					{
-						logger.log('warn', "Reached 100, redoing - " + loop + " times")
-						catalog(message, ++loop);
-					} else 
-					{
-						fs.writeFile("json/" + message.channel.id +".json", JSON.stringify(chain), err => {})
-					}
+					fs.writeFile("json/" + message.channel.id +".json", JSON.stringify(chain), err => {})
 				}
-			} else 
-			{
-				itemsProcessed++;
 			}
 		}
 	));
@@ -557,7 +563,7 @@ async function getRedditImage(user, channel, sub, last = '') {
 }
 
 var helpMessage = `:robot: Current commands: :robot:  
-\`image [subreddit]\`: gets a random imgur picture from the given subreddit 
+~~\`image [subreddit]\`: gets a random imgur picture from the given subreddit ~~
 \`reddit [subreddit]\`: gets a random link from the given subreddit 
 \`emoji\`: turns your message into emojis 
 \`react\`: reacts to your post with emojis using the text you posted
@@ -565,10 +571,8 @@ var helpMessage = `:robot: Current commands: :robot:
 \`help farm \`: shows help for farm commands
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
-\`draw\`: prints the current drawing board 
-\`draw\`: draw on the board here http://botje.ga/draw
-\`http://botje.ga/\`: visit Botje's website 
-\`Current Version\`: ` + package.version;
+~~\`draw\`: prints the current drawing board ~~
+\`Current Version\`: ` + package.versionname + '-' + package.version;
 
 var farmHelpMessage = `:seedling: Current commands for farming: :seedling:  
 \`farm\`: shows how your good boy point farm is doing
@@ -578,5 +582,4 @@ var farmHelpMessage = `:seedling: Current commands for farming: :seedling:
 \`farm seed\`: give some points to plant an extra plant on your farm
 \`farm info\`: displays information about your farm including upgrade costs and grow time
 \`farm rename\`: renames your farm (format "[username]'s [farm name] farm")
-\`farm fence\`: upgrades your fencing to a higher level
-\`Current Version\`: ` + package.version;
+\`farm fence\`: upgrades your fencing to a higher level`;
