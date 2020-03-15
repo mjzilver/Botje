@@ -4,7 +4,7 @@ block content
 	<script src="/js/log.js"></script>
 
 	<br/>
-	select(name='dropDown', id='levelSelect')
+	select(name='dropDown',class="custom-select", id='levelSelect')
 		each val in ['none','debug', 'info', 'warn', 'error']
 			option(onclick="selectLevel()")=val
 		
