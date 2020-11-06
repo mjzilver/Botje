@@ -12,14 +12,14 @@ const {
     transports
 } = require('winston')
 
-const { combine, timestamp, json } = format;
+const { combine, timestamp, colorize, printf} = format;
 
 loggers.add('logger', {
     format: combine(
-    timestamp({
-      format: 'DD-MM-YYYY HH:mm:ss'
-    }),
-    json()),
+        timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+        colorize(),
+        printf(output => `${output.timestamp} ${output.level}: ${output.message}`)
+    ),
     transports: [
         new(transports.Console)({
             colorize: true,
