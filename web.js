@@ -26,6 +26,11 @@ var fs = require('fs')
 // views folder is static so that it wont get to middleware
 app.use(express.static(__dirname + '/views'));
 
+app.use('/command', function (req, res) {
+
+	res.render('command')
+});
+
 app.use('/log', function (req, res) {
 	const options = {
 		from: new Date() - (24 * 60 * 60 * 1000),
