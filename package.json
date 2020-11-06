@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "3.0.1",
+  "version": "3.3.0",
   "versionname":"Exile",
   "description": "Discord Greenspace Bot",
   "main": "start.js",

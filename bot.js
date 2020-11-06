@@ -50,6 +50,9 @@ bot.on('error', function (error) {
 bot.on('message', message => {
 	var channel = message.channel
 
+	storemsg(message)
+
+
 	// look for the b! meaning bot command
 	if (message.content.match(new RegExp(config.prefix, "i"))) {
 		message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
@@ -59,6 +62,13 @@ bot.on('message', message => {
 		var allowed = true;
 		
 		currentTimestamp = new Date();
+		
+		// no more bert
+		if(message.author.id === '177970000420798464')
+		{
+			allowed = false;
+		}
+		
 		
 		if(!(message.author.username in lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
 			lastRequest[message.author.username] = currentTimestamp;
@@ -93,35 +103,17 @@ bot.on('message', message => {
 				case 'help':
 					helpFunction(channel, args[0])
 					break;
-				case 'image':
-					getImage(message.author.username, channel, args[0]);
-					break;
 				case 'reddit':
 					getRedditImage(message.author.username, channel, args[0]);
 					break;
-				case 'dog':
-					getDogPicture(channel, args[0]);
-					break;
 				case 'emoji':
 					turnIntoEmoji(channel, args);
-					break;
-				case 'react':
-					reactTo(message, args.join(" "));
-					break;
-				case 'points':
-					checkPoints(message);
 					break;
 				case 'ping':
 					ping(channel, message);
 					break;
 				case 'delete':
 					prune(message.author.username);
-					break;
-				case 'farm':
-					farm(message, args);
-					break;
-				case 'draw':
-					renderImage(message)
 					break;
 				case 'purge':
 					purge(message);
@@ -131,6 +123,18 @@ bot.on('message', message => {
 					break;
 				case 'catalog':
 					catalog(message);
+					break;
+				case 'count':
+					count(message);
+					break;
+				case 'top':
+					top(message);
+					break;
+				case 'word':
+					word(message);
+					break;
+				case 'emotes':
+					emotes(message);
 					break;
 				default:
 					break;
@@ -142,7 +146,8 @@ bot.on('message', message => {
 function initializeDatabase() {
 	db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
 	db.run(`CREATE TABLE IF NOT EXISTS farm (user_id TEXT PRIMARY KEY UNIQUE, yield INTEGER, tier INTEGER, fence_tier INTEGER, time INTEGER, points INTEGER, planted_at INTEGER)`)
-	db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER,y INTEGER,red INTEGER,green INTEGER,blue INTEGER,PRIMARY KEY(x,y))`)
+	db.run(`CREATE TABLE IF NOT EXISTS messages (user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, PRIMARY KEY(user_id, date, channel))`)
+	db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER,y INTEGER,red INTEGER,green INTEGER,blue INTEGER, PRIMARY KEY(x,y))`)
 }
 
 function helpFunction(channel, arg) {
@@ -156,12 +161,24 @@ function helpFunction(channel, arg) {
 	}
 }
 
+function storemsg(message) {
+	if(message.content.length >= 5 && !message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
+	{
+		var insert = db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, date) VALUES (?, ?, ?, ?, ?)', 
+			[message.author.id, message.author.username, message.content, message.channel.id, message.createdAt.getTime()]);	
+		insert.run(function (err) {
+			if (err) {
+				logger.error("failed to insert: " + message.content + ' posted by ' + message.author.username);
+				logger.error(err);
+			}
+		});
+	}
+}
+
 async function purge(message)
 {
-	if (message.member.hasPermission("ADMINISTRATOR"))
+	if(message.author.id === '265610043691499521')
 	{
-		logger.log('warn', 'Admin has initiated purge')
-
 		message.channel.fetchMessages()
 		.then(messages => messages.array().forEach(
 			(message) => {
@@ -203,6 +220,213 @@ function speak(message)
 	} 
 }
 
+function count(message)
+{
+	const args = message.content.split(' ');
+	const mention = message.mentions.users.first();
+	
+	if(args.length == 1)
+	{
+		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ' + message.channel.id;
+
+		db.get(selectSQL, [], (err, row) => {
+			if (err) {
+				throw err;
+			} else {
+				message.channel.send('Ive found '+ row['count'] +' messages in this channel');
+			}
+
+		})
+	} else if(args.length == 2 && mention) {
+		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ' + message.channel.id + ' AND user_id = ' + mention.id;
+
+		db.get(selectSQL, [], (err, row) => {
+			if (err) {
+				throw err;
+			} else {
+				message.channel.send('Ive found '+ row['count'] +' messages by ' + mention.username + ' in this channel');
+			}
+
+		})
+	} else if(args.length == 2 && args[1] == "*") {
+		let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
+		FROM messages
+		WHERE user_id NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = "` + message.channel.id +`"
+		GROUP BY LOWER(user_id)
+		HAVING count > 1
+		ORDER BY count DESC 
+		LIMIT 10`;
+		
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				var result = "Top 10 posters in this channel \n"
+				for (var i = 0; i < rows.length; i++) {
+					result += '\n' + rows[i]['user_name'] + ' has posted ' + rows[i]['count'] + ' messages!'
+				}
+				message.channel.send(result);
+			}
+		})
+	}
+}
+
+function word(message)
+{
+	const args = message.content.split(' ');
+	const mention = message.mentions.users.first();
+
+	if(!mention && !args[2])
+	{
+		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+		FROM messages
+		WHERE message LIKE "%` + args[1] + `%" AND channel = "` + message.channel.id + '"';
+		
+		db.get(selectSQL, [], (err, row) => {
+			if (err) {
+				throw err;
+			} else {
+				message.channel.send('Ive found '+ row['count'] +' messages in this channel that contain ' + args[1]);
+			}
+		})
+	} else if (args[2] && mention) {
+		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+		FROM messages
+		WHERE message LIKE "%` + args[2] + `%" 
+		AND channel = "` + message.channel.id +`" AND user_id = "` + mention.id  + '"';
+		
+		db.get(selectSQL, [], (err, row) => {
+			if (err) {
+				throw err;
+			} else {
+				message.channel.send('Ive found '+ row['count'] +' messages from ' + mention.username + ' in this channel that contain ' + args[2]);
+			}
+		})
+	} else if (args[2] == "?")
+	{
+		let selectSQL = `SELECT user_id, user_name, count(message) as count
+		FROM messages
+		WHERE message LIKE "%` + args[1] + `%" AND channel = "` + message.channel.id + `"
+		GROUP BY user_id
+		HAVING count > 1
+		ORDER BY count DESC 
+		LIMIT 10`;
+		
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				var result = "Top 10 users for the word " + args[1]  +"\n"
+				for (var i = 0; i < rows.length; i++) {
+					result += '\n' + rows[i]['user_name'] + ' said the word ' + rows[i]['count'] + ' times!'
+				}
+				message.channel.send(result);
+			}
+		})
+	}
+}
+
+function top(message)
+{
+	const args = message.content.split(' ');
+	const mention = message.mentions.users.first();
+
+	if(args.length == 1)
+	{
+		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+		FROM messages
+		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = "` + message.channel.id +`"
+		GROUP BY LOWER(message)
+		HAVING count > 1
+		ORDER BY count DESC 
+		LIMIT 10`;
+		
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				var result = "Top 10 must used sentences in this channel \n"
+				for (var i = 0; i < rows.length; i++) {
+					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
+				}
+				message.channel.send(result);
+			}
+		})
+	} else if(args.length == 2 && mention){
+		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+		FROM messages
+		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
+		AND channel = "` + message.channel.id +`" AND user_id = "` + mention.id + `"
+		GROUP BY LOWER(message)
+		HAVING count > 1
+		ORDER BY count DESC 
+		LIMIT 10`;
+		
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				var result = "Top 10 must used sentences in this channel said by " + mention.username +" \n"
+				for (var i = 0; i < rows.length; i++) {
+					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
+				}
+				message.channel.send(result);
+			}
+		})
+	} 
+}
+
+function emotes(message)
+{
+	const args = message.content.split(' ');
+	const mention = message.mentions.users.first();
+
+	if(args.length == 1)
+	{
+		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+		FROM messages
+		WHERE (message LIKE "%<%" OR message LIKE "%:%") AND message NOT LIKE "%@%"
+		AND channel = "` + message.channel.id +`"
+		GROUP BY LOWER(message)
+		HAVING count > 1
+		ORDER BY count DESC 
+		LIMIT 10`;
+		
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				var result = "Top 10 must used emotes in this channel \n"
+				for (var i = 0; i < rows.length; i++) {
+					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
+				}
+				message.channel.send(result);
+			}
+		})
+	} else if(args.length == 2 && mention){
+		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+		FROM messages
+		WHERE (message LIKE "%<%" OR message LIKE "%:%" ) AND message NOT LIKE "%@%"
+		AND channel = "` + message.channel.id +`" AND user_id = "` + mention.id + `"
+		GROUP BY LOWER(message)
+		HAVING count > 1
+		ORDER BY count DESC 
+		LIMIT 10`;
+		
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				var result = "Top 10 must used emotes in this channel said by " + mention.username +" \n"
+				for (var i = 0; i < rows.length; i++) {
+					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
+				}
+				message.channel.send(result);
+			}
+		})
+	} 
+}
+
 function catalog(message, loop = 0)
 {	
 	if(loop == 0)
@@ -217,6 +441,8 @@ function catalog(message, loop = 0)
 
 			if(!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
 			{
+				storemsg(message);
+				
 				const words = message.content.split(' ')
 				var prevWord = "";
 
@@ -563,15 +789,19 @@ async function getRedditImage(user, channel, sub, last = '') {
 }
 
 var helpMessage = `:robot: Current commands: :robot:  
-~~\`image [subreddit]\`: gets a random imgur picture from the given subreddit ~~
 \`reddit [subreddit]\`: gets a random link from the given subreddit 
 \`emoji\`: turns your message into emojis 
-\`react\`: reacts to your post with emojis using the text you posted
-\`points\`: check how much good boy points you have acquired
-\`help farm \`: shows help for farm commands
+\`word [word]\`: shows how many times a word is used in the current channel
+\`word [word] ? \`: shows how many times a word is used in the current channel per user
+\`word @user [word]\`: shows how many times a word is used in the current channel by the mentioned user
+\`count\`: counts messages in the current channel
+\`count @user\`: counts messages in the current channel from the mentioned user
+\`top\`: shows the top 10 messages in the current channel
+\`top @user\`: shows the top 10 messages in the current channel from the mentioned user
+\`emotes\`: shows the top 10 emotes in the current channel
+\`emotes @user\`: shows the top 10 emotes in the current channel from the mentioned user
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
-~~\`draw\`: prints the current drawing board ~~
 \`Current Version\`: ` + package.versionname + '-' + package.version;
 
 var farmHelpMessage = `:seedling: Current commands for farming: :seedling:  
