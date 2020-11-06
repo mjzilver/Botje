@@ -46,43 +46,40 @@ bot.on('message', message => {
 		message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
 		const args = message.content.split(' ');
 		const command = args.shift().toLowerCase();
-		
+
 		var allowed = true;
-		
+
 		currentTimestamp = new Date();
-		
-		if(!(message.author.username in lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
+
+		if (!(message.author.username in lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
 			lastRequest[message.author.username] = currentTimestamp;
 		} else {
 			// set timer
-			lastRequestTimer[message.author.username] = (message.author.username in lastRequestTimer) ? lastRequestTimer[message.author.username]: 5;
+			lastRequestTimer[message.author.username] = (message.author.username in lastRequestTimer) ? lastRequestTimer[message.author.username] : 5;
 			currentTimer = lastRequestTimer[message.author.username];
-			
-			if((currentTimestamp - lastRequest[message.author.username] < (currentTimer * 1000)))
-			{
+
+			if ((currentTimestamp - lastRequest[message.author.username] < (currentTimer * 1000))) {
 				lastRequestTimer[message.author.username] = currentTimer + 5;
-				
+
 				var diff = new Date(currentTimestamp.getTime() - lastRequest[message.author.username].getTime());
-				if(currentTimer == 5)
+				if (currentTimer == 5)
 					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds <:genoeg1:445570292023296022>')
-				else 
+				else
 					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait <:genoeg2:445570451859570688>')
 
 				allowed = false;
-			}
-			else {
+			} else {
 				lastRequestTimer[message.author.username] = 5;
 				lastRequest[message.author.username] = currentTimestamp;
 			}
 		}
-		
+
 		logger.log('debug', message.author.username + ' requested ' + command + ' with arguments ' + args);
 
-		if(allowed)
-		{
+		if (allowed) {
 			switch (command) {
 				case 'help':
-					helpFunction(channel, args[0])
+					helpFunction(channel)
 					break;
 				case 'reddit':
 					getRedditImage(message.author.username, channel, args[0]);
@@ -120,7 +117,7 @@ bot.on('message', message => {
 				default:
 					break;
 			}
-		} 
+		}
 	}
 })
 
@@ -129,15 +126,14 @@ function initializeDatabase() {
 	db.run(`CREATE TABLE IF NOT EXISTS messages (user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, PRIMARY KEY(user_id, date, channel))`)
 }
 
-function helpFunction(channel, arg) {
+function helpFunction(channel) {
 	channel.send(helpMessage)
 }
 
 function storemsg(message) {
-	if(message.content.length >= 3 && !message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
-	{
-		var insert = db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, date) VALUES (?, ?, ?, ?, ?)', 
-			[message.author.id, message.author.username, message.content, message.channel.id, message.createdAt.getTime()]);	
+	if (message.content.length >= 3 && !message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i"))) {
+		var insert = db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, date) VALUES (?, ?, ?, ?, ?)',
+			[message.author.id, message.author.username, message.content, message.channel.id, message.createdAt.getTime()]);
 		insert.run(function (err) {
 			if (err) {
 				logger.error("failed to insert: " + message.content + ' posted by ' + message.author.username);
@@ -147,80 +143,71 @@ function storemsg(message) {
 	}
 }
 
-async function purge(message)
-{
-	if(message.author.id === '265610043691499521')
-	{
+async function purge(message) {
+	if (message.author.id === '265610043691499521') {
 		message.channel.fetchMessages()
-		.then(messages => messages.array().forEach(
-			(message) => {
-				if(message.author.equals(bot.user) || message.content.match(new RegExp(config.prefix, "i")))
-				{
-					logger.log('debug', 'Purging message: ' + message.content);
-					message.delete()
+			.then(messages => messages.array().forEach(
+				(message) => {
+					if (message.author.equals(bot.user) || message.content.match(new RegExp(config.prefix, "i"))) {
+						logger.log('debug', 'Purging message: ' + message.content);
+						message.delete()
+					}
 				}
-			}
-		));
+			));
 	}
 }
 
-function speak(message)
-{
-	var chain = JSON.parse(fs.readFileSync("json/" + message.channel.id +".json"));
+function speak(message) {
+	var chain = JSON.parse(fs.readFileSync("json/" + message.channel.id + ".json"));
 	var sentence = "";
 	var sentenceLength = Math.floor(Math.random() * 3) + 2
-	
-	if(chain[""])
-	{
+
+	if (chain[""]) {
 		var previousWord = chain[""][Math.floor(Math.random() * chain[""].length)]
 		sentence += previousWord
-		
-		for(i = 0; i < sentenceLength-1; i++)
-		{				
-			if(!chain[previousWord])
-			{
+
+		for (i = 0; i < sentenceLength - 1; i++) {
+			if (!chain[previousWord]) {
 				var currentWord = chain[""][Math.floor(Math.random() * chain[""].length)]
-			} else {				
+			} else {
 				var currentWord = chain[previousWord][Math.floor(Math.random() * chain[previousWord].length)]
 			}
-			
+
 			sentence += " " + currentWord
 			previousWord = currentWord
 		}
-			
+
 		message.channel.send(sentence);
-	} 
+	}
 }
 
-function count(message)
-{
+function count(message) {
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
-	
-	if(args.length == 1)
-	{
+
+	if (args.length == 1) {
 		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ?';
 
 		db.get(selectSQL, [message.channel.id], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
-				message.channel.send('Ive found '+ row['count'] +' messages in this channel');
+				message.channel.send('Ive found ' + row['count'] + ' messages in this channel');
 			}
 
 		})
-	} else if(args.length == 2 && mention) {
+	} else if (args.length == 2 && mention) {
 		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ? AND user_id = ?';
 
 		db.get(selectSQL, [message.channel.id, mention.id], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
-				message.channel.send('Ive found '+ row['count'] +' messages by ' + mention.username + ' in this channel');
+				message.channel.send('Ive found ' + row['count'] + ' messages by ' + mention.username + ' in this channel');
 			}
 
 		})
-	} else if(args.length == 2 && args[1] == "*") {
+	} else if (args.length == 2 && args[1] == "*") {
 		let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
 		FROM messages
 		WHERE user_id NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = ?
@@ -228,7 +215,7 @@ function count(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
-		
+
 		db.all(selectSQL, [message.channel.id], (err, rows) => {
 			if (err) {
 				throw err;
@@ -243,12 +230,11 @@ function count(message)
 	}
 }
 
-function word(message)
-{
+function word(message) {
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
 
-	if(args[2] == "?") {
+	if (args[2] == "?") {
 		let selectSQL = `SELECT user_id, user_name, count(message) as count
 		FROM messages
 		WHERE message LIKE ? AND channel = ?
@@ -256,12 +242,12 @@ function word(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
-		
-		db.all(selectSQL, ['%' + args[1] + '%', message.channel.id ], (err, rows) => {
+
+		db.all(selectSQL, ['%' + args[1] + '%', message.channel.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
-				var result = "Top 10 users for the word " + args[1]  +"\n"
+				var result = "Top 10 users for the word " + args[1] + "\n"
 				for (var i = 0; i < rows.length; i++) {
 					result += '\n' + rows[i]['user_name'] + ' said the word ' + rows[i]['count'] + ' times!'
 				}
@@ -273,36 +259,34 @@ function word(message)
 		FROM messages
 		WHERE message LIKE ? 
 		AND channel = ? AND user_id = ? `;
-		
+
 		db.get(selectSQL, ['%' + args[2] + '%', message.channel.id, mention.id], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
-				message.channel.send('Ive found '+ row['count'] +' messages from ' + mention.username + ' in this channel that contain ' + args[2]);
+				message.channel.send('Ive found ' + row['count'] + ' messages from ' + mention.username + ' in this channel that contain ' + args[2]);
 			}
 		})
 	} else {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE message LIKE ?AND channel = ? `;
-		
+
 		db.get(selectSQL, ['%' + args[1] + '%', message.channel.id], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
-				message.channel.send('Ive found '+ row['count'] +' messages in this channel that contain ' + args[1]);
+				message.channel.send('Ive found ' + row['count'] + ' messages in this channel that contain ' + args[1]);
 			}
 		})
 	}
 }
 
-function top(message)
-{
+function top(message) {
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
 
-	if(args.length == 1)
-	{
+	if (args.length == 1) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = ?
@@ -310,7 +294,7 @@ function top(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
-		
+
 		db.all(selectSQL, [message.channel.id], (err, rows) => {
 			if (err) {
 				throw err;
@@ -322,7 +306,7 @@ function top(message)
 				message.channel.send(result);
 			}
 		})
-	} else if(args.length == 2 && mention){
+	} else if (args.length == 2 && mention) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
@@ -331,28 +315,26 @@ function top(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
-		
+
 		db.all(selectSQL, [message.channel.id, mention.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
-				var result = "Top 10 must used sentences in this channel said by " + mention.username +" \n"
+				var result = "Top 10 must used sentences in this channel said by " + mention.username + " \n"
 				for (var i = 0; i < rows.length; i++) {
 					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
 				}
 				message.channel.send(result);
 			}
 		})
-	} 
+	}
 }
 
-function emotes(message)
-{
+function emotes(message) {
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
 
-	if(args.length == 1)
-	{
+	if (args.length == 1) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE (message LIKE "%<%" OR message LIKE "%:%") AND message NOT LIKE "%@%"
@@ -361,7 +343,7 @@ function emotes(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
-		
+
 		db.all(selectSQL, [message.channel.id], (err, rows) => {
 			if (err) {
 				throw err;
@@ -373,7 +355,7 @@ function emotes(message)
 				message.channel.send(result);
 			}
 		})
-	} else if(args.length == 2 && mention){
+	} else if (args.length == 2 && mention) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE (message LIKE "%<%" OR message LIKE "%:%" ) AND message NOT LIKE "%@%"
@@ -382,83 +364,76 @@ function emotes(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
-		
+
 		db.all(selectSQL, [message.channel.id, mention.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
-				var result = "Top 10 must used emotes in this channel said by " + mention.username +" \n"
+				var result = "Top 10 must used emotes in this channel said by " + mention.username + " \n"
 				for (var i = 0; i < rows.length; i++) {
 					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
 				}
 				message.channel.send(result);
 			}
 		})
-	} 
+	}
 }
 
-function catalog(message, loop = 0)
-{	
-	if(loop == 0)
+function catalog(message, loop = 0) {
+	if (loop == 0)
 		message.delete()
 
-	var itemsProcessed = 0; 
+	var itemsProcessed = 0;
 
-	message.channel.fetchMessages({ limit: 100, before: message.id })
-	.then(messages => messages.array().forEach(
-		(message) => {
-			itemsProcessed++;
+	message.channel.fetchMessages({
+			limit: 100,
+			before: message.id
+		})
+		.then(messages => messages.array().forEach(
+			(message) => {
+				itemsProcessed++;
 
-			if(!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
-			{
-				storemsg(message);
-				
-				const words = message.content.split(' ')
-				var prevWord = "";
+				if (!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i"))) {
+					storemsg(message);
 
-				for(var i = 0; i < words.length; i += 3)
-				{
-					if(words[i] !== undefined && words[i+1] !== undefined && words[i+2] !== undefined)
-					{
-						var word = words[i] +" "+ words[i+1] +" "+ words[i+2];
-						word = word.toLowerCase()
-											
-						if (!chain[prevWord])
-						{
-							i == words.length+1;
+					const words = message.content.split(' ')
+					var prevWord = "";
+
+					for (var i = 0; i < words.length; i += 3) {
+						if (words[i] !== undefined && words[i + 1] !== undefined && words[i + 2] !== undefined) {
+							var word = words[i] + " " + words[i + 1] + " " + words[i + 2];
+							word = word.toLowerCase()
+
+							if (!chain[prevWord]) {
+								i == words.length + 1;
+								chain[prevWord] = [word]
+							} else {
+								chain[prevWord].push(word)
+							}
+							prevWord = word;
+						} else if (chain[prevWord] && prevWord.length >= 2) {
+							var word = words[i];
+							if (words[i + 1] !== undefined)
+								word += words[i + 1]
+
+							i == words.length + 1;
 							chain[prevWord] = [word]
-						} else 
-						{
-							chain[prevWord].push(word)
 						}
-						prevWord = word;
-					} else if (chain[prevWord] && prevWord.length >= 2)
-					{
-						var word = words[i];
-						if(words[i+1] !== undefined)	
-							word += words[i+1]
-						
-						i == words.length+1;
-						chain[prevWord] = [word]
 					}
 				}
-			} 
-			
-			if(itemsProcessed === messages.array().length)
-			{											
-				if(itemsProcessed == 100 && loop <= maxMarkov/100)
-				{
-					logger.log('debug', "100 messages scanned - total ~" + loop*100 + " messages")
-					catalog(message, ++loop);
-				} else 
-				{
-					logger.log('debug', "End reached ~" + loop * 100 + " messages catalogged")
 
-					fs.writeFile("json/" + message.channel.id +".json", JSON.stringify(chain), err => {})
+				if (itemsProcessed === messages.array().length) {
+					if (itemsProcessed == 100 && loop <= maxMarkov / 100) {
+						logger.log('debug', "100 messages scanned - total ~" + loop * 100 + " messages")
+						catalog(message, ++loop);
+					} else {
+						logger.log('debug', "End reached ~" + loop * 100 + " messages catalogged")
+
+						fs.writeFile("json/" + message.channel.id + ".json", JSON.stringify(chain), err => {})
+					}
 				}
 			}
-		}
-	));
+		));
 }
 
 async function ping(channel, message) {
@@ -493,11 +468,11 @@ async function getRedditImage(user, channel, sub, last = '') {
 		json: true
 	};
 
-	request(options, (err, res, body) => {		
+	request(options, (err, res, body) => {
 		if (err) {
 			return logger.info(err)
 		}
-				
+
 		if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined' && typeof (body.data.children) !== 'undefined') {
 			let selectSQL = 'SELECT * FROM images WHERE sub = "' + sub + '"';
 			var foundImages = {};
@@ -537,8 +512,8 @@ async function getRedditImage(user, channel, sub, last = '') {
 					});
 				} else {
 					if (body.data.children.length > 0) {
-						logger.debug('Finding posts before post ' + body.data.children[body.data.children.length-1].data.title);
-						getRedditImage(user, channel, sub, body.data.children[body.data.children.length-1].data.name);
+						logger.debug('Finding posts before post ' + body.data.children[body.data.children.length - 1].data.title);
+						getRedditImage(user, channel, sub, body.data.children[body.data.children.length - 1].data.name);
 					} else {
 						channel.send("I have ran out of images to show you <:feelssad:445577555857113089>");
 					}
