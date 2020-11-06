@@ -16,16 +16,17 @@ var lastRequest = [];
 // adding the timer (so the timeout stacks)
 var lastRequestTimer = [];
 
-// Initialize Discord Bot
-var bot = global.bot
-
 // markov chain
 var chain = {};
 var maxMarkov = 1000000
 
+// Initialize Discord Bot
+var bot = global.bot
+
 bot.on('ready', () => {
 	logger.info('Connected');
 	logger.info(`Logged in as: ${bot.user.username} - ${bot.user.id}`);
+	logger.info(`Running Version` + package.versionname + '-' + package.version);
 	initializeDatabase();
 });
 
@@ -270,10 +271,10 @@ function word(message)
 	} else if (args[2] && mention) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
-		WHERE message LIKE "%` + args[2] + `%" 
-		AND channel = "` + message.channel.id +`" AND user_id = "` + mention.id  + '"';
+		WHERE message LIKE ? 
+		AND channel = ? AND user_id = ? `;
 		
-		db.get(selectSQL, [], (err, row) => {
+		db.get(selectSQL, ['%' + args[2] + '%', message.channel.id, mention.id], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
@@ -283,9 +284,9 @@ function word(message)
 	} else {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
-		WHERE message LIKE "%` + args[1] + `%" AND channel = "` + message.channel.id + '"';
+		WHERE message LIKE ?AND channel = ? `;
 		
-		db.get(selectSQL, [], (err, row) => {
+		db.get(selectSQL, ['%' + args[1] + '%', message.channel.id], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
@@ -304,13 +305,13 @@ function top(message)
 	{
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
-		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = "` + message.channel.id +`"
+		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = ?
 		GROUP BY LOWER(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
 		
-		db.all(selectSQL, [], (err, rows) => {
+		db.all(selectSQL, [message.channel.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -325,13 +326,13 @@ function top(message)
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
-		AND channel = "` + message.channel.id +`" AND user_id = "` + mention.id + `"
+		AND channel = ? AND user_id = ?
 		GROUP BY LOWER(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
 		
-		db.all(selectSQL, [], (err, rows) => {
+		db.all(selectSQL, [message.channel.id, mention.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -355,13 +356,13 @@ function emotes(message)
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE (message LIKE "%<%" OR message LIKE "%:%") AND message NOT LIKE "%@%"
-		AND channel = "` + message.channel.id +`"
+		AND channel = ?
 		GROUP BY LOWER(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
 		
-		db.all(selectSQL, [], (err, rows) => {
+		db.all(selectSQL, [message.channel.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -376,13 +377,13 @@ function emotes(message)
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE (message LIKE "%<%" OR message LIKE "%:%" ) AND message NOT LIKE "%@%"
-		AND channel = "` + message.channel.id +`" AND user_id = "` + mention.id + `"
+		AND channel = ? AND user_id = ?
 		GROUP BY LOWER(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
 		
-		db.all(selectSQL, [], (err, rows) => {
+		db.all(selectSQL, [message.channel.id, mention.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
