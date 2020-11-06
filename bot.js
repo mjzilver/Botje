@@ -1,25 +1,16 @@
-var PNGImage = require('pngjs-image');
 var request = require('request');
 const sqlite3 = require('sqlite3');
 var logger = require('winston').loggers.get('logger');
+var fs = require('fs');
 
-// get the right configuration
-var dev = false;
-if (dev)
-	var config = require('./devconfig.json');
-else
-	var config = require('./config.json');
+var db = new sqlite3.Database("./discord.db")
 
 var package = require('./package.json');
 var emoji = require('./emoji.json');
-var db = new sqlite3.Database("./discord.db")
-
-var Farm = require("./farm")
+var config = require('./config.json');
 
 // person as key -> message as value
 var imagesSent = [];
-var imageSize = config.imageSize
-
 // person as key -> time as value
 var lastRequest = [];
 // adding the timer (so the timeout stacks)
@@ -30,10 +21,7 @@ var bot = global.bot
 
 // markov chain
 var chain = {};
-
 var maxMarkov = 1000000
-
-var fs = require('fs');
 
 bot.on('ready', () => {
 	logger.info('Connected');
@@ -52,7 +40,6 @@ bot.on('message', message => {
 
 	storemsg(message)
 
-
 	// look for the b! meaning bot command
 	if (message.content.match(new RegExp(config.prefix, "i"))) {
 		message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
@@ -62,13 +49,6 @@ bot.on('message', message => {
 		var allowed = true;
 		
 		currentTimestamp = new Date();
-		
-		// no more bert
-		if(message.author.id === '177970000420798464')
-		{
-			allowed = false;
-		}
-		
 		
 		if(!(message.author.username in lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
 			lastRequest[message.author.username] = currentTimestamp;
@@ -145,24 +125,15 @@ bot.on('message', message => {
 
 function initializeDatabase() {
 	db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
-	db.run(`CREATE TABLE IF NOT EXISTS farm (user_id TEXT PRIMARY KEY UNIQUE, yield INTEGER, tier INTEGER, fence_tier INTEGER, time INTEGER, points INTEGER, planted_at INTEGER)`)
 	db.run(`CREATE TABLE IF NOT EXISTS messages (user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, PRIMARY KEY(user_id, date, channel))`)
-	db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER,y INTEGER,red INTEGER,green INTEGER,blue INTEGER, PRIMARY KEY(x,y))`)
 }
 
 function helpFunction(channel, arg) {
-	switch (arg) {
-		case 'farm':
-			channel.send(farmHelpMessage)
-			break;
-		default:
-			channel.send(helpMessage)
-			break;
-	}
+	channel.send(helpMessage)
 }
 
 function storemsg(message) {
-	if(message.content.length >= 5 && !message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
+	if(message.content.length >= 3 && !message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")))
 	{
 		var insert = db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, date) VALUES (?, ?, ?, ?, ?)', 
 			[message.author.id, message.author.username, message.content, message.channel.id, message.createdAt.getTime()]);	
@@ -227,9 +198,9 @@ function count(message)
 	
 	if(args.length == 1)
 	{
-		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ' + message.channel.id;
+		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ?';
 
-		db.get(selectSQL, [], (err, row) => {
+		db.get(selectSQL, [message.channel.id], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
@@ -238,9 +209,9 @@ function count(message)
 
 		})
 	} else if(args.length == 2 && mention) {
-		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ' + message.channel.id + ' AND user_id = ' + mention.id;
+		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ? AND user_id = ?';
 
-		db.get(selectSQL, [], (err, row) => {
+		db.get(selectSQL, [message.channel.id, mention.id], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
@@ -251,13 +222,13 @@ function count(message)
 	} else if(args.length == 2 && args[1] == "*") {
 		let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
 		FROM messages
-		WHERE user_id NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = "` + message.channel.id +`"
+		WHERE user_id NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = ?
 		GROUP BY LOWER(user_id)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
 		
-		db.all(selectSQL, [], (err, rows) => {
+		db.all(selectSQL, [message.channel.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -276,17 +247,24 @@ function word(message)
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
 
-	if(!mention && !args[2])
-	{
-		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+	if(args[2] == "?") {
+		let selectSQL = `SELECT user_id, user_name, count(message) as count
 		FROM messages
-		WHERE message LIKE "%` + args[1] + `%" AND channel = "` + message.channel.id + '"';
+		WHERE message LIKE ? AND channel = ?
+		GROUP BY user_id
+		HAVING count > 1
+		ORDER BY count DESC 
+		LIMIT 10`;
 		
-		db.get(selectSQL, [], (err, row) => {
+		db.all(selectSQL, ['%' + args[1] + '%', message.channel.id ], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
-				message.channel.send('Ive found '+ row['count'] +' messages in this channel that contain ' + args[1]);
+				var result = "Top 10 users for the word " + args[1]  +"\n"
+				for (var i = 0; i < rows.length; i++) {
+					result += '\n' + rows[i]['user_name'] + ' said the word ' + rows[i]['count'] + ' times!'
+				}
+				message.channel.send(result);
 			}
 		})
 	} else if (args[2] && mention) {
@@ -302,25 +280,16 @@ function word(message)
 				message.channel.send('Ive found '+ row['count'] +' messages from ' + mention.username + ' in this channel that contain ' + args[2]);
 			}
 		})
-	} else if (args[2] == "?")
-	{
-		let selectSQL = `SELECT user_id, user_name, count(message) as count
+	} else {
+		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
-		WHERE message LIKE "%` + args[1] + `%" AND channel = "` + message.channel.id + `"
-		GROUP BY user_id
-		HAVING count > 1
-		ORDER BY count DESC 
-		LIMIT 10`;
+		WHERE message LIKE "%` + args[1] + `%" AND channel = "` + message.channel.id + '"';
 		
-		db.all(selectSQL, [], (err, rows) => {
+		db.get(selectSQL, [], (err, row) => {
 			if (err) {
 				throw err;
 			} else {
-				var result = "Top 10 users for the word " + args[1]  +"\n"
-				for (var i = 0; i < rows.length; i++) {
-					result += '\n' + rows[i]['user_name'] + ' said the word ' + rows[i]['count'] + ' times!'
-				}
-				message.channel.send(result);
+				message.channel.send('Ive found '+ row['count'] +' messages in this channel that contain ' + args[1]);
 			}
 		})
 	}
@@ -496,28 +465,6 @@ async function ping(channel, message) {
 	m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(bot.ping)}ms`);
 }
 
-function getDogPicture(channel, breed = "") {
-	if (breed == "") {
-		request('https://dog.ceo/api/breeds/image/random', {
-			json: true
-		}, (err, res, body) => {
-			if (err) {
-				return logger.info(err)
-			}
-			channel.send(body.message);
-		});
-	} else {
-		request(`https://dog.ceo/api/breed/${breed}/images/random`, {
-			json: true
-		}, (err, res, body) => {
-			if (err) {
-				return logger.info(err)
-			}
-			channel.send(body.message);
-		});
-	}
-}
-
 function turnIntoEmoji(channel, sentence) {
 	sentence = sentence.join(' ');
 	sentence = sentence.toLowerCase();
@@ -532,197 +479,11 @@ function turnIntoEmoji(channel, sentence) {
 	channel.send(result);
 }
 
-function reactTo(message, sentence) {
-	sentence = sentence.toLowerCase();
-
-	if (sentence.length > 0) {
-		var startchar = sentence.charAt(0); {
-			if (startchar >= 'a' && startchar <= 'z') {
-				message.react(emoji['letter_' + startchar]).then(setTimeout(() => {
-					reactTo(message, sentence.substring(1));
-				}, 500));
-			} else {
-				reactTo(message, sentence.substring(1));
-			}
-		}
-	}
-}
-
-function checkPoints(message) {
-	var mentioned_user = message.mentions.users.first();
-	var member = message.guild.member(mentioned_user);
-
-	var checkrepfor = 0;
-
-	if (member)
-		checkrepfor = mentioned_user;
-	else
-		checkrepfor = message.author
-
-	let selectSQL = 'SELECT points FROM farm WHERE user_id = ' + checkrepfor.id;
-
-	db.get(selectSQL, [], (err, row) => {
-		if (err) {
-			throw err;
-		}
-
-		if (row["points"] == null)
-			message.channel.send('You dont have any good boy points');
-		else
-			message.channel.send(checkrepfor.username + ' has ' + row["points"] + ' good boy points');
-	})
-}
-
-function renderImage(message) {
-	var image = PNGImage.createImage(imageSize * 2, imageSize * 2);
-	image.fillRect(0, 0, imageSize * 2, imageSize * 2, {
-		red: 255,
-		green: 255,
-		blue: 255,
-		alpha: 255
-	})
-
-	let selectSQL = 'SELECT * FROM colors';
-
-	db.all(selectSQL, [], async (err, rows) => {
-		if (err) {
-			throw err;
-		}
-		for (var i = 0; i < rows.length; i++) {
-			if (rows[i].x >= 0 && rows[i].x < imageSize && rows[i].y >= 0 && rows[i].y < imageSize) {
-				image.fillRect(rows[i].x * 2, rows[i].y * 2, 2, 2, {
-					red: rows[i].red,
-					green: rows[i].green,
-					blue: rows[i].blue,
-					alpha: 255
-				});
-			}
-		}
-
-		image.writeImage('./views/images/image.png', function (err) {
-			message.channel.send("Current image", {
-				files: ["./views/images/image.png"]
-			});
-		});
-	});
-}
-
-function farm(message, arguments) {
-	var mentioned_user = message.mentions.users.first();
-	var member = message.guild.member(mentioned_user);
-
-	var channel = message.channel
-
-	if (!member) {
-		var selectedfarm = Farm.init(message.author);
-
-		switch (arguments[0]) {
-			case 'harvest':
-				selectedfarm.harvest(channel)
-				break;
-			case 'seed':
-				selectedfarm.seed(channel)
-				break;
-			case 'upgrade':
-				selectedfarm.upgrade(channel)
-				break;
-			case 'fence':
-				selectedfarm.upgradefence(channel)
-				break;
-			case 'info':
-				selectedfarm.info(channel)
-				break;
-			case 'rename':
-				selectedfarm.editnickname(channel, arguments.slice(1).join(' '))
-				break;
-			default:
-				selectedfarm.print(channel)
-				break;
-		}
-	} else {
-		var selectedfarm = Farm.init(mentioned_user);
-
-		switch (arguments[1]) {
-			case 'info':
-				selectedfarm.info(channel)
-				break;
-			default:
-				selectedfarm.print(channel)
-				break;
-		}
-	}
-}
-
 function prune(user, amount = 1) {
 	if (imagesSent[user]) {
 		imagesSent[user].delete().then(logger.log('warn', "deleted: " + imagesSent[user].content));
 		delete imagesSent[user];
 	}
-}
-
-function getImage(user, channel, sub, page = 0) {
-	const options = {
-		//https://api.imgur.com/3/gallery/r/{{subreddit}}/{{sort}}/{{window}}/{{page}}
-		url: 'https://api.imgur.com/3/gallery/r/' + sub + '/hot/day/' + page,
-		headers: {
-			'Authorization': 'Client-ID ' + config.imgur
-		},
-		json: true
-	};
-
-	request(options, (err, res, body) => {
-		if (err) {
-			return logger.info(err)
-		}
-		if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined' && typeof (body.data[0]) !== 'undefined') {
-			let selectSQL = 'SELECT * FROM images WHERE sub = "' + sub + '"';
-			var foundImages = {};
-
-			db.all(selectSQL, [], async (err, rows) => {
-				if (err) {
-					throw err;
-				}
-				for (var i = 0; i < rows.length; i++) {
-					foundImages[rows[i].link] = true;
-				}
-
-				var filteredImages = [];
-
-				for (var i = 0; i < body.data.length; i++) {
-					if (!(body.data[i].link in foundImages))
-						filteredImages.push(body.data[i]);
-				}
-
-				if (filteredImages.length > 0) {
-					var chosen = Math.floor(Math.random() * filteredImages.length);
-					var link = filteredImages[chosen].link;
-
-					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
-
-					imagesSent[user] = await channel.send(link);
-
-					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
-
-					insert.run(function (err) {
-						if (err) {
-							logger.error("failed to insert: " + link);
-							logger.error(err);
-						} else
-							logger.log('debug', "inserted: " + link);
-					});
-				} else {
-					if (body.data.length > 0) {
-						logger.debug(page + ' page of images used');
-						getImage(user, channel, sub, ++page);
-					} else {
-						channel.send("I have ran out of images to show you <:feelssad:445577555857113089>");
-					}
-				}
-			});
-		} else {
-			channel.send("No images were found <:feelsdumb:445570808472141834>");
-		}
-	});
 }
 
 async function getRedditImage(user, channel, sub, last = '') {
@@ -803,13 +564,3 @@ var helpMessage = `:robot: Current commands: :robot:
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
 \`Current Version\`: ` + package.versionname + '-' + package.version;
-
-var farmHelpMessage = `:seedling: Current commands for farming: :seedling:  
-\`farm\`: shows how your good boy point farm is doing
-\`farm @person\`: shows how @person's good boy point farm is doing
-\`farm harvest\`: harvest your good boy points
-\`farm upgrade\`: give some points to upgrade your plants to produce one more point per plant
-\`farm seed\`: give some points to plant an extra plant on your farm
-\`farm info\`: displays information about your farm including upgrade costs and grow time
-\`farm rename\`: renames your farm (format "[username]'s [farm name] farm")
-\`farm fence\`: upgrades your fencing to a higher level`;

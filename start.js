@@ -40,4 +40,3 @@ process.on('uncaughtException', function (error) {
 });
 
 require('./bot.js');
-require('./web.js');
