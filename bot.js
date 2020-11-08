@@ -34,7 +34,7 @@ bot.on('error', function (error) {
 bot.on('message', message => {
 	var channel = message.channel
 
-	storemsg(message)
+	storemsg(message);
 
 	// look for the b! meaning bot command
 	if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user))  {

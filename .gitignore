@@ -66,4 +66,5 @@ bot.log
 # dont include the config
 config.json
 
+# dont include the db
 discord.db
