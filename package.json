@@ -1,8 +1,8 @@
 {
   "name": "botje",
-  "version": "4.0.1",
-  "versionname": "Exile",
-  "description": "Discord Greenspace Bot",
+  "version": "5.0",
+  "versionname": "Revival",
+  "description": "Discord Bot",
   "main": "start.js",
   "author": "Mick",
   "dependencies": {

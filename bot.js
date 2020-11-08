@@ -20,7 +20,7 @@ var bot = global.bot
 bot.on('ready', () => {
 	logger.info('Connected');
 	logger.info(`Logged in as: ${bot.user.username} - ${bot.user.id}`);
-	logger.info(`Running Version` + package.versionname + '-' + package.version);
+	logger.info(`Running Version ` + package.versionname + ' - ' + package.version);
 
 	initializeDatabase();
 });
@@ -58,9 +58,9 @@ bot.on('message', message => {
 
 				var diff = new Date(currentTimestamp.getTime() - lastRequest[message.author.username].getTime());
 				if (currentTimer == 5)
-					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds <:genoeg1:445570292023296022>')
+					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds')
 				else
-					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait <:genoeg2:445570451859570688>')
+					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait')
 
 				allowed = false;
 			} else {
