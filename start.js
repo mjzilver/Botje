@@ -40,3 +40,4 @@ process.on('uncaughtException', function (error) {
 });
 
 require('./bot.js');
+require('./io.js');

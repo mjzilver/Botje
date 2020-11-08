@@ -2,11 +2,13 @@ var request = require('request');
 const sqlite3 = require('sqlite3');
 var logger = require('winston').loggers.get('logger');
 var fs = require('fs');
+var moment = require('moment');
 
 var db = new sqlite3.Database("./discord.db")
 
 var package = require('./package.json');
 var emoji = require('./emoji.json');
+var letter_values = require('./letter_values.json');
 var config = require('./config.json');
 
 // person as key -> message as value
@@ -15,6 +17,8 @@ var imagesSent = [];
 var lastRequest = [];
 // adding the timer (so the timeout stacks)
 var lastRequestTimer = [];
+
+var loginTime = Date(0);
 
 // markov chain
 var chain = {};
@@ -27,6 +31,8 @@ bot.on('ready', () => {
 	logger.info('Connected');
 	logger.info(`Logged in as: ${bot.user.username} - ${bot.user.id}`);
 	logger.info(`Running Version` + package.versionname + '-' + package.version);
+
+	loginTime = Date.now();
 	initializeDatabase();
 });
 
@@ -42,7 +48,7 @@ bot.on('message', message => {
 	storemsg(message)
 
 	// look for the b! meaning bot command
-	if (message.content.match(new RegExp(config.prefix, "i"))) {
+	if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user))  {
 		message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
 		const args = message.content.split(' ');
 		const command = args.shift().toLowerCase();
@@ -88,7 +94,10 @@ bot.on('message', message => {
 					turnIntoEmoji(channel, args);
 					break;
 				case 'ping':
-					ping(channel, message);
+					ping(message);
+					break;
+				case 'uptime':
+					uptime(message);
 					break;
 				case 'delete':
 					prune(message.author.username);
@@ -114,7 +123,14 @@ bot.on('message', message => {
 				case 'emotes':
 					emotes(message);
 					break;
+				case 'score':
+					score(message);
+					break;
+				case 'syllables':
+					syllables(message);
+					break;
 				default:
+					channel.send(command + ' isnt a command retard')
 					break;
 			}
 		}
@@ -146,15 +162,44 @@ function storemsg(message) {
 async function purge(message) {
 	if (message.author.id === '265610043691499521') {
 		message.channel.fetchMessages()
-			.then(messages => messages.array().forEach(
-				(message) => {
-					if (message.author.equals(bot.user) || message.content.match(new RegExp(config.prefix, "i"))) {
-						logger.log('debug', 'Purging message: ' + message.content);
-						message.delete()
-					}
+		.then(messages => messages.array().forEach(
+			(message) => {
+				if (message.author.equals(bot.user) || message.content.match(new RegExp(config.prefix, "i"))) {
+					logger.log('warn', 'Purging message: ' + message.content);
+					message.delete()
 				}
-			));
+			}
+		));
 	}
+}
+
+function nuke(message, loop = 0) {
+	if (loop == 0)
+		message.delete()
+
+	var itemsProcessed = 0;
+
+	message.channel.fetchMessages({
+			limit: 100,
+			before: message.id
+		})
+	.then(messages => messages.array().forEach(
+		(message) => {
+			itemsProcessed++;
+
+			logger.log('warn', 'NUKING message: ' + message.content);
+			message.delete()
+
+			if (itemsProcessed === messages.array().length) {
+				if (itemsProcessed == 100 && loop <= maxMarkov / 100) {
+					logger.log('debug', "100 messages NUKED - total ~" + loop * 100 + " messages NUKED")
+					nuke(message, ++loop);
+				} else {
+					logger.log('warn', "End reached ~" + (loop+1) * 100 + " messages NUKED")
+				}
+			}
+		}
+	));
 }
 
 function speak(message) {
@@ -179,6 +224,173 @@ function speak(message) {
 
 		message.channel.send(sentence);
 	}
+}
+
+
+function syllables(message) {
+	const mention = message.mentions.users.first();
+	if(!mention)
+	{
+		let selectSQL = `SELECT user_id, user_name, message
+		FROM messages 
+		WHERE channel = ${message.channel.id}
+		ORDER BY user_id`
+
+		var userdata = {};
+
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				for (var i = 0; i < rows.length; i++) {
+					var user_name = rows[i]['user_name']
+
+					if(!userdata[user_name])
+						userdata[user_name] = {'syllables': 0, 'total': 0, 'average' : 0};
+
+
+					var syllables = calculateSyllables(rows[i]['message']);
+					if(syllables >= 1)
+					{
+						userdata[user_name]['syllables'] += syllables
+
+						userdata[user_name]['total'] += 1
+					}
+				}
+
+				var sorted = [];
+				for (var user in userdata) {
+					// magical calculation
+					userdata[user]['average'] = Math.round(userdata[user]['syllables'] / userdata[user]['total']);
+
+					sorted.push([user, userdata[user]['average']]);
+				}
+				
+				sorted.sort(function(a, b) {
+					return b[1]- a[1];
+				});
+				var result = "Top 10 most intellectual posters \n"
+
+				for (var i = 0; (i < sorted.length && i <= 10); i++) {
+					result += '\n' + sorted[i][0] + ' has an average of ' + sorted[i][1] + " syllables per post"
+				}
+				message.channel.send(result);
+			}
+		})
+	} else {
+		let selectSQL = `SELECT user_id, user_name, message
+		FROM messages 
+		WHERE channel = ${message.channel.id} AND user_id = ${mention.id} `
+
+		var userdata = {'syllables': 0, 'total': 0, 'average' : 0}
+
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				for (var i = 0; i < rows.length; i++) {
+					var syllables = calculateSyllables(rows[i]['message']);
+					if(syllables >= 1)
+					{
+						userdata['syllables'] += syllables
+
+						userdata['total'] += 1
+					}
+				}
+
+				userdata['average'] = Math.round(userdata['syllables'] / userdata['total']);
+
+				message.channel.send(`${mention.username} has an average of ${userdata['average']} syllables per post`);
+			}
+		})
+	}
+}
+
+function score(message) {
+	const mention = message.mentions.users.first();
+
+	if(mention) {
+		let selectSQL = `SELECT user_id, user_name, message
+		FROM messages 
+		WHERE channel = ${message.channel.id} AND user_id = ${mention.id} `
+
+		var userdata = {'points': 0, 'total': 0, 'quality' : 0}
+
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				for (var i = 0; i < rows.length; i++) {
+					userdata['points'] += calculateScore(rows[i]['message'])
+
+					userdata['total'] += rows[i]['message'].length
+				}
+
+				userdata['quality'] = Math.round(((userdata['points'] / userdata['total']) * 100) / 2);
+
+				message.channel.send(`${mention.username}'s post quality is ${userdata['quality']}%`);
+			}
+		})
+	} else {
+		let selectSQL = `SELECT user_id, user_name, message
+		FROM messages 
+		WHERE channel = ${message.channel.id}
+		ORDER BY user_id`
+
+		var userdata = {};
+
+		db.all(selectSQL, [], (err, rows) => {
+			if (err) {
+				throw err;
+			} else {
+				for (var i = 0; i < rows.length; i++) {
+					var user_name = rows[i]['user_name']
+
+					if(!userdata[user_name])
+						userdata[user_name] = {'points': 0, 'total': 0, 'quality' : 0};
+
+					userdata[user_name]['points'] += calculateScore(rows[i]['message'])
+
+					userdata[user_name]['total'] += rows[i]['message'].length
+				}
+
+				var sorted = [];
+				for (var user in userdata) {
+					// magical calculation
+					userdata[user]['quality'] = Math.round(((userdata[user]['points'] / userdata[user]['total']) * 100) / 2);
+
+					sorted.push([user, userdata[user]['quality']]);
+				}
+				
+				sorted.sort(function(a, b) {
+					return b[1]- a[1];
+				});
+				var result = "Top 10 quality posters \n"
+
+				for (var i = 0; (i < sorted.length && i <= 10); i++) {
+					result += '\n' + sorted[i][0] + '\'s post quality is ' + sorted[i][1] + "%"
+				}
+				message.channel.send(result);
+			}
+		})
+	}
+}
+
+function calculateScore(message)
+{
+	var score = 0;
+	for (var i = 0; i < message.length; i++) {
+		score += letter_values[message.charAt(i)] === undefined ? 0 : letter_values[message.charAt(i)]
+	}
+	return score;
+}
+
+function calculateSyllables(message)
+{
+	var message = message.replace(/e /i)
+	var message = message.replace(/ y/i)
+	var score = message.match(/(?:[aeiouy]{1,2})/gi)
+	return score ? score.length : 0;
 }
 
 function count(message) {
@@ -207,7 +419,7 @@ function count(message) {
 			}
 
 		})
-	} else if (args.length == 2 && args[1] == "*") {
+	} else if (args.length == 2 && args[1] == "?") {
 		let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
 		FROM messages
 		WHERE user_id NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = ?
@@ -389,56 +601,67 @@ function catalog(message, loop = 0) {
 			limit: 100,
 			before: message.id
 		})
-		.then(messages => messages.array().forEach(
-			(message) => {
-				itemsProcessed++;
+	.then(messages => messages.array().forEach(
+		(message) => {
+			itemsProcessed++;
 
-				if (!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i"))) {
-					storemsg(message);
+			if (!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i"))) {
+				storemsg(message);
 
-					const words = message.content.split(' ')
-					var prevWord = "";
+				const words = message.content.split(' ')
+				var prevWord = "";
 
-					for (var i = 0; i < words.length; i += 3) {
-						if (words[i] !== undefined && words[i + 1] !== undefined && words[i + 2] !== undefined) {
-							var word = words[i] + " " + words[i + 1] + " " + words[i + 2];
-							word = word.toLowerCase()
+				for (var i = 0; i < words.length; i += 3) {
+					if (words[i] !== undefined && words[i + 1] !== undefined && words[i + 2] !== undefined) {
+						var word = words[i] + " " + words[i + 1] + " " + words[i + 2];
+						word = word.toLowerCase()
 
-							if (!chain[prevWord]) {
-								i == words.length + 1;
-								chain[prevWord] = [word]
-							} else {
-								chain[prevWord].push(word)
-							}
-							prevWord = word;
-						} else if (chain[prevWord] && prevWord.length >= 2) {
-							var word = words[i];
-							if (words[i + 1] !== undefined)
-								word += words[i + 1]
-
+						if (!chain[prevWord]) {
 							i == words.length + 1;
 							chain[prevWord] = [word]
+						} else {
+							chain[prevWord].push(word)
 						}
-					}
-				}
+						prevWord = word;
+					} else if (chain[prevWord] && prevWord.length >= 2) {
+						var word = words[i];
+						if (words[i + 1] !== undefined)
+							word += words[i + 1]
 
-				if (itemsProcessed === messages.array().length) {
-					if (itemsProcessed == 100 && loop <= maxMarkov / 100) {
-						logger.log('debug', "100 messages scanned - total ~" + loop * 100 + " messages")
-						catalog(message, ++loop);
-					} else {
-						logger.log('debug', "End reached ~" + loop * 100 + " messages catalogged")
-
-						fs.writeFile("json/" + message.channel.id + ".json", JSON.stringify(chain), err => {})
+						i == words.length + 1;
+						chain[prevWord] = [word]
 					}
 				}
 			}
-		));
+
+			if (itemsProcessed === messages.array().length) {
+				if (itemsProcessed == 100 && loop <= maxMarkov / 100) {
+					logger.log('debug', "100 messages scanned - total ~" + loop * 100 + " messages")
+					catalog(message, ++loop);
+				} else {
+					logger.log('debug', "End reached ~" + loop * 100 + " messages catalogged")
+
+					fs.writeFile("json/" + message.channel.id + ".json", JSON.stringify(chain), err => {})
+				}
+			}
+		}
+	));
 }
 
-async function ping(channel, message) {
+async function ping(message) {
 	const m = await message.channel.send("Ping?");
 	m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(bot.ping)}ms`);
+}
+
+function uptime(message) {
+	//var timepassed = moment.duration(moment().diff(loginTime));
+	var login = moment(loginTime);
+	const now = moment();
+	hours = now.diff(login, 'hours');
+	minutes = now.subtract(hours, 'hours').diff(login, 'minutes');
+	seconds = now.subtract(minutes, 'minutes').diff(login, 'seconds');
+
+	message.channel.send(`I have been online for ${hours} hours, ${minutes} minutes and ${seconds} seconds.`)
 }
 
 function turnIntoEmoji(channel, sentence) {
@@ -531,6 +754,8 @@ var helpMessage = `:robot: Current commands: :robot:
 \`word [word]\`: shows how many times a word is used in the current channel
 \`word [word] ? \`: shows how many times a word is used in the current channel per user
 \`word @user [word]\`: shows how many times a word is used in the current channel by the mentioned user
+\`score\`: shows the top quality posters in the channel
+\`score @user\`: shows the quality of posts in this channel by the mentioned user
 \`count\`: counts messages in the current channel
 \`count @user\`: counts messages in the current channel from the mentioned user
 \`top\`: shows the top 10 messages in the current channel
