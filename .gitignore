@@ -63,7 +63,7 @@ typings/
 # dont include the log
 bot.log
 
-discord.db
+# dont include the config
+config.json
 
-./view/images/image.png
-views/images/image.png
+discord.db
