@@ -5,6 +5,7 @@ var emotes = require('./commands/emotes.js');
 var ping = require('./commands/ping.js');
 var reddit = require('./commands/reddit.js');
 var score = require('./commands/score.js');
+var quality = require('./commands/quality.js');
 var syllables = require('./commands/syllables.js');
 var top = require('./commands/top.js');
 var uptime = require('./commands/uptime.js');
@@ -19,6 +20,7 @@ var commands = {
    "ping" : ping,
    "reddit" : reddit,
    "score" : score,
+   "quality" : quality,
    "syllables" : syllables,
    "top" : top,
    "uptime" : uptime,

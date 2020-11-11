@@ -2,7 +2,6 @@ var request = require('request');
 var logger = require('winston').loggers.get('logger');
 
 module.exports = async function getRedditImage(message, db, last = '') {
-    console.log(1)
 	const args = message.content.split(' ');
 	var sub = args[1]
 	var channel = message.channel
@@ -43,11 +42,10 @@ module.exports = async function getRedditImage(message, db, last = '') {
 
 					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
 
-					await channel.send(title + "\n" + link)
+					channel.send(title + "\n" + link)
 
 					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
-
-					var query = insert.run(function (err) {
+					insert.run(function (err) {
 						if (err) {
 							logger.error("failed to insert: " + link + ' - ' + sub);
 							logger.error(err);
