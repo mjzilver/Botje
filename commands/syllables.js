@@ -48,12 +48,12 @@ module.exports = function syllables(message, db) {
 				sorted.sort(function(a, b) {
 					return b[1]- a[1];
 				});
-				var result = "Top 10 most intellectual posters \n"
+				var result = "```Top 10 most intellectual posters \n"
 
 				for (var i = 0; (i < sorted.length && i <= 10); i++) {
 					result += '\n' + sorted[i][0] + ' has an average of ' + sorted[i][1] + " syllables per post"
 				}
-				message.channel.send(result);
+				message.channel.send(result + "```");
 			}
 		})
 	} else {

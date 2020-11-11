@@ -16,11 +16,11 @@ module.exports = function word(message, db) {
 			if (err) {
 				throw err;
 			} else {
-				var result = "Top 10 users for the word " + args[1] + "\n"
+				var result = "```Top 10 users for the word " + args[1] + "\n"
 				for (var i = 0; i < rows.length; i++) {
 					result += '\n' + rows[i]['user_name'] + ' said the word ' + rows[i]['count'] + ' times!'
 				}
-				message.channel.send(result);
+				message.channel.send(result + "```");
 			}
 		})
 	} else if (args[2] && mention) {

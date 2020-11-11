@@ -8,6 +8,7 @@ var config = require('./config.json');
 
 var commands = require('./commands.js');
 var admincommands = require('./admincommands.js');
+const { Attachment } = require('discord.js');
 
 // person as key -> time as value
 var lastRequest = [];
@@ -76,10 +77,41 @@ bot.on('message', message => {
 				commands[command](message, db);
 
 		// only me for now
-		if(message.author.id === '265610043691499521')
+		if(message.author.id === config.owner)
 			if(command in admincommands)
 				admincommands[command](message, db);
 	}
+})
+
+bot.on('messageDelete', message => {
+	message.guild.members.get(config.owner).send(` \`\`\`
+		This Message has been deleted
+		-----------------------------
+		${message.author.username}: ${message.content} 
+		Send at: ${new Date(message.createdTimestamp).toUTCString()}
+		\`\`\``);
+
+	if(message.edits.length > 1)
+	{
+		message.edits.forEach(edit => {
+			message.guild.members.get(config.owner).send(` \`\`\`
+				This edit belongs to  
+				${message.author.username}: ${message.content} 
+				-----------------------------
+				${edit.content} 
+				Edited at: ${new Date(edit.editedTimestamp).toUTCString()}
+				\`\`\``);
+		});
+	}
+
+	message.attachments.forEach(attachment => {
+		message.guild.members.get(config.owner).send(` \`\`\`
+		This attachment belongs to  
+		${message.author.username}: ${message.content} 
+		-----------------------------
+		${attachment.url}
+		\`\`\``);
+	});
 })
 
 function initializeDatabase() {

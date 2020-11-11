@@ -16,11 +16,11 @@ module.exports = function top(message, db) {
 			if (err) {
 				throw err;
 			} else {
-				var result = "Top 10 must used sentences in this channel \n"
+				var result = "```Top 10 must used sentences in this channel \n"
 				for (var i = 0; i < rows.length; i++) {
 					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
 				}
-				message.channel.send(result);
+				message.channel.send(result + "```");
 			}
 		})
 	} else if (args.length == 2 && mention) {
@@ -37,11 +37,11 @@ module.exports = function top(message, db) {
 			if (err) {
 				throw err;
 			} else {
-				var result = "Top 10 must used sentences in this channel said by " + mention.username + " \n"
+				var result = "```Top 10 must used sentences in this channel said by " + mention.username + " \n"
 				for (var i = 0; i < rows.length; i++) {
 					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
 				}
-				message.channel.send(result);
+				message.channel.send(result + "```");
 			}
 		})
 	}
