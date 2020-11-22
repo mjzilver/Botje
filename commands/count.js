@@ -1,7 +1,7 @@
-
-module.exports = function count(message, db) {
+module.exports = function count(message) {
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
+	const db = global.database.db;
 
 	if (args.length == 1) {
 		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ?';

@@ -1,6 +1,4 @@
-var logger = require('winston').loggers.get('logger');
-
-module.exports = function nuke(message, db, loop = 0) {
+module.exports = function nuke(message, loop = 0) {
     if (loop == 0)
         message.delete()
 
@@ -14,15 +12,15 @@ module.exports = function nuke(message, db, loop = 0) {
         (message) => {
             itemsProcessed++;
 
-            logger.log('warn', 'NUKING message: ' + message.content);
+            global.logger.log('warn', 'NUKING message: ' + message.content);
             message.delete()
 
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
-                    logger.log('debug', "100 messages NUKED - total ~" + loop * 100 + " messages NUKED")
-                    nuke(message, db, ++loop);
+                    global.logger.log('debug', "100 messages NUKED - total ~" + loop * 100 + " messages NUKED")
+                    nuke(message, ++loop);
                 } else {
-                    logger.log('warn', "End reached ~" + ((loop * 100) + itemsProcessed) + " messages NUKED")
+                    global.logger.log('warn', "End reached ~" + ((loop * 100) + itemsProcessed) + " messages NUKED")
                 }
             }
         }

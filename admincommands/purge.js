@@ -1,12 +1,9 @@
-var config = require('../config.json');
-var logger = require('winston').loggers.get('logger');
-
-module.exports = async function purge(message, db) {
+module.exports = async function purge(message) {
     message.channel.fetchMessages()
     .then(messages => messages.array().forEach(
         (message) => {
-            if (message.author.equals(bot.user) || message.content.match(new RegExp(config.prefix, "i"))) {
-                logger.log('warn', 'Purging message: ' + message.content);
+            if (message.author.equals(bot.user) || message.content.match(new RegExp(global.config.prefix, "i"))) {
+                global.logger.log('warn', 'Purging message: ' + message.content);
                 message.delete()
             }
         }

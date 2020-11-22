@@ -6,8 +6,10 @@ function calculateSyllables(message)
 	return score ? score.length : 0;
 }
 
-module.exports = function syllables(message, db) {
+module.exports = function syllables(message) {
 	const mention = message.mentions.users.first();
+	const db = global.database.db;
+
 	if(!mention)
 	{
 		let selectSQL = `SELECT user_id, user_name, message

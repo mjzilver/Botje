@@ -9,8 +9,9 @@ function calculateScore(message)
 	return score;
 }
 
-module.exports = function score(message, db) {
+module.exports = function score(message) {
 	const mention = message.mentions.users.first();
+	const db = global.database.db;
 
 	if(mention) {
 		let selectSQL = `SELECT user_id, user_name, message

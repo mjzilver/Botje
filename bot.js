@@ -1,133 +1,112 @@
-const sqlite3 = require('sqlite3');
-var logger = require('winston').loggers.get('logger');
+class Bot {
+	constructor() {
+		this.commands = require('./commands.js');
+		this.admincommands = require('./admincommands.js');
+		
+		// person as key -> time as value
+		this.lastRequest = [];
+		// adding the timer (so the timeout stacks)
+		this.lastRequestTimer = [];
+	
+		global.discord = discord;
+		this.bot = new discord.Client({
+			autoReconnect: true
+		})
+		global.bot = this.bot;
+	
+		this.bot.on('ready', () => {
+			global.logger.info('Connected');
+			global.logger.info(`Logged in as: ${this.bot.user.username} - ${this.bot.user.id}`);
+			global.logger.info(`Running Version ` + global.package.versionname + ' - ' + global.package.version);
+		});
 
-var db = new sqlite3.Database("./discord.db")
+		this.bot.login(global.config.token);
 
-var package = require('./package.json');
-var config = require('./config.json');
+		this.bot.on('error', function (error) {
+			global.logger.error(error.message);
+		});
 
-var commands = require('./commands.js');
-var admincommands = require('./admincommands.js');
-const { Attachment } = require('discord.js');
+		this.bot.on('message', message => {
+			var channel = message.channel
 
-// person as key -> time as value
-var lastRequest = [];
-// adding the timer (so the timeout stacks)
-var lastRequestTimer = [];
+			global.database.storemessage(message);
 
-// Initialize Discord Bot
-var bot = global.bot
+			// look for the b! meaning bot command
+			if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user))  {
+				message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
+				const args = message.content.split(' ');
+				const command = args.shift().toLowerCase();
 
-bot.on('ready', () => {
-	logger.info('Connected');
-	logger.info(`Logged in as: ${bot.user.username} - ${bot.user.id}`);
-	logger.info(`Running Version ` + package.versionname + ' - ' + package.version);
+				var allowed = true;
 
-	initializeDatabase();
-});
+				this.currentTimestamp = new Date();
 
-bot.login(config.token);
+				if (!(message.author.username in this.lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
+					this.lastRequest[message.author.username] = this.currentTimestamp;
+				} else {
+					// set timer
+					this.lastRequestTimer[message.author.username] = (message.author.username in this.lastRequestTimer) ? this.lastRequestTimer[message.author.username] : 5;
+					currentTimer = this.lastRequestTimer[message.author.username];
 
-bot.on('error', function (error) {
-	logger.error(error.message);
-});
+					if ((currentTimestamp - this.lastRequest[message.author.username] < (currentTimer * 1000))) {
+						this.lastRequestTimer[message.author.username] = currentTimer + 5;
 
-bot.on('message', message => {
-	var channel = message.channel
+						var diff = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime());
+						if (currentTimer == 5)
+							channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds')
+						else
+							channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait')
 
-	storemsg(message);
+						allowed = false;
+					} else {
+						this.lastRequestTimer[message.author.username] = 5;
+						this.lastRequest[message.author.username] = currentTimestamp;
+					}
+				}
 
-	// look for the b! meaning bot command
-	if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user))  {
-		message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
-		const args = message.content.split(' ');
-		const command = args.shift().toLowerCase();
+				global.logger.log('debug', message.author.username + ' requested ' + command + ' with arguments ' + args);
 
-		var allowed = true;
+				if(allowed)
+					if(command in this.commands)
+					this.commands[command](message);
 
-		currentTimestamp = new Date();
-
-		if (!(message.author.username in lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
-			lastRequest[message.author.username] = currentTimestamp;
-		} else {
-			// set timer
-			lastRequestTimer[message.author.username] = (message.author.username in lastRequestTimer) ? lastRequestTimer[message.author.username] : 5;
-			currentTimer = lastRequestTimer[message.author.username];
-
-			if ((currentTimestamp - lastRequest[message.author.username] < (currentTimer * 1000))) {
-				lastRequestTimer[message.author.username] = currentTimer + 5;
-
-				var diff = new Date(currentTimestamp.getTime() - lastRequest[message.author.username].getTime());
-				if (currentTimer == 5)
-					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds')
-				else
-					channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait')
-
-				allowed = false;
-			} else {
-				lastRequestTimer[message.author.username] = 5;
-				lastRequest[message.author.username] = currentTimestamp;
+				// only me for now
+				if(message.author.id === global.config.owner)
+					if(command in this.admincommands)
+						this.admincommands[command](message);
 			}
-		}
+		})
 
-		logger.log('debug', message.author.username + ' requested ' + command + ' with arguments ' + args);
-
-		if(allowed)
-			if(command in commands)
-				commands[command](message, db);
-
-		// only me for now
-		if(message.author.id === config.owner)
-			if(command in admincommands)
-				admincommands[command](message, db);
-	}
-})
-
-bot.on('messageDelete', message => {
-	message.guild.members.get(config.owner).send(` \`\`\`
-		This Message has been deleted
-		-----------------------------
-		${message.author.username}: ${message.content} 
-		Send at: ${new Date(message.createdTimestamp).toUTCString()}
-		\`\`\``);
-
-	if(message.edits.length > 1)
-	{
-		message.edits.forEach(edit => {
+		this.bot.on('messageDelete', message => {
 			message.guild.members.get(config.owner).send(` \`\`\`
-				This edit belongs to  
+				This Message has been deleted
+				-----------------------------
+				${message.author.username}: ${message.content} 
+				Send at: ${new Date(message.createdTimestamp).toUTCString()}
+				\`\`\``);
+
+			if(message.edits.length > 1)
+			{
+				message.edits.forEach(edit => {
+					message.guild.members.get(config.owner).send(` \`\`\`
+						This edit belongs to  
+						${message.author.username}: ${message.content} 
+						-----------------------------
+						${edit.content} 
+						Edited at: ${new Date(edit.editedTimestamp).toUTCString()}
+						\`\`\``);
+				});
+			}
+
+			message.attachments.forEach(attachment => {
+				message.guild.members.get(config.owner).send(` \`\`\`
+				This attachment belongs to  
 				${message.author.username}: ${message.content} 
 				-----------------------------
-				${edit.content} 
-				Edited at: ${new Date(edit.editedTimestamp).toUTCString()}
+				${attachment.url}
 				\`\`\``);
-		});
-	}
-
-	message.attachments.forEach(attachment => {
-		message.guild.members.get(config.owner).send(` \`\`\`
-		This attachment belongs to  
-		${message.author.username}: ${message.content} 
-		-----------------------------
-		${attachment.url}
-		\`\`\``);
-	});
-})
-
-function initializeDatabase() {
-	db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
-	db.run(`CREATE TABLE IF NOT EXISTS messages (user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, PRIMARY KEY(user_id, date, channel))`)
+			});
+		})
+	}	
 }
-
-function storemsg(message) {
-	if (message.content.length >= 3 && !message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i"))) {
-		var insert = db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, date) VALUES (?, ?, ?, ?, ?)',
-			[message.author.id, message.author.username, message.content, message.channel.id, message.createdAt.getTime()]);
-		insert.run(function (err) {
-			if (err) {
-				logger.error("failed to insert: " + message.content + ' posted by ' + message.author.username);
-				logger.error(err);
-			}
-		});
-	}
-}
+module.exports = new Bot();

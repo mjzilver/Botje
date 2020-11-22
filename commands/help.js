@@ -1,6 +1,4 @@
-var package = require('../package.json');
-
-var helpMessage = `\`\`\`:robot: Current commands: :robot:  
+var helpMessage = `:robot: Current commands: :robot:  
 \`reddit [subreddit]\`: gets a random link from the given subreddit 
 \`emoji\`: turns your message into emojis 
 \`word [word]\`: shows how many times a word is used in the current channel
@@ -16,7 +14,7 @@ var helpMessage = `\`\`\`:robot: Current commands: :robot:
 \`emotes @user\`: shows the top 10 emotes in the current channel from the mentioned user
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
-\`Current Version\`: ` + package.versionname + '-' + package.version + "```";
+\`Current Version\`: ` + global.package.versionname + '-' + global.package.version;
 
 module.exports = function(message) {
     message.channel.send(helpMessage)
