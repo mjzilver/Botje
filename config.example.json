@@ -1,0 +1,5 @@
+{
+	"prefix": "^(b!|bot(je)?) ?",
+	"token": "TOKEN HERE",
+	"owner": "OWNER ID"
+}
