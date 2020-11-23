@@ -17,5 +17,5 @@ var helpMessage = `:robot: Current commands: :robot:
 \`Current Version\`: ` + global.package.versionname + '-' + global.package.version;
 
 module.exports = function(message) {
-    message.channel.send(helpMessage)
+    message.author.send(helpMessage)
 }

@@ -37,14 +37,14 @@ class Bot {
 
 				var allowed = true;
 
-				this.currentTimestamp = new Date();
+				var currentTimestamp = new Date();
 
 				if (!(message.author.username in this.lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
-					this.lastRequest[message.author.username] = this.currentTimestamp;
+					this.lastRequest[message.author.username] = currentTimestamp;
 				} else {
 					// set timer
 					this.lastRequestTimer[message.author.username] = (message.author.username in this.lastRequestTimer) ? this.lastRequestTimer[message.author.username] : 5;
-					currentTimer = this.lastRequestTimer[message.author.username];
+					var currentTimer = this.lastRequestTimer[message.author.username];
 
 					if ((currentTimestamp - this.lastRequest[message.author.username] < (currentTimer * 1000))) {
 						this.lastRequestTimer[message.author.username] = currentTimer + 5;
@@ -76,34 +76,14 @@ class Bot {
 		})
 
 		this.bot.on('messageDelete', message => {
-			message.guild.members.get(config.owner).send(` \`\`\`
-				This Message has been deleted
-				-----------------------------
-				${message.author.username}: ${message.content} 
-				Send at: ${new Date(message.createdTimestamp).toUTCString()}
-				\`\`\``);
+			global.logger.log('warn', `This Message has been deleted: ${message.author.username}: ${message.content} == Send at: ${new Date(message.createdTimestamp).toUTCString()}`);
 
 			if(message.edits.length > 1)
 			{
 				message.edits.forEach(edit => {
-					message.guild.members.get(config.owner).send(` \`\`\`
-						This edit belongs to  
-						${message.author.username}: ${message.content} 
-						-----------------------------
-						${edit.content} 
-						Edited at: ${new Date(edit.editedTimestamp).toUTCString()}
-						\`\`\``);
+					global.logger.log('warn', `This edit belongs to ${message.author.username}: ${message.content} == Edit at: ${edit.content}  ${new Date(message.editedTimestamp).toUTCString()}`);
 				});
 			}
-
-			message.attachments.forEach(attachment => {
-				message.guild.members.get(config.owner).send(` \`\`\`
-				This attachment belongs to  
-				${message.author.username}: ${message.content} 
-				-----------------------------
-				${attachment.url}
-				\`\`\``);
-			});
 		})
 	}	
 }
