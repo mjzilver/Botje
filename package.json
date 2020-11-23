@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "6.0",
+  "version": "6.2.0",
   "versionname": "Revival",
   "description": "Discord Bot",
   "main": "start.js",

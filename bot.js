@@ -8,11 +8,9 @@ class Bot {
 		// adding the timer (so the timeout stacks)
 		this.lastRequestTimer = [];
 	
-		global.discord = discord;
 		this.bot = new discord.Client({
 			autoReconnect: true
 		})
-		global.bot = this.bot;
 	
 		this.bot.on('ready', () => {
 			global.logger.info('Connected');

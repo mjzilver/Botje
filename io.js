@@ -2,6 +2,8 @@ const readline = require('readline');
 
 class IO {
     constructor() {
+        this.commands = require('./commandline.js');
+
         this.rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -9,7 +11,11 @@ class IO {
         }); 
 
         this.rl.on('line', (input) => {
-            console.log(`Received: ${input}`);
+            const args = input.split(' ');
+            const command = args.shift().toLowerCase();
+
+            if(command in this.commands)
+                this.commands[command](args);
         });
     }
 }
