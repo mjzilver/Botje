@@ -42,4 +42,4 @@ socket.on('disconnect', (reason) => {
       $("#errorlabel").text('You got kicked');
     }
     // else the socket will automatically try to reconnect
-  });
+});
