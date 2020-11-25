@@ -7,10 +7,14 @@
   "author": "Mick",
   "dependencies": {
     "discord.js": "^11.6.2",
-    "moment": "^2.29.1",
-    "request": "^2.81.0",
     "sqlite3": "^4.0.6",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "express": "^4.16.4",
+    "moment": "^2.24.0",
+    "pngjs-image": "^0.11.7",
+    "pug": "^2.0.3",
+    "request": "^2.81.0",
+    "socket.io": "^2.2.0"
   },
   "scripts": {
     "start": "nodemon start.js"

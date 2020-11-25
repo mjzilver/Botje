@@ -1,0 +1,20 @@
+extends layout
+
+block content
+	<script src="/js/log.js"></script>
+
+	<br/>
+	select(name='dropDown',class="custom-select", id='levelSelect')
+		each val in ['none','debug', 'info', 'warn', 'error']
+			option(onclick="selectLevel()")=val
+		
+	table(class='table table-striped' id='log')
+		thead(class='thead-dark')
+			th(scope='col') Level
+			th(scope='col') Message
+			th(scope='col') Timestamp
+		each val in list.length ? list : ['No log was found']
+			tr
+				td= val.level
+				td= val.message
+				td= val.timestamp

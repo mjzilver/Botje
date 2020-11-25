@@ -11,3 +11,4 @@ global.database = require('./database.js');
 global.discord = require('discord.js');
 global.cl = require('./cl.js');
 global.bot = require('./bot.js');
+global.web = require('./web.js');
