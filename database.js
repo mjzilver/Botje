@@ -1,4 +1,3 @@
-
 class Database {
     constructor() {
         this.sqlite3 = require('sqlite3');

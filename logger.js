@@ -1,4 +1,4 @@
-const {format, loggers, transports } = require('winston')
+const { format, loggers, transports } = require('winston')
 
 const { combine, timestamp, colorize, printf} = format;
 

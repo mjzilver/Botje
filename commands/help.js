@@ -14,7 +14,7 @@ var helpMessage = `:robot: Current commands: :robot:
 \`emotes @user\`: shows the top 10 emotes in the current channel from the mentioned user
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API
-\`Current Version\`: ` + global.package.versionname + '-' + global.package.version;
+\`Current Version\`: ` + package.versionname + '-' + package.version;
 
 module.exports = function(message) {
     message.author.send(helpMessage)

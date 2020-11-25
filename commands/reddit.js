@@ -1,7 +1,7 @@
 var request = require('request');
 
 module.exports = async function getRedditImage(message, last = '') {
-	const db = global.database.db;
+	const db = database.db;
 	const args = message.content.split(' ');
 	var sub = args[1]
 	var channel = message.channel
@@ -13,7 +13,7 @@ module.exports = async function getRedditImage(message, last = '') {
 
 	request(options, (err, res, body) => {
 		if (err) {
-			return global.logger.info(err)
+			return logger.info(err)
 		}
 
 		if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined' && typeof (body.data.children) !== 'undefined') {
@@ -40,21 +40,21 @@ module.exports = async function getRedditImage(message, last = '') {
 					var link = filteredImages[chosen].data.url;
 					var title = filteredImages[chosen].data.title;
 
-					global.logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
+					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
 
 					channel.send(title + "\n" + link)
 
 					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
 					insert.run(function (err) {
 						if (err) {
-							global.logger.error("failed to insert: " + link + ' - ' + sub);
-							global.logger.error(err);
+							logger.error("failed to insert: " + link + ' - ' + sub);
+							logger.error(err);
 						} else
-							global.logger.log('debug', "inserted: " + link + ' - ' + sub);
+							logger.log('debug', "inserted: " + link + ' - ' + sub);
 					});
 				} else {
 					if (body.data.children.length > 0) {
-						global.logger.debug('Finding posts before post ' + body.data.children[body.data.children.length - 1].data.title);
+						logger.debug('Finding posts before post ' + body.data.children[body.data.children.length - 1].data.title);
 						getRedditImage(message, body.data.children[body.data.children.length - 1].data.name);
 					} else {
 						channel.send("I have ran out of images to show you");

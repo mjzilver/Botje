@@ -1,7 +1,7 @@
 module.exports = function emotes(message) {
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
-	const db = global.database.db;
+	const db = database.db;
 
 	if (args.length == 1) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count

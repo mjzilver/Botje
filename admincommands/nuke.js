@@ -12,15 +12,15 @@ module.exports = function nuke(message, loop = 0) {
         (message) => {
             itemsProcessed++;
 
-            global.logger.log('warn', 'NUKING message: ' + message.content);
+            logger.log('warn', 'NUKING message: ' + message.content);
             message.delete()
 
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
-                    global.logger.log('debug', "100 messages NUKED - total ~" + loop * 100 + " messages NUKED")
+                    logger.log('debug', "100 messages NUKED - total ~" + loop * 100 + " messages NUKED")
                     nuke(message, ++loop);
                 } else {
-                    global.logger.log('warn', "End reached ~" + ((loop * 100) + itemsProcessed) + " messages NUKED")
+                    logger.log('warn', "End reached ~" + ((loop * 100) + itemsProcessed) + " messages NUKED")
                 }
             }
         }

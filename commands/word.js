@@ -1,7 +1,7 @@
 module.exports = function word(message) {
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
-	const db = global.database.db;
+	const db = database.db;
 
 	if (args[2] == "?") {
 		let selectSQL = `SELECT user_id, user_name, count(message) as count

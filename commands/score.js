@@ -11,7 +11,7 @@ function calculateScore(message)
 
 module.exports = function score(message) {
 	const mention = message.mentions.users.first();
-	const db = global.database.db;
+	const db = database.db;
 
 	if(mention) {
 		let selectSQL = `SELECT user_id, user_name, message

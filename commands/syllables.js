@@ -8,7 +8,7 @@ function calculateSyllables(message)
 
 module.exports = function syllables(message) {
 	const mention = message.mentions.users.first();
-	const db = global.database.db;
+	const db = database.db;
 
 	if(!mention)
 	{

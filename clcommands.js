@@ -13,7 +13,7 @@ var commands = {
     "shutdown" : shutdown,
     "erase" : erase,
     "clear" : clear,
-    "dbinfo" : dbinfo,
+    "dbinfo" : dbinfo
 }
 
 module.exports = commands
