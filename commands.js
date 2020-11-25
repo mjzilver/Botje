@@ -11,7 +11,6 @@ var top = require('./commands/top.js');
 var uptime = require('./commands/uptime.js');
 var word = require('./commands/word.js');
 
-// the commands
 var commands = {
    "help" : help,
    "emoji" : emoji,

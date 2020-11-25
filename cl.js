@@ -1,8 +1,8 @@
 const readline = require('readline');
 
-class IO {
+class CL {
     constructor() {
-        this.commands = require('./commandline.js');
+        this.commands = require('./clcommands.js');
 
         this.rl = readline.createInterface({
             input: process.stdin,
@@ -20,4 +20,4 @@ class IO {
     }
 }
 
-module.exports = new IO();
+module.exports = new CL();

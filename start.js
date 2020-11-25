@@ -9,5 +9,5 @@ process.on('uncaughtException', function (error) {
 
 global.database = require('./database.js');
 global.discord = require('discord.js');
-global.consolereader = require('./io.js');
+global.cl = require('./cl.js');
 global.bot = require('./bot.js');
