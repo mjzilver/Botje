@@ -13,9 +13,10 @@ class Bot {
 		})
 	
 		this.bot.on('ready', () => {
+			this.bot.user.setPresence({ activity: { name: `Running Version ${global.package.version}` }})
 			logger.info('Connected');
 			logger.info(`Logged in as: ${this.bot.user.username} - ${this.bot.user.id}`);
-			logger.info(`Running Version ` + global.package.versionname + ' - ' + global.package.version);
+			logger.info(`Running Version ${global.package.versionname} - ${global.package.version}`);
 		});
 
 		this.bot.login(config.discord_api_key);
@@ -66,12 +67,12 @@ class Bot {
 
 				if(allowed)
 					if(command in this.commands)
-					this.commands[command](message);
+						return this.commands[command](message);
 
 				// only me for now
 				if(message.author.id === config.owner)
 					if(command in this.admincommands)
-						this.admincommands[command](message);
+						return this.admincommands[command](message);
 			}
 		})
 

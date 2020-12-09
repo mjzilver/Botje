@@ -25,7 +25,7 @@ module.exports = function(message) {
             var sunrise = new Date((result.sys.sunrise + result.timezone) * 1000 ).toLocaleTimeString('en-UK', options)
             var sunset = new Date((result.sys.sunset + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
 
-            const weatherEmbed = new discord.RichEmbed()
+            const weatherEmbed = new discord.MessageEmbed()
                 .setColor(config.color_hex)
                 .setTitle(`Weather in ${result.name} ${result.sys.country}`)
                 .setThumbnail(`https://openweathermap.org/img/wn/${result.weather[0].icon}@2x.png`)
