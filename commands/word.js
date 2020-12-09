@@ -16,11 +16,16 @@ module.exports = function word(message) {
 			if (err) {
 				throw err;
 			} else {
-				var result = "```Top 10 users for the word " + args[1] + "\n"
-				for (var i = 0; i < rows.length; i++) {
-					result += '\n' + rows[i]['user_name'] + ' said the word ' + rows[i]['count'] + ' times!'
-				}
-				message.channel.send(result + "```");
+				var result = ""
+				for (var i = 0; (i < rows.length && i <= 10); i++) 
+					result += `${rows[i]['user_name']} has said ${args[1]} ${rows[i]['count']} times! \n`
+				
+				const top = new discord.MessageEmbed()
+					.setColor(config.color_hex)
+					.setTitle(`Top 10 users for the word ${args[1]} in #${message.channel.name} `)
+					.setDescription(result);
+
+				message.channel.send(top);
 			}
 		})
 	} else if (args[2] && mention) {
@@ -30,11 +35,10 @@ module.exports = function word(message) {
 		AND channel = ? AND user_id = ? `;
 
 		db.get(selectSQL, ['%' + args[2] + '%', message.channel.id, mention.id], (err, row) => {
-			if (err) {
+			if (err) 
 				throw err;
-			} else {
+			else 
 				message.channel.send('Ive found ' + row['count'] + ' messages from ' + mention.username + ' in this channel that contain ' + args[2]);
-			}
 		})
 	} else {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
@@ -42,11 +46,10 @@ module.exports = function word(message) {
 		WHERE message LIKE ?AND channel = ? `;
 
 		db.get(selectSQL, ['%' + args[1] + '%', message.channel.id], (err, row) => {
-			if (err) {
+			if (err)
 				throw err;
-			} else {
+			else 
 				message.channel.send('Ive found ' + row['count'] + ' messages in this channel that contain ' + args[1]);
-			}
 		})
 	}
 }

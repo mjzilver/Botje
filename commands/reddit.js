@@ -21,48 +21,54 @@ module.exports = async function getRedditImage(message, last = '') {
 			var foundImages = {};
 
 			db.all(selectSQL, [], async (err, rows) => {
-				if (err) {
+				if (err) 
 					throw err;
-				}
-				for (var i = 0; i < rows.length; i++) {
+
+				for (var i = 0; i < rows.length; i++) 
 					foundImages[rows[i].link] = true;
-				}
 
 				var filteredImages = [];
 
-				for (var i = 0; i < body.data.children.length; i++) {
+				for (var i = 0; i < body.data.children.length; i++) 
 					if (!(body.data.children[i].data.url in foundImages))
 						filteredImages.push(body.data.children[i]);
-				}
 
 				if (filteredImages.length > 0) {
 					var chosen = Math.floor(Math.random() * filteredImages.length);
-					var link = filteredImages[chosen].data.url;
-					var title = filteredImages[chosen].data.title;
+					var post = filteredImages[chosen].data;
 
-					logger.debug('Image requested from ' + sub + ' received ' + filteredImages.length + ' chosen number ' + chosen);
-
-					channel.send(title + "\n" + link)
-
-					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [link, sub]);
+					if(post.url && post.url.isImage())
+					{
+						const image = new discord.MessageEmbed()
+							.setColor(config.color_hex)
+							.setTitle(post.title)
+							.setImage(post.url)
+							.setFooter(`From: reddit/r/${sub} Posted by: ${post.author}`)
+						channel.send(image);
+					} else if(post.media)
+					{
+						channel.send(post.title + "\n" + post.scrubber_media_url)
+					} else {
+						channel.send(post.title + "\n" + post.url)
+					}
+					
+					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [post.url, sub]);
 					insert.run(function (err) {
 						if (err) {
-							logger.error("failed to insert: " + link + ' - ' + sub);
+							logger.error(`failed to insert: ${post.url} - ${sub}`);
 							logger.error(err);
 						} else
-							logger.log('debug', "inserted: " + link + ' - ' + sub);
+							logger.log('debug', `inserted: ${post.url} - ${sub}`);
 					});
 				} else {
 					if (body.data.children.length > 0) {
 						logger.debug('Finding posts before post ' + body.data.children[body.data.children.length - 1].data.title);
 						getRedditImage(message, body.data.children[body.data.children.length - 1].data.name);
-					} else {
+					} else 
 						channel.send("I have ran out of images to show you");
-					}
 				}
 			});
-		} else {
+		} else 
 			channel.send("No images were found");
-		}
 	})
 }

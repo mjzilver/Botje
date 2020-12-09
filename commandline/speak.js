@@ -1,5 +1,5 @@
 module.exports = function speak(input) {
-    let channels = bot.bot.channels;
+    let channels = bot.bot.channels.cache;
 
     var channelId = input.shift()
     var channel = channels.find(c => c.id === channelId)

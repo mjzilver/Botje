@@ -7,23 +7,19 @@ module.exports = function count(message) {
 		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ?';
 
 		db.get(selectSQL, [message.channel.id], (err, row) => {
-			if (err) {
+			if (err) 
 				throw err;
-			} else {
-				message.channel.send('Ive found ' + row['count'] + ' messages in this channel');
-			}
-
+			else 
+				message.channel.send(`Ive found ${row['count']} messages in this channel`);
 		})
 	} else if (args.length == 2 && mention) {
 		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ? AND user_id = ?';
 
 		db.get(selectSQL, [message.channel.id, mention.id], (err, row) => {
-			if (err) {
+			if (err) 
 				throw err;
-			} else {
-				message.channel.send('Ive found ' + row['count'] + ' messages by ' + mention.username + ' in this channel');
-			}
-
+			else 
+				message.channel.send(`Ive found ${row['count']} messages by ${mention.username} in this channel`);
 		})
 	} else if (args.length == 2 && args[1] == "?") {
 		let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
@@ -38,11 +34,16 @@ module.exports = function count(message) {
 			if (err) {
 				throw err;
 			} else {
-				var result = "```Top 10 posters in this channel \n"
-				for (var i = 0; i < rows.length; i++) {
-					result += '\n' + rows[i]['user_name'] + ' has posted ' + rows[i]['count'] + ' messages!'
-				}
-				message.channel.send(result + "```");
+				var result = ""
+				for (var i = 0; i < rows.length; i++) 
+					result += `${rows[i]['user_name']} has posted ${rows[i]['count']} messages! \n`
+
+				const top = new discord.MessageEmbed()
+					.setColor(config.color_hex)
+					.setTitle(`Top 10 posters in #${message.channel.name}`)
+					.setDescription(result);
+
+				message.channel.send(top);
 			}
 		})
 	} else if (args.length == 2 && args[1] == "%") {
@@ -59,11 +60,16 @@ module.exports = function count(message) {
 			if (err) {
 				throw err;
 			} else {
-				var result = "```Top 10 posters in this channel \n"
-				for (var i = 0; i < rows.length; i++) {
-					result += '\n' + rows[i]['user_name'] + ' has posted ' + Math.round((parseInt(rows[i]['count']) / parseInt(rows[i]['total'])) * 100) +  '% of all messages!'
-				}
-				message.channel.send(result + "```");
+				var result = "";
+				for (var i = 0; i < rows.length; i++) 
+					result += `${rows[i]['user_name']} has posted ${Math.round((parseInt(rows[i]['count']) / parseInt(rows[i]['total'])) * 100)}% of all messages! \n`
+
+				const top = new discord.MessageEmbed()
+					.setColor(config.color_hex)
+					.setTitle(`Top 10 posters in #${message.channel.name}`)
+					.setDescription(result);
+
+				message.channel.send(top);
 			}
 		})
 	}
