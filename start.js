@@ -12,3 +12,8 @@ global.discord = require('discord.js');
 global.cl = require('./cl.js');
 global.bot = require('./bot.js');
 global.web = require('./web.js');
+
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}

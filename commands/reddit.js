@@ -13,7 +13,7 @@ module.exports = async function getRedditImage(message, last = '') {
 
 	request(options, (err, res, body) => {
 		if (err) {
-			return logger.info(err)
+			return logger.error(err)
 		}
 
 		if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined' && typeof (body.data.children) !== 'undefined') {

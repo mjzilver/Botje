@@ -10,11 +10,11 @@ class Database {
 	initializeDatabase() {
 		this.db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
         this.db.run(`CREATE TABLE IF NOT EXISTS messages (user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, PRIMARY KEY(user_id, date, channel))`)
-        this.db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER,y INTEGER,red INTEGER,green INTEGER,blue INTEGER, PRIMARY KEY(x,y))`)
+        this.db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER, y INTEGER, red INTEGER, green INTEGER, blue INTEGER, PRIMARY KEY(x,y))`)
 	}
 
 	storemessage(message) {
-		if (message.content.length >= 3 && !message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i"))) {
+		if (message.content.length >= 3 && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i"))) {
 			var insert = this.db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, date) VALUES (?, ?, ?, ?, ?)',
 				[message.author.id, message.author.username, message.cleanContent, message.channel.id, message.createdAt.getTime()]);
 			insert.run(function (err) {

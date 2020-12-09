@@ -21,16 +21,7 @@ function catalog(channel, messageid, loop = 0) {
         (message) => {
             itemsProcessed++;
 
-            if (!message.author.equals(bot.user) && !message.content.match(new RegExp(config.prefix, "i")) && message.content.length >= 3) {
-                var insert = database.db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, date) VALUES (?, ?, ?, ?, ?)',
-                    [message.author.id, message.author.username, message.cleanContent, message.channel.id, message.createdAt.getTime()]);
-                insert.run(function (err) {
-                    if (err) {
-                        logger.error("failed to insert: " + message.content + ' posted by ' + message.author.username);
-                        logger.error(err);
-                    }
-                });
-            }
+            database.storemessage(message);
 
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {

@@ -18,7 +18,7 @@ class Bot {
 			logger.info(`Running Version ` + global.package.versionname + ' - ' + global.package.version);
 		});
 
-		this.bot.login(config.token);
+		this.bot.login(config.discord_api_key);
 
 		this.bot.on('error', function (error) {
 			logger.error(error.message);

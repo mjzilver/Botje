@@ -29,12 +29,10 @@ module.exports = function syllables(message) {
 					if(!userdata[user_name])
 						userdata[user_name] = {'syllables': 0, 'total': 0, 'average' : 0};
 
-
 					var syllables = calculateSyllables(rows[i]['message']);
 					if(syllables >= 1)
 					{
 						userdata[user_name]['syllables'] += syllables
-
 						userdata[user_name]['total'] += 1
 					}
 				}
