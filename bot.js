@@ -31,7 +31,7 @@ class Bot {
 			database.storemessage(message);
 
 			// look for the b! meaning bot command
-			if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user))  {
+			if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)) {
 				message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
 				const args = message.content.split(' ');
 				const command = args.shift().toLowerCase();

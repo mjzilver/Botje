@@ -3,9 +3,8 @@ var letter_values = require('../json/letter_values.json');
 function calculateScore(message)
 {
 	var score = 0;
-	for (var i = 0; i < message.length; i++) {
+	for (var i = 0; i < message.length; i++) 
 		score += letter_values[message.charAt(i)] === undefined ? 0 : letter_values[message.charAt(i)]
-	}
 	return score;
 }
 

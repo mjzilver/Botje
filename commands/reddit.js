@@ -45,7 +45,7 @@ module.exports = async function getRedditImage(message, last = '') {
 							.setImage(post.url)
 							.setFooter(`From: reddit/r/${sub} Posted by: ${post.author}`)
 						channel.send(image);
-					} else if(post.media)
+					} else if(post.media && post.scrubber_media_url)
 					{
 						channel.send(post.title + "\n" + post.scrubber_media_url)
 					} else {

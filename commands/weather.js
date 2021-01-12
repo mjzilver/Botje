@@ -2,26 +2,27 @@ var request = require('request');
 const logger = require('../logger');
 
 module.exports = function(message) {
-    var city = "Leiden"; // default city
+    var city = "Leiden"; // default city to avoid errors
     var args = message.content.split(' ')
+
     if(args[1])
     {
         city = args[1];
         if(args[2])
             city += args[2];
-    }
+    } else
+        return message.channel.send('You need to enter a city')
 
     request(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${config.weather_api_key}&units=metric&mode=JSON`, 
     (err, res, body) => {
-		if (err) {
-			return logger.error(err.error)
-        }
+		if (err) 
+            return logger.error(err.error)
+            
         const result = JSON.parse(body);
 
         if(result.cod == 200)
         {
             var options = { timeZone: 'UTC'};
-
             var sunrise = new Date((result.sys.sunrise + result.timezone) * 1000 ).toLocaleTimeString('en-UK', options)
             var sunset = new Date((result.sys.sunset + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
 
