@@ -30,7 +30,7 @@ module.exports = async function getRedditImage(message, last = '') {
 				var filteredImages = [];
 
 				for (var i = 0; i < body.data.children.length; i++) 
-					if (!(body.data.children[i].data.url in foundImages))
+					if (!(body.data.children[i].data.url in foundImages) && body.data.children[i].data.url.isImage())
 						filteredImages.push(body.data.children[i]);
 
 				if (filteredImages.length > 0) {
@@ -43,14 +43,11 @@ module.exports = async function getRedditImage(message, last = '') {
 							.setColor(config.color_hex)
 							.setTitle(post.title)
 							.setImage(post.url)
-							.setFooter(`From: reddit/r/${sub} Posted by: ${post.author}`)
+							.setURL(`https://reddit.com${post.permalink}`)
+							.setFooter(`From: reddit/r/${sub}  Posted by: ${post.author}`)
 						channel.send(image);
-					} else if(post.media && post.scrubber_media_url)
-					{
-						channel.send(post.title + "\n" + post.scrubber_media_url)
-					} else {
+					} else                       
 						channel.send(post.title + "\n" + post.url)
-					}
 					
 					var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [post.url, sub]);
 					insert.run(function (err) {

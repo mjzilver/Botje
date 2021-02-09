@@ -1,8 +1,8 @@
 {
   "name": "botje",
-  "version": "8.0.0",
-  "versionname": "Polished",
-  "description": "A discord bot made for casual server",
+  "version": "8.1",
+  "versionname": "Status Quo",
+  "description": "The discord bot for the thinking man",
   "main": "start.js",
   "author": "Mick Jari",
   "dependencies": {

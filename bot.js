@@ -26,8 +26,6 @@ class Bot {
 		});
 
 		this.bot.on('message', message => {
-			var channel = message.channel
-
 			database.storemessage(message);
 
 			// look for the b! meaning bot command
@@ -52,9 +50,9 @@ class Bot {
 
 						var diff = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime());
 						if (currentTimer == 5)
-							channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds')
+							message.channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds')
 						else
-							channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait')
+							message.channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait')
 
 						allowed = false;
 					} else {
@@ -63,7 +61,7 @@ class Bot {
 					}
 				}
 
-				logger.log('debug', message.author.username + ' requested ' + command + ' with arguments ' + args);
+				logger.log('debug', `'${message.author.username}' issued '${command}' with arguments '${args}' in channel '${message.channel.name}' in server '${message.channel.guild.name}'`);
 
 				if(allowed)
 					if(command in this.commands)
