@@ -1,7 +1,7 @@
 module.exports = function top(message) {
 	const args = message.content.split(' ');
 	const mention = message.mentions.users.first();
-	const db = global.database.db;
+	const db = database.db;
 
 	if (args.length == 1) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
@@ -16,11 +16,16 @@ module.exports = function top(message) {
 			if (err) {
 				throw err;
 			} else {
-				var result = "```Top 10 must used sentences in this channel \n"
-				for (var i = 0; i < rows.length; i++) {
-					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
-				}
-				message.channel.send(result + "```");
+				var result = ""
+				for (var i = 0; (i < rows.length && i <= 10); i++) 
+					result += `${rows[i]['message']} was said ${rows[i]['count']} times \n`
+				
+				const top = new discord.MessageEmbed()
+					.setColor(config.color_hex)
+					.setTitle(`Top 10 must used sentences in #${message.channel.name}`)
+					.setDescription(result);
+
+				message.channel.send(top);
 			}
 		})
 	} else if (args.length == 2 && mention) {
@@ -37,11 +42,16 @@ module.exports = function top(message) {
 			if (err) {
 				throw err;
 			} else {
-				var result = "```Top 10 must used sentences in this channel said by " + mention.username + " \n"
-				for (var i = 0; i < rows.length; i++) {
-					result += '\n' + rows[i]['message'] + ' said ' + rows[i]['count'] + ' times!'
-				}
-				message.channel.send(result + "```");
+				var result = ""
+				for (var i = 0; (i < rows.length && i <= 10); i++) 
+					result += `${rows[i]['message']} was said ${rows[i]['count']} times \n`
+				
+				const top = new discord.MessageEmbed()
+					.setColor(config.color_hex)
+					.setTitle(`Top 10 must used sentences in #${message.channel.name} by ${mention.username}`)
+					.setDescription(result);
+
+				message.channel.send(top);
 			}
 		})
 	}

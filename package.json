@@ -1,15 +1,19 @@
 {
   "name": "botje",
-  "version": "0.6.3",
-  "versionname": "Revisal",
-  "description": "Discord Bot",
+  "version": "8.1",
+  "versionname": "Status Quo",
+  "description": "The discord bot for the thinking man",
   "main": "start.js",
-  "author": "Mick",
+  "author": "Mick Jari",
   "dependencies": {
-    "discord.js": "^11.6.2",
-    "moment": "^2.29.1",
+    "discord.js": "^12.5.1",
+    "express": "^4.16.4",
+    "moment": "^2.24.0",
+    "pngjs-image": "^0.11.7",
+    "pug": "^2.0.3",
     "request": "^2.81.0",
-    "sqlite3": "^4.0.6",
+    "socket.io": "^2.2.0",
+    "sqlite3": "^4.2.0",
     "winston": "^3.2.1"
   },
   "scripts": {

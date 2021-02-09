@@ -1,5 +1,8 @@
 {
 	"prefix": "^(b!|bot(je)?) ?",
-	"token": "TOKEN HERE",
-	"owner": "OWNER ID"
+	"discord_api_key": "discord bot api key",
+	"weather_api_key" : "openweathermap api key",
+	"owner": "owner discord UUID",
+	"bot_avatar": "direct link to img",
+	"color_hex": "#bab3be"
 }

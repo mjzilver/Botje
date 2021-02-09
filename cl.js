@@ -1,8 +1,7 @@
-const readline = require('readline');
-
 class CL {
     constructor() {
         this.commands = require('./clcommands.js');
+        const readline = require('readline');
 
         this.rl = readline.createInterface({
             input: process.stdin,

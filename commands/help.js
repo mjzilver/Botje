@@ -1,4 +1,4 @@
-var helpMessage = `:robot: Current commands: :robot:  
+var helpMessage = `
 \`reddit [subreddit]\`: gets a random link from the given subreddit 
 \`emoji\`: turns your message into emojis 
 \`word [word]\`: shows how many times a word is used in the current channel
@@ -13,9 +13,14 @@ var helpMessage = `:robot: Current commands: :robot:
 \`emotes\`: shows the top 10 emotes in the current channel
 \`emotes @user\`: shows the top 10 emotes in the current channel from the mentioned user
 \`delete \`:deletes the last message from you
-\`ping\`: prints the current ping of the bot and the API
-\`Current Version\`: ` + global.package.versionname + '-' + global.package.version;
+\`ping\`: prints the current ping of the bot and the API`;
 
 module.exports = function(message) {
-    message.author.send(helpMessage)
+    const help = new discord.MessageEmbed()
+        .setColor(config.color_hex)
+        .setTitle(`:robot: Current commands: :robot:`)
+        .setDescription(helpMessage)
+        .setFooter(`Current Version: ${package.versionname} - ${package.version}`)
+
+    message.author.send(help)
 }

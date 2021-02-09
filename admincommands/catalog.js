@@ -1,10 +1,12 @@
+const database = require("../database");
+
 module.exports = function catalog(message, loop = 0) {
     if (loop == 0)
         message.delete()
 
     var itemsProcessed = 0;
 
-    message.channel.fetchMessages({
+    message.channel.messages.fetch({
             limit: 100,
             before: message.id
         })
@@ -12,23 +14,14 @@ module.exports = function catalog(message, loop = 0) {
         (message) => {
             itemsProcessed++;
 
-            if (!message.author.equals(bot.user) && !message.content.match(new RegExp(global.config.prefix, "i")) && message.content.length >= 3) {
-                var insert = global.database.db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, date) VALUES (?, ?, ?, ?, ?)',
-                    [message.author.id, message.author.username, message.cleanContent, message.channel.id, message.createdAt.getTime()]);
-                insert.run(function (err) {
-                    if (err) {
-                        global.logger.error("failed to insert: " + message.content + ' posted by ' + message.author.username);
-                        global.logger.error(err);
-                    }
-                });
-            }
+            database.storemessage(message);
 
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
-                    global.logger.log('debug', "100 messages scanned - total ~" + loop * 100 + " messages")
+                    logger.log('debug', "100 messages scanned - total ~" + loop * 100 + " messages")
                     catalog(message, ++loop);
                 } else {
-                    global.logger.log('debug', "End reached ~" + ((loop * 100) + itemsProcessed) + " messages catalogged")
+                    logger.log('debug', "End reached ~" + ((loop * 100) + itemsProcessed) + " messages catalogged")
                 }
             }
         }

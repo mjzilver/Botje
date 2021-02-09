@@ -1,7 +1,7 @@
 var moment = require('moment');
 
 module.exports = function(message) {
-    var login = moment(global.bot.readyTimestamp);
+    var login = moment(bot.bot.readyTimestamp);
 	const now = moment();
 	hours = now.diff(login, 'hours');
 	minutes = now.subtract(hours, 'hours').diff(login, 'minutes');

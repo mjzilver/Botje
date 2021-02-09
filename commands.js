@@ -10,6 +10,7 @@ var syllables = require('./commands/syllables.js');
 var top = require('./commands/top.js');
 var uptime = require('./commands/uptime.js');
 var word = require('./commands/word.js');
+var weather = require('./commands/weather.js');
 
 var commands = {
    "help" : help,
@@ -24,6 +25,7 @@ var commands = {
    "top" : top,
    "uptime" : uptime,
    "word" : word,
+   "weather" : weather
 }
 
 module.exports = commands

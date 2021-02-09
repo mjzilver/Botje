@@ -1,21 +1,25 @@
-const {format, loggers, transports } = require('winston')
+const { format, loggers, transports } = require('winston')
 
-const { combine, timestamp, colorize, printf} = format;
+const { combine, timestamp, colorize, printf, json} = format;
 
 loggers.add('logger', {
-    format: combine(
-        timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
-        colorize(),
-        printf(output => `${output.timestamp} ${output.level}: ${output.message}`)
-    ),
     transports: [
         new(transports.Console)({
             colorize: true,
-            level: 'debug'
+            level: 'debug',
+            format: combine(
+                timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+                colorize(),
+                printf(output => `${output.timestamp} ${output.level}: ${output.message}`)
+            )
         }),
         new(transports.File)({
             filename: 'bot.log',
             level: 'debug',
+            format: combine(
+                timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+                json()
+            )
         })
     ]
 });

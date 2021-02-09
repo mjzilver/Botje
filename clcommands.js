@@ -4,7 +4,8 @@ var save = require('./commandline/save.js');
 var shutdown = require('./commandline/shutdown.js');
 var erase = require('./commandline/erase.js');
 var clear = require('./commandline/clear.js');
-var dbinfo = require('./commandline/dbinfo.js');
+var dbinfo = require('./commandline/dbinfo.js'); 
+var listcommands = require('./commandline/listcommands.js'); 
 
 var commands = {
     "list" : list,
@@ -14,6 +15,7 @@ var commands = {
     "erase" : erase,
     "clear" : clear,
     "dbinfo" : dbinfo,
+    "listcommands" : listcommands
 }
 
 module.exports = commands
