@@ -1,6 +1,6 @@
 var moment = require('moment');
 
-module.exports = function(message) {
+module.exports = function uptime(message) {
     var login = moment(bot.bot.readyTimestamp);
 	const now = moment();
 	hours = now.diff(login, 'hours');

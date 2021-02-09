@@ -15,7 +15,7 @@ var helpMessage = `
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API`;
 
-module.exports = function(message) {
+module.exports = function help(message) {
     const help = new discord.MessageEmbed()
         .setColor(config.color_hex)
         .setTitle(`:robot: Current commands: :robot:`)

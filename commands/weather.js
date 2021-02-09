@@ -1,7 +1,7 @@
 var request = require('request');
 const logger = require('../logger');
 
-module.exports = function(message) {
+module.exports = function weather(message) {
     var city = "Leiden"; // default city to avoid errors
     var args = message.content.split(' ')
 

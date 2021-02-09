@@ -1,6 +1,6 @@
 var emoji_values = require('../json/emoji.json');
 
-module.exports = function(message) {
+module.exports = function emoji(message) {
     var sentence = message.content.split(' ').slice(1);
 
     sentence = sentence.join(' ');
