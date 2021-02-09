@@ -3,7 +3,7 @@ global.config = require('./config.json');
 global.logger = require('./logger.js');
 global.database = require('./database.js');
 global.discord = require('discord.js');
-global.cl = require('./cl.js');
+global.commandline = require('./commandline.js');
 global.bot = require('./bot.js');
 global.web = require('./web.js');
 

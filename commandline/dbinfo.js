@@ -1,4 +1,4 @@
-module.exports = function clear(input) {
+module.exports = function dbinfo(input) {
     console.log('===== Database information =====')
     let selectSQL = 'SELECT COUNT(*) as count FROM messages';
 

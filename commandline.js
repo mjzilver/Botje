@@ -1,4 +1,4 @@
-class CL {
+class commandline {
     constructor() {
         this.commands = require('./clcommands.js');
         const readline = require('readline');
@@ -19,4 +19,4 @@ class CL {
     }
 }
 
-module.exports = new CL();
+module.exports = new commandline();
