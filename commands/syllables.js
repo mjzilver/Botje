@@ -14,7 +14,7 @@ module.exports = function syllables(message) {
 	{
 		let selectSQL = `SELECT user_id, user_name, message
 		FROM messages 
-		WHERE channel = ${message.channel.id}
+		WHERE server = ${message.guild.id}
 		ORDER BY user_id`
 
 		var userdata = {};
@@ -52,7 +52,7 @@ module.exports = function syllables(message) {
 
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
-					.setTitle(`Top 10 most intellectual posters in #${message.channel.name}`)
+					.setTitle(`Top 10 most intellectual posters in ${message.guild.name}`)
 					.setDescription(result);
 
 				message.channel.send(top);
@@ -61,7 +61,7 @@ module.exports = function syllables(message) {
 	} else {
 		let selectSQL = `SELECT user_id, user_name, message
 		FROM messages 
-		WHERE channel = ${message.channel.id} AND user_id = ${mention.id} `
+		WHERE server = ${message.guild.id} AND user_id = ${mention.id} `
 
 		var userdata = {'syllables': 0, 'total': 0, 'average' : 0}
 

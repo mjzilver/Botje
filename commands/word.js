@@ -6,13 +6,13 @@ module.exports = function word(message) {
 	if (args[2] == "?") {
 		let selectSQL = `SELECT user_id, user_name, count(message) as count
 		FROM messages
-		WHERE message LIKE ? AND channel = ?
+		WHERE message LIKE ? AND server = ?
 		GROUP BY user_id
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
 
-		db.all(selectSQL, ['%' + args[1] + '%', message.channel.id], (err, rows) => {
+		db.all(selectSQL, ['%' + args[1] + '%', message.guild.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -22,7 +22,7 @@ module.exports = function word(message) {
 				
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
-					.setTitle(`Top 10 users for the word ${args[1]} in #${message.channel.name} `)
+					.setTitle(`Top 10 users for the word ${args[1]} in ${message.guild.name} `)
 					.setDescription(result);
 
 				message.channel.send(top);
@@ -32,24 +32,24 @@ module.exports = function word(message) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE message LIKE ? 
-		AND channel = ? AND user_id = ? `;
+		AND server = ? AND user_id = ? `;
 
-		db.get(selectSQL, ['%' + args[2] + '%', message.channel.id, mention.id], (err, row) => {
+		db.get(selectSQL, ['%' + args[2] + '%', message.guild.id, mention.id], (err, row) => {
 			if (err) 
 				throw err;
 			else 
-				message.channel.send('Ive found ' + row['count'] + ' messages from ' + mention.username + ' in this channel that contain ' + args[2]);
+				message.channel.send('Ive found ' + row['count'] + ' messages from ' + mention.username + ' in this server that contain ' + args[2]);
 		})
 	} else {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
-		WHERE message LIKE ?AND channel = ? `;
+		WHERE message LIKE ? AND server = ? `;
 
-		db.get(selectSQL, ['%' + args[1] + '%', message.channel.id], (err, row) => {
+		db.get(selectSQL, ['%' + args[1] + '%', message.guild.id], (err, row) => {
 			if (err)
 				throw err;
 			else 
-				message.channel.send('Ive found ' + row['count'] + ' messages in this channel that contain ' + args[1]);
+				message.channel.send('Ive found ' + row['count'] + ' messages in this server that contain ' + args[1]);
 		})
 	}
 }

@@ -16,7 +16,7 @@ module.exports = function score(message) {
 	if(mention) {
 		let selectSQL = `SELECT user_id, user_name, message
 		FROM messages 
-		WHERE channel = ${message.channel.id} AND user_id = ${mention.id} `
+		WHERE server = ${message.guild.id} AND user_id = ${mention.id} `
 
 		var userdata = {'points': 0, 'total': 0, 'quality' : 0, 'score': 0}
 
@@ -38,7 +38,7 @@ module.exports = function score(message) {
 	} else {
 		let selectSQL = `SELECT user_id, user_name, message
 		FROM messages 
-		WHERE channel = ${message.channel.id}
+		WHERE server = ${message.guild.id}
 		ORDER BY user_id`
 
 		var userdata = {};
@@ -75,7 +75,7 @@ module.exports = function score(message) {
 
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
-					.setTitle(`Top 10 posters in #${message.channel.name}`)
+					.setTitle(`Top 10 posters in ${message.guild.name}`)
 					.setDescription(result);
 
 				message.channel.send(top);

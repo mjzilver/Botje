@@ -4,34 +4,34 @@ module.exports = function count(message) {
 	const db = database.db;
 
 	if (args.length == 1) {
-		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ?';
+		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE server = ?';
 
-		db.get(selectSQL, [message.channel.id], (err, row) => {
+		db.get(selectSQL, [message.guild.id], (err, row) => {
 			if (err) 
 				throw err;
 			else 
-				message.channel.send(`Ive found ${row['count']} messages in this channel`);
+				message.channel.send(`Ive found ${row['count']} messages in ${message.guild.name}`);
 		})
 	} else if (args.length == 2 && mention) {
-		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE channel = ? AND user_id = ?';
+		let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE server = ? AND user_id = ?';
 
-		db.get(selectSQL, [message.channel.id, mention.id], (err, row) => {
+		db.get(selectSQL, [message.guild.id, mention.id], (err, row) => {
 			if (err) 
 				throw err;
 			else 
-				message.channel.send(`Ive found ${row['count']} messages by ${mention.username} in this channel`);
+				message.channel.send(`Ive found ${row['count']} messages by ${mention.username} in this server`);
 		})
 	} else if (args.length >= 2 && args[1] == "?") {
 		let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
 		FROM messages
-		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = ?
+		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?
 		GROUP BY LOWER(user_id)
 		HAVING count > 1
 		ORDER BY count DESC`;
 
 		var page = (args[2] ? args[2] - 1: 0);
 
-		db.all(selectSQL, [message.channel.id], (err, rows) => {
+		db.all(selectSQL, [message.guild.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -41,7 +41,7 @@ module.exports = function count(message) {
 
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
-					.setTitle(`Top 10 posters in #${message.channel.name}`)
+					.setTitle(`Top 10 posters in ${message.guild.name}`)
 					.setDescription(result)
 					.setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
@@ -50,9 +50,9 @@ module.exports = function count(message) {
 		})
 	} else if (args.length == 2 && args[1] == "%") {
         let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count,
-        (SElECT COUNT(message) FROM messages WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = ?) as total
+        (SElECT COUNT(message) FROM messages WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?) as total
 		FROM messages
-		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND channel = ?
+		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?
 		GROUP BY LOWER(user_id)
 		HAVING count > 1
 		ORDER BY count DESC 
@@ -60,7 +60,7 @@ module.exports = function count(message) {
 
 		var page = (args[2] ? args[2] - 1: 0);
 
-		db.all(selectSQL, [message.channel.id, message.channel.id], (err, rows) => {
+		db.all(selectSQL, [message.guild.id, message.guild.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -70,7 +70,7 @@ module.exports = function count(message) {
 
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
-					.setTitle(`Top 10 posters in #${message.channel.name}`)
+					.setTitle(`Top 10 posters in ${message.guild.name}`)
 					.setDescription(result)
 					.setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
