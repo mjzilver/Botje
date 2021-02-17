@@ -13,6 +13,7 @@ var word = require('./commands/word.js');
 var weather = require('./commands/weather.js');
 var age = require('./commands/age.js');
 var speak = require('./commands/speak.js');
+var talk = require('./commands/talk.js');
 
 var commands = {
    "help" : help,
@@ -29,6 +30,7 @@ var commands = {
    "word" : word,
    "weather" : weather,
    "speak" : speak,
+   "talk" : talk,
    "age" : age
 }
 

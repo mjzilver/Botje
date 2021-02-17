@@ -27,6 +27,13 @@ String.prototype.removeQuotes = function() {
     return this.replace(new RegExp(/"/gi, "gi"), '');
 }
 
+global.randomBetween = function(min, max) { 
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 process.on('uncaughtException', function (error) {
     logger.error(error.message);
 });
+
+
+console.log(randomBetween(0, 10))
