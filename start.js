@@ -34,6 +34,3 @@ global.randomBetween = function(min, max) {
 process.on('uncaughtException', function (error) {
     logger.error(error.message);
 });
-
-
-console.log(randomBetween(0, 10))
