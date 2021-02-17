@@ -12,6 +12,9 @@ var helpMessage = `
 \`top @user\`: shows the top 10 messages in the current channel from the mentioned user
 \`emotes\`: shows the top 10 emotes in the current channel
 \`emotes @user\`: shows the top 10 emotes in the current channel from the mentioned user
+\`speak \`: makes the bot speak via recycled messages
+\`talk \`: makes the bot talk via predictive text 
+\`talk @user \`: makes the bot talk as if it is the mentioned user via predictive text
 \`delete \`:deletes the last message from you
 \`ping\`: prints the current ping of the bot and the API`;
 

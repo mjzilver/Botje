@@ -18,10 +18,10 @@ module.exports = function catalog(message, loop = 0) {
 
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
-                    logger.log('debug', "100 messages scanned - total ~" + loop * 100 + " messages")
+                    logger.log('debug', `100 messages scanned - total ~ ${loop * 100} messages from ${message.channel.name} in ${message.channel.guild.name}`)
                     catalog(message, ++loop);
                 } else {
-                    logger.log('debug', "End reached ~" + ((loop * 100) + itemsProcessed) + " messages catalogged")
+                    logger.log('info', `End reached ~ ${((loop * 100) + itemsProcessed)} messages catalogged from ${message.channel.name} in ${message.channel.guild.name}`)
                 }
             }
         }

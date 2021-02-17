@@ -7,13 +7,13 @@ module.exports = function emotes(message) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE (message LIKE "%<%" OR message LIKE "%:%") AND message NOT LIKE "%@%"
-		AND channel = ?
+		AND server = ?
 		GROUP BY LOWER(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
 
-		db.all(selectSQL, [message.channel.id], (err, rows) => {
+		db.all(selectSQL, [message.guild.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -23,7 +23,7 @@ module.exports = function emotes(message) {
 
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
-					.setTitle(`Top 10 most used emotes in #${message.channel.name}`)
+					.setTitle(`Top 10 most used emotes in ${message.guild.name}`)
 					.setDescription(result);
 
 				message.channel.send(top);
@@ -33,13 +33,13 @@ module.exports = function emotes(message) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
 		FROM messages
 		WHERE (message LIKE "%<%" OR message LIKE "%:%" ) AND message NOT LIKE "%@%"
-		AND channel = ? AND user_id = ?
+		AND server = ? AND user_id = ?
 		GROUP BY LOWER(message)
 		HAVING count > 1
 		ORDER BY count DESC 
 		LIMIT 10`;
 
-		db.all(selectSQL, [message.channel.id, mention.id], (err, rows) => {
+		db.all(selectSQL, [message.guild.id, mention.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
@@ -49,7 +49,7 @@ module.exports = function emotes(message) {
 
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
-					.setTitle(`Top 10 most used emotes in #${message.channel.name} used by ${mention.username}`)
+					.setTitle(`Top 10 most used emotes in ${message.guild.name} used by ${mention.username}`)
 					.setDescription(result);
 
 				message.channel.send(top);

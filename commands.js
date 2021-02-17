@@ -11,6 +11,9 @@ var top = require('./commands/top.js');
 var uptime = require('./commands/uptime.js');
 var word = require('./commands/word.js');
 var weather = require('./commands/weather.js');
+var age = require('./commands/age.js');
+var speak = require('./commands/speak.js');
+var talk = require('./commands/talk.js');
 
 var commands = {
    "help" : help,
@@ -25,7 +28,10 @@ var commands = {
    "top" : top,
    "uptime" : uptime,
    "word" : word,
-   "weather" : weather
+   "weather" : weather,
+   "speak" : speak,
+   "talk" : talk,
+   "age" : age
 }
 
 module.exports = commands

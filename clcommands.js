@@ -6,6 +6,7 @@ var erase = require('./commandline/erase.js');
 var clear = require('./commandline/clear.js');
 var dbinfo = require('./commandline/dbinfo.js'); 
 var listcommands = require('./commandline/listcommands.js'); 
+var fullscan = require('./commandline/fullscan.js'); 
 
 var commands = {
     "list" : list,
@@ -15,6 +16,7 @@ var commands = {
     "erase" : erase,
     "clear" : clear,
     "dbinfo" : dbinfo,
+    "fullscan" : fullscan,
     "listcommands" : listcommands
 }
 

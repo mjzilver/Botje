@@ -68,3 +68,7 @@ config.json
 
 # dont include the db
 discord.db
+discord.db-journal
+
+# no backups
+backups/

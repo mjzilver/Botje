@@ -11,11 +11,12 @@ function calculateScore(message)
 module.exports = function score(message) {
 	const db = database.db;
 	const mention = message.mentions.users.first();
+	const args = message.content.split(' ');
 
 	if(mention) {
 		let selectSQL = `SELECT user_id, user_name, message
 		FROM messages 
-		WHERE channel = ${message.channel.id} AND user_id = ${mention.id} `
+		WHERE server = ${message.guild.id} AND user_id = ${mention.id} `
 
 		var userdata = {'points': 0, 'total': 0, 'quality' : 0}
 
@@ -36,10 +37,11 @@ module.exports = function score(message) {
 	} else {
 		let selectSQL = `SELECT user_id, user_name, message
 		FROM messages 
-		WHERE channel = ${message.channel.id}
+		WHERE server = ${message.guild.id}
 		ORDER BY user_id`
 
 		var userdata = {};
+		var page = (args[1] ? args[1] - 1: 0);
 
 		db.all(selectSQL, [], (err, rows) => {
 			if (err) {
@@ -64,14 +66,18 @@ module.exports = function score(message) {
 				
 				sorted.sort(function(a, b) { return b[1]- a[1]; });
 
+				if(page > Math.ceil(sorted.length / 10))
+					return message.channel.send(`Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)} not found`)
+
 				var result = ""
-				for (var i = 0; (i < sorted.length && i <= 10); i++) 
+				for (var i = page * 10; i < sorted.length && i <= (page * 10) + 9; i++) 
 					result += `${sorted[i][0]}'s post quality is ${sorted[i][1]}% \n`
 
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
-					.setTitle(`Top 10 quality posters in #${message.channel.name}`)
-					.setDescription(result);
+					.setTitle(`Top 10 quality posters in ${message.guild.name}`)
+					.setDescription(result)
+					.setFooter(`Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)}`)
 
 				message.channel.send(top);
 			}

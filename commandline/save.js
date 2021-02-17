@@ -27,12 +27,12 @@ function catalog(channel, messageid, amount, loop = 0) {
                 if (itemsProcessed == 100) {
                     if(amount > 0)
                     {
-                        logger.log('debug', `100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages`)
+                        logger.log('debug', `100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                         catalog(channel, message.id, amount, ++loop);
                     } else 
-                        logger.log('debug', `Set amount reached ${((loop * 100) + itemsProcessed)} messages catalogged`)
+                        logger.log('info', `Set amount reached ${((loop * 100) + itemsProcessed)} messages catalogged from ${channel.name} in ${channel.guild.name}`)
                 } else 
-                    logger.log('debug', `End reached ${((loop * 100) + itemsProcessed)} messages catalogged`)
+                    logger.log('info', `End reached ${((loop * 100) + itemsProcessed)} messages catalogged from ${channel.name} in ${channel.guild.name}`)
             }
         }
     ));
