@@ -1,5 +1,4 @@
 module.exports = function talk(message) {    
-    console.time('talk')
     var mention = message.mentions.users.first()
     var chain = {};
 
@@ -46,7 +45,6 @@ module.exports = function talk(message) {
                 }
         
                 message.channel.send(sentence.capitalize());
-                console.timeEnd('talk')
             }
         }
     })
