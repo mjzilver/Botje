@@ -14,12 +14,13 @@ class Database {
 	}
 
 	storemessage(message) {
-		if (message.content.length >= 3 && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")) && !message.content.match(new RegExp("^t!", "i"))) {
+	if (message.content.length >= 3 && message.guild.member(message.author) 
+		&& !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")) && !message.content.match(new RegExp("^t!", "i"))) {
 			var insert = this.db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?)',
 				[message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()]);
 			insert.run(function (err) {
 				if (err) {
-					logger.error("failed to insert: " + message.content + ' posted by ' + message.author.username);
+					logger.error(`failed to insert: ${message.content} posted by ${message.author.username}`);
 					logger.error(err);
 				}
 			});

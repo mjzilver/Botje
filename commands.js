@@ -12,6 +12,7 @@ var uptime = require('./commands/uptime.js');
 var word = require('./commands/word.js');
 var weather = require('./commands/weather.js');
 var age = require('./commands/age.js');
+var speak = require('./commands/speak.js');
 
 var commands = {
    "help" : help,
@@ -27,6 +28,7 @@ var commands = {
    "uptime" : uptime,
    "word" : word,
    "weather" : weather,
+   "speak" : speak,
    "age" : age
 }
 

@@ -66,6 +66,9 @@ module.exports = function score(message) {
 				
 				sorted.sort(function(a, b) { return b[1]- a[1]; });
 
+				if(page > Math.ceil(sorted.length / 10))
+					return message.channel.send(`Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)} not found`)
+
 				var result = ""
 				for (var i = page * 10; i < sorted.length && i <= (page * 10) + 9; i++) 
 					result += `${sorted[i][0]}'s post quality is ${sorted[i][1]}% \n`

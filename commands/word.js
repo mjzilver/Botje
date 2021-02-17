@@ -1,5 +1,5 @@
 module.exports = function word(message) {
-	const args = message.content.split(' ');
+	const args = message.content.match(/([^" ]+)|"([^"]+)"/gi);
 	const mention = message.mentions.users.first();
 	const db = database.db;
 
@@ -12,13 +12,16 @@ module.exports = function word(message) {
 		ORDER BY count DESC 
 		LIMIT 10`;
 
-		db.all(selectSQL, ['%' + args[1] + '%', message.guild.id], (err, rows) => {
+		db.all(selectSQL, ['%' + args[1].removeQuotes() + '%', message.guild.id], (err, rows) => {
 			if (err) {
 				throw err;
 			} else {
 				var result = ""
 				for (var i = 0; (i < rows.length && i <= 10); i++) 
 					result += `${rows[i]['user_name']} has said ${args[1]} ${rows[i]['count']} times! \n`
+
+				if(result == "")
+					return message.channel.send(`Nothing found for ${args[1]} in ${message.guild.name} `)
 				
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
@@ -34,7 +37,7 @@ module.exports = function word(message) {
 		WHERE message LIKE ? 
 		AND server = ? AND user_id = ? `;
 
-		db.get(selectSQL, ['%' + args[2] + '%', message.guild.id, mention.id], (err, row) => {
+		db.get(selectSQL, ['%' + args[2].removeQuotes() + '%', message.guild.id, mention.id], (err, row) => {
 			if (err) 
 				throw err;
 			else 
@@ -45,7 +48,7 @@ module.exports = function word(message) {
 		FROM messages
 		WHERE message LIKE ? AND server = ? `;
 
-		db.get(selectSQL, ['%' + args[1] + '%', message.guild.id], (err, row) => {
+		db.get(selectSQL, ['%' + args[1].removeQuotes() + '%', message.guild.id], (err, row) => {
 			if (err)
 				throw err;
 			else 

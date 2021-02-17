@@ -12,7 +12,19 @@ String.prototype.capitalize = function() {
 }
 
 String.prototype.isImage = function() {
-    return this.match(new RegExp(/(?:http(s?):)*\.(jpe?g|gif|png)/, "i"))
+    return this.match(new RegExp(/(?:http(s?):)*\.(jpe?g|gif|png)/i, "i"))
+}
+
+String.prototype.normalizeSpaces = function() {
+    return this.replace(new RegExp(/  +/gi, "gi"), ' ');
+}
+
+String.prototype.textOnly = function() {
+    return this.replace(new RegExp(/[^\w ]/gi, "gi"), '');
+}
+
+String.prototype.removeQuotes = function() {
+    return this.replace(new RegExp(/"/gi, "gi"), '');
 }
 
 process.on('uncaughtException', function (error) {

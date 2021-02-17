@@ -7,6 +7,9 @@ class Bot {
 		this.lastRequest = [];
 		// adding the timer (so the timeout stacks)
 		this.lastRequestTimer = [];
+
+		this.messageCounter = 0;
+		this.lastMessageSent = new Date();
 	
 		this.bot = new discord.Client({
 			autoReconnect: true
@@ -27,16 +30,15 @@ class Bot {
 
 		this.bot.on('message', message => {
 			database.storemessage(message);
+			var currentTimestamp = new Date();
 
 			// look for the b! meaning bot command
 			if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)) {
 				message.content = message.content.replace(new RegExp(config.prefix, "i"), '');
+				message.content = message.content.normalizeSpaces()
 				const args = message.content.split(' ');
 				const command = args.shift().toLowerCase();
-
 				var allowed = true;
-
-				var currentTimestamp = new Date();
 
 				if (!(message.author.username in this.lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
 					this.lastRequest[message.author.username] = currentTimestamp;
@@ -48,11 +50,11 @@ class Bot {
 					if ((currentTimestamp - this.lastRequest[message.author.username] < (currentTimer * 1000))) {
 						this.lastRequestTimer[message.author.username] = currentTimer + 5;
 
-						var diff = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime());
+						var difference = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime());
 						if (currentTimer == 5)
-							message.channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds')
+							message.channel.send('You need to wait ' + (currentTimer - difference.getSeconds()) + ' seconds')
 						else
-							message.channel.send('You need to wait ' + (currentTimer - diff.getSeconds()) + ' seconds, added 5 seconds because you didnt wait')
+							message.channel.send('You need to wait ' + (currentTimer - difference.getSeconds()) + ' seconds, added 5 seconds because you didnt wait')
 
 						allowed = false;
 					} else {
@@ -67,11 +69,19 @@ class Bot {
 					if(command in this.commands)
 						return this.commands[command](message);
 
-				// only me for now
 				if(message.author.id === config.owner)
 					if(command in this.admincommands)
 						return this.admincommands[command](message);
+			} 
+
+			var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
+
+			if(this.messageCounter >= config.speakEvery && timepassed >= 10) {
+				this.commands['speak'](message);
+				this.lastMessageSent = currentTimestamp;
+				this.messageCounter = 0;
 			}
+			this.messageCounter++;
 		})
 
 		this.bot.on('messageDelete', message => {
