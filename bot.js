@@ -74,14 +74,16 @@ class Bot {
 						return this.admincommands[command](message);
 			} 
 
-			var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
+			if(!message.author.bot) {
+				var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
 
-			if(this.messageCounter >= config.speakEvery && timepassed >= 10) {
-				this.commands['speak'](message);
-				this.lastMessageSent = currentTimestamp;
-				this.messageCounter = 0;
+				if((this.messageCounter >= config.speakEvery && timepassed >= 10) || message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
+					this.commands['speak'](message);
+					this.lastMessageSent = currentTimestamp;
+					this.messageCounter = 0;
+				}
+				this.messageCounter++;
 			}
-			this.messageCounter++;
 		})
 
 		this.bot.on('messageDelete', message => {

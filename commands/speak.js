@@ -1,6 +1,7 @@
 module.exports = function speak(message) {    
     let selectSQL = `SELECT message FROM messages
     WHERE server = ?
+    AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
     ORDER BY RANDOM()
     LIMIT 1 `;
 

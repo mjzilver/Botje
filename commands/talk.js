@@ -3,7 +3,8 @@ module.exports = function talk(message) {
     var chain = {};
 
     let selectSQL = `SELECT message FROM messages
-    WHERE server = ? `;
+    WHERE server = ? 
+    AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" `;
 
     if(mention)
         selectSQL += `AND user_id = ${mention.id}` 
