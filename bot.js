@@ -30,7 +30,6 @@ class Bot {
 
 		this.bot.on('message', message => {
 			database.storemessage(message);
-			var currentTimestamp = new Date();
 
 			// look for the b! meaning bot command
 			if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)) {
@@ -38,32 +37,9 @@ class Bot {
 				message.content = message.content.normalizeSpaces()
 				const args = message.content.split(' ');
 				const command = args.shift().toLowerCase();
-				var allowed = true;
+				var allowed = this.isUserAllowed(message);
 
-				if (!(message.author.username in this.lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
-					this.lastRequest[message.author.username] = currentTimestamp;
-				} else {
-					// set timer
-					this.lastRequestTimer[message.author.username] = (message.author.username in this.lastRequestTimer) ? this.lastRequestTimer[message.author.username] : 5;
-					var currentTimer = this.lastRequestTimer[message.author.username];
-
-					if ((currentTimestamp - this.lastRequest[message.author.username] < (currentTimer * 1000))) {
-						this.lastRequestTimer[message.author.username] = currentTimer + 5;
-
-						var difference = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime());
-						if (currentTimer == 5)
-							message.channel.send('You need to wait ' + (currentTimer - difference.getSeconds()) + ' seconds')
-						else
-							message.channel.send('You need to wait ' + (currentTimer - difference.getSeconds()) + ' seconds, added 5 seconds because you didnt wait')
-
-						allowed = false;
-					} else {
-						this.lastRequestTimer[message.author.username] = 5;
-						this.lastRequest[message.author.username] = currentTimestamp;
-					}
-				}
-
-				logger.log('debug', `'${message.author.username}' issued '${command}' with arguments '${args}' in channel '${message.channel.name}' in server '${message.channel.guild.name}'`);
+				logger.log('debug', `'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`);
 
 				if(allowed)
 					if(command in this.commands)
@@ -75,6 +51,7 @@ class Bot {
 			} 
 
 			if(!message.author.bot) {
+				var currentTimestamp = new Date();
 				var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
 
 				if((this.messageCounter >= config.speakEvery && timepassed >= 10) || message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
@@ -92,10 +69,32 @@ class Bot {
 			if(message.edits.length > 1)
 			{
 				message.edits.forEach(edit => {
-					logger.log('warn', `This edit belongs to ${message.author.username}: ${message.content} == Edit at: ${edit.content}  ${new Date(message.editedTimestamp).toUTCString()}`);
+					logger.log('warn', `This edit belongs to ${message.author.username}: ${message.content} == Edit at: ${edit.content} ${new Date(message.editedTimestamp).toUTCString()}`);
 				});
 			}
 		})
 	}	
+	
+	isUserAllowed(message) {
+		var currentTimestamp = new Date();
+
+		if (!(message.author.username in this.lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
+			this.lastRequest[message.author.username] = currentTimestamp;
+		} else {
+			this.lastRequestTimer[message.author.username] = (message.author.username in this.lastRequestTimer) ? this.lastRequestTimer[message.author.username] : 5;
+			var currentTimer = this.lastRequestTimer[message.author.username];
+
+			if ((currentTimestamp - this.lastRequest[message.author.username] < (currentTimer * 1000))) {
+				var difference = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime());
+				message.channel.send(`You need to wait ${(currentTimer - difference.getSeconds())} seconds`)
+
+				return false;
+			} else {
+				this.lastRequestTimer[message.author.username] = 5;
+				this.lastRequest[message.author.username] = currentTimestamp;
+			}
+		}
+		return true;
+	}
 }
 module.exports = new Bot();
