@@ -4,7 +4,7 @@ module.exports = function nuke(message, loop = 0) {
 
     var itemsProcessed = 0;
 
-    message.channel.fetchMessages({
+    message.channel.messages.fetch({
             limit: 100,
             before: message.id
         })

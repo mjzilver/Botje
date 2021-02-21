@@ -54,7 +54,7 @@ class Bot {
 				var currentTimestamp = new Date();
 				var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
 
-				if((this.messageCounter >= config.speakEvery && timepassed >= 10) || message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
+				if(((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= 10) || message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
 					this.commands['speak'](message);
 					this.lastMessageSent = currentTimestamp;
 					this.messageCounter = 0;

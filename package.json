@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "8.2",
+  "version": "8.3",
   "versionname": "Status Quo",
   "description": "The discord bot for the thinking man",
   "main": "start.js",

@@ -20,7 +20,7 @@ String.prototype.normalizeSpaces = function() {
 }
 
 String.prototype.textOnly = function() {
-    return this.replace(new RegExp(/[^\w ]/gi, "gi"), '');
+    return this.replace(new RegExp(/[^a-zA-Z ]/gi, "gi"), '');
 }
 
 String.prototype.removeQuotes = function() {
