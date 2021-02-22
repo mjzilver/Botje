@@ -1,9 +1,9 @@
-var catalog = require('./admincommands/catalog.js');
 var purge = require('./admincommands/purge.js');
+var disallow = require('./admincommands/disallow.js');
 
 var commands = {
-    "catalog" : catalog,
     "purge" : purge,
+    "disallow" : disallow
 }
 
 module.exports = commands

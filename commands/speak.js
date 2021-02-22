@@ -1,13 +1,13 @@
 module.exports = function speak(message, findWord = 1) {
-    let selectSQL = `SELECT message FROM messages
+    let selectSQL = `SELECT message, LENGTH(message) as len FROM messages
     WHERE server = ?
-    AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+    AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" AND len < 100
     ORDER BY RANDOM()
     LIMIT 1 `;
 
     if (findWord) {
         message.content = message.content.replace(new RegExp(/(\b|^| )(bot(je)?|:.+:|<.+>)( *|$)/, "gi"), '');
-        message.contet = message.content.textOnly();
+        message.content = message.content.textOnly();
         const words = message.content.split(' ');
         if (words[0] == 'speak')
             words.shift();
@@ -23,14 +23,17 @@ module.exports = function speak(message, findWord = 1) {
                     });
             }
 
-            selectSQL = `SELECT message FROM messages
+            selectSQL = `SELECT message, LENGTH(message) as len FROM messages
             WHERE server = ?
-            AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+            AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" AND len < 100
             AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()}
             ORDER BY RANDOM()
             LIMIT 1 `;
-        }
-    }
+            logger.log('debug', `Sending message with '${words[0]}' in it`)
+        } else
+            logger.log('debug', `Sending message with no context - no suitable word found`)
+    } else 
+        logger.log('debug', `Sending message with no context - no match in DB`)
 
     database.db.get(selectSQL, [message.guild.id], (err, row) => {
         if (err)

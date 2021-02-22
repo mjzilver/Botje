@@ -1,7 +1,6 @@
 class Database {
     constructor() {
         this.sqlite3 = require('sqlite3');
-	
         this.db = new this.sqlite3.Database("./discord.db")
         
         this.initializeDatabase();
@@ -14,7 +13,7 @@ class Database {
 	}
 
 	storemessage(message) {
-	if (message.content.length >= 3 && message.guild.member(message.author) 
+		if (message.content.length >= 3 && (message.guild && message.guild.member(message.author))
 		&& !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")) && !message.content.match(new RegExp("^t!", "i"))) {
 			var insert = this.db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?)',
 				[message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()]);

@@ -2,11 +2,10 @@ class Bot {
 	constructor() {
 		this.commands = require('./commands.js');
 		this.admincommands = require('./admincommands.js');
+		this.fs = require('fs')
 		
 		// person as key -> time as value
 		this.lastRequest = [];
-		// adding the timer (so the timeout stacks)
-		this.lastRequestTimer = [];
 
 		this.messageCounter = 0;
 		this.lastMessageSent = new Date();
@@ -37,27 +36,31 @@ class Bot {
 				message.content = message.content.normalizeSpaces()
 				const args = message.content.split(' ');
 				const command = args.shift().toLowerCase();
-				var allowed = this.isUserAllowed(message);
 
 				logger.log('debug', `'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`);
 
-				if(allowed)
-					if(command in this.commands)
+				if(this.isUserAllowed(message) || message.member.hasPermission("ADMINISTRATOR"))
+				{
+					if(command in this.commands) {
 						return this.commands[command](message);
-
-				if(message.author.id === config.owner)
-					if(command in this.admincommands)
-						return this.admincommands[command](message);
-			} 
-
-			if(!message.author.bot) {
+					} else if(message.author.id === config.owner) {
+						if(command in this.admincommands)
+							return this.admincommands[command](message);
+					} else {
+						message.author.send(`${command.capitalize()} is not a command, retard`)
+					}
+				} 
+			} else if(!message.author.bot) {
 				var currentTimestamp = new Date();
 				var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
 
-				if(((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= 10) || message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
+				if((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= randomBetween(10,20)) {
 					this.commands['speak'](message);
 					this.lastMessageSent = currentTimestamp;
 					this.messageCounter = 0;
+				} else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
+					if(this.isUserAllowed(message))
+						this.commands['speak'](message);
 				}
 				this.messageCounter++;
 			}
@@ -76,21 +79,21 @@ class Bot {
 	}	
 	
 	isUserAllowed(message) {
+		var disallowed = JSON.parse(this.fs.readFileSync('./json/disallowed.json'));
+		if(message.author.id in disallowed) {
+			message.author.send(`You aren't allowed to use botje because you are on the banlist.`)
+			return false
+		}
 		var currentTimestamp = new Date();
 
-		if (!(message.author.username in this.lastRequest) || message.member.hasPermission("ADMINISTRATOR")) {
+		if (!(message.author.username in this.lastRequest)) {
 			this.lastRequest[message.author.username] = currentTimestamp;
 		} else {
-			this.lastRequestTimer[message.author.username] = (message.author.username in this.lastRequestTimer) ? this.lastRequestTimer[message.author.username] : 5;
-			var currentTimer = this.lastRequestTimer[message.author.username];
-
-			if ((currentTimestamp - this.lastRequest[message.author.username] < (currentTimer * 1000))) {
+			if ((currentTimestamp - this.lastRequest[message.author.username] < (config.timeoutDuration * 1000))) {
 				var difference = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime());
-				message.channel.send(`You need to wait ${(currentTimer - difference.getSeconds())} seconds`)
-
+				message.channel.send(`You need to wait ${(config.timeoutDuration - difference.getSeconds())} seconds`)
 				return false;
 			} else {
-				this.lastRequestTimer[message.author.username] = 5;
 				this.lastRequest[message.author.username] = currentTimestamp;
 			}
 		}
