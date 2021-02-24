@@ -1,9 +1,7 @@
 const save = require("./save");
 
-module.exports = function list(input) {
-    let channels = bot.bot.channels.cache;
-
-    for (const [channelID, channel] of channels.entries()) 
+module.exports = function fullscan(input) {
+    for (const [channelID, channel] of bot.bot.channels.cache.entries()) 
         if(channel.type == "text")
             save([channelID])
 }

@@ -72,3 +72,5 @@ discord.db-journal
 
 # no backups
 backups/
+# no emotes
+emotes/

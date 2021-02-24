@@ -46,7 +46,7 @@ class Bot {
 					} else if(message.author.id === config.owner && command in this.admincommands) {
 						return this.admincommands[command](message);
 					} else {
-						message.channel.send(`${command.capitalize()} is not a command, retard <:botje:813818359484907551>`)
+						message.channel.send(`${command.capitalize()} is not a command, retard`)
 					}
 				} 
 			} else if(!message.author.bot) {

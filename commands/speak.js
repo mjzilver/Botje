@@ -5,6 +5,9 @@ module.exports = function speak(message, findWord = 1) {
     ORDER BY RANDOM()
     LIMIT 1 `;
 
+    if(randomBetween(0, 100))
+        message.channel.send(`<:botje:813818359484907551>`)
+
     if (findWord) {
         message.content = message.content.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '');
         message.content = message.content.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '');
