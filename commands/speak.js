@@ -1,12 +1,13 @@
 module.exports = function speak(message, findWord = 1) {
+    var earliest = new Date();
+    earliest.setMonth(earliest.getMonth() - 3);
+
     let selectSQL = `SELECT message, LENGTH(message) as len FROM messages
     WHERE server = ?
-    AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" AND len < 100
+    AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+    AND len < 100 AND date < ${earliest.getTime()}
     ORDER BY RANDOM()
     LIMIT 1 `;
-
-    if(randomBetween(0, 100))
-        message.channel.send(`<:botje:813818359484907551>`)
 
     if (findWord) {
         message.content = message.content.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '');
@@ -30,7 +31,7 @@ module.exports = function speak(message, findWord = 1) {
             selectSQL = `SELECT message, LENGTH(message) as len FROM messages
             WHERE server = ?
             AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" AND len < 100
-            AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()}
+            AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
             ORDER BY RANDOM()
             LIMIT 1 `;
             logger.log('debug', `Sending message with '${words[0]}' in it`)
