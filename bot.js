@@ -43,11 +43,10 @@ class Bot {
 				{
 					if(command in this.commands) {
 						return this.commands[command](message);
-					} else if(message.author.id === config.owner) {
-						if(command in this.admincommands)
-							return this.admincommands[command](message);
+					} else if(message.author.id === config.owner && command in this.admincommands) {
+						return this.admincommands[command](message);
 					} else {
-						message.author.send(`${command.capitalize()} is not a command, retard`)
+						message.channel.send(`${command.capitalize()} is not a command, retard <:botje:813818359484907551>`)
 					}
 				} 
 			} else if(!message.author.bot) {
@@ -67,12 +66,12 @@ class Bot {
 		})
 
 		this.bot.on('messageDelete', message => {
-			logger.log('warn', `This Message has been deleted: ${message.author.username}: ${message.content} == Send at: ${new Date(message.createdTimestamp).toUTCString()}`);
+			logger.log('warn', `This Message has been deleted: ${message.author.username}: ${message.content} == Posted in channel '${message.channel.name}' in server '${message.channel.guild.name} == Send at: ${new Date(message.createdTimestamp).toUTCString()}`);
 
 			if(message.edits.length > 1)
 			{
 				message.edits.forEach(edit => {
-					logger.log('warn', `This edit belongs to ${message.author.username}: ${message.content} == Edit at: ${edit.content} ${new Date(message.editedTimestamp).toUTCString()}`);
+					logger.log('warn', `This edit belongs to ${message.author.username}: ${message.content} == Posted in channel '${message.channel.name}' in server '${message.channel.guild.name} == Edit at: ${edit.content} ${new Date(message.editedTimestamp).toUTCString()}`);
 				});
 			}
 		})

@@ -6,7 +6,8 @@ module.exports = function speak(message, findWord = 1) {
     LIMIT 1 `;
 
     if (findWord) {
-        message.content = message.content.replace(new RegExp(/(\b|^| )(bot(je)?|:.+:|<.+>)( *|$)/, "gi"), '');
+        message.content = message.content.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '');
+        message.content = message.content.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '');
         message.content = message.content.textOnly();
         const words = message.content.split(' ');
         if (words[0] == 'speak')

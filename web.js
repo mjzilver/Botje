@@ -19,11 +19,8 @@ class WebServer {
 
         expressapp.use('/log', function (req, res) {
             const options = {
-                from: new Date() - (24 * 60 * 60 * 1000),
-                until: new Date(),
-                limit: 1000,
-                start: 0,
-                order: 'asc',
+                limit: Number.MAX_SAFE_INTEGER,
+                order: 'desc',
             };
             
             logger.query(options, function (err, results) {
