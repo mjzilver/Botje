@@ -3,10 +3,10 @@ class BackupSystem {
         
     } 
 
-    saveEmoji(emoji) {
+    saveEmoji(emoji, filename = "") {
         var guildpath = './emotes/' + emoji.guild.id;
         var emojilink = `https://cdn.discordapp.com/emojis/${emoji.id}.png`
-        var emojipath = guildpath + '/' + emoji.name + '.png';
+        var emojipath = guildpath + '/' + emoji.name + filename + '.png';
 
         if (!fs.existsSync(emojipath) || fs.statSync(emojipath).size < 1000) {
             console.log(`Saving ${emoji.name} at ${emojipath} from ${emojilink}`)

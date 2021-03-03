@@ -1,3 +1,5 @@
+const backupsystem = require('./backupsystem.js');
+
 class Bot {
 	constructor() {
 		this.commands = require('../commandholders/commands.js');
@@ -76,15 +78,16 @@ class Bot {
 		})
 
 		this.bot.on('emojiCreate', emoji => {
-			
+			backupsystem.saveEmoji(emoji)
 		})
 
 		this.bot.on('emojiDelete', emoji => {
-			
+			backupsystem.saveEmoji(emoji, new Date().getTime())
 		})
 
 		this.bot.on('emojiUpdate', (oldEmoji, newEmoji) => {
-			
+			backupsystem.saveEmoji(oldEmoji, new Date().getTime())
+			backupsystem.saveEmoji(newEmoji)
 		})
 	}	
 	
