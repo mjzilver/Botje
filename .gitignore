@@ -69,6 +69,8 @@ config.json
 # dont include the db
 discord.db
 discord.db-journal
+discord.db.sqbpro
+discord.db*
 
 # no backups
 backups/

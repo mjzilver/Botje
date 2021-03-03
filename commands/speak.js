@@ -1,6 +1,8 @@
-module.exports = function speak(message, findWord = 1) {
+const database = require("../systems/database");
+
+module.exports = function speak(message, monthsOld = 5, findWord = 1) {
     var earliest = new Date();
-    earliest.setMonth(earliest.getMonth() - 3);
+    earliest.setMonth(earliest.getMonth() - monthsOld);
 
     let selectSQL = `SELECT message, LENGTH(message) as len FROM messages
     WHERE server = ?
@@ -47,7 +49,7 @@ module.exports = function speak(message, findWord = 1) {
             if (row)
                 message.channel.send(row['message'].capitalize().normalizeSpaces());
             else
-                speak(message, 0)
+                speak(message, --monthsOld, 0)
         }
     })
 }
