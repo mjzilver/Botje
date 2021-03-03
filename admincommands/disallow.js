@@ -1,4 +1,3 @@
-const fs = require('fs')
 var filepath = './json/disallowed.json';
 
 module.exports = function disallow(message) {

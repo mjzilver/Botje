@@ -1,6 +1,6 @@
 class commandline {
     constructor() {
-        this.commands = require('./clcommands.js');
+        this.commands = require('../commandholders/clcommands.js');
         const readline = require('readline');
 
         this.rl = readline.createInterface({

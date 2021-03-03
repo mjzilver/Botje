@@ -1,8 +1,7 @@
 class Bot {
 	constructor() {
-		this.commands = require('./commands.js');
-		this.admincommands = require('./admincommands.js');
-		this.fs = require('fs')
+		this.commands = require('../commandholders/commands.js');
+		this.admincommands = require('../commandholders/admincommands.js');
 		
 		// person as key -> time as value
 		this.lastRequest = [];
@@ -43,7 +42,7 @@ class Bot {
 				{
 					if(command in this.commands) {
 						return this.commands[command](message);
-					} else if(message.author.id === config.owner && command in this.admincommands) {
+					} else if((message.author.id === config.owner || message.member.hasPermission("ADMINISTRATOR")) && command in this.admincommands) {
 						return this.admincommands[command](message);
 					} else {
 						message.channel.send(`${command.capitalize()} is not a command, retard`)
@@ -75,10 +74,22 @@ class Bot {
 				});
 			}
 		})
+
+		this.bot.on('emojiCreate', emoji => {
+			
+		})
+
+		this.bot.on('emojiDelete', emoji => {
+			
+		})
+
+		this.bot.on('emojiUpdate', (oldEmoji, newEmoji) => {
+			
+		})
 	}	
 	
 	isUserAllowed(message) {
-		var disallowed = JSON.parse(this.fs.readFileSync('./json/disallowed.json'));
+		var disallowed = JSON.parse(fs.readFileSync('./json/disallowed.json'));
 		if(message.author.id in disallowed) {
 			message.author.send(`You aren't allowed to use botje because you are on the banlist.`)
 			return false

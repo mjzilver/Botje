@@ -1,5 +1,3 @@
-const fs = require('fs')
-const request = require('request');
 const path = './emotes'
 
 module.exports = function saveemotes(input) {
@@ -12,16 +10,7 @@ module.exports = function saveemotes(input) {
         }
 
         for (const [emojiID, emoji] of guild.emojis.cache.entries()) {
-            var emojilink = `https://cdn.discordapp.com/emojis/${emojiID}.png`
-            var emojipath = guildpath + '/' + emoji.name + '.png';
-
-            if (!fs.existsSync(emojipath) || fs.statSync(emojipath).size < 1000) {
-                console.log(`Saving ${emoji.name} at ${emojipath} from ${emojilink}`)
-
-                request(emojilink).pipe(fs.createWriteStream(emojipath)).on('error', function(err) {
-                    console.error(err)
-                })           
-            }
+            backupsystem.saveEmoji(emoji)
         }
     }
 

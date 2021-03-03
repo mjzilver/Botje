@@ -1,11 +1,17 @@
+global.discord = require('discord.js');
+
 global.package = require('./package.json');
 global.config = require('./config.json');
-global.logger = require('./logger.js');
-global.database = require('./database.js');
-global.discord = require('discord.js');
-global.commandline = require('./commandline.js');
-global.bot = require('./bot.js');
-global.web = require('./web.js');
+
+global.logger = require('./systems/logger.js');
+global.database = require('./systems/database.js');
+global.commandline = require('./systems/commandline.js');
+global.bot = require('./systems/bot.js');
+global.web = require('./systems/web.js');
+global.backupsystem = require('./systems/backupsystem')
+
+global.fs = require('fs')
+global.request = require('request');
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1).toLocaleLowerCase();
