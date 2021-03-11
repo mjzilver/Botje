@@ -19,7 +19,7 @@ class WebServer {
 
         expressapp.use('/log', function (req, res) {
             const options = {
-                limit: Number.MAX_SAFE_INTEGER,
+                limit: 10000,
                 order: 'desc',
             };
             

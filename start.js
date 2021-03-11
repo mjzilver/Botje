@@ -21,6 +21,10 @@ String.prototype.isImage = function() {
     return this.match(new RegExp(/(?:http(s?):)*\.(jpe?g|gif|png)/i, "i"))
 }
 
+String.prototype.isLink = function() {
+    return this.match(new RegExp(/(http(s?):|www).*?/, "gi"))
+}
+
 String.prototype.normalizeSpaces = function() {
     return this.replace(new RegExp(/  +/gi, "gi"), ' ');
 }

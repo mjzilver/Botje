@@ -44,8 +44,11 @@ class Bot {
 				{
 					if(command in this.commands) {
 						return this.commands[command](message);
-					} else if((message.author.id === config.owner || message.member.hasPermission("ADMINISTRATOR")) && command in this.admincommands) {
-						return this.admincommands[command](message);
+					} else if(command in this.admincommands) {
+						if(message.author.id === config.owner || message.member.hasPermission("ADMINISTRATOR"))
+							return this.admincommands[command](message);
+						else
+							message.channel.send(`${command.capitalize()} is an admin command, you are not allowed`)
 					} else {
 						message.channel.send(`${command.capitalize()} is not a command, retard`)
 					}
