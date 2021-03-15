@@ -7,6 +7,7 @@ var dbinfo = require('../commandline/dbinfo.js');
 var listcommands = require('../commandline/listcommands.js'); 
 var fullscan = require('../commandline/fullscan.js'); 
 var saveemotes = require('../commandline/saveemotes.js'); 
+var nukekanna = require('../commandline/nukekanna.js'); 
 
 var commands = {
     "list" : list,
@@ -17,6 +18,7 @@ var commands = {
     "dbinfo" : dbinfo,
     "fullscan" : fullscan,
     "saveemotes" : saveemotes,
+    "nukekanna" : nukekanna,
     "listcommands" : listcommands
 }
 
