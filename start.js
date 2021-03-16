@@ -8,7 +8,8 @@ global.database = require('./systems/database.js');
 global.commandline = require('./systems/commandline.js');
 global.bot = require('./systems/bot.js');
 global.web = require('./systems/web.js');
-global.backupsystem = require('./systems/backupsystem')
+global.backupsystem = require('./systems/backupsystem.js')
+global.replysystem = require('./systems/replysystem.js')
 
 global.fs = require('fs')
 global.request = require('request');
@@ -35,6 +36,10 @@ String.prototype.textOnly = function() {
 
 String.prototype.removeQuotes = function() {
     return this.replace(new RegExp(/"/gi, "gi"), '');
+}
+
+Array.prototype.pickRandom = function() {
+    return this[randomBetween(0, this.length - 1)]
 }
 
 global.randomBetween = function(min, max) { 

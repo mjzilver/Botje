@@ -1,5 +1,3 @@
-const backupsystem = require('./backupsystem.js');
-
 class Bot {
 	constructor() {
 		this.commands = require('../commandholders/commands.js');
@@ -56,6 +54,8 @@ class Bot {
 			} else if(!message.author.bot) {
 				var currentTimestamp = new Date();
 				var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
+
+				replysystem.process(message);
 
 				if((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= randomBetween(10,20)) {
 					this.commands['speak'](message);
