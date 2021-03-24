@@ -3,6 +3,12 @@
         "name" : "Goodnight wishes",
         "regex" : "\\b(((g|good ?)night)|good evening|^nn|night ?night|sleep (tight|well))\\b",
         "replies" : ["Good night", "Sleep well", "Go to bed already"],
-        "timeout" : 5
+        "timeout" : 20
+    },
+    {
+        "name" : "Greetings",
+        "regex" : "\\b(hello|hi|good (day|afternoon|morning)|whatsup|sup|what's up)\\b",
+        "replies" : ["Greetings", "Go away", "Sup dude"],
+        "timeout" : 30
     }
 ]

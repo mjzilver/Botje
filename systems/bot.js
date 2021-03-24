@@ -57,7 +57,7 @@ class Bot {
 
 				replysystem.process(message);
 
-				if((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= randomBetween(10,20)) {
+				if((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= randomBetween(20,60)) {
 					this.commands['speak'](message);
 					this.lastMessageSent = currentTimestamp;
 					this.messageCounter = 0;
