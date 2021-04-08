@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "9.1",
+  "version": "9.1.1",
   "versionname": "Freedom",
   "description": "The discord bot for the thinking man",
   "main": "start.js",
@@ -17,6 +17,12 @@
     "winston": "^3.2.1"
   },
   "scripts": {
-    "start": "nodemon start.js"
+    "dev": "nodemon start.js -e js"
+  },
+  "nodemonConfig": {
+    "verbose" : "false",
+    "ignore": [
+      "start.js"
+    ]
   }
 }

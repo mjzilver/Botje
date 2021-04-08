@@ -1,1 +1,1 @@
-nodemon -e js start.js
+npm run dev
