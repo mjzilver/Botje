@@ -18,7 +18,7 @@ module.exports = function emotes(message) {
 				throw err;
 			} else {
 				var result = ""
-				for (var i = 0; i < rows.length; i++) 
+				for (var i = 0; i < rows.length; i++)
 					result += `${rows[i]['message']} said ${rows[i]['count']} times! \n`
 
 				const top = new discord.MessageEmbed()
@@ -44,7 +44,7 @@ module.exports = function emotes(message) {
 				throw err;
 			} else {
 				var result = ""
-				for (var i = 0; i < rows.length; i++) 
+				for (var i = 0; i < rows.length; i++)
 					result += `${rows[i]['message']} said ${rows[i]['count']} times! \n`
 
 				const top = new discord.MessageEmbed()

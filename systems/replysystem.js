@@ -1,17 +1,15 @@
 class ReplySystem {
-	constructor() {
+    constructor() {
         this.replyPatterns = require('../json/reply.json');
 
         // replyPattern name as key -> time as value
-		this.lastRequest = [];
+        this.lastRequest = [];
     }
 
     process(message) {
         var match = false
-        for (const reply of this.replyPatterns) 
-        {
-            if(message.content.match(new RegExp(reply["regex"], "gi")) && this.checkTime(reply))
-            {
+        for (const reply of this.replyPatterns) {
+            if (message.content.match(new RegExp(reply["regex"], "gi")) && this.checkTime(reply)) {
                 logger.log('debug', `Replying to message '${message.content}' that matched ReplyPattern '${reply["name"]}'`)
                 message.channel.send(reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
                 match = true
@@ -21,19 +19,19 @@ class ReplySystem {
     }
 
     checkTime(reply) {
-		var currentTimestamp = new Date();
+        var currentTimestamp = new Date();
 
-		if (!(reply["name"] in this.lastRequest)) {
-			this.lastRequest[reply["name"]] = currentTimestamp;
-		} else {
-			if ((currentTimestamp - this.lastRequest[reply["name"]] < (reply["timeout"] * 60 * 1000))) {
-				return false;
-			} else {
-				this.lastRequest[reply["name"]] = currentTimestamp;
-			}
-		}
-		return true;
-	}
+        if (!(reply["name"] in this.lastRequest)) {
+            this.lastRequest[reply["name"]] = currentTimestamp;
+        } else {
+            if ((currentTimestamp - this.lastRequest[reply["name"]] < (reply["timeout"] * 60 * 1000))) {
+                return false;
+            } else {
+                this.lastRequest[reply["name"]] = currentTimestamp;
+            }
+        }
+        return true;
+    }
 }
 
 module.exports = new ReplySystem();

@@ -1,6 +1,6 @@
 module.exports = async function nuke(message) {
 
-    if(message.author.id == message.guild.ownerID)
+    if (message.author.id == message.guild.ownerID)
     {
         const filter = m => {
             return (m.content.startsWith('launch') && m.author.id == message.author.id)
@@ -19,7 +19,7 @@ module.exports = async function nuke(message) {
 
 function nukeguild(message) {
     for (const [channelID, channel] of bot.bot.channels.cache.entries()) 
-        if(channel.type == "text" && channel.guild.id == message.guild.id)
+        if (channel.type == "text" && channel.guild.id == message.guild.id)
             nukechannel(channelID)
 }
 
@@ -28,13 +28,11 @@ function nukechannel(channelId) {
 
     var channel = channels.find(c => c.id === channelId)
 
-    if(channel && channel.type == "text") 
-    {
+    if (channel && channel.type == "text")  {
         nukemessages(channel, channel.lastMessageID)
         channel.lastMessage.delete({ timeout : 100 })
-        logger.log('warn', `NUKING channel: ${channel.name}`);
-    }
-    else
+        logger.log('warn', `NUKING channel: ${channel.name}`)
+    } else
         console.log('Channel not found')
 }
 
@@ -42,10 +40,9 @@ function nukemessages(channel, messageid, loop = 0) {
     var itemsProcessed = 0;
 
     channel.messages.fetch({
-            limit: 100,
-            before: messageid
-        })
-    .then(messages => messages.array().forEach(
+        limit: 100,
+        before: messageid
+    }).then(messages => messages.array().forEach(
         (message) => {
             itemsProcessed++;
             message.delete({ timeout: 10 })

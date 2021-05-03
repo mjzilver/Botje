@@ -7,10 +7,9 @@ module.exports = function catalog(message, loop = 0) {
     var itemsProcessed = 0;
 
     message.channel.messages.fetch({
-            limit: 100,
-            before: message.id
-        })
-    .then(messages => messages.array().forEach(
+        limit: 100,
+        before: message.id
+    }).then(messages => messages.array().forEach(
         (message) => {
             itemsProcessed++;
 

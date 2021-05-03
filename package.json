@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "9.2.1",
+  "version": "9.3.0",
   "versionname": "Exarch",
   "description": "The discord bot for the thinking man",
   "main": "start.js",

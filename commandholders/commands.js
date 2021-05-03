@@ -16,22 +16,22 @@ var speak = require('../commands/speak.js');
 var talk = require('../commands/talk.js');
 
 var commands = {
-   "help" : help,
-   "emoji" : emoji,
-   "count" : count,
-   "emotes" : emotes,
-   "ping" : ping,
-   "reddit" : reddit,
-   "score" : score,
-   "quality" : quality,
-   "syllables" : syllables,
-   "top" : top,
-   "uptime" : uptime,
-   "word" : word,
-   "weather" : weather,
-   "speak" : speak,
-   "talk" : talk,
-   "age" : age
+   "help": help,
+   "emoji": emoji,
+   "count": count,
+   "emotes": emotes,
+   "ping": ping,
+   "reddit": reddit,
+   "score": score,
+   "quality": quality,
+   "syllables": syllables,
+   "top": top,
+   "uptime": uptime,
+   "word": word,
+   "weather": weather,
+   "speak": speak,
+   "talk": talk,
+   "age": age
 }
 
 module.exports = commands

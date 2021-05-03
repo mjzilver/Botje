@@ -3,11 +3,11 @@ module.exports = function dbinfo(input) {
     let selectSQL = 'SELECT COUNT(*) as count FROM messages';
 
     database.db.get(selectSQL, [], (err, row) => {
-        if (err) {
+        if (err)
             console.log('Error in database: ' + err);
-        } else {
+        else
             console.log(`There are ${row['count']} messages in the database`)
-        }
+
         console.log('================================')
     })
 }

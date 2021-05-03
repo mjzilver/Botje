@@ -49,7 +49,7 @@ module.exports = function score(message) {
 				for (var i = 0; i < rows.length; i++) {
 					var user_name = rows[i]['user_name']
 
-					if(!userdata[user_name])
+					if (!userdata[user_name])
 						userdata[user_name] = {'points': 0, 'total': 0, 'quality' : 0, 'score': 0 };
 
 					userdata[user_name]['points'] += calculateScore(rows[i]['message'])

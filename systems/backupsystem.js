@@ -1,7 +1,7 @@
 class BackupSystem {
     constructor() {
-        
-    } 
+
+    }
 
     saveEmoji(emoji, filename = "") {
         var guildpath = './emotes/' + emoji.guild.id;
@@ -11,9 +11,9 @@ class BackupSystem {
         if (!fs.existsSync(emojipath) || fs.statSync(emojipath).size < 1000) {
             console.log(`Saving ${emoji.name} at ${emojipath} from ${emojilink}`)
 
-            request(emojilink).pipe(fs.createWriteStream(emojipath)).on('error', function(err) {
+            request(emojilink).pipe(fs.createWriteStream(emojipath)).on('error', function (err) {
                 console.error(err)
-            })           
+            })
         }
     }
 }

@@ -2,19 +2,23 @@ class Bot {
 	constructor() {
 		this.commands = require('../commandholders/commands.js');
 		this.admincommands = require('../commandholders/admincommands.js');
-		
+
 		// person as key -> time as value
 		this.lastRequest = [];
 
 		this.messageCounter = 0;
 		this.lastMessageSent = new Date();
-	
+
 		this.bot = new discord.Client({
 			autoReconnect: true
 		})
-	
+
 		this.bot.on('ready', () => {
-			this.bot.user.setPresence({ activity: { name: `Running Version ${global.package.version}` }})
+			this.bot.user.setPresence({
+				activity: {
+					name: `Running Version ${global.package.version}`
+				}
+			})
 			logger.info('Connected');
 			logger.info(`Logged in as: ${this.bot.user.username} - ${this.bot.user.id}`);
 			logger.info(`Running Version ${global.package.versionname} - ${global.package.version}`);
@@ -38,31 +42,29 @@ class Bot {
 
 				logger.log('debug', `'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`);
 
-				if(this.isUserAllowed(message) || message.member.hasPermission("ADMINISTRATOR"))
-				{
-					if(command in this.commands) {
+				if (this.isUserAllowed(message) || message.member.hasPermission("ADMINISTRATOR")) {
+					if (command in this.commands) {
 						return this.commands[command](message);
-					} else if(command in this.admincommands) {
-						if(message.author.id === config.owner || message.member.hasPermission("ADMINISTRATOR"))
+					} else if (command in this.admincommands) {
+						if (message.author.id === config.owner || message.member.hasPermission("ADMINISTRATOR"))
 							return this.admincommands[command](message);
 						else
 							message.channel.send(`${command.capitalize()} is an admin command, you are not allowed`)
 					} else {
 						message.channel.send(`${command.capitalize()} is not a command, retard`)
 					}
-				} 
-			} else if(!message.author.bot) {
+				}
+			} else if (!message.author.bot) {
 				var currentTimestamp = new Date();
 				var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
 
-				if(!replysystem.process(message))
-				{
-					if((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= randomBetween(20,60)) {
+				if (!replysystem.process(message)) {
+					if ((this.messageCounter >= config.speakEvery || randomBetween(1, 20) == 1) && timepassed >= randomBetween(20, 60)) {
 						this.commands['speak'](message);
 						this.lastMessageSent = currentTimestamp;
 						this.messageCounter = 0;
 					} else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
-						if(this.isUserAllowed(message))
+						if (this.isUserAllowed(message))
 							this.commands['speak'](message);
 					}
 				}
@@ -73,8 +75,7 @@ class Bot {
 		this.bot.on('messageDelete', message => {
 			logger.log('warn', `This Message has been deleted: ${message.author.username}: ${message.content} == Posted in channel '${message.channel.name}' in server '${message.channel.guild.name} == Send at: ${new Date(message.createdTimestamp).toUTCString()}`);
 
-			if(message.edits.length > 1)
-			{
+			if (message.edits.length > 1) {
 				message.edits.forEach(edit => {
 					logger.log('warn', `This edit belongs to ${message.author.username}: ${message.content} == Posted in channel '${message.channel.name}' in server '${message.channel.guild.name} == Edit at: ${edit.content} ${new Date(message.editedTimestamp).toUTCString()}`);
 				});
@@ -93,11 +94,11 @@ class Bot {
 			backupsystem.saveEmoji(oldEmoji, new Date().getTime())
 			backupsystem.saveEmoji(newEmoji)
 		})
-	}	
-	
+	}
+
 	isUserAllowed(message) {
 		var disallowed = JSON.parse(fs.readFileSync('./json/disallowed.json'));
-		if(message.author.id in disallowed) {
+		if (message.author.id in disallowed) {
 			message.author.send(`You aren't allowed to use botje because you are on the banlist.`)
 			return false
 		}

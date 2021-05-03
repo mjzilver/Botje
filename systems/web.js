@@ -18,26 +18,21 @@ class WebServer {
         expressapp.use(express.static(__dirname + '/views'));
 
         expressapp.use('/log', function (req, res) {
-            const options = {
-                limit: 10000,
-                order: 'desc',
-            };
-            
+            const options = { limit: 10000, order: 'desc' };
+
             logger.query(options, function (err, results) {
-                if (err) 
+                if (err)
                     logger.warn('Error in query' + err)
-                
+
                 var logs = []
-                        
-                if(req.query.level)
-                    for(var i = 0; i < results.file.length; i++)
-                    {
-                        if(results.file[i].level == req.query.level)
+
+                if (req.query.level)
+                    for (var i = 0; i < results.file.length; i++) 
+                        if (results.file[i].level == req.query.level)
                             logs.push(results.file[i])
-                    }
-                else 
+                else
                     logs = results.file
-        
+
                 res.render('log', {
                     list: logs
                 })
@@ -46,7 +41,7 @@ class WebServer {
 
         expressapp.use('/draw', function (req, res) {
             let selectSQL = 'SELECT * FROM colors ORDER BY y, x ASC';
-        
+
             var pixels = new Array(web.imageSize);
             for (var i = 0; i < pixels.length; i++) {
                 pixels[i] = new Array(web.imageSize);
@@ -60,11 +55,11 @@ class WebServer {
                     };
                 }
             }
-        
+
             database.db.all(selectSQL, [], async (err, rows) => {
                 for (let i = 0; i < rows.length; i++) {
                     const element = rows[i];
-        
+
                     if (element.x >= 0 && element.x < web.imageSize && element.y >= 0 && element.y < web.imageSize) {
                         pixels[element.y][element.x] = {
                             y: element.y,
@@ -86,7 +81,6 @@ class WebServer {
             res.render('index')
         });
 
-        
         io.on('connection', function (socket) {
             io.emit('connectCounter', ++web.connectCounter);
 
@@ -112,7 +106,7 @@ class WebServer {
                 }
             });
 
-            socket.on('disconnect', function() {
+            socket.on('disconnect', function () {
                 io.emit('connectCounter', --web.connectCounter);
                 delete web.editPerPerson[socket.id];
             })
@@ -121,7 +115,7 @@ class WebServer {
         server.listen(port, () => {
             logger.info('Webserver running on port ' + port)
         });
-    } 
+    }
 
     spamChecker(id) {
         if (web.editPerPerson[id] == undefined)
@@ -135,7 +129,7 @@ class WebServer {
                 for (const index in web.editPerPerson[id]) {
                     var edited_at = web.moment(web.editPerPerson[id][index]);
                     var time_passed = web.moment.duration(web.moment().diff(edited_at)).asMilliseconds();
-    
+
                     if (time_passed < 200)
                         count++;
                 }

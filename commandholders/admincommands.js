@@ -3,9 +3,9 @@ var disallow = require('../admincommands/disallow.js');
 var nuke = require('../admincommands/nuke.js');
 
 var commands = {
-    "purge" : purge,
-    "disallow" : disallow,
-    "nuke" : nuke
+    "purge": purge,
+    "disallow": disallow,
+    "nuke": nuke
 }
 
 module.exports = commands

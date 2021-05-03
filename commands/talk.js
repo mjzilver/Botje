@@ -6,7 +6,7 @@ module.exports = function talk(message) {
     WHERE server = ? 
     AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" `;
 
-    if(mention)
+    if (mention)
         selectSQL += `AND user_id = ${mention.id}` 
 
     database.db.all(selectSQL, [message.guild.id], (err, rows) => {
