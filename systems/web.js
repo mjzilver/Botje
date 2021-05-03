@@ -15,7 +15,7 @@ class WebServer {
         this.connectCounter = 0;
         this.imageSize = 150;
 
-        expressapp.use(express.static(__dirname + '/views'));
+        expressapp.use(express.static(__dirname + '/../views'));
 
         expressapp.use('/log', function (req, res) {
             const options = { limit: 10000, order: 'desc' };
