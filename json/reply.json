@@ -2,13 +2,43 @@
     {
         "name" : "Goodnight wishes",
         "regex" : "\\b(((g|good ?)night)|good evening|^nn|night ?night|sleep (tight|well))\\b",
-        "replies" : ["Good night", "Sleep well", "Go to bed already"],
-        "timeout" : 20
+        "replies" : ["Good night", "Sleep well", "Go to bed already", "Sleep tight"],
+        "timeout" : 20,
+        "mention" : true 
     },
     {
         "name" : "Greetings",
         "regex" : "\\b(hello|hi|good (day|afternoon|morning)|whatsup|sup|what's up)\\b",
-        "replies" : ["Greetings", "Go away", "Sup dude"],
-        "timeout" : 30
+        "replies" : ["Hi", "Sup", "How're you", "Hello", "Good day"],
+        "timeout" : 30,
+        "mention" : true 
+    },
+    {
+        "name" : "Bad botje",
+        "regex" : "\\b(dumb|stupid|bad) (bot(je)?)\\b",
+        "replies" : ["<:hidden:838402665800531988>", "<:worried:838402665960308777>"],
+        "timeout" : 0,
+        "mention" : false 
+    },
+    {
+        "name" : "Insult botje",
+        "regex" : "\\b(retard|fuck you|fuck|asshole|cunt|I hate|hate) (bot(je)?)\\b",
+        "replies" : ["<:growl:838463518394286150>", "<:angrycorgi:838466685815750726>", "<:disapproving:838467034986840084>"],
+        "timeout" : 0,
+        "mention" : false 
+    },
+    {
+        "name" : "Praise botje",
+        "regex" : "\\b(good|love|like|good job|well done|funny|nice) (bot(je)?)\\b",
+        "replies" : ["<:cool:838402665485697045>", "<:happy:838464326691192872>", "<:yummy:838402665729359873>"],
+        "timeout" : 0,
+        "mention" : false 
+    },
+    {
+        "name" : "Based botje",
+        "regex" : "\\b(based) (bot(je)?)\\b",
+        "replies" : ["<:hecorgi:838491755879071784>"],
+        "timeout" : 0,
+        "mention" : false 
     }
 ]

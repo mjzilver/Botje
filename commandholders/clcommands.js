@@ -7,6 +7,8 @@ var dbinfo = require('../commandline/dbinfo.js');
 var listcommands = require('../commandline/listcommands.js'); 
 var fullscan = require('../commandline/fullscan.js'); 
 var saveemotes = require('../commandline/saveemotes.js'); 
+var expunge = require('../commandline/expunge.js'); 
+var vacuum = require('../commandline/vacuum.js'); 
 
 var commands = {
     "list" : list,
@@ -17,7 +19,9 @@ var commands = {
     "dbinfo" : dbinfo,
     "fullscan" : fullscan,
     "saveemotes" : saveemotes,
-    "listcommands" : listcommands
+    "listcommands" : listcommands,
+    "expunge" : expunge,
+    "vacuum" : vacuum
 }
 
 module.exports = commands

@@ -60,7 +60,7 @@ module.exports = async function getRedditImage(message, last = '') {
 							logger.log('debug', `inserted: ${post.url} - ${sub}`);
 					});
 				} else {
-					if (body.data.children.length > 0) {
+					if (body.data.children.length >= 100) {
 						logger.debug('Finding posts before post ' + body.data.children[body.data.children.length - 1].data.title);
 						getRedditImage(message, body.data.children[body.data.children.length - 1].data.name);
 					} else 

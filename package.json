@@ -1,7 +1,7 @@
 {
   "name": "botje",
-  "version": "9.1.1",
-  "versionname": "Freedom",
+  "version": "9.2.1",
+  "versionname": "Exarch",
   "description": "The discord bot for the thinking man",
   "main": "start.js",
   "author": "Mick Jari",
@@ -20,7 +20,6 @@
     "dev": "nodemon start.js -e js"
   },
   "nodemonConfig": {
-    "verbose" : "false",
     "ignore": [
       "start.js"
     ]

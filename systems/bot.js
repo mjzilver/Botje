@@ -55,15 +55,16 @@ class Bot {
 				var currentTimestamp = new Date();
 				var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes();
 
-				replysystem.process(message);
-
-				if((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= randomBetween(20,60)) {
-					this.commands['speak'](message);
-					this.lastMessageSent = currentTimestamp;
-					this.messageCounter = 0;
-				} else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
-					if(this.isUserAllowed(message))
+				if(!replysystem.process(message))
+				{
+					if((this.messageCounter >= config.speakEvery || randomBetween(1,20) == 1) && timepassed >= randomBetween(20,60)) {
 						this.commands['speak'](message);
+						this.lastMessageSent = currentTimestamp;
+						this.messageCounter = 0;
+					} else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
+						if(this.isUserAllowed(message))
+							this.commands['speak'](message);
+					}
 				}
 				this.messageCounter++;
 			}

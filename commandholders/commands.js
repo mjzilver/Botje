@@ -14,7 +14,6 @@ var weather = require('../commands/weather.js');
 var age = require('../commands/age.js');
 var speak = require('../commands/speak.js');
 var talk = require('../commands/talk.js');
-var avatar = require('../commands/avatar.js');
 
 var commands = {
    "help" : help,
@@ -32,7 +31,6 @@ var commands = {
    "weather" : weather,
    "speak" : speak,
    "talk" : talk,
-   "avatar" : avatar,
    "age" : age
 }
 
