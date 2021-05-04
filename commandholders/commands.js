@@ -14,6 +14,7 @@ var weather = require('../commands/weather.js');
 var age = require('../commands/age.js');
 var speak = require('../commands/speak.js');
 var talk = require('../commands/talk.js');
+var hangman = require('../systems/hangman.js')
 
 var commands = {
    "help": help,
@@ -31,7 +32,9 @@ var commands = {
    "weather": weather,
    "speak": speak,
    "talk": talk,
-   "age": age
+   "age": age,
+   "hangman": (message) => {hangman.start(message)},
+   "guess": (message) => {hangman.guess(message)}
 }
 
 module.exports = commands

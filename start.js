@@ -38,6 +38,10 @@ String.prototype.removeQuotes = function() {
     return this.replace(new RegExp(/"/gi, "gi"), '');
 }
 
+String.prototype.replaceAt = function(index, replacement) {
+    return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+}
+
 Array.prototype.pickRandom = function() {
     return this[randomBetween(0, this.length - 1)]
 }
