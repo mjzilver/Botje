@@ -33,8 +33,7 @@ var commands = {
    "speak": speak,
    "talk": talk,
    "age": age,
-   "hangman": (message) => {hangman.start(message)},
-   "guess": (message) => {hangman.guess(message)}
+   "hangman": (message) => {hangman.run(message)}
 }
 
 module.exports = commands

@@ -8,41 +8,62 @@ class hangman {
         this.hasEnded = true
     }
 
+    run(message) {
+        var args = message.cleanContent.toLowerCase().split(' ')
+
+        switch (args[1]) {
+            case "start":
+                this.start(message)
+                break;
+            case "guess":
+                this.guess(message, args[2])
+                break;
+            case "help":
+                this.help(message)
+                break;
+            default:
+                this.sendEmbed(message)
+                break;
+        }
+    }
+
     start(message) {
-        if(!this.hasEnded) 
+        if (!this.hasEnded)
             return message.channel.send("A game of hangman is still ongoing use b!guess to guess!")
-        
+
         let selectSQL = `SELECT message
 		FROM messages 
+        WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%"
 		ORDER BY random()
         LIMIT 1`
 
         this.word = ""
         this.visibleWord = ""
-        this.maxTries = 10
         this.tries = 0
         this.alreadyGuessed = []
-        this.hasEnded = false
 
         database.db.get(selectSQL, [], (err, row) => {
             if (err)
                 throw err;
             else {
                 this.word = row.message.toLowerCase().textOnly().split(' ').pickRandom();
-                for (let i = 0; i < this.word.length; i++) 
+                for (let i = 0; i < this.word.length; i++)
                     this.visibleWord += '―'
 
-                message.channel.send('Starting new hangman game. \nUse b!guess to guess')
-                this.sendEmbed(message)
+                if (this.word.length > 2 && this.word.length <= 12) { 
+                    this.hasEnded = false
+                    message.channel.send('Starting new hangman game.')
+                    this.sendEmbed(message)
+                } else {
+                    this.start(message)
+                }
             }
         })
     }
 
-    guess(message) {
-        if (this.hasEnded) 
-            return message.channel.send('This hangman game has ended... \nUse b!hangman to restart')
-
-        var geussedContent = message.cleanContent.toLowerCase().split(' ')[1];
+    guess(message, geussedContent) {
+        if (this.hasEnded)
+            return message.channel.send('This hangman game has ended...')
 
         if (geussedContent) {
             if (geussedContent.length > 1) {
@@ -85,6 +106,10 @@ class hangman {
         }
     }
 
+    help(message) {
+        message.channel.send(`Use \`b!hangman start\` to start a round \nUse \`b!hangman guess [letter]\` to guess`)
+    }
+
     sendEmbed(message) {
         const attachment = new discord.MessageAttachment(`${__dirname}/../hangman/${this.tries}.png`, "hangman.png");
 
@@ -94,7 +119,7 @@ class hangman {
 
         const hangmanEmbed = new discord.MessageEmbed()
             .setColor(config.color_hex)
-            .setTitle("Hangman -- " + this.word)
+            .setTitle(`Hangman -- ${this.tries}/${this.maxTries} tries`)
             .setImage("attachment://hangman.png")
             .addField('Word', showVisibleWord, false)
 
@@ -105,10 +130,10 @@ class hangman {
             hangmanEmbed.addField('Already guessed letters', alreadyGuessedString, false)
         }
 
-        if(this.hasEnded)
-            hangmanEmbed.setFooter(`Use b!hangman to start a new game!`)
+        if (this.hasEnded)
+            hangmanEmbed.setFooter(`Use b!hangman start to start a new game!`)
         else
-            hangmanEmbed.setFooter(`${this.tries}/${this.maxTries} tries`)
+            hangmanEmbed.setFooter(` Use b!hangman guess to guess`)
 
         message.channel.send({
             files: [attachment],
