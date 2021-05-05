@@ -22,7 +22,7 @@ class hangman {
                 this.help(message)
                 break;
             default:
-                this.sendEmbed(message)
+                this.help(message)
                 break;
         }
     }
@@ -51,8 +51,10 @@ class hangman {
                     this.visibleWord += '―'
 
                 if (this.word.length > 2 && this.word.length <= 12) { 
-                    this.hasEnded = false
                     message.channel.send('Starting new hangman game.')
+                    logger.log('debug', `Starting new hangman game the word is ${this.word}`);
+
+                    this.hasEnded = false
                     this.sendEmbed(message)
                 } else {
                     this.start(message)
