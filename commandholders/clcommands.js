@@ -9,6 +9,9 @@ var fullscan = require('../commandline/fullscan.js');
 var saveemotes = require('../commandline/saveemotes.js');
 var expunge = require('../commandline/expunge.js');
 var vacuum = require('../commandline/vacuum.js');
+var say = require('../commandline/say.js');
+var pretend = require('../commandline/pretend.js');
+var cleanwebhooks = require('../commandline/cleanwebhooks.js');
 
 var commands = {
     "list": list,
@@ -21,7 +24,10 @@ var commands = {
     "saveemotes": saveemotes,
     "listcommands": listcommands,
     "expunge": expunge,
-    "vacuum": vacuum
+    "vacuum": vacuum,
+    "say": say,
+    "pretend": pretend,
+    "cleanwebhooks": cleanwebhooks
 }
 
 module.exports = commands

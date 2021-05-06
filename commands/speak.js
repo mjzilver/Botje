@@ -5,8 +5,7 @@ module.exports = function speak(message, monthsOld = 5, findWord = 1) {
     earliest.setMonth(earliest.getMonth() - monthsOld);
 
     let selectSQL = `SELECT message, LENGTH(message) as len FROM messages
-    WHERE server = ?
-    AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+    WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
     AND len < 100 AND date < ${earliest.getTime()}
     ORDER BY RANDOM()
     LIMIT 1 `;
@@ -31,8 +30,7 @@ module.exports = function speak(message, monthsOld = 5, findWord = 1) {
             }
 
             selectSQL = `SELECT message, LENGTH(message) as len FROM messages
-            WHERE server = ?
-            AND message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" AND len < 100
+            WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" AND len < 100
             AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
             ORDER BY RANDOM()
             LIMIT 1 `;
@@ -42,7 +40,7 @@ module.exports = function speak(message, monthsOld = 5, findWord = 1) {
     } else 
         logger.log('debug', `Sending message with no context - no match in DB`)
 
-    database.db.get(selectSQL, [message.guild.id], (err, row) => {
+    database.db.get(selectSQL, [], (err, row) => {
         if (err)
             throw err;
         else {

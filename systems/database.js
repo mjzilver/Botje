@@ -14,7 +14,8 @@ class Database {
 
 	storemessage(message) {
 		if (message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")) && !message.content.match(new RegExp("^t!", "i"))) {
-			message.guild.members.fetch(message.author.id).then((result) => {
+			message.guild.members.fetch(message.author.id).then(
+				(result) => {
 					this.insertmessage(message)
 				},
 				(error) => {})
