@@ -1,9 +1,12 @@
 module.exports = async function clean(input) {
-    var channel = bot.bot.channels.cache.get(input[0]);
-
-    var webhooks = await channel.fetchWebhooks();
-    for (const [id, webhook] of webhooks) {
-        console.log(webhook)
-        webhook.delete()
+    for (const [channelID, channel] of bot.bot.channels.cache.entries()) {
+        if (channel.type == "text") {
+            channel.fetchWebhooks().then((webhooks) => {
+                webhooks.forEach((webhook) => {
+                    console.log(webhook)
+                    webhook.delete();
+                });
+            });
+        }
     }
 }
