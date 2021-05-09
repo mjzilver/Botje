@@ -14,16 +14,16 @@ class hangman {
         switch (args[1]) {
             case "start":
                 this.start(message)
-                break;
+                break
             case "guess":
                 this.guess(message, args[2])
-                break;
+                break
             case "help":
                 this.help(message)
-                break;
+                break
             default:
                 this.help(message)
-                break;
+                break
         }
     }
 
@@ -44,15 +44,15 @@ class hangman {
 
         database.db.get(selectSQL, [], (err, row) => {
             if (err)
-                throw err;
+                throw err
             else {
-                this.word = row.message.toLowerCase().textOnly().split(' ').pickRandom();
+                this.word = row.message.toLowerCase().textOnly().split(' ').pickRandom()
                 for (let i = 0; i < this.word.length; i++)
                     this.visibleWord += '―'
 
                 if (this.word.length > 2 && this.word.length <= 12) { 
                     message.channel.send('Starting new hangman game.')
-                    logger.log('debug', `Starting new hangman game the word is ${this.word}`);
+                    logger.log('debug', `Starting new hangman game the word is ${this.word}`)
 
                     this.hasEnded = false
                     this.sendEmbed(message)
@@ -71,7 +71,7 @@ class hangman {
             if (geussedContent.length > 1) {
                 if (geussedContent == this.word) {
                     message.channel.send(`You guessed the word ${this.word} after ${this.tries} tries -- You have won!`)
-                    this.hasEnded = true;
+                    this.hasEnded = true
                 } else {
                     message.channel.send(`Wrong! The word is not ${geussedContent}`)
                     this.tries++
@@ -96,10 +96,10 @@ class hangman {
 
             if (this.tries == this.maxTries) {
                 message.channel.send(`Oh no! You have been hanged! The word was ${this.word}`)
-                this.hasEnded = true;
+                this.hasEnded = true
             } else if (this.visibleWord == this.word) {
                 message.channel.send(`You've won by guessing all the letters!`)
-                this.hasEnded = true;
+                this.hasEnded = true
             }
 
             this.sendEmbed(message)
@@ -113,9 +113,9 @@ class hangman {
     }
 
     sendEmbed(message) {
-        const attachment = new discord.MessageAttachment(`${__dirname}/../hangman/${this.tries}.png`, "hangman.png");
+        const attachment = new discord.MessageAttachment(`${__dirname}/../hangman/${this.tries}.png`, "hangman.png")
 
-        var showVisibleWord = "";
+        var showVisibleWord = ""
         for (let i = 0; i < this.visibleWord.length; i++)
             showVisibleWord += this.visibleWord[i].toUpperCase() + " "
 
@@ -126,9 +126,9 @@ class hangman {
             .addField('Word', showVisibleWord, false)
 
         if (this.alreadyGuessed.length > 0) {
-            var alreadyGuessedString = "";
+            var alreadyGuessedString = ""
             for (let i = 0; i < this.alreadyGuessed.length; i++)
-                alreadyGuessedString += this.alreadyGuessed[i].toUpperCase() + " ";
+                alreadyGuessedString += this.alreadyGuessed[i].toUpperCase() + " "
             hangmanEmbed.addField('Already guessed letters', alreadyGuessedString, false)
         }
 
@@ -140,8 +140,8 @@ class hangman {
         message.channel.send({
             files: [attachment],
             embed: hangmanEmbed
-        });
+        })
     }
 }
 
-module.exports = new hangman();
+module.exports = new hangman()

@@ -4,9 +4,9 @@ module.exports = async function clean(input) {
             channel.fetchWebhooks().then((webhooks) => {
                 webhooks.forEach((webhook) => {
                     console.log(webhook)
-                    webhook.delete();
-                });
-            });
+                    webhook.delete()
+                })
+            })
         }
     }
 }

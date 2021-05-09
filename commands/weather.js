@@ -1,13 +1,13 @@
-var request = require('request');
+var request = require('request')
 
 module.exports = function weather(message) {
     var city = "Leiden"; // default city to avoid errors
     var args = message.content.split(' ')
 
     if (args[1]) {
-        city = args[1];
+        city = args[1]
         if (args[2])
-            city += args[2];
+            city += args[2]
     } else
         return message.channel.send('You need to enter a city')
 
@@ -16,12 +16,12 @@ module.exports = function weather(message) {
             if (err)
                 return logger.error(err.error)
 
-            const result = JSON.parse(body);
+            const result = JSON.parse(body)
 
             if (result.cod == 200) {
                 var options = {
                     timeZone: 'UTC'
-                };
+                }
                 var sunrise = new Date((result.sys.sunrise + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
                 var sunset = new Date((result.sys.sunset + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
 
@@ -39,9 +39,9 @@ module.exports = function weather(message) {
                     .addField('Sunrise', sunrise, true)
                     .addField('Sunset', sunset, true)
 
-                message.channel.send(weatherEmbed);
+                message.channel.send(weatherEmbed)
             } else {
-                message.channel.send(result.message.capitalize());
+                message.channel.send(result.message.capitalize())
                 logger.warn(`Weather error on ${city}`)
             }
         })

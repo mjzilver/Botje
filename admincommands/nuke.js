@@ -4,13 +4,13 @@ module.exports = async function nuke(message) {
     {
         const filter = m => {
             return (m.content.startsWith('launch') && m.author.id == message.author.id)
-        };
+        }
 
         message.channel.awaitMessages(filter, { max: 1, time: 60000 })
-        .then(collected  => {
-            message.channel.send(`Nuke launched. Blowout soon, fellow stalker.`)
-            nukeguild(message)
-        })  
+            .then(collected  => {
+                message.channel.send(`Nuke launched. Blowout soon, fellow stalker.`)
+                nukeguild(message)
+            })  
         message.channel.send("Nuke armed to confirm launch type 'launch' to launch the nuke, this cannot be cancelled.")
     } else {
         message.channel.send("Only the server owner may send the nuke.")
@@ -24,7 +24,7 @@ function nukeguild(message) {
 }
 
 function nukechannel(channelId) {
-    let channels = bot.bot.channels.cache;
+    let channels = bot.bot.channels.cache
 
     var channel = channels.find(c => c.id === channelId)
 
@@ -37,23 +37,23 @@ function nukechannel(channelId) {
 }
 
 function nukemessages(channel, messageid, loop = 0) {
-    var itemsProcessed = 0;
+    var itemsProcessed = 0
 
     channel.messages.fetch({
         limit: 100,
         before: messageid
     }).then(messages => messages.array().forEach(
         (message) => {
-            itemsProcessed++;
+            itemsProcessed++
             message.delete({ timeout: 10 })
             
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
                     logger.log('debug', `100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
-                    nukemessages(channel, message.id, ++loop);
+                    nukemessages(channel, message.id, ++loop)
                 } else 
                     logger.log('info', `End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
             }
         }
-    ));
+    ))
 }

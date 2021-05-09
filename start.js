@@ -1,25 +1,25 @@
-global.discord = require('discord.js');
+global.discord = require('discord.js')
 
-global.package = require('./package.json');
-global.config = require('./config.json');
+global.package = require('./package.json')
+global.config = require('./config.json')
 
-global.logger = require('./systems/logger.js');
-global.database = require('./systems/database.js');
-global.commandline = require('./systems/commandline.js');
-global.bot = require('./systems/bot.js');
-global.web = require('./systems/web.js');
+global.logger = require('./systems/logger.js')
+global.database = require('./systems/database.js')
+global.commandline = require('./systems/commandline.js')
+global.bot = require('./systems/bot.js')
+global.web = require('./systems/web.js')
 global.backupsystem = require('./systems/backupsystem.js')
 global.replysystem = require('./systems/replysystem.js')
 
 global.fs = require('fs')
-global.request = require('request');
+global.request = require('request')
 
 String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1).toLocaleLowerCase();
+    return this.charAt(0).toUpperCase() + this.slice(1).toLocaleLowerCase()
 }
 
 String.prototype.isImage = function() {
-    return this.match(new RegExp(/(?:http(s?):)*\.(jpe?g|gif|png)/i, "i"))
+    return this.match(new RegExp(/(?:http(s?):)*\.(jpe?g|gif|png)$/i, "i"))
 }
 
 String.prototype.isLink = function() {
@@ -27,19 +27,19 @@ String.prototype.isLink = function() {
 }
 
 String.prototype.normalizeSpaces = function() {
-    return this.replace(new RegExp(/  +/gi, "gi"), ' ');
+    return this.replace(new RegExp(/  +/gi, "gi"), ' ')
 }
 
 String.prototype.textOnly = function() {
-    return this.replace(new RegExp(/[^a-zA-Z ]/gi, "gi"), '');
+    return this.replace(new RegExp(/[^a-zA-Z ]/gi, "gi"), '')
 }
 
 String.prototype.removeQuotes = function() {
-    return this.replace(new RegExp(/"/gi, "gi"), '');
+    return this.replace(new RegExp(/"/gi, "gi"), '')
 }
 
 String.prototype.replaceAt = function(index, replacement) {
-    return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+    return this.substr(0, index) + replacement + this.substr(index + replacement.length)
 }
 
 Array.prototype.pickRandom = function() {
@@ -47,9 +47,9 @@ Array.prototype.pickRandom = function() {
 }
 
 global.randomBetween = function(min, max) { 
-    return Math.floor(Math.random() * (max - min + 1) + min);
+    return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 process.on('uncaughtException', function (error) {
-    logger.error(error.message);
-});
+    logger.error(error.message)
+})

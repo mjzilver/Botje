@@ -1,6 +1,6 @@
 const { format, loggers, transports } = require('winston')
 
-const { combine, timestamp, colorize, printf, json} = format;
+const { combine, timestamp, colorize, printf, json} = format
 
 loggers.add('logger', {
     transports: [
@@ -22,6 +22,6 @@ loggers.add('logger', {
             )
         })
     ]
-});
+})
 
-module.exports = require('winston').loggers.get('logger');
+module.exports = require('winston').loggers.get('logger')

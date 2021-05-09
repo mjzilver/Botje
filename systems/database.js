@@ -1,9 +1,9 @@
 class Database {
 	constructor() {
-		this.sqlite3 = require('sqlite3');
+		this.sqlite3 = require('sqlite3')
 		this.db = new this.sqlite3.Database("./discord.db")
 
-		this.initializeDatabase();
+		this.initializeDatabase()
 	}
 
 	initializeDatabase() {
@@ -24,14 +24,14 @@ class Database {
 
 	insertmessage(message) {
 		var insert = this.db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?)',
-			[message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()]);
+			[message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
 		insert.run(function (err) {
 			if (err) {
-				logger.error(`failed to insert: ${message.content} posted by ${message.author.username}`);
-				logger.error(err);
+				logger.error(`failed to insert: ${message.content} posted by ${message.author.username}`)
+				logger.error(err)
 			}
-		});
+		})
 	}
 }
 
-module.exports = new Database();
+module.exports = new Database()

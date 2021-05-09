@@ -1,9 +1,9 @@
 class ReplySystem {
     constructor() {
-        this.replyPatterns = require('../json/reply.json');
+        this.replyPatterns = require('../json/reply.json')
 
         // replyPattern name as key -> time as value
-        this.lastRequest = [];
+        this.lastRequest = []
     }
 
     process(message) {
@@ -19,19 +19,19 @@ class ReplySystem {
     }
 
     checkTime(reply) {
-        var currentTimestamp = new Date();
+        var currentTimestamp = new Date()
 
         if (!(reply["name"] in this.lastRequest)) {
-            this.lastRequest[reply["name"]] = currentTimestamp;
+            this.lastRequest[reply["name"]] = currentTimestamp
         } else {
             if ((currentTimestamp - this.lastRequest[reply["name"]] < (reply["timeout"] * 60 * 1000))) {
-                return false;
+                return false
             } else {
-                this.lastRequest[reply["name"]] = currentTimestamp;
+                this.lastRequest[reply["name"]] = currentTimestamp
             }
         }
-        return true;
+        return true
     }
 }
 
-module.exports = new ReplySystem();
+module.exports = new ReplySystem()

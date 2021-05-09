@@ -1,7 +1,7 @@
 module.exports = function top(message) {
-	const args = message.content.split(' ');
-	const mention = message.mentions.users.first();
-	const db = database.db;
+	const args = message.content.split(' ')
+	const mention = message.mentions.users.first()
+	const db = database.db
 
 	if (args.length == 1) {
 		let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
@@ -10,11 +10,11 @@ module.exports = function top(message) {
 		GROUP BY LOWER(message)
 		HAVING count > 1
 		ORDER BY count DESC 
-		LIMIT 10`;
+		LIMIT 10`
 
 		db.all(selectSQL, [message.guild.id], (err, rows) => {
 			if (err) {
-				throw err;
+				throw err
 			} else {
 				var result = ""
 				for (var i = 0; (i < rows.length && i <= 10); i++) 
@@ -23,9 +23,9 @@ module.exports = function top(message) {
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
 					.setTitle(`Top 10 must used sentences in ${message.guild.name}`)
-					.setDescription(result);
+					.setDescription(result)
 
-				message.channel.send(top);
+				message.channel.send(top)
 			}
 		})
 	} else if (args.length == 2 && mention) {
@@ -36,11 +36,11 @@ module.exports = function top(message) {
 		GROUP BY LOWER(message)
 		HAVING count > 1
 		ORDER BY count DESC 
-		LIMIT 10`;
+		LIMIT 10`
 
 		db.all(selectSQL, [message.guild.id, mention.id], (err, rows) => {
 			if (err) {
-				throw err;
+				throw err
 			} else {
 				var result = ""
 				for (var i = 0; (i < rows.length && i <= 10); i++) 
@@ -49,9 +49,9 @@ module.exports = function top(message) {
 				const top = new discord.MessageEmbed()
 					.setColor(config.color_hex)
 					.setTitle(`Top 10 must used sentences in ${message.guild.name} by ${mention.username}`)
-					.setDescription(result);
+					.setDescription(result)
 
-				message.channel.send(top);
+				message.channel.send(top)
 			}
 		})
 	}

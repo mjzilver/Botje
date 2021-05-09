@@ -3,7 +3,7 @@ module.exports = function vacuum(input) {
 
     database.db.run('VACUUM', [], (err) => {
         if (err)
-            return console.error(err.message);
-        console.log(`Vacuuming completed`);
+            return console.error(err.message)
+        console.log(`Vacuuming completed`)
     })
 }

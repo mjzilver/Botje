@@ -5,7 +5,7 @@ module.exports = function nukeguild(input) {
 }
 
 function nukechannel(input) {
-    let channels = bot.bot.channels.cache;
+    let channels = bot.bot.channels.cache
 
     var channelId = input.shift()
     var channel = channels.find(c => c.id === channelId)
@@ -17,14 +17,14 @@ function nukechannel(input) {
 }
 
 function nukemessages(channel, messageid, loop = 0) {
-    var itemsProcessed = 0;
+    var itemsProcessed = 0
 
     channel.messages.fetch({
         limit: 100,
         before: messageid
     }).then(messages => messages.array().forEach(
         (message) => {
-            itemsProcessed++;
+            itemsProcessed++
 
             if (message.createdAt.getTime() < new Date(2021, 01, 01))
                 message.delete({ timeout: 10 })
@@ -32,10 +32,10 @@ function nukemessages(channel, messageid, loop = 0) {
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
                     logger.log('debug', `100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
-                    nukemessages(channel, message.id, ++loop);
+                    nukemessages(channel, message.id, ++loop)
                 } else 
                     logger.log('info', `End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
             }
         }
-    ));
+    ))
 }
