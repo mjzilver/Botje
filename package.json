@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "9.4.3",
+  "version": "9.4.4",
   "description": "The discord bot for the thinking man",
   "main": "start.js",
   "author": "Mick Jari",
@@ -21,6 +21,7 @@
   "nodemonConfig": {
     "ignore": [
       "start.js"
-    ]
+    ],
+    "signal" : "SIGINT"
   }
 }

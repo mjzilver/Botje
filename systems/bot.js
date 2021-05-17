@@ -9,28 +9,27 @@ class Bot {
 		this.messageCounter = 0
 		this.lastMessageSent = new Date()
 
-		this.bot = new discord.Client({
+		this.client = new discord.Client({
 			autoReconnect: true
 		})
 
-		this.bot.on('ready', () => {
-			this.bot.user.setPresence({
+		this.client.on('ready', () => {
+			this.client.user.setPresence({
 				activity: {
 					name: `Running Version ${global.package.version}`
 				}
 			})
-			logger.info('Connected')
-			logger.info(`Logged in as: ${this.bot.user.username} - ${this.bot.user.id}`)
+			logger.info(`Logged in as: ${this.client.user.username} - ${this.client.user.id}`)
 			logger.info(`Running Version ${global.package.version}`)
 		})
 
-		this.bot.login(config.discord_api_key)
+		this.client.login(config.discord_api_key)
 
-		this.bot.on('error', function (error) {
+		this.client.on('error', function (error) {
 			logger.error(error.message)
 		})
 
-		this.bot.on('message', message => {
+		this.client.on('message', message => {
 			database.storemessage(message)
 
 			// look for the b! meaning bot command
@@ -72,7 +71,7 @@ class Bot {
 			}
 		})
 
-		this.bot.on('messageDelete', message => {
+		this.client.on('messageDelete', message => {
 			logger.log('warn', `This Message has been deleted: ${message.author.username}: ${message.content} == Posted in channel '${message.channel.name}' in server '${message.channel.guild.name} == Send at: ${new Date(message.createdTimestamp).toUTCString()}`)
 
 			if (message.edits.length > 1) {
@@ -82,15 +81,15 @@ class Bot {
 			}
 		})
 
-		this.bot.on('emojiCreate', emoji => {
+		this.client.on('emojiCreate', emoji => {
 			backupsystem.saveEmoji(emoji)
 		})
 
-		this.bot.on('emojiDelete', emoji => {
+		this.client.on('emojiDelete', emoji => {
 			backupsystem.saveEmoji(emoji, new Date().getTime())
 		})
 
-		this.bot.on('emojiUpdate', (oldEmoji, newEmoji) => {
+		this.client.on('emojiUpdate', (oldEmoji, newEmoji) => {
 			backupsystem.saveEmoji(oldEmoji, new Date().getTime())
 			backupsystem.saveEmoji(newEmoji)
 		})

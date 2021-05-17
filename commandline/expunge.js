@@ -1,17 +1,16 @@
 module.exports = function nukeguild(input) {
-    for (const [channelID, channel] of bot.bot.channels.cache.entries()) 
+    for (const [channelID, channel] of bot.client.channels.cache.entries()) 
         if (channel.type == "text")
             nukechannel([channelID])
 }
 
 function nukechannel(input) {
-    let channels = bot.bot.channels.cache
+    let channels = bot.client.channels.cache
 
     var channelId = input.shift()
     var channel = channels.find(c => c.id === channelId)
 
     if (channel && channel.type == "text" && channel.guild.id == "445564853399191562") 
-        nukemessages(channel, channel.lastMessageID)
     else
         console.log('Channel not found')
 }

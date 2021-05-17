@@ -1,7 +1,7 @@
 var moment = require('moment')
 
 module.exports = function uptime(message) {
-    var login = moment(bot.bot.readyTimestamp)
+    var login = moment(bot.client.readyTimestamp)
 	const now = moment()
 	days = now.diff(login, 'days')
 	hours = now.subtract(days, 'days').diff(login, 'hours')

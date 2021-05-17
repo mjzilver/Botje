@@ -1,5 +1,5 @@
 module.exports = function save(input) {
-    let channels = bot.bot.channels.cache
+    let channels = bot.client.channels.cache
 
     var channelId = input.shift()
     var amount = (input[0] ? input[0] : 1000000) // if no set amount 1 million is set as the max OR the end is reached

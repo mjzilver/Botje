@@ -1,7 +1,7 @@
 const path = './emotes'
 
 module.exports = function saveemotes(input) {
-    for (const [guildID, guild] of bot.bot.guilds.cache.entries()) {
+    for (const [guildID, guild] of bot.client.guilds.cache.entries()) {
         var guildpath = path + '/' + guildID
 
         if (!fs.existsSync(guildpath)) {

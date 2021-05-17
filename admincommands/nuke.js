@@ -18,13 +18,13 @@ module.exports = async function nuke(message) {
 }
 
 function nukeguild(message) {
-    for (const [channelID, channel] of bot.bot.channels.cache.entries()) 
+    for (const [channelID, channel] of bot.client.channels.cache.entries()) 
         if (channel.type == "text" && channel.guild.id == message.guild.id)
             nukechannel(channelID)
 }
 
 function nukechannel(channelId) {
-    let channels = bot.bot.channels.cache
+    let channels = bot.client.channels.cache
 
     var channel = channels.find(c => c.id === channelId)
 

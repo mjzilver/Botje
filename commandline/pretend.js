@@ -1,5 +1,5 @@
 module.exports = function pretend(input) {
-    var channel = bot.bot.channels.cache.get(input[0])
+    var channel = bot.client.channels.cache.get(input[0])
 
     channel.guild.members.fetch(input[1]).then(
         async (user) => {
