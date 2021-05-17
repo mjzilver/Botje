@@ -11,6 +11,7 @@ function nukechannel(input) {
     var channel = channels.find(c => c.id === channelId)
 
     if (channel && channel.type == "text" && channel.guild.id == "445564853399191562") 
+        nukemessages(channel, "834497222069583912")
     else
         console.log('Channel not found')
 }
