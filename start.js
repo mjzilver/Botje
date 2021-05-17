@@ -50,6 +50,14 @@ global.randomBetween = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
+process.on('exit', function () {
+    logger.log('info', `=== Botje shutting down, goodbye ===`)
+})
+
+process.on('SIGINT', function () {
+    logger.log('info', `=== Botje forced to shut down, goodbye ===`)
+})
+
 process.on('uncaughtException', function (error) {
     logger.error(error.message)
 })

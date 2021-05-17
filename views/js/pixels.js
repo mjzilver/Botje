@@ -9,8 +9,8 @@ function pixelClick(x, y)
 
 socket.on('pixelChanged', function(pixel)
 {
-    $(`#${pixel.x}-${pixel.y}`).attr("style", ""); 
-    $(`#${pixel.x}-${pixel.y}`).attr("style", `background-color: rgb(${pixel.red}, ${pixel.green}, ${pixel.blue}) !important;`); 
+    $(`#${pixel.x}-${pixel.y}`).attr("style", "")
+    $(`#${pixel.x}-${pixel.y}`).attr("style", `background-color: rgb(${pixel.red}, ${pixel.green}, ${pixel.blue}) !important;`)
 })
 
 function hexToRgb(hex) {

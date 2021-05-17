@@ -91,7 +91,7 @@ class WebServer {
                     insert.run(function (err) {
                         if (err) {
                             logger.info("failed to insert pixel")
-                            socket.disconnect(); // user gets kicked
+                            socket.disconnect() // user gets kicked
                         } else {
                             io.emit('pixelChanged', pixel)
                             if (web.editPerPerson[socket.id] == undefined)
@@ -102,7 +102,7 @@ class WebServer {
                     })
                 } else {
                     logger.warn("User kicked for invalid emit")
-                    socket.disconnect(); // user gets kicked
+                    socket.disconnect() // user gets kicked
                 }
             })
 

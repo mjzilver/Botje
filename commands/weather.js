@@ -1,7 +1,7 @@
 var request = require('request')
 
 module.exports = function weather(message) {
-    var city = "Leiden"; // default city to avoid errors
+    var city = "Leiden" // default city to avoid errors
     var args = message.content.split(' ')
 
     if (args[1]) {
