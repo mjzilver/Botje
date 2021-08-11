@@ -131,8 +131,6 @@ class WebServer {
                     var edited_at = web.editPerPerson[id][index]
                     var time_passed = (new Date(currentTimestamp.getTime() - edited_at.getTime())).getTime()
                     
-                    console.log(time_passed)
-
                     if (time_passed < 200)
                         count++
                 }
