@@ -18,9 +18,9 @@ class WebServer {
         expressapp.use(express.static(__dirname + '/../views'))
 
         expressapp.use('/log', function (req, res) {
-            const options = { limit: 10000, order: 'desc' }
+            const options = { limit: 1000, order: 'desc' }
 
-            logger.query(options, function (err, results) {
+            logger.query(options, async function (err, results) {
                 if (err)
                     logger.warn('Error in query' + err)
 
@@ -127,13 +127,16 @@ class WebServer {
             } else {
                 var count = 0
                 for (const index in web.editPerPerson[id]) {
-                    var edited_at = web.moment(web.editPerPerson[id][index])
-                    var time_passed = web.moment.duration(web.moment().diff(edited_at)).asMilliseconds()
+                    var currentTimestamp = new Date()
+                    var edited_at = web.editPerPerson[id][index]
+                    var time_passed = (new Date(currentTimestamp.getTime() - edited_at.getTime())).getTime()
+                    
+                    console.log(time_passed)
 
                     if (time_passed < 200)
                         count++
                 }
-                if (count >= 3)
+                if (count >= 2)
                     return false
             }
             return true

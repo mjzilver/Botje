@@ -42,9 +42,10 @@ String.prototype.replaceAt = function(index, replacement) {
     return this.substr(0, index) + replacement + this.substr(index + replacement.length)
 }
 
-Array.prototype.pickRandom = function() {
-    return this[randomBetween(0, this.length - 1)]
-}
+Object.defineProperty(Array.prototype, "pickRandom", {
+    enumerable: false,
+    value: function(array) { return this[randomBetween(0, this.length - 1)] }
+})
 
 global.randomBetween = function(min, max) { 
     return Math.floor(Math.random() * (max - min + 1) + min)
