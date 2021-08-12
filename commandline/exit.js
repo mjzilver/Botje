@@ -1,6 +1,6 @@
 module.exports = function shutdown(input) {
-    logger.log('warn', ` --- Shutting down the bot --- `);
+    logger.log('warn', ` --- Shutting down the bot --- `)
 
-    bot.bot.destroy();
+    bot.client.destroy()
     process.exit()
 }

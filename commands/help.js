@@ -15,15 +15,15 @@ var helpMessage = `
 \`speak \`: makes the bot speak via recycled messages
 \`talk \`: makes the bot talk via predictive text 
 \`talk @user \`: makes the bot talk as if it is the mentioned user via predictive text
-\`delete \`:deletes the last message from you
-\`ping\`: prints the current ping of the bot and the API`;
+\`hangman \`: get the commands for a hangman minigame
+\`ping\`: prints the current ping of the bot and the API`
 
 module.exports = function help(message) {
     const help = new discord.MessageEmbed()
         .setColor(config.color_hex)
         .setTitle(`:robot: Current commands: :robot:`)
         .setDescription(helpMessage)
-        .setFooter(`Current Version: ${package.versionname} - ${package.version}`)
+        .setFooter(`Current Version: ${package.version}`)
 
     message.author.send(help)
 }

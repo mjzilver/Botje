@@ -1,12 +1,12 @@
-var moment = require('moment');
+var moment = require('moment')
 
 module.exports = function age(message) {
-	var joined = moment(message.guild.members.cache.find(u => u.id === bot.bot.user.id).joinedAt);
+	var joined = moment(message.guild.members.cache.find(u => u.id === bot.client.user.id).joinedAt)
 	console.log(joined)
-	const now = moment();
-	years = now.diff(joined, 'years');
-	days = now.subtract(years, 'years').diff(joined, 'days');
-	hours = now.subtract(days, 'days').diff(joined, 'hours');
+	const now = moment()
+	years = now.diff(joined, 'years')
+	days = now.subtract(years, 'years').diff(joined, 'days')
+	hours = now.subtract(days, 'days').diff(joined, 'hours')
 
 	message.channel.send(`I have been in this server for ${years ? `${years} years, ` : ''}${days} days and ${hours} hours.`)
 }

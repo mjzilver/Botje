@@ -21,6 +21,10 @@ body {
     background-color: whitesmoke;
 }
 
+#errorlabel {
+    color: red;
+}
+
 #pageDiv {
     padding: 2rem 1rem !important;
 }
@@ -32,6 +36,11 @@ body {
 
 .drawboard {
     border: 3px groove darkslategray;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 
 .drawboard-header {
