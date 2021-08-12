@@ -76,3 +76,6 @@ discord.db*
 backups/
 # no emotes
 emotes/
+
+# dont include the drawboard
+views/images/image.png

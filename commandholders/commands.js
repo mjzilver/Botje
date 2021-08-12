@@ -14,6 +14,7 @@ var weather = require('../commands/weather.js')
 var age = require('../commands/age.js')
 var speak = require('../commands/speak.js')
 var talk = require('../commands/talk.js')
+var draw = require('../commands/draw.js')
 var hangman = require('../systems/hangman.js')
 
 var commands = {
@@ -33,6 +34,7 @@ var commands = {
    "speak": speak,
    "talk": talk,
    "age": age,
+   "draw" : draw,
    "hangman": (message) => {hangman.run(message)}
 }
 
