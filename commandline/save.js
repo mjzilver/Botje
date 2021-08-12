@@ -24,7 +24,7 @@ function catalog(channel, messageid, amount, loop = 0) {
 
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
-                    if (amount > 0) {
+                    if ((amount - ((loop * 100) + itemsProcessed)) > 0) {
                         logger.log('debug', `100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                         catalog(channel, message.id, amount, ++loop)
                     } else
