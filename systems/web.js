@@ -13,7 +13,6 @@ class WebServer {
         // logs the edits per peron
         this.editPerPerson = []
         this.connectCounter = 0
-        this.imageSize = 150
 
         expressapp.use(express.static(__dirname + '/../views'))
 
@@ -42,9 +41,9 @@ class WebServer {
         expressapp.use('/draw', function (req, res) {
             let selectSQL = 'SELECT * FROM colors ORDER BY y, x ASC'
 
-            var pixels = new Array(web.imageSize)
+            var pixels = new Array(config.image.size)
             for (var i = 0; i < pixels.length; i++) {
-                pixels[i] = new Array(web.imageSize)
+                pixels[i] = new Array(config.image.size)
                 for (var j = 0; j < pixels[i].length; j++) {
                     pixels[i][j] = {
                         y: i,
@@ -60,7 +59,7 @@ class WebServer {
                 for (let i = 0; i < rows.length; i++) {
                     const element = rows[i]
 
-                    if (element.x >= 0 && element.x < web.imageSize && element.y >= 0 && element.y < web.imageSize) {
+                    if (element.x >= 0 && element.x < config.image.size && element.y >= 0 && element.y < config.image.size) {
                         pixels[element.y][element.x] = {
                             y: element.y,
                             x: element.x,
@@ -85,7 +84,7 @@ class WebServer {
             io.emit('connectCounter', ++web.connectCounter)
 
             socket.on('pixelChange', function (pixel) {
-                if (web.spamChecker(socket.id) && (pixel.x >= 0 && pixel.x < web.imageSize && pixel.y >= 0 && pixel.y < web.imageSize)) {
+                if (web.spamChecker(socket.id) && (pixel.x >= 0 && pixel.x < config.image.size && pixel.y >= 0 && pixel.y < config.image.size)) {
                     var insert = database.db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue])
 
                     insert.run(function (err) {
