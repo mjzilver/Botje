@@ -15,8 +15,10 @@ class WebServer {
         this.connectCounter = 0
 
         expressapp.use(express.static(__dirname + '/../views'))
+        expressapp.use(express.json())
+        expressapp.use(express.urlencoded({extended: true}))
 
-        expressapp.use('/log', function (req, res) {
+        expressapp.get('/log', function (req, res) {
             const options = { limit: 1000, order: 'desc' }
 
             logger.query(options, async function (err, results) {
@@ -38,7 +40,53 @@ class WebServer {
             })
         })
 
-        expressapp.use('/draw', function (req, res) {
+        expressapp.get('/interact', function (req, res) {
+            let selectSQL = `SELECT user_id, user_name, COUNT(message) AS amount 
+            FROM messages
+            GROUP BY user_id 
+            ORDER BY amount DESC`
+
+            const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == 'text'))
+
+            database.db.all(selectSQL, [], async (err, rows) => {
+                rows.unshift({'user_id' : '542721460033028117', 'user_name' : 'Botje'})
+
+                res.render('interact', {
+                    'channels': channels,
+                    'users' : rows
+                })
+            })
+        })
+
+        expressapp.post('/interact', function (req, res) {
+            var channel = bot.client.channels.cache.get(req.body.channel)
+
+            channel.guild.members.fetch(req.body.user).then(
+                async (user) => {
+                        let member = channel.guild.member(user.user)
+                        var botWebhook
+        
+                        var webhooks = await channel.fetchWebhooks()
+                        for (const [id, webhook] of webhooks) {
+                            if (webhook.name == global.package.name) {
+                                console.log('Found webhook')
+                                botWebhook = webhook
+                            }
+                        }
+                        if (!botWebhook) {
+                            console.log('making new webhook')
+                            botWebhook = await channel.createWebhook(global.package.name)
+                        }
+        
+                        botWebhook.send(req.body.text, {
+                            username: member.nickname ? member.nickname : user.user.username,
+                            avatarURL: user.user.displayAvatarURL()
+                        })
+                    },
+                    (error) => {})
+        })
+
+        expressapp.get('/draw', function (req, res) {
             let selectSQL = 'SELECT * FROM colors ORDER BY y, x ASC'
 
             var pixels = new Array(config.image.size)

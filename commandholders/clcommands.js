@@ -12,6 +12,7 @@ var vacuum = require('../commandline/vacuum.js')
 var say = require('../commandline/say.js')
 var pretend = require('../commandline/pretend.js')
 var cleanwebhooks = require('../commandline/cleanwebhooks.js')
+var webhooks = require('../commandline/webhooks.js')
 
 var commands = {
     "list": list,
@@ -27,7 +28,8 @@ var commands = {
     "vacuum": vacuum,
     "say": say,
     "pretend": pretend,
-    "cleanwebhooks": cleanwebhooks
+    "cleanwebhooks": cleanwebhooks,
+    "webhooks" : webhooks
 }
 
 module.exports = commands
