@@ -11,3 +11,24 @@ function sendMessage() {
         })
     }
 }
+
+function guildSelected() {
+    var selectedGuild = $(`#guildSelect`).val()
+    var first = null;
+
+    $('#channelSelect > option').each(function() {
+        if ($(this).attr('guild') == selectedGuild) {
+            $(this).show()
+            if(!first)
+                first = $(this)
+        } else {
+            $(this).hide()
+        }
+    })
+    $("#channelSelect option:selected").prop("selected", false);
+    $(first).prop("selected", "selected");
+}
+
+$(document).ready(function() {
+    guildSelected()
+})

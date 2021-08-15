@@ -47,11 +47,13 @@ class WebServer {
             ORDER BY amount DESC`
 
             const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == 'text'))
+            var guilds = Object.fromEntries(bot.client.guilds.cache)
 
             database.db.all(selectSQL, [], async (err, rows) => {
                 rows.unshift({'user_id' : '542721460033028117', 'user_name' : 'Botje'})
 
                 res.render('interact', {
+                    'guilds' : guilds,
                     'channels': channels,
                     'users' : rows
                 })
