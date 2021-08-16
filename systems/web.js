@@ -7,7 +7,6 @@ class WebServer {
         var server = require('http').createServer(expressapp)
         var io = require('socket.io').listen(server)
         global.io = io
-        var port = 1500
         this.moment = require('moment')
 
         // logs the edits per peron
@@ -19,19 +18,18 @@ class WebServer {
         expressapp.use(express.urlencoded({extended: true}))
 
         expressapp.get('/log', function (req, res) {
-            const options = { limit: 1000, order: 'desc' }
+            const options = { limit: 10000, order: 'desc' }
 
             logger.query(options, async function (err, results) {
                 if (err)
                     logger.warn('Error in query' + err)
 
                 var logs = []
-
-                if (req.query.level)
+                if (req.query.level) {
                     for (var i = 0; i < results.file.length; i++) 
                         if (results.file[i].level == req.query.level)
                             logs.push(results.file[i])
-                else
+                } else 
                     logs = results.file
 
                 res.render('log', {
@@ -161,8 +159,8 @@ class WebServer {
             })
         })
 
-        server.listen(port, () => {
-            logger.info('Webserver running on port ' + port)
+        server.listen(global.config.port, () => {
+            logger.info('Webserver running on port ' + global.config.port)
         })
     }
 
