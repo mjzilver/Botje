@@ -93,15 +93,6 @@ class Bot {
 			backupsystem.saveEmoji(oldEmoji, new Date().getTime())
 			backupsystem.saveEmoji(newEmoji)
 		})
-
-		this.client.on('webhookUpdate', channel => {
-			channel.fetchWebhooks().then((webhooks) => {				
-                webhooks.forEach((webhook) => {
-					if (webhook.name !== global.package.name) 
-                    	webhook.delete()
-                })
-            })
-		})
 	}
 
 	isUserAllowed(message) {
