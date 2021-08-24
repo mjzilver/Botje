@@ -61,13 +61,7 @@ class WebServer {
         })
 
         expressapp.post('/interact', function (req, res) {
-            var channel = bot.client.channels.cache.get(req.body.channel)
-
-            if(req.body.type == "webhook") {
-                webhook.sendMessage(req.body.channel, req.body.text, req.body.user)
-            } else if (req.body.type == "command") {
-                console.log(req.body)
-            }
+            webhook.sendMessage(req.body.channel, req.body.text, req.body.user)
         })
 
         expressapp.get('/draw', function (req, res) {

@@ -2,14 +2,14 @@ class Webhook {
     constructor() {}
 
     async fetch(channel) {
-        var webhooks = await channel.fetchWebhooks()
-        for (const [id, webhook] of webhooks) {
-            if (webhook.name == global.package.name) {
-                console.log('Found webhook')
-                return webhook
+        if(channel && channel.type == "text") {
+            var webhooks = await channel.fetchWebhooks()
+            for (const [id, webhook] of webhooks) {
+                if (webhook.name == global.package.name) {
+                    console.log('Found webhook')
+                    return webhook
+                }
             }
-        }
-        if (!botWebhook) {
             console.log('making new webhook')
             return await channel.createWebhook(global.package.name)
         }

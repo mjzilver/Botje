@@ -12,24 +12,10 @@ block content
             each val in channels
                 option(guild=val.guild.id, value=val.id) #{val.name} 
 
-        br
-        div(id='webhookForm')
-            select(name='dropDown', class="interact-select", id='userSelect')
-                each val in users
-                    option(value=val.user_id) #{val.user_name}
+        select(name='dropDown', class="interact-select", id='userSelect')
+            each val in users
+                option(value=val.user_id) #{val.user_name}
 
-            input(id="textToSend", class="interact-text")
+        input(id="textToSend", class="interact-text")
 
-            button(id="send", class="interact=button", onclick="sendMessage()") Use webhook
-        br
-        div(id='commandForm')
-            select(name='dropDown', class="interact-select", id='commandSelect')
-                each val in commandNames
-                    option(value=val.name) #{val.name}
-
-            input(id="commandText", class="command-text")
-
-            button(id="Use command", class="interact=button", onclick="useCommand()") Command
-
-
-
+        button(id="send", class="interact=button", onclick="sendMessage()") Use webhook

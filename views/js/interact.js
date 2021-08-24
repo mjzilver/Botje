@@ -5,25 +5,9 @@ function sendMessage() {
 
     if (textToSend != '') {
         $.post('/interact', {
-            'type' : 'webhook',
             'channel': selectedChannel,
             'user': selectedUser,
             'text': textToSend
-        })
-    }
-}
-
-function useCommand() {
-    var selectedChannel = $(`#channelSelect`).val()
-    var selectedCommand = $(`#commandSelect`).val()
-    var commandText = $(`#commandText`).val()
-
-    if (textToSend != '') {
-        $.post('/interact', {
-            'type' : 'command',
-            'channel': selectedChannel,
-            'command': selectedCommand,
-            'text': commandText
         })
     }
 }
