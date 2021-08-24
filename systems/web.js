@@ -46,6 +46,7 @@ class WebServer {
 
             const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == 'text'))
             var guilds = Object.fromEntries(bot.client.guilds.cache)
+            var commands = (require('../commandholders/commands.js'))
 
             database.db.all(selectSQL, [], async (err, rows) => {
                 rows.unshift({'user_id' : '542721460033028117', 'user_name' : 'Botje'})
@@ -53,7 +54,8 @@ class WebServer {
                 res.render('interact', {
                     'guilds' : guilds,
                     'channels': channels,
-                    'users' : rows
+                    'users' : rows,
+                    'commandNames' : commands
                 })
             })
         })
@@ -61,29 +63,11 @@ class WebServer {
         expressapp.post('/interact', function (req, res) {
             var channel = bot.client.channels.cache.get(req.body.channel)
 
-            channel.guild.members.fetch(req.body.user).then(
-                async (user) => {
-                        let member = channel.guild.member(user.user)
-                        var botWebhook
-        
-                        var webhooks = await channel.fetchWebhooks()
-                        for (const [id, webhook] of webhooks) {
-                            if (webhook.name == global.package.name) {
-                                console.log('Found webhook')
-                                botWebhook = webhook
-                            }
-                        }
-                        if (!botWebhook) {
-                            console.log('making new webhook')
-                            botWebhook = await channel.createWebhook(global.package.name)
-                        }
-        
-                        botWebhook.send(req.body.text, {
-                            username: member.nickname ? member.nickname : user.user.username,
-                            avatarURL: user.user.displayAvatarURL()
-                        })
-                    },
-                    (error) => {})
+            if(req.body.type == "webhook") {
+                webhook.sendMessage(req.body.channel, req.body.text, req.body.user)
+            } else if (req.body.type == "command") {
+                console.log(req.body)
+            }
         })
 
         expressapp.get('/draw', function (req, res) {

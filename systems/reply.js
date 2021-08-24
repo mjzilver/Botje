@@ -1,4 +1,4 @@
-class ReplySystem {
+class Reply {
     constructor() {
         this.replyPatterns = require('../json/reply.json')
 
@@ -34,4 +34,4 @@ class ReplySystem {
     }
 }
 
-module.exports = new ReplySystem()
+module.exports = new Reply()

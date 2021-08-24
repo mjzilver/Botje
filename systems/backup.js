@@ -1,4 +1,4 @@
-class BackupSystem {
+class Backup {
     constructor() {}
 
     saveEmoji(emoji, filename = "") {
@@ -16,4 +16,4 @@ class BackupSystem {
     }
 }
 
-module.exports = new BackupSystem()
+module.exports = new Backup()

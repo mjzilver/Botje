@@ -10,7 +10,6 @@ var saveemotes = require('../commandline/saveemotes.js')
 var expunge = require('../commandline/expunge.js')
 var vacuum = require('../commandline/vacuum.js')
 var say = require('../commandline/say.js')
-var pretend = require('../commandline/pretend.js')
 var cleanwebhooks = require('../commandline/cleanwebhooks.js')
 var webhooks = require('../commandline/webhooks.js')
 
@@ -27,7 +26,6 @@ var commands = {
     "expunge": expunge,
     "vacuum": vacuum,
     "say": say,
-    "pretend": pretend,
     "cleanwebhooks": cleanwebhooks,
     "webhooks" : webhooks
 }
