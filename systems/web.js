@@ -138,7 +138,7 @@ class WebServer {
         })
 
         server.listen(global.config.port, () => {
-            logger.info('Webserver running on port ' + global.config.port)
+            logger.console('Webserver running on port ' + global.config.port)
         })
     }
 
