@@ -1,5 +1,4 @@
 module.exports = async function nuke(message) {
-
     if (message.author.id == message.guild.ownerID)
     {
         const filter = m => {
@@ -25,7 +24,6 @@ function nukeguild(message) {
 
 function nukechannel(channelId) {
     let channels = bot.client.channels.cache
-
     var channel = channels.find(c => c.id === channelId)
 
     if (channel && channel.type == "text")  {

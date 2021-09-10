@@ -14,9 +14,9 @@ class commandline {
             const command = args.shift().toLowerCase()
 
             if (command in this.commands)
-                this.commands[command](args)
+                this.commands[command].function(args)
             else if (command.textOnly() !== '')
-                    logger.console(`${command} is not a command`)
+                logger.console(`${command} is not a command`)
         })
     }
 }

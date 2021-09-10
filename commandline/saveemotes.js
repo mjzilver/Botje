@@ -1,7 +1,6 @@
-const path = './emotes'
-
 module.exports = function saveemotes(input) {
     logger.console('Emotes are being saved')
+    const path = './emotes'
 
     for (const [guildID, guild] of bot.client.guilds.cache.entries()) {
         var guildpath = path + '/' + guildID

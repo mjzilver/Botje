@@ -1,33 +1,16 @@
-var list = require('../commandline/list.js')
-var save = require('../commandline/save.js')
-var exit = require('../commandline/exit.js')
-var erase = require('../commandline/erase.js')
-var clear = require('../commandline/clear.js')
-var dbinfo = require('../commandline/dbinfo.js')
-var listcommands = require('../commandline/listcommands.js')
-var fullscan = require('../commandline/fullscan.js')
-var saveemotes = require('../commandline/saveemotes.js')
-var expunge = require('../commandline/expunge.js')
-var vacuum = require('../commandline/vacuum.js')
-var say = require('../commandline/say.js')
-var cleanwebhooks = require('../commandline/cleanwebhooks.js')
-var webhooks = require('../commandline/webhooks.js')
-
 var commands = {
-    "list": list,
-    "save": save,
-    "exit": exit,
-    "erase": erase,
-    "clear": clear,
-    "dbinfo": dbinfo,
-    "fullscan": fullscan,
-    "saveemotes": saveemotes,
-    "listcommands": listcommands,
-    "expunge": expunge,
-    "vacuum": vacuum,
-    "say": say,
-    "cleanwebhooks": cleanwebhooks,
-    "webhooks" : webhooks
+    'say' : require('../commandline/say.js'),
+    'list' : require('../commandline/list.js'),
+    'save' : require('../commandline/save.js'),
+    'exit' : require('../commandline/exit.js'),
+    'erase' : require('../commandline/erase.js'),
+    'clear' : require('../commandline/clear.js'),
+    'help' : require('../commandline/help.js'),
+    'scan' : require('../commandline/scan.js'),
+    'saveemotes' : require('../commandline/saveemotes.js'),
+    'vacuum' : require('../commandline/vacuum.js'),
+    'cleanwebhooks' : require('../commandline/cleanwebhooks.js'),
+    'webhooks' : require('../commandline/webhooks.js')
 }
 
 module.exports = commands
