@@ -43,7 +43,7 @@ class Bot {
 
 				if (this.isUserAllowed(message) || message.member.hasPermission("ADMINISTRATOR")) {
 					if (command in this.commands) {
-						return this.commands[command](message)
+						return this.commands[command].function(message)
 					} else if (command in this.admincommands) {
 						if (message.author.id === config.owner || message.member.hasPermission("ADMINISTRATOR"))
 							return this.admincommands[command](message)
@@ -59,12 +59,12 @@ class Bot {
 
 				if (!replysystem.process(message)) {
 					if ((this.messageCounter >= config.speakEvery || randomBetween(1, 20) == 1) && timepassed >= randomBetween(20, 60)) {
-						this.commands['speak'](message)
+						this.commands['speak'].function(message)
 						this.lastMessageSent = currentTimestamp
 						this.messageCounter = 0
 					} else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
 						if (this.isUserAllowed(message))
-							this.commands['speak'](message)
+							this.commands['speak'].function(message)
 					}
 				}
 				this.messageCounter++

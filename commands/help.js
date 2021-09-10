@@ -1,29 +1,21 @@
-var helpMessage = `
-\`reddit [subreddit]\`: gets a random link from the given subreddit 
-\`emoji\`: turns your message into emojis 
-\`word [word]\`: shows how many times a word is used in the current channel
-\`word [word] ? \`: shows how many times a word is used in the current channel per user
-\`word @user [word]\`: shows how many times a word is used in the current channel by the mentioned user
-\`score\`: shows the top quality posters in the channel
-\`score @user\`: shows the quality of posts in this channel by the mentioned user
-\`count\`: counts messages in the current channel
-\`count @user\`: counts messages in the current channel from the mentioned user
-\`top\`: shows the top 10 messages in the current channel
-\`top @user\`: shows the top 10 messages in the current channel from the mentioned user
-\`emotes\`: shows the top 10 emotes in the current channel
-\`emotes @user\`: shows the top 10 emotes in the current channel from the mentioned user
-\`speak \`: makes the bot speak via recycled messages
-\`talk \`: makes the bot talk via predictive text 
-\`talk @user \`: makes the bot talk as if it is the mentioned user via predictive text
-\`hangman \`: get the commands for a hangman minigame
-\`ping\`: prints the current ping of the bot and the API`
+module.exports = {
+    'name': 'help',
+    'description': 'sends this helpful message',
+    'format': 'help',
+    'function': function help(message) {
+        var helpMessage = `**Here is a list of all the commands *you* can use: **
+        Format: \`()\` = optional argument, \`[]\` = required argument\n`
+        
+        commands = require('../commandholders/commands.js')
+        for (const [name, command] of Object.entries(commands))
+            helpMessage += `\`${command.format}\`: ${command.description} \n`
 
-module.exports = function help(message) {
-    const help = new discord.MessageEmbed()
-        .setColor(config.color_hex)
-        .setTitle(`:robot: Current commands: :robot:`)
-        .setDescription(helpMessage)
-        .setFooter(`Current Version: ${package.version}`)
+        const help = new discord.MessageEmbed()
+            .setColor(config.color_hex)
+            .setTitle(`:robot: Current commands: :robot:`)
+            .setDescription(helpMessage)
+            .setFooter(`Current Version: ${package.version}`)
 
-    message.author.send(help)
+        message.author.send(help)
+    }
 }
