@@ -16,6 +16,6 @@ module.exports = {
             .setDescription(helpMessage)
             .setFooter(`Current Version: ${package.version}`)
 
-        message.author.send(help)
+        message.channel.send(help)
     }
 }

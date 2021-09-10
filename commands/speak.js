@@ -59,11 +59,11 @@ module.exports = {
                     ORDER BY RANDOM()
                     LIMIT 1`
 
-                    logger.log('debug', `Sending message with '${words[0]}' in it`)
+                    logger.debug( `Sending message with '${words[0]}' in it`)
                 } else
-                    logger.log('debug', `Sending message with no context - no suitable word found`)
+                    logger.debug( `Sending message with no context - no suitable word found`)
             } else
-                logger.log('debug', `Sending message with no context - no match in DB`)
+                logger.debug( `Sending message with no context - no match in DB`)
 
             database.db.get(selectSQL, [], (err, row) => {
                 if (err)

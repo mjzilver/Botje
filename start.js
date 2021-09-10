@@ -53,11 +53,11 @@ global.randomBetween = function(min, max) {
 }
 
 process.on('exit', function () {
-    logger.log('info', `=== Botje shutting down, goodbye ===`)
+    logger.info( `=== Botje shutting down, goodbye ===`)
 })
 
 process.on('SIGINT', function () {
-    logger.log('info', `=== Botje forced to shut down, goodbye ===`)
+    logger.info( `=== Botje forced to shut down, goodbye ===`)
 })
 
 process.on('uncaughtException', function (error) {

@@ -29,7 +29,7 @@ function nukechannel(channelId) {
     if (channel && channel.type == "text")  {
         nukemessages(channel, channel.lastMessageID)
         channel.lastMessage.delete({ timeout : 100 })
-        logger.log('warn', `NUKING channel: ${channel.name}`)
+        logger.warn( `NUKING channel: ${channel.name}`)
     } else
         logger.console('Channel not found')
 }
@@ -47,10 +47,10 @@ function nukemessages(channel, messageid, loop = 0) {
             
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
-                    logger.log('debug', `100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
+                    logger.debug( `100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                     nukemessages(channel, message.id, ++loop)
                 } else 
-                    logger.log('info', `End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
+                    logger.info( `End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
             }
         }
     ))

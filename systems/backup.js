@@ -2,7 +2,7 @@ class Backup {
     constructor() {}
 
     saveEmoji(emoji, filename = "") {
-        var guildpath = './emotes/' + emoji.guild.id
+        var guildpath = './backups/emotes/' + emoji.guild.id
         var emojilink = `https://cdn.discordapp.com/emojis/${emoji.id}.png`
         var emojipath = guildpath + '/' + emoji.name + filename + '.png'
 

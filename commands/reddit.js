@@ -60,7 +60,7 @@ module.exports = {
 								logger.error(`failed to insert: ${post.url} - ${sub}`)
 								logger.error(err)
 							} else
-								logger.log('debug', `inserted: ${post.url} - ${sub}`)
+								logger.debug( `inserted: ${post.url} - ${sub}`)
 						})
 					} else {
 						if (body.data.children.length >= 100) {

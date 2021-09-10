@@ -3,7 +3,7 @@ module.exports = async function purge(message) {
     .then(messages => messages.array().forEach(
         (message) => {
             if (message.author.id == bot.client.user.id || message.content.match(new RegExp(config.prefix, "gi")) || message.content.match(new RegExp(/bot(je)/, "gi"))) {
-                logger.log('warn', 'Purging message: ' + message.content)
+                logger.warn( 'Purging message: ' + message.content)
                 message.delete()
             }
         }
