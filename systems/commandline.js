@@ -15,8 +15,8 @@ class commandline {
 
             if (command in this.commands)
                 this.commands[command](args)
-            else 
-                logger.console(`${command} is not a command`)
+            else if (command.textOnly() !== '')
+                    logger.console(`${command} is not a command`)
         })
     }
 }
