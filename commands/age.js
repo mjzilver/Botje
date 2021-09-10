@@ -2,7 +2,7 @@ var moment = require('moment')
 
 module.exports = function age(message) {
 	var joined = moment(message.guild.members.cache.find(u => u.id === bot.client.user.id).joinedAt)
-	console.log(joined)
+	logger.console(joined)
 	const now = moment()
 	years = now.diff(joined, 'years')
 	days = now.subtract(years, 'years').diff(joined, 'days')

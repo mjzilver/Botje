@@ -6,11 +6,11 @@ class Webhook {
             var webhooks = await channel.fetchWebhooks()
             for (const [id, webhook] of webhooks) {
                 if (webhook.name == global.package.name) {
-                    console.log('Found webhook')
+                    logger.console('Found webhook')
                     return webhook
                 }
             }
-            console.log('making new webhook')
+            logger.console('making new webhook')
             return await channel.createWebhook(global.package.name)
         }
     }

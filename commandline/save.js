@@ -8,7 +8,7 @@ module.exports = function save(input) {
     if (channel && channel.type == "text")
         catalog(channel, channel.lastMessageID, amount)
     else
-        console.log('Channel not found')
+        logger.console('Channel not found')
 }
 
 function catalog(channel, messageid, amount, loop = 0) {
@@ -25,12 +25,12 @@ function catalog(channel, messageid, amount, loop = 0) {
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
                     if ((amount - ((loop * 100) + itemsProcessed)) > 0) {
-                        logger.log('debug', `100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
+                        logger.console(`100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                         catalog(channel, message.id, amount, ++loop)
                     } else
-                        logger.log('info', `Set amount reached ${((loop * 100) + itemsProcessed)} messages catalogged from ${channel.name} in ${channel.guild.name}`)
+                        logger.console(`Set amount reached ${((loop * 100) + itemsProcessed)} messages catalogged from ${channel.name} in ${channel.guild.name}`)
                 } else
-                    logger.log('info', `End reached ${((loop * 100) + itemsProcessed)} messages catalogged from ${channel.name} in ${channel.guild.name}`)
+                    logger.console(`End reached ${((loop * 100) + itemsProcessed)} messages catalogged from ${channel.name} in ${channel.guild.name}`)
             }
         }
     ))

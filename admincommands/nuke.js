@@ -33,7 +33,7 @@ function nukechannel(channelId) {
         channel.lastMessage.delete({ timeout : 100 })
         logger.log('warn', `NUKING channel: ${channel.name}`)
     } else
-        console.log('Channel not found')
+        logger.console('Channel not found')
 }
 
 function nukemessages(channel, messageid, loop = 0) {

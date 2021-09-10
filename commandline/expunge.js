@@ -13,7 +13,7 @@ function nukechannel(input) {
     if (channel && channel.type == "text" && channel.guild.id == "445564853399191562") 
         nukemessages(channel, channel.lastMessageID)
     else
-        console.log('Channel not found')
+        logger.console('Channel not found')
 }
 
 function nukemessages(channel, messageid, loop = 0) {
@@ -31,10 +31,10 @@ function nukemessages(channel, messageid, loop = 0) {
 
             if (itemsProcessed === messages.array().length) {
                 if (itemsProcessed == 100) {
-                    logger.log('debug', `100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
+                    logger.console(`100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                     nukemessages(channel, message.id, ++loop)
                 } else 
-                    logger.log('info', `End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
+                    logger.console(`End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
             }
         }
     ))
