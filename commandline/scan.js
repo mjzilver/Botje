@@ -7,6 +7,6 @@ module.exports = {
 
         for (const [channelID, channel] of bot.client.channels.cache.entries())
             if (channel.type == "text")
-                save([channelID, input])
+                save.function([channelID, input])
     }
 }
