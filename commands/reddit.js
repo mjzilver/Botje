@@ -2,18 +2,27 @@ var request = require('request')
 
 module.exports = {
 	'name': 'reddit',
-	'description': 'gets a random link from the given subreddit ',
-	'format': 'reddit [subreddit]',
+	'description': 'gets a random link from the given subreddit use top|hot|new to sort and the timeframe (only for top)',
+	'format': 'reddit [subreddit] (top|hot|new) (hour|day|week|month|year|all)',
 	'function': async function getRedditImage(message, last = '') {
 		const db = database.db
 		const args = message.content.split(' ')
 		var sub = args[1]
+		var sort = 'hot'
+		var time = 'month'
 		var channel = message.channel
 
+		if (['top', 'hot', 'new'].includes(args[2])) 
+			sort = args[2]
+		if (['hour', 'day', 'week', 'month', 'year', 'all'].includes(args[3])) 
+			time = args[3]
+
 		const options = {
-			url: 'https://www.reddit.com/r/' + sub + '.json?sort=top&t=week&limit=100&after=' + last,
+			url: `https://www.reddit.com/r/${sub}/${sort}.json?sort=${sort}&t=${time}&limit=100&after=${last}`,
 			json: true
 		}
+
+		console.log(options.url)
 
 		request(options, (err, res, body) => {
 			if (err) {
@@ -60,7 +69,7 @@ module.exports = {
 								logger.error(`failed to insert: ${post.url} - ${sub}`)
 								logger.error(err)
 							} else
-								logger.debug( `inserted: ${post.url} - ${sub}`)
+								logger.debug(`inserted: ${post.url} - ${sub}`)
 						})
 					} else {
 						if (body.data.children.length >= 100) {
