@@ -1,11 +1,7 @@
-var purge = require('../admincommands/purge.js')
-var disallow = require('../admincommands/disallow.js')
-var nuke = require('../admincommands/nuke.js')
-
 var commands = {
-    "purge": purge,
-    "disallow": disallow,
-    "nuke": nuke
+    "purge": require('../admincommands/purge.js'),
+    "disallow": require('../admincommands/disallow.js'),
+    "nuke": require('../admincommands/nuke.js')
 }
 
 module.exports = commands
