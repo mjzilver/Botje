@@ -22,8 +22,6 @@ module.exports = {
 			json: true
 		}
 
-		console.log(options.url)
-
 		request(options, (err, res, body) => {
 			if (err) {
 				return logger.error(err)

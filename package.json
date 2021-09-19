@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "10.3.2",
+  "version": "10.3.4",
   "description": "The discord bot for the thinking man",
   "main": "start.js",
   "author": "Mick Jari",
