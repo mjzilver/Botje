@@ -87,12 +87,6 @@ class Bot {
 
 		this.client.on('messageDelete', message => {
 			logger.admin( `This Message has been deleted: ${message.author.username}: ${message.content} == Posted in channel '${message.channel.name}' in server '${message.channel.guild.name} == Send at: ${new Date(message.createdTimestamp).toUTCString()}`)
-
-			if (message.edits.length > 1) {
-				message.edits.forEach(edit => {
-					logger.admin( `This edit belongs to ${message.author.username}: ${message.content} == Posted in channel '${message.channel.name}' in server '${message.channel.guild.name} == Edit at: ${edit.content} ${new Date(message.editedTimestamp).toUTCString()}`)
-				})
-			}
 		})
 
 		this.client.on('emojiCreate', emoji => {
