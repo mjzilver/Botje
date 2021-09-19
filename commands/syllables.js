@@ -63,7 +63,7 @@ module.exports = {
 						.setTitle(`Top 10 most intellectual posters in ${message.guild.name}`)
 						.setDescription(result)
 
-					message.channel.send(top)
+					message.channel.send({embeds: [top]})
 				}
 			})
 		} else {

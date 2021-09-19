@@ -1,13 +1,14 @@
 {
   "name": "botje",
-  "version": "10.3.4",
+  "version": "11.1.0",
   "description": "The discord bot for the thinking man",
   "main": "start.js",
   "author": "Mick Jari",
   "dependencies": {
-    "discord.js": "^12.5.1",
+    "discord.js": "^13.1.0",
     "express": "^4.16.4",
     "moment": "^2.24.0",
+    "npm": "^7.24.0",
     "pngjs-image": "^0.11.7",
     "pug": "^2.0.3",
     "request": "^2.81.0",
@@ -22,6 +23,6 @@
     "ignore": [
       "start.js"
     ],
-    "signal" : "SIGINT"
+    "signal": "SIGINT"
   }
 }

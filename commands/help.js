@@ -16,6 +16,6 @@ module.exports = {
             .setDescription(helpMessage)
             .setFooter(`Current Version: ${package.version}`)
 
-        message.channel.send(help)
+        message.channel.send({embeds: [help]})
     }
 }

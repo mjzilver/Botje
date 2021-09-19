@@ -43,7 +43,7 @@ module.exports = {
                         .addField('Sunrise', sunrise, true)
                         .addField('Sunset', sunset, true)
 
-                    message.channel.send(weatherEmbed)
+                    message.channel.send({embeds: [weatherEmbed]})
                 } else {
                     message.channel.send(result.message.capitalize())
                     logger.warn(`Weather error on ${city}`)

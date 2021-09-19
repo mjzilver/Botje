@@ -33,7 +33,7 @@ module.exports = {
 						.setTitle(`Top 10 users for the word ${args[1]} in ${message.guild.name} `)
 						.setDescription(result)
 
-					message.channel.send(top)
+					message.channel.send({embeds: [top]})
 				}
 			})
 		} else if (args[2] && mention) {

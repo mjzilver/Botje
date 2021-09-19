@@ -11,6 +11,7 @@ global.web = require('./systems/web.js')
 global.backupsystem = require('./systems/backup.js')
 global.replysystem = require('./systems/reply.js')
 global.webhook = require('./systems/webhook.js')
+global.spellcheck = require('./systems/spellcheck.js')
 
 global.fs = require('fs')
 global.request = require('request')

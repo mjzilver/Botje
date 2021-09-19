@@ -139,7 +139,7 @@ class hangman {
 
         message.channel.send({
             files: [attachment],
-            embed: hangmanEmbed
+            embeds: [hangmanEmbed]
         })
     }
 }

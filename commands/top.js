@@ -30,7 +30,7 @@ module.exports = {
 						.setTitle(`Top 10 must used sentences in ${message.guild.name}`)
 						.setDescription(result)
 
-					message.channel.send(top)
+					message.channel.send({embeds: [top]})
 				}
 			})
 		} else if (args.length == 2 && mention) {
@@ -57,7 +57,7 @@ module.exports = {
 						.setTitle(`Top 10 must used sentences in ${message.guild.name} by ${mention.username}`)
 						.setDescription(result)
 
-					message.channel.send(top)
+					message.channel.send({embeds: [top]})
 				}
 			})
 		}

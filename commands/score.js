@@ -94,7 +94,7 @@ module.exports = {
 						.setTitle(`Top 10 posters in ${message.guild.name}`)
 						.setDescription(result)
 
-					message.channel.send(top)
+					message.channel.send({embeds: [top]})
 				}
 			})
 		}

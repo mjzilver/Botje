@@ -1,5 +1,3 @@
-
-
 var commands = {
    'help': require('../commands/help.js'),
    'emoji': require('../commands/emoji.js'),
@@ -18,7 +16,8 @@ var commands = {
    'speak': require('../commands/speak.js'),
    'talk': require('../commands/talk.js'),
    'draw': require('../commands/draw.js'),
-   "hangman": require('../commands/hangmanholder.js')
+   "hangman": require('../commands/hangmanholder.js'),
+   'match' : require('../commands/match.js')
 }
 
 module.exports = commands

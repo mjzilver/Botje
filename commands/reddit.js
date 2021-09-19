@@ -50,14 +50,14 @@ module.exports = {
 
 						if (post.url && post.url.isImage()) {
 							const image = new discord.MessageEmbed()
-								.setColor(config.color_hex)
-								.setTitle(post.title)
-								.addField('Updoots', post.score, true)
-								.addField('Posted by', post.author, true)
-								.setImage(post.url)
+								.setColor(`${config.color_hex}`)
+								.setTitle(`${post.title}`)
+								.addField('Updoots', `${post.score}`, true)
+								.addField('Posted by', `${post.author}`, true)
+								.setImage(`${post.url}`)
 								.setURL(`https://reddit.com${post.permalink}`)
 								.setFooter(`From: reddit/r/${sub}`)
-							channel.send(image)
+							channel.send({embeds: [image]})
 						} else
 							channel.send(post.title + "\n" + post.url)
 

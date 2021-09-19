@@ -92,7 +92,7 @@ module.exports = {
 						.setDescription(result)
 						.setFooter(`Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)}`)
 
-					message.channel.send(top)
+					message.channel.send({embeds: [top]})
 				}
 			})
 		}

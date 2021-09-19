@@ -49,7 +49,7 @@ module.exports = {
 						.setDescription(result)
 						.setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
-					message.channel.send(top)
+					message.channel.send({embeds: [top]})
 				}
 			})
 		} else if (args.length == 2 && args[1] == "%") {
@@ -78,8 +78,8 @@ module.exports = {
 						.setDescription(result)
 						.setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
-					message.channel.send(top)
-				}
+						message.channel.send({embeds: [top]})
+					}
 			})
 		}
 	}
