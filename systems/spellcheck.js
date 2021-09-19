@@ -1,11 +1,10 @@
 class Spellcheck {
     constructor() {
-        this.wordList = []
+        this.wordList = {}
 
         const selectSQL = `SELECT LOWER(message) AS message, COUNT(*) AS amount 
         FROM messages 
         GROUP BY message 
-        HAVING amount > 5
         ORDER BY amount DESC `
 
         database.db.all(selectSQL, [], (err, rows) => {
@@ -14,15 +13,39 @@ class Spellcheck {
             } else {
                 rows.forEach(row => {
                     row.message.split(' ').forEach(word => {
-                        this.wordList.push(word)
+                        if (!(word in this.wordList)) {
+                            this.wordList[word] = 1;
+                        } else {
+                            this.wordList[word] = this.wordList[word] + 1
+                        }
                     })
                 });
             }
         })
     }
 
+    checkSentence(sentence) {
+        logger.console(`Searching for a match for ${sentence}`)
+        var words = []
+        var mistakes = 0;
+
+        for (const word of sentence.split(' ')) {
+            if (this.checkWord(word)) {
+                words.push(word)
+            } else {
+                var result = this.findClosestWord(word)
+                mistakes++
+                words.push(result)
+            }
+        }
+        return {
+            'result': words.join(' '),
+            'mistakes': mistakes
+        }
+    }
+
     checkWord(word) {
-        return this.wordList.includes(word.toLowerCase())
+        return word.toLowerCase() in this.wordList
     }
 
     findClosestWord(word) {
@@ -32,12 +55,20 @@ class Spellcheck {
 
         var closestMatch = ""
         var difference = Number.MAX_VALUE
+        var chosenAmount = 0
 
-        for (const wordlistword of this.wordList) {
+        for (const [wordlistword, wordlistamount] of Object.entries(this.wordList)) {
             var currentdifference = this.levenshtein(word, wordlistword)
             if (currentdifference < difference) {
                 difference = currentdifference
                 closestMatch = wordlistword
+                chosenAmount = wordlistamount
+            } else if (currentdifference == difference) {
+                if (wordlistamount < chosenAmount) {
+                    difference = currentdifference
+                    closestMatch = wordlistword
+                    chosenAmount = wordlistamount
+                }
             }
         }
         return closestMatch

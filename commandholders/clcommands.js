@@ -10,7 +10,8 @@ var commands = {
     'saveemotes' : require('../commandline/saveemotes.js'),
     'vacuum' : require('../commandline/vacuum.js'),
     'cleanwebhooks' : require('../commandline/cleanwebhooks.js'),
-    'webhooks' : require('../commandline/webhooks.js')
+    'webhooks' : require('../commandline/webhooks.js'),
+    'match' : require('../commandline/match.js')
 }
 
 module.exports = commands
