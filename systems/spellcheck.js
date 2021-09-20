@@ -29,7 +29,8 @@ class Spellcheck {
         var words = []
         var mistakes = 0;
 
-        for (const word of sentence.split(' ')) {
+        for (var word of sentence.split(' ')) {
+            word = word.textOnly()
             if (this.checkWord(word)) {
                 words.push(word)
             } else {
@@ -58,16 +59,18 @@ class Spellcheck {
         var chosenAmount = 0
 
         for (const [wordlistword, wordlistamount] of Object.entries(this.wordList)) {
-            var currentdifference = this.levenshtein(word, wordlistword)
-            if (currentdifference < difference) {
-                difference = currentdifference
-                closestMatch = wordlistword
-                chosenAmount = wordlistamount
-            } else if (currentdifference == difference) {
-                if (wordlistamount < chosenAmount) {
+            if (wordlistamount >= 5) {
+                var currentdifference = this.levenshtein(word, wordlistword)
+                if (currentdifference < difference) {
                     difference = currentdifference
                     closestMatch = wordlistword
                     chosenAmount = wordlistamount
+                } else if (currentdifference == difference) {
+                    if (wordlistamount < chosenAmount) {
+                        difference = currentdifference
+                        closestMatch = wordlistword
+                        chosenAmount = wordlistamount
+                    }
                 }
             }
         }

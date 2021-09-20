@@ -2,7 +2,7 @@ class Webhook {
     constructor() {}
 
     async fetch(channel) {
-        if(channel && channel.type == "text") {
+        if(channel && channel.type == "GUILD_TEXT") {
             var webhooks = await channel.fetchWebhooks()
             for (const [id, webhook] of webhooks) {
                 if (webhook.name == global.package.name) {

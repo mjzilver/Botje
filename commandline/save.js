@@ -9,8 +9,8 @@ module.exports = {
         var amount = (input[0] ? input[0] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
         var channel = channels.find(c => c.id === channelId)
 
-        if (channel && channel.type == "text")
-            catalog(channel, channel.lastMessageID, amount)
+        if (channel && channel.type == "GUILD_TEXT")
+            catalog(channel, channel.lastMessageId, amount)
         else
             logger.console('Channel not found')
     }

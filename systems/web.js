@@ -44,7 +44,7 @@ class WebServer {
             GROUP BY user_id 
             ORDER BY amount DESC`
 
-            const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == 'text'))
+            const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == 'GUILD_TEXT'))
             var guilds = Object.fromEntries(bot.client.guilds.cache)
             var commands = (require('../commandholders/commands.js'))
 

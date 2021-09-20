@@ -1,12 +1,11 @@
 module.exports = async function nuke(message) {
-    if (message.author.id == message.guild.ownerID)
-    {
-        const filter = m => {
-            return (m.content.startsWith('launch') && m.author.id == message.author.id)
+    if (message.author.id == message.guild.ownerId) {
+        const filter = launchMessage => {
+            return (launchMessage.content.startsWith('launch') && launchMessage.author.id == message.author.id)
         }
 
-        message.channel.awaitMessages(filter, { max: 1, time: 60000 })
-            .then(collected  => {
+        message.channel.awaitMessages({filter, max: 1, time: 60000 })
+            .then(collected => {
                 message.channel.send(`Nuke launched. Blowout soon, fellow stalker.`)
                 nukeguild(message)
             })  
@@ -17,17 +16,17 @@ module.exports = async function nuke(message) {
 }
 
 function nukeguild(message) {
-    for (const [channelID, channel] of bot.client.channels.cache.entries()) 
-        if (channel.type == "text" && channel.guild.id == message.guild.id)
-            nukechannel(channelID)
+    for (const [channelId, channel] of bot.client.channels.cache.entries()) 
+        if (channel.type == "GUILD_TEXT" && channel.guild.id == message.guild.id)
+            nukechannel(channelId)
 }
 
 function nukechannel(channelId) {
     let channels = bot.client.channels.cache
     var channel = channels.find(c => c.id === channelId)
 
-    if (channel && channel.type == "text")  {
-        nukemessages(channel, channel.lastMessageID)
+    if (channel && channel.type == "GUILD_TEXT")  {
+        nukemessages(channel, channel.lastMessageId)
         channel.lastMessage.delete({ timeout : 100 })
         logger.warn( `NUKING channel: ${channel.name}`)
     } else
@@ -40,17 +39,17 @@ function nukemessages(channel, messageid, loop = 0) {
     channel.messages.fetch({
         limit: 100,
         before: messageid
-    }).then(messages => messages.array().forEach(
+    }).then(messages => messages.forEach(
         (message) => {
             itemsProcessed++
             message.delete({ timeout: 10 })
             
-            if (itemsProcessed === messages.array().length) {
+            if (itemsProcessed === messages.length) {
                 if (itemsProcessed == 100) {
-                    logger.debug( `100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
+                    logger.console( `100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                     nukemessages(channel, message.id, ++loop)
                 } else 
-                    logger.info( `End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
+                    logger.warn( `End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
             }
         }
     ))

@@ -55,11 +55,11 @@ class Bot {
 
 				logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
 
-				if (this.isUserAllowed(message) || message.member.hasPermission("ADMINISTRATOR")) {
+				if (this.isUserAllowed(message) || message.member.permissions.has("ADMINISTRATOR")) {
 					if (command in this.commands) {
 						return this.commands[command].function(message)
 					} else if (command in this.admincommands) {
-						if (message.author.id === config.owner || message.member.hasPermission("ADMINISTRATOR"))
+						if (message.author.id === config.owner || message.member.permissions.has("ADMINISTRATOR"))
 							return this.admincommands[command](message)
 						else
 							message.channel.send(`${command.capitalize()} is an admin command, you are not allowed`)

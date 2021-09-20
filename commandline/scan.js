@@ -5,8 +5,8 @@ module.exports = {
     'function': function scan(input) {
         const save = require("./save")
 
-        for (const [channelID, channel] of bot.client.channels.cache.entries())
-            if (channel.type == "text")
-                save.function([channelID, input])
+        for (const [channelId, channel] of bot.client.channels.cache.entries())
+            if (channel.type == "GUILD_TEXT")
+                save.function([channelId, input])
     }
 }
