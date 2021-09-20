@@ -1,9 +1,12 @@
 class Spellcheck {
     constructor() {
         this.wordList = {}
+        var earliest = new Date()
+        earliest.setMonth(earliest.getMonth() - 3)
 
         const selectSQL = `SELECT LOWER(message) AS message, COUNT(*) AS amount 
         FROM messages 
+        WHERE date < ${earliest.getTime()}
         GROUP BY message 
         ORDER BY amount DESC `
 
@@ -25,7 +28,6 @@ class Spellcheck {
     }
 
     checkSentence(sentence) {
-        logger.console(`Searching for a match for ${sentence}`)
         var words = []
         var mistakes = 0;
 

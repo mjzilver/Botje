@@ -22,12 +22,12 @@ function catalog(channel, messageid, amount, loop = 0) {
     channel.messages.fetch({
         limit: (amount - itemsProcessed < 100 ? amount - itemsProcessed : 100),
         before: messageid
-    }).then(messages => messages.array().forEach(
+    }).then(messages => messages.forEach(
         (message) => {
             itemsProcessed++
             database.storemessage(message)
 
-            if (itemsProcessed === messages.array().length) {
+            if (itemsProcessed === messages.length) {
                 if (itemsProcessed == 100) {
                     if ((amount - ((loop * 100) + itemsProcessed)) > 0) {
                         logger.console(`100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
