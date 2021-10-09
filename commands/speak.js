@@ -4,7 +4,7 @@ module.exports = {
     'format': 'speak (sentence)',
     'function': function speak(message, monthsOld = 5, findWord = 1) {
         if (message.content.includes('about')) {
-            var topic = message.content.substring(message.content.indexOf('about')  + 'about'.length + 1)
+            var topic = message.content.substring(message.content.indexOf('about') + 'about'.length + 1)
 
             if (topic != '') {
                 let selectSQL = `SELECT LOWER(message) as message
@@ -16,7 +16,7 @@ module.exports = {
                     if (err)
                         throw err
 
-                    if(rows.length < 3) {
+                    if (rows.length < 3) {
                         logger.console(`Not enough info about topic -- redirecting to the regular method`)
                         message.content = message.content.replace(/about/ig, "")
                         return speak(message, --monthsOld, 0)
@@ -101,11 +101,11 @@ module.exports = {
                         }
 
                         selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
-                    WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
-                    AND len < 100 AND (len - spaces) >= 2 
-                    AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
-                    ORDER BY RANDOM()
-                    LIMIT 1`
+                        WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+                        AND len < 100 AND (len - spaces) >= 2 
+                        AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
+                        ORDER BY RANDOM()
+                        LIMIT 1`
 
                         logger.console(`Sending message with '${words[0]}' in it`)
                     } else
