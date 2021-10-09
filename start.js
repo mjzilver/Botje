@@ -36,6 +36,10 @@ String.prototype.textOnly = function() {
     return this.replace(new RegExp(/[^a-zA-Z ]/gi, "gi"), '')
 }
 
+String.prototype.chatCharsOnly = function() {
+    return this.replace(new RegExp(/[^a-zA-Z .,!?]/gi, "gi"), '')
+}
+
 String.prototype.removeQuotes = function() {
     return this.replace(new RegExp(/"/gi, "gi"), '')
 }

@@ -3,17 +3,16 @@ module.exports = {
     'description': 'makes the bot talk via predictive text or as if it were the mentioned user',
     'format': 'talk (@user)',
     'function': function talk(message) {
-        var mention = message.mentions.users.first()
+        var mention = message.mentions ? message.mentions.users.first() : null
         var chain = {}
 
         let selectSQL = `SELECT message FROM messages
-        WHERE server = ? 
-        AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" `
+        WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" `
 
         if (mention)
             selectSQL += `AND user_id = ${mention.id}`
 
-        database.db.all(selectSQL, [message.guild.id], (err, rows) => {
+        database.db.all(selectSQL, [], (err, rows) => {
             if (err)
                 throw err
             else {
@@ -34,7 +33,7 @@ module.exports = {
                 }
 
                 var sentence = ""
-                var sentenceLength = randomBetween(5, 10)
+                var sentenceLength = randomBetween(8, 15)
 
                 if (chain[""]) {
                     var previousWord = chain[""][randomBetween(0, chain[""].length - 1)]

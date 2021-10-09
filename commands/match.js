@@ -3,9 +3,15 @@ module.exports = {
     'description': '',
     'format': 'match [string]',
     'function': function match(message) {
-        var input = message.content.split(' ').slice(1)
-        var spellchecked = spellcheck.checkSentence(input.join(' '));
+        var words = message.content.split(' ')
 
-        message.reply(`Found match: '${spellchecked.result}' \nYou made ${spellchecked.mistakes} mistakes`)
+        if (words[0] == 'match')
+            words.shift()
+
+        var spellchecked = spellcheck.checkSentence(words.join(' '));
+
+        if(spellchecked.mistakes >= 1) {
+            message.reply(`You made a mistake retard, it should be: \n"${spellchecked.result}"`)
+        } 
     }
 }
