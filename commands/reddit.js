@@ -58,8 +58,33 @@ module.exports = {
 								.setURL(`https://reddit.com${post.permalink}`)
 								.setFooter(`From: reddit/r/${sub}`)
 							channel.send({embeds: [image]})
-						} else
-							channel.send(post.title + "\n" + post.url)
+						} else if (post.url.match(/v\.redd\.it/gi)) {		
+							const options = {
+								url: post.url,
+								json: true,
+								followAllRedirects: true,
+							}
+							
+							request(options, (err, res, body) => {
+								if (err)
+									throw err
+								
+									logger.console(`Redirected to ${res.request.uri.href}`)
+
+									const options = {
+										url: res.request.uri.href + ".json",
+										json: true,
+									}
+
+									request(options, (err, res, body) => {
+										var videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
+
+										channel.send(`${post.title} \n ${videolink}`)
+									})
+							})
+						} else {
+							channel.send(`${post.title} \n ${post.url}`)
+						}
 
 						var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [post.url, sub])
 						insert.run(function (err) {
