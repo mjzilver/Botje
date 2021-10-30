@@ -3,8 +3,10 @@ module.exports = {
     'description': 'makes the bot speak via recycled messages',
     'format': 'speak (sentence)',
     'function': function speak(message, monthsOld = 5, findWord = 1) {
-        if (message.content.includes('about')) {
-            var topic = message.content.substring(message.content.indexOf('about') + 'about'.length + 1)
+        var matches  = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
+
+        if (matches) {
+            var topic = matches[1]
 
             if (topic != '') {
                 let selectSQL = `SELECT LOWER(message) as message
@@ -18,7 +20,7 @@ module.exports = {
 
                     if (rows.length < 3) {
                         logger.console(`Not enough info about topic -- redirecting to the regular method`)
-                        message.content = message.content.replace(/about/ig, "")
+                        message.content = message.content.replace(/(about|think|of)/ig, "")
                         return speak(message, --monthsOld, 0)
                     }
 
@@ -39,11 +41,11 @@ module.exports = {
                     var picker = randomBetween(0, 2)
 
                     if (picker == 0) {
-                        message.reply(`${first}`.normalizeSpaces().chatCharsOnly())
+                        message.reply(`${first}`.normalizeSpaces())
                     } else if (picker == 1) {
-                        message.reply(`${first} ${linkerwords.pickRandom()} ${second}`.normalizeSpaces().chatCharsOnly())
+                        message.reply(`${first} ${linkerwords.pickRandom()} ${second}`.normalizeSpaces())
                     } else {
-                        message.reply(`${first}, ${second} ${linkerwords.pickRandom()} ${third}`.normalizeSpaces().chatCharsOnly())
+                        message.reply(`${first}, ${second} ${linkerwords.pickRandom()} ${third}`.normalizeSpaces())
                     }
                 })
             } else {
