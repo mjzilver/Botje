@@ -44,7 +44,7 @@ function nukemessages(channel, messageid, loop = 0) {
             itemsProcessed++
             message.delete({ timeout: 10 })
             
-            if (itemsProcessed === messages.length) {
+            if (itemsProcessed === messages.size) {
                 if (itemsProcessed == 100) {
                     logger.console( `100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                     nukemessages(channel, message.id, ++loop)

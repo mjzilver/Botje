@@ -5,8 +5,8 @@ module.exports = {
     'function': function save(input) {
         let channels = bot.client.channels.cache
 
-        var channelId = input.shift()
-        var amount = (input[0] ? input[0] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
+        var channelId = input[0]
+        var amount = (input[1].length !== 0 ? input[1] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
         var channel = channels.find(c => c.id === channelId)
 
         if (channel && channel.type == "GUILD_TEXT")
@@ -26,8 +26,8 @@ function catalog(channel, messageid, amount, loop = 0) {
         (message) => {
             itemsProcessed++
             database.storemessage(message)
-
-            if (itemsProcessed === messages.length) {
+            
+            if (itemsProcessed === messages.size) {
                 if (itemsProcessed == 100) {
                     if ((amount - ((loop * 100) + itemsProcessed)) > 0) {
                         logger.console(`100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)

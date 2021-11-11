@@ -22,7 +22,7 @@ class Bot {
 				'GUILD_PRESENCES',
 				'GUILD_MESSAGES',
 				'GUILD_MESSAGE_REACTIONS',
-				'GUILD_MESSAGE_TYPING'
+				'GUILD_MESSAGE_TYPING',
 			],
 			autoReconnect: true
 		})

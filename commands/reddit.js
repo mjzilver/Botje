@@ -79,11 +79,11 @@ module.exports = {
 									request(options, (err, res, body) => {
 										var videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
 
-										channel.send(`${post.title} \n ${videolink}`)
+										channel.send(`${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
 									})
 							})
 						} else {
-							channel.send(`${post.title} \n ${post.url}`)
+							channel.send(`${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
 						}
 
 						var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [post.url, sub])

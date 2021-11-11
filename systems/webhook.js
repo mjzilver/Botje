@@ -20,11 +20,14 @@ class Webhook {
         var webhook = await this.fetch(channel)
 
         channel.guild.members.fetch(userid).then(
-            async (user) => {
-                let member = channel.guild.member(user.user)
-                webhook.send(text, {
-                    username: member.nickname ? member.nickname : user.user.username,
-                    avatarURL: user.user.displayAvatarURL()
+            async (member) => {
+                console.log(member.user)
+                console.log(typeof(member.user))
+                console.log(member.user.displayAvatarURL())
+                webhook.send({
+                    content: text,
+                    username: member.user.nickname ? member.user.nickname : member.user.username,
+                    avatarURL: member.user.displayAvatarURL()
                 })
             })
     }
