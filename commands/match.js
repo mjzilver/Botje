@@ -1,6 +1,6 @@
 module.exports = {
     'name': 'match',
-    'description': '',
+    'description': 'Ignore this one',
     'format': 'match [string]',
     'function': function match(message) {
         var words = message.content.split(' ')

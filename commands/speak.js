@@ -120,7 +120,7 @@ module.exports = {
                         throw err
                     else {
                         if (row)
-                            message.channel.send(row['message'].capitalize().normalizeSpaces())
+                            message.channel.send(row['message'].normalizeSpaces())
                         else
                             speak(message, --monthsOld, 0)
                     }
