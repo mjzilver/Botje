@@ -6,8 +6,6 @@ module.exports = {
         var helpMessage = `**Here is a list of all the commands *you* can use: **
         Format: \`()\` = optional argument, \`[]\` = required argument\n`
 		const args = message.content.split(' ')
-
-        console.log(args)
         
         commands = require('../commandholders/commands.js')
         var pageAmount = Math.ceil(Object.entries(commands).length / 10)
