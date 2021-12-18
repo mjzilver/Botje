@@ -29,7 +29,7 @@ String.prototype.isLink = function() {
 }
 
 String.prototype.normalizeSpaces = function() {
-    return this.replace(new RegExp(/(^ +| +$|  +)/gi, "gi"), '')
+    return this.replace(new RegExp(/(^ +| +$|  +)/gi, "gi"), ' ')
 }
 
 String.prototype.textOnly = function() {

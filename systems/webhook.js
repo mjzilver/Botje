@@ -21,9 +21,6 @@ class Webhook {
 
         channel.guild.members.fetch(userid).then(
             async (member) => {
-                console.log(member.user)
-                console.log(typeof(member.user))
-                console.log(member.user.displayAvatarURL())
                 webhook.send({
                     content: text,
                     username: member.user.nickname ? member.user.nickname : member.user.username,

@@ -18,7 +18,8 @@ var commands = {
    'draw': require('../commands/draw.js'),
    "hangman": require('../commands/hangmanholder.js'),
    'choose' : require('../commands/choose.js'),
-   'match' : require('../commands/match.js')
+   'match' : require('../commands/match.js'),
+   'roll' : require('../commands/roll.js')
 }
 
 module.exports = commands

@@ -32,7 +32,7 @@ module.exports = {
 
                     logger.console(`Picked terms related to ${topic}, first ${first}, second ${second}, third ${third}`)
 
-                    first = first.substring(first.indexOf(topic.toLowerCase()) - 1)
+                    first = first.substring(first.indexOf(topic.toLowerCase()))
                     second = second.substring(second.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), '')
                     third = third.substring(third.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), '')
 
