@@ -106,7 +106,6 @@ class Bot {
 	isUserAllowed(message) {
 		var disallowed = JSON.parse(fs.readFileSync('./json/disallowed.json'))
 		if (message.author.id in disallowed) {
-			message.author.send(`You aren't allowed to use botje because you are on the banlist.`)
 			return false
 		}
 		var currentTimestamp = new Date()

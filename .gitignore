@@ -74,8 +74,9 @@ discord.db*
 
 # no backups
 backups/
-# no emotes
-emotes/
+
+# dont copy the disallowed.json
+json/disallowed.json
 
 # dont include the drawboard
 views/images/image.png
