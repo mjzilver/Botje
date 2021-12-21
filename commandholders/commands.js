@@ -19,7 +19,8 @@ var commands = {
    "hangman": require('../commands/hangmanholder.js'),
    'choose' : require('../commands/choose.js'),
    'match' : require('../commands/match.js'),
-   'roll' : require('../commands/roll.js')
+   'roll' : require('../commands/roll.js'),
+   'youtube' : require('../commands/youtube.js')
 }
 
 module.exports = commands
