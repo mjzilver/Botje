@@ -11,7 +11,8 @@ module.exports = {
 		years = now.diff(joined, 'years')
 		days = now.subtract(years, 'years').diff(joined, 'days')
 		hours = now.subtract(days, 'days').diff(joined, 'hours')
+		birthday = `${joined.format('Do of MMMM')}`
 
-		message.channel.send(`I have been in this server for ${years ? `${years} years, ` : ''}${days} days and ${hours} hours.`)
+		message.channel.send(`I have been in this server for ${years ? `${years} years, ` : ''}${days} days and ${hours} hours. My birthday is ${birthday}`)
 	}
 }
