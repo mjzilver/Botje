@@ -6,7 +6,7 @@ module.exports = {
         var keyword = message.content.replace(/youtube /g, '')
 
         const options = {
-			url: `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${keyword}&key=${config.youtube_api_key}`,
+			url: `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${keyword}&key=${config.youtube_api_key}`,
 			json: true
 		}
 
