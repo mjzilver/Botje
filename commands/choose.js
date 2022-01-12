@@ -8,6 +8,6 @@ module.exports = {
 
 		var presets = ["You should", "You ought to", "I pick", "I tell you", "An Angel told me in a dream that", "The tarot card reads"]
 
-		message.reply(`${presets.pickRandom()} \`${items.pickRandom().normalizeSpaces()}\``)
+		message.reply(`${presets.pickRandom()} \`${items.pickRandom().trim()}\``)
 	}
 }
