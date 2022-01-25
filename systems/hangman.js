@@ -32,9 +32,9 @@ class hangman {
             return message.channel.send("A game of hangman is still ongoing use b!guess to guess!")
 
         let selectSQL = `SELECT message
-		FROM messages 
+        FROM messages 
         WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%"
-		ORDER BY random()
+        ORDER BY random()
         LIMIT 1`
 
         this.word = ""
