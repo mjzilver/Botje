@@ -11,7 +11,8 @@ var commands = {
     'vacuum' : require('../commandline/vacuum.js'),
     'cleanwebhooks' : require('../commandline/cleanwebhooks.js'),
     'webhooks' : require('../commandline/webhooks.js'),
-    'match' : require('../commandline/match.js')
+    'match' : require('../commandline/match.js'),
+    'report' : require('../commandline/report.js')
 }
 
 module.exports = commands
