@@ -4,7 +4,7 @@ module.exports = {
     'format': 'match [string]',
     'function': function match(input) {
         if(input.length >= 1) {
-            var spellchecked = spellcheck.checkSentence(input.join(' '));
+            var spellchecked = spellcheck.checkSentence(input.join(' '))
             logger.console(`Found match: '${spellchecked.result}' \nYou made ${spellchecked.mistakes} mistakes`)
         }
     }

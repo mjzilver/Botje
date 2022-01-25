@@ -37,6 +37,6 @@ Winston.loggers.add('logger', {
 Winston.addColors({
     console: 'grey',
     admin: 'yellow'
-});
+})
 
 module.exports = Winston.loggers.get('logger')

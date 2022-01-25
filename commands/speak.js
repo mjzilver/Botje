@@ -92,7 +92,7 @@ module.exports = {
                     if (words && words.length >= 1 && words[0]) {
                         if (words.length > 1) {
                             words.sort(function (a, b) {
-                                return b.length - a.length;
+                                return b.length - a.length
                             })
                             if (randomBetween(0, 1))
                                 words.sort(function (a, b) {

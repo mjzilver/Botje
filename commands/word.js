@@ -21,8 +21,7 @@ module.exports = {
                     throw err
                 } else {
                     var result = ""
-                    for (var i = 0;
-                        (i < rows.length && i <= 10); i++)
+                    for (var i = 0; (i < rows.length && i <= 10); i++)
                         result += `${rows[i]['user_name']} has said ${args[1]} ${rows[i]['count']} times! \n`
 
                     if (result == "")

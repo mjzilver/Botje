@@ -76,7 +76,7 @@ module.exports = {
                     }
 
                     sorted.sort(function (a, b) {
-                        return b[1] - a[1];
+                        return b[1] - a[1]
                     })
 
                     if (page > Math.ceil(sorted.length / 10))

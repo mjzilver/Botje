@@ -14,7 +14,7 @@ function sendMessage() {
 
 function guildSelected() {
     var selectedGuild = $(`#guildSelect`).val()
-    var first = null;
+    var first = null
 
     $('#channelSelect > option').each(function() {
         if ($(this).attr('guild') == selectedGuild) {
@@ -25,8 +25,8 @@ function guildSelected() {
             $(this).hide()
         }
     })
-    $("#channelSelect option:selected").prop("selected", false);
-    $(first).prop("selected", "selected");
+    $("#channelSelect option:selected").prop("selected", false)
+    $(first).prop("selected", "selected")
 }
 
 $(document).ready(function() {

@@ -50,12 +50,11 @@ module.exports = {
                     }
 
                     sorted.sort(function (a, b) {
-                        return b[1] - a[1];
+                        return b[1] - a[1]
                     })
 
                     var result = ""
-                    for (var i = 0;
-                        (i < sorted.length && i <= 10); i++)
+                    for (var i = 0; (i < sorted.length && i <= 10); i++)
                         result += `${sorted[i][0]} has an average of ${sorted[i][1]} syllables per post \n`
 
                     const top = new discord.MessageEmbed()

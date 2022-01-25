@@ -17,19 +17,19 @@ class Spellcheck {
                 rows.forEach(row => {
                     row.message.split(' ').forEach(word => {
                         if (!(word in this.wordList)) {
-                            this.wordList[word] = 1;
+                            this.wordList[word] = 1
                         } else {
                             this.wordList[word] = this.wordList[word] + 1
                         }
                     })
-                });
+                })
             }
         })
     }
 
     checkSentence(sentence) {
         var words = []
-        var mistakes = 0;
+        var mistakes = 0
 
         for (var word of sentence.split(' ')) {
             word = word.textOnly()

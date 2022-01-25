@@ -1,4 +1,4 @@
-var PNGImage = require('pngjs-image');
+var PNGImage = require('pngjs-image')
 
 module.exports = {
     'name': 'draw',
@@ -32,8 +32,8 @@ module.exports = {
             image.writeImage('./views/images/image.png', function (err) {
                 message.channel.send("Current image", {
                     files: ["./views/images/image.png"]
-                });
-            });
-        });
+                })
+            })
+        })
     }
 }

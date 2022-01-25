@@ -8,7 +8,7 @@ module.exports = {
         if (words[0] == 'match')
             words.shift()
 
-        var spellchecked = spellcheck.checkSentence(words.join(' '));
+        var spellchecked = spellcheck.checkSentence(words.join(' '))
 
         if(spellchecked.mistakes >= 1) {
             message.reply(`You made a mistake retard, it should be: \n"${spellchecked.result}"`)

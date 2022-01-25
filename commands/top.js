@@ -21,8 +21,7 @@ module.exports = {
                     throw err
                 } else {
                     var result = ""
-                    for (var i = 0;
-                        (i < rows.length && i <= 10); i++)
+                    for (var i = 0; (i < rows.length && i <= 10); i++)
                         result += `${rows[i]['message']} was said ${rows[i]['count']} times \n`
 
                     const top = new discord.MessageEmbed()
@@ -48,8 +47,7 @@ module.exports = {
                     throw err
                 } else {
                     var result = ""
-                    for (var i = 0;
-                        (i < rows.length && i <= 10); i++)
+                    for (var i = 0; (i < rows.length && i <= 10); i++)
                         result += `${rows[i]['message']} was said ${rows[i]['count']} times \n`
 
                     const top = new discord.MessageEmbed()
