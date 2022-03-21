@@ -45,7 +45,7 @@ module.exports = {
                 if (err)
                     throw err
                 else
-                    message.channel.send(`Ive found ${row['count']} messages from${mention.username} in this server that contain ${args[2]}`)
+                    message.channel.send(`Ive found ${row['count']} messages from ${mention.username} in this server that contain ${args[2]}`)
             })
         } else {
             let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
