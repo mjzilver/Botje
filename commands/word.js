@@ -9,12 +9,12 @@ module.exports = {
 
         if (args[2] == "?") {
             let selectSQL = `SELECT user_id, user_name, count(message) as count
-        FROM messages
-        WHERE message LIKE ? AND server = ?
-        GROUP BY user_id
-        HAVING count > 1
-        ORDER BY count DESC 
-        LIMIT 10`
+            FROM messages
+            WHERE message LIKE ? AND server = ?
+            GROUP BY user_id
+            HAVING count > 1
+            ORDER BY count DESC 
+            LIMIT 10`
 
             db.all(selectSQL, ['%' + args[1].removeQuotes() + '%', message.guild.id], (err, rows) => {
                 if (err) {
@@ -37,9 +37,9 @@ module.exports = {
             })
         } else if (args[2] && mention) {
             let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-        FROM messages
-        WHERE message LIKE ? 
-        AND server = ? AND user_id = ? `
+            FROM messages
+            WHERE message LIKE ? 
+            AND server = ? AND user_id = ? `
 
             db.get(selectSQL, ['%' + args[2].removeQuotes() + '%', message.guild.id, mention.id], (err, row) => {
                 if (err)
@@ -49,8 +49,8 @@ module.exports = {
             })
         } else {
             let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-        FROM messages
-        WHERE message LIKE ? AND server = ? `
+            FROM messages
+            WHERE message LIKE ? AND server = ? `
 
             db.get(selectSQL, ['%' + args[1].removeQuotes() + '%', message.guild.id], (err, row) => {
                 if (err)
