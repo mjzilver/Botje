@@ -20,7 +20,8 @@ var commands = {
    'choose' : require('../commands/choose.js'),
    'match' : require('../commands/match.js'),
    'roll' : require('../commands/roll.js'),
-   'youtube' : require('../commands/youtube.js')
+   'youtube' : require('../commands/youtube.js'),
+   'meme': require('../commands/meme.js')
 }
 
 module.exports = commands
