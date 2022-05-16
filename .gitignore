@@ -80,3 +80,6 @@ json/disallowed.json
 
 # dont include the drawboard
 views/images/image.png
+
+#
+assets/meme.png
