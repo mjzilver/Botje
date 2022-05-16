@@ -2,8 +2,8 @@ var Jimp = require("jimp");
 
 module.exports = {
     'name': 'meme',
-    'description': 'turn an image into a meme',
-    'format': 'meme [link to image] [top text - bottom text]',
+    'description': 'turn an image into a meme, include picture by uploading, replying or URL',
+    'format': 'meme (link to image) (top text) - (bottom text)',
     'function': async function roll(message) {
         var args = message.content.split(' ')
         args.shift()
