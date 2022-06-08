@@ -102,7 +102,8 @@ function findTopic(message, topic) {
     var selectSQL = `SELECT LOWER(message) as message
     FROM messages
     WHERE message LIKE "%${topic} is%" OR message LIKE "%${topic} are%" 
-    AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" `
+    AND message NOT LIKE "%<%" AND message NOT LIKE "%:%"
+    ORDER BY random() `
 
     database.db.all(selectSQL, [], (err, rows) => {
         if (err)
@@ -116,9 +117,9 @@ function findTopic(message, topic) {
 
         var regStr = `\\b(is|are)\\b`
 
-        var first = rows[randomBetween(0, rows.length - 1)].message
-        var second = rows[randomBetween(0, rows.length - 1)].message
-        var third = rows[randomBetween(0, rows.length - 1)].message
+        var first = rows[0].message
+        var second = rows[1].message
+        var third = rows[2].message
 
         logger.console(`Picked terms related to '${topic}', first '${first}', second '${second}', third '${third}'`)
 

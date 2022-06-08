@@ -12,6 +12,15 @@ class Database {
         this.db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER, y INTEGER, red INTEGER, green INTEGER, blue INTEGER, PRIMARY KEY(x,y))`)
     }
 
+    query(selectSQL, parameters = [], callback) {
+        database.db.all(selectSQL, parameters, (err, rows) => {
+            if (err)
+                throw err
+            else
+                callback(rows)
+        })
+    }
+
     storemessage(message) {
         if (message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")) && !message.content.match(new RegExp("^t!", "i"))) {
             message.guild.members.fetch(message.author.id).then(

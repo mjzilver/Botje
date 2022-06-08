@@ -1,4 +1,4 @@
-var Jimp = require("jimp");
+var Jimp = require("jimp")
 
 module.exports = {
     'name': 'meme',
@@ -17,20 +17,17 @@ module.exports = {
         }
 
         if (url !== '') {
-            if (args[0].indexOf("http") == 0) {
-                url = args[0]
-                args.shift()
-            }
+            if (args[0].indexOf("http") == 0) 
+                url = args.shift()
 
-            args = args.join(' ')
-            args = args.split('-')
+            args = args.join(' ').split('-')
 
             var top = args[0]?.trim() ?? ''
             var bottom = args[1]?.trim() ?? ''
 
             processPicture(url, top, bottom, message)
         } else {
-            message.reply("You must include a picture")
+            message.reply("You must include a picture; you can link an url, upload a picture of reply to a picture")
         }
     }
 }
