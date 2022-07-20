@@ -9,7 +9,7 @@ module.exports = {
 
         if (mentioned && args[2]) {
             mention(message, mentioned, args[2].removeQuotes())
-        } else if (args[1] == "?") {
+        } else if (args[1] == "?" && args[2]) {
             perPerson(message, args[2].removeQuotes())
         } else if (args[1]) {
             total(message, args[1].removeQuotes())
