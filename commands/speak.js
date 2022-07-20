@@ -37,7 +37,7 @@ function findByWord(message) {
             }
         }
 
-        const words = message.content.split(' ')
+        var words = message.content.split(' ')
         if (words[0] == 'speak')
             words.shift()
 
@@ -54,26 +54,62 @@ function findByWord(message) {
                     })
             }
 
-            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
+            if (words.length > 1) {
+                var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
+                WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+                AND len < 100 AND (len - spaces) >= 2 
+                AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
+                ORDER BY RANDOM()`
+
+                database.db.all(selectSQL, [], (err, rows) => {
+                    if (err)
+                        throw err
+                    else {
+                        if (rows) {
+                            logger.console(`Sending message with '${words.join(",")}' in it`)
+
+                            var highestAmount = 0
+                            var chosenMessage = ''
+
+                            for (var i = 0; i < rows.length; i++) {
+                                var amount = 0
+                                for (var j = 0; j < words.length; j++) {
+                                    if (rows[i]['message'].match(new RegExp(words[j], 'gmi'))) 
+                                        amount += 30 - (j * j)
+                                }
+                                if (amount > highestAmount) {
+                                    chosenMessage = rows[i]['message']
+                                    highestAmount = amount
+                                }
+                            }
+
+                            logger.console(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
+                            message.channel.send(chosenMessage)
+                        } else
+                            findRandom(message)
+                    }
+                })
+            } else {
+                var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
                 WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
                 AND len < 100 AND (len - spaces) >= 2 
                 AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
                 ORDER BY RANDOM()
                 LIMIT 1`
 
-            logger.console(`Sending message with '${words[0]}' in it`)
-
-            database.db.get(selectSQL, [], (err, row) => {
-                if (err)
-                    throw err
-                else {
-                    if (row)
-                        message.channel.send(row['message'].normalizeSpaces())
-                    else 
-                        findRandom(message)
-                }
-            })
-        } else 
+                database.db.get(selectSQL, [], (err, row) => {
+                    if (err)
+                        throw err
+                    else {
+                        if (row) {
+                            logger.console(`Sending message with '${words[0]}' in it`)
+                            message.channel.send(row['message'].normalizeSpaces())
+                        } else
+                            findRandom(message)
+                    }
+                })
+            }
+        } else
             findRandom(message)
     })
 }
@@ -93,7 +129,7 @@ function findRandom(message) {
     database.db.get(selectSQL, [], (err, row) => {
         if (err)
             throw err
-        else 
+        else
             message.channel.send(row['message'].normalizeSpaces())
     })
 }
@@ -131,11 +167,11 @@ function findTopic(message, topic) {
 
         var picker = randomBetween(0, 2)
 
-        if (picker == 0) 
+        if (picker == 0)
             message.reply(`${first}`.normalizeSpaces())
-        else if (picker == 1) 
+        else if (picker == 1)
             message.reply(`${first} ${linkerwords.pickRandom()} ${second}`.normalizeSpaces())
-        else 
+        else
             message.reply(`${first}, ${second} ${linkerwords.pickRandom()} ${third}`.normalizeSpaces())
     })
 }
