@@ -28,7 +28,7 @@ function nukechannel(channelId) {
     if (channel && channel.type == "GUILD_TEXT")  {
         nukemessages(channel, channel.lastMessageId)
         channel.lastMessage.delete({ timeout : 100 })
-        logger.warn( `NUKING channel: ${channel.name}`)
+        logger.warn(`NUKING channel: ${channel.name}`)
     } else
         logger.console('Channel not found')
 }

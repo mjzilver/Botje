@@ -29,8 +29,7 @@ module.exports = {
             var path = './assets/meme_templates'
             var files = fs.readdirSync(path)
             let chosenFile = files[Math.floor(Math.random() * files.length)] 
-            console.log(chosenFile)
-
+            
             processPicture(`${path}/${chosenFile}`, top, bottom, message)
         }
     }
@@ -39,6 +38,10 @@ module.exports = {
 async function processPicture(url, top, bottom, message) {
     var image = await Jimp.read(url)
     const font = await Jimp.loadFont('./assets/font.fnt')
+
+    if(image.bitmap.width < 500 || image.bitmap.height < 500) {
+        image = image.resize(550, Jimp.AUTO)
+    }
 
     image.print(font, 0, 0, {
         text: top,
