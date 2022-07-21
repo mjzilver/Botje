@@ -16,18 +16,22 @@ module.exports = {
             url = getURL(message)
         }
 
+        if (args[0].indexOf("http") == 0) 
+        url = args.shift()
+
+        args = args.join(' ').split('-')
+        var top = args[0]?.trim() ?? ''
+        var bottom = args[1]?.trim() ?? ''
+
         if (url !== '') {
-            if (args[0].indexOf("http") == 0) 
-                url = args.shift()
-
-            args = args.join(' ').split('-')
-
-            var top = args[0]?.trim() ?? ''
-            var bottom = args[1]?.trim() ?? ''
-
             processPicture(url, top, bottom, message)
         } else {
-            message.reply("You must include a picture; you can link an url, upload a picture of reply to a picture")
+            var path = './assets/meme_templates'
+            var files = fs.readdirSync(path)
+            let chosenFile = files[Math.floor(Math.random() * files.length)] 
+            console.log(chosenFile)
+
+            processPicture(`${path}/${chosenFile}`, top, bottom, message)
         }
     }
 }

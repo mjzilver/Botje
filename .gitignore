@@ -81,5 +81,6 @@ json/disallowed.json
 # dont include the drawboard
 views/images/image.png
 
-#
+# dont include the meme and the meme_templates
 assets/meme.png
+assets/meme_templates/*
