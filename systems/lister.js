@@ -3,27 +3,35 @@ class Lister {
     }
 
     process(message) {
-        const mention = message.mentions.users.first()
-        if(mention)
-            mention(message)
-        else {
-            
-        }
+        const mentioned = message.mentions.users.first()
+        const args = message.content.split(' ')
+
+		if (args.length == 1) {
+			total(message)
+		} else if (mentioned) {
+			mention(message, mentioned)
+		} else if (args[1] == "?") {
+			perPerson(message)
+		} else if (args[1] == "%") {
+			percentage(message)
+		} else {
+            message.reply('Incorrect format')
+		}
     }
 
-    mention() {
-        
+    total(message) {
+        message.reply('This command does not work without a target')
+    }
+
+    mention(message, mentioned) {
+        message.reply('This command does not work with @')
     }
     
-    perPerson() {
-        
+    perPerson(message) {
+        message.reply('This command does not work with ?')
     }
 
-    perTopic() {
-        
-    }
-
-    percentage() {
-        
+    percentage(message) {
+        message.reply('This command does not work with %')
     }
 }

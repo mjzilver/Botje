@@ -1,7 +1,7 @@
 {
   "name": "botje",
-  "version": "12.1.1",
-  "description": "Pet-project discord bot for the thinking man",
+  "version": "12.1.2",
+  "description": "Pet-project; discord bot for the thinking man",
   "main": "start.js",
   "author": "Mick Jari",
   "email": "4ilverj@gmail.com",

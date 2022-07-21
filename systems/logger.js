@@ -1,4 +1,4 @@
-const Winston = require('winston');
+const Winston = require('winston')
 
 const { combine, timestamp, colorize, printf, json} = Winston.format
 
