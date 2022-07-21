@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "12.1.7",
+  "version": "12.1.8",
   "description": "Pet-project; discord bot for the thinking man",
   "main": "start.js",
   "author": "Mick Jari",

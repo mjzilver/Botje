@@ -73,7 +73,11 @@ class Bot {
 
                 if (!replysystem.process(message)) {
                     if ((this.messageCounter >= config.speakEvery || randomBetween(1, 20) == 1) && timepassed >= randomBetween(20, 60)) {
-                        this.commands['speak'].function(message)
+                        if(message.attachments.size >= 1 || message.embeds.length >= 1) {
+                            this.commands['meme'].function(message)
+                        } else {
+                            this.commands['speak'].function(message)
+                        }
                         this.lastMessageSent = currentTimestamp
                         this.messageCounter = 0
                     } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {

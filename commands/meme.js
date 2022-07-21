@@ -23,7 +23,7 @@ module.exports = {
         var top = args[0]?.trim() ?? ''
         var bottom = args[1]?.trim() ?? ''
 
-        if (url !== '') {
+        if (url.match(/\.(jpeg|jpg|gif|png)/gi)) {
             processPicture(url, top, bottom, message)
         } else {
             var path = './assets/meme_templates'
@@ -39,9 +39,7 @@ async function processPicture(url, top, bottom, message) {
     var image = await Jimp.read(url)
     const font = await Jimp.loadFont('./assets/font.fnt')
 
-    if(image.bitmap.width < 500 || image.bitmap.height < 500) {
-        image = image.resize(550, Jimp.AUTO)
-    }
+    image = image.resize(800, Jimp.AUTO)
 
     image.print(font, 0, 0, {
         text: top,
