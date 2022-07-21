@@ -21,6 +21,7 @@ var commands = {
    'match' : require('../commands/match.js'),
    'roll' : require('../commands/roll.js'),
    'youtube' : require('../commands/youtube.js'),
+   'getemote' : require('../commands/getemote.js'),
    'meme': require('../commands/meme.js')
 }
 
