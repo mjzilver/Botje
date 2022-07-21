@@ -71,9 +71,7 @@ function percentage(message, word) {
     let selectSQL = `SELECT user_id, user_name, count(message) as count,
         (SElECT COUNT(m2.message) 
         FROM messages AS m2
-        WHERE m2.message NOT LIKE "%<%" 
-        AND m2.message NOT LIKE "%:%"
-        AND m2.user_id = messages.user_id
+        WHERE m2.user_id = messages.user_id
         AND m2.server = messages.server) as total
     FROM messages
     WHERE message LIKE ?
