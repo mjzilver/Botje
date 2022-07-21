@@ -18,7 +18,26 @@ body {
     border-collapse: separate;
     border-radius: 3px;
     border: 3px groove darkslategray;
-    background-color: whitesmoke;
+    background-color: black;
+    font-family: consolas;
+    color: white;
+    table-layout: fixed;
+}
+
+#log td {
+    padding: 0.1rem !important;
+}
+
+#log th.level {
+    width: 5%;
+}
+
+#log th.message {
+    width: 80%;
+}
+
+#log th.timestamp {
+    width: 15%;
 }
 
 #errorlabel {

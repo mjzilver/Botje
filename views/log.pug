@@ -10,9 +10,9 @@ block content
         
     table(class='table table-striped' id='log')
         thead(class='thead-dark')
-            th(scope='col') Level
-            th(scope='col') Message
-            th(scope='col') Timestamp
+            th(scope='col' class='level') Level
+            th(scope='col' class='message') Message
+            th(scope='col' class='timestamp') Timestamp
         each val in list.length ? list : [{'message': 'Cant find any log'}]
             tr
                 td= val.level
