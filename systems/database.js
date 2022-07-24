@@ -61,7 +61,6 @@ class Database {
             if (i != max - 1)
                 nonSelectorsRegex += '|'
         }
-        console.log(nonSelectorsRegex)
         return new RegExp(`\\b((${nonSelectorsRegex})\\s)\\b`, "gmi")
     }
 
