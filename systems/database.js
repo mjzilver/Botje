@@ -4,12 +4,53 @@ class Database {
         this.db = new this.sqlite3.Database("./discord.db")
 
         this.initializeDatabase()
+        this.generateNonselectors()
+        this.nonSelectors = []
     }
 
     initializeDatabase() {
         this.db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
         this.db.run(`CREATE TABLE IF NOT EXISTS messages (user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, server TEXT, PRIMARY KEY(user_id, date, channel))`)
         this.db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER, y INTEGER, red INTEGER, green INTEGER, blue INTEGER, PRIMARY KEY(x,y))`)
+    }
+
+    generateNonselectors() {
+        let selectSQL = `SELECT LOWER(message) as message
+        FROM messages
+        WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND message NOT LIKE ""`
+
+        var wordHolder = {}
+
+        this.db.all(selectSQL, [], (err, rows) => {
+            for (var i = 0; i < rows.length; i++) {
+                var words = rows[i]['message'].split(/\s+/)
+
+                for (let j = 0; j < words.length; j++) {
+                    if (!wordHolder[words[j]])
+                        wordHolder[words[j]] = 1
+                    else
+                        wordHolder[words[j]]++
+                }
+            }
+      
+            for (var word in wordHolder) {
+                this.nonSelectors.push([word, wordHolder[word]]);
+            }
+            this.nonSelectors.sort(function (a, b) {
+                return b[1] - a[1]
+            })
+
+            fs.writeFile('./backups/words.json', JSON.stringify(this.nonSelectors), function (err) {
+                if (err)
+                    logger.error(err)
+            })
+        })
+    }
+
+    getNonSelectors(amount = 100) {
+        var returnArray = [...this.nonSelectors]
+        returnArray.length = amount
+        return returnArray
     }
 
     query(selectSQL, parameters = [], callback) {
@@ -27,7 +68,7 @@ class Database {
                 (result) => {
                     this.insertmessage(message)
                 },
-                (error) => {})
+                (error) => { })
         }
     }
 

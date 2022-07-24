@@ -17,101 +17,95 @@ function findByWord(message) {
     var earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
 
-    let topWordsSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-    FROM messages
-    WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
-    GROUP BY message
-    HAVING count > 1
-    ORDER BY count DESC 
-    LIMIT 100`
+    message.content = message.content.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '')
+    message.content = message.content.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '')
+    message.content = message.content.textOnly()
 
-    database.db.all(topWordsSQL, [], (err, filters) => {
-        message.content = message.content.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '')
-        message.content = message.content.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '')
-        message.content = message.content.textOnly()
+    var nonSelectors = database.getNonSelectors()
+    var nonSelectorsRegex = `\\b((`
+    for (var i = 0; i < nonSelectors.length; i++) {
+        nonSelectorsRegex += nonSelectors[i][0]
+        if(i != nonSelectors.length-1)
+            nonSelectorsRegex += '|'
+    }
+    nonSelectorsRegex += `)\\s)\\b`
+    message.content = message.content.replace(new RegExp(nonSelectorsRegex, "gmi"), '').trim()
 
-        for (var i = 0; i < filters.length - 1; i++) {
-            if (filters[i].message.textOnly()) {
-                var regStr = `\\b(${filters[i].message})\\b`
-                message.content = message.content.replace(new RegExp(regStr, "gi"), '').trim()
-            }
+    var words = message.content.split(' ')
+    if (words[0] == 'speak')
+        words.shift()
+
+    if (words && words.length >= 1 && words[0]) {
+        if (words.length > 1) {
+            words.sort(function (a, b) {
+                return b.length - a.length
+            })
+            if (randomBetween(0, 1))
+                words.sort(function (a, b) {
+                    let al = a.match(/(?:[aeiouy]{1,2})/gi)
+                    let bl = b.match(/(?:[aeiouy]{1,2})/gi)
+                    return (bl ? bl.length : 0) - (al ? al.length : 0)
+                })
         }
 
-        var words = message.content.split(' ')
-        if (words[0] == 'speak')
-            words.shift()
-
-        if (words && words.length >= 1 && words[0]) {
-            if (words.length > 1) {
-                words.sort(function (a, b) {
-                    return b.length - a.length
-                })
-                if (randomBetween(0, 1))
-                    words.sort(function (a, b) {
-                        let al = a.match(/(?:[aeiouy]{1,2})/gi)
-                        let bl = b.match(/(?:[aeiouy]{1,2})/gi)
-                        return (bl ? bl.length : 0) - (al ? al.length : 0)
-                    })
-            }
-
-            if (words.length > 1) {
-                var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
+        if (words.length > 1) {
+            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
                 WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
                 AND len < 100 AND (len - spaces) >= 2 
                 AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
                 ORDER BY RANDOM()`
 
-                database.db.all(selectSQL, [], (err, rows) => {
-                    if (err)
-                        throw err
-                    else {
-                        if (rows) {
-                            logger.console(`Sending message with '${words.join(",")}' in it`)
+            database.db.all(selectSQL, [], (err, rows) => {
+                if (err)
+                    throw err
+                else {
+                    if (rows) {
+                        logger.console(`Sending message with '${words.join(",")}' in it`)
 
-                            var highestAmount = 0
-                            var chosenMessage = ''
+                        var highestAmount = 0
+                        var chosenMessage = ''
 
-                            for (var i = 0; i < rows.length; i++) {
-                                var amount = 0
-                                for (var j = 0; j < words.length; j++) {
-                                    if (rows[i]['message'].match(new RegExp(words[j], 'gmi'))) 
-                                        amount += 30 - (j * j)
-                                }
-                                if (amount > highestAmount) {
-                                    chosenMessage = rows[i]['message']
-                                    highestAmount = amount
-                                }
+                        for (var i = 0; i < rows.length; i++) {
+                            var amount = 0
+                            for (var j = 0; j < words.length; j++) {
+                                if (rows[i]['message'].match(new RegExp(words[j], 'gmi')))
+                                    amount += 30 - (j * j)
                             }
+                            if (amount > highestAmount) {
+                                chosenMessage = rows[i]['message']
+                                highestAmount = amount
+                            }
+                        }
 
-                            logger.console(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
-                            message.channel.send(chosenMessage)
-                        } else
-                            findRandom(message)
-                    }
-                })
-            } else {
-                var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
+                        logger.console(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
+                        message.channel.send(chosenMessage)
+                    } else
+                        findRandom(message)
+                }
+            })
+        } else {
+            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
                 WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
                 AND len < 100 AND (len - spaces) >= 2 
                 AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
                 ORDER BY RANDOM()
                 LIMIT 1`
 
-                database.db.get(selectSQL, [], (err, row) => {
-                    if (err)
-                        throw err
-                    else {
-                        if (row) {
-                            logger.console(`Sending message with '${words[0]}' in it`)
-                            message.channel.send(row['message'].normalizeSpaces())
-                        } else
-                            findRandom(message)
-                    }
-                })
-            }
-        } else
-            findRandom(message)
-    })
+            database.db.get(selectSQL, [], (err, row) => {
+                if (err)
+                    throw err
+                else {
+                    if (row) {
+                        logger.console(`Sending message with '${words[0]}' in it`)
+                        message.channel.send(row['message'].normalizeSpaces())
+                    } else
+                        findRandom(message)
+                }
+            })
+        }
+    } else
+        findRandom(message)
+
 }
 
 function findRandom(message) {
