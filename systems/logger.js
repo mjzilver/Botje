@@ -25,7 +25,7 @@ Winston.loggers.add('logger', {
         }),
         new(Winston.transports.File)({
             filename: 'bot.log',
-            level: 'debug',
+            level: 'admin',
             format: combine(
                 timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
                 json()

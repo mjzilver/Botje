@@ -5,7 +5,7 @@ block content
 
     <br/>
     select(name='dropDown',class="custom-select", id='levelSelect')
-        each val in ['none','debug', 'info', 'warn', 'error']
+        each val in ['none','debug', 'info', 'warn', 'error', 'console', 'admin']
             option(onclick="selectLevel()")=val
         
     table(class='table table-striped' id='log')
