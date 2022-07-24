@@ -15,23 +15,24 @@ module.exports = {
 
 function findByWord(message) {
     var earliest = new Date()
+    var editedText = message.content
     earliest.setMonth(earliest.getMonth() - 5)
 
-    message.content = message.content.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '')
-    message.content = message.content.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '')
-    message.content = message.content.textOnly()
+    editedText = editedText.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '')
+    editedText = editedText.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '')
+    editedText = editedText.textOnly()
 
     var nonSelectors = database.getNonSelectors()
     var nonSelectorsRegex = `\\b((`
     for (var i = 0; i < nonSelectors.length; i++) {
         nonSelectorsRegex += nonSelectors[i][0]
-        if(i != nonSelectors.length-1)
+        if (i != nonSelectors.length - 1)
             nonSelectorsRegex += '|'
     }
     nonSelectorsRegex += `)\\s)\\b`
-    message.content = message.content.replace(new RegExp(nonSelectorsRegex, "gmi"), '').trim()
+    editedText = editedText.replace(new RegExp(nonSelectorsRegex, "gmi"), '').trim()
 
-    var words = message.content.split(' ')
+    var words = editedText.split(' ')
     if (words[0] == 'speak')
         words.shift()
 
@@ -72,8 +73,10 @@ function findByWord(message) {
                                     amount += 30 - (j * j)
                             }
                             if (amount > highestAmount) {
-                                chosenMessage = rows[i]['message']
-                                highestAmount = amount
+                                if (logic.levenshtein(rows[i]['message'], message.content) > 15) {
+                                    chosenMessage = rows[i]['message']
+                                    highestAmount = amount
+                                }
                             }
                         }
 

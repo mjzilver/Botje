@@ -32,7 +32,7 @@ class Database {
                         wordHolder[words[j]]++
                 }
             }
-      
+
             for (var word in wordHolder) {
                 this.nonSelectors.push([word, wordHolder[word]]);
             }
@@ -68,7 +68,7 @@ class Database {
                 (result) => {
                     this.insertmessage(message)
                 },
-                (error) => { })
+                (error) => {})
         }
     }
 

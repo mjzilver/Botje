@@ -5,6 +5,7 @@ global.config = require('./config.json')
 
 global.logger = require('./systems/logger.js')
 global.database = require('./systems/database.js')
+global.logic = require('./systems/logic.js')
 global.commandline = require('./systems/commandline.js')
 global.bot = require('./systems/bot.js')
 global.web = require('./systems/web.js')
