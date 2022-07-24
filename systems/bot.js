@@ -44,7 +44,7 @@ class Bot {
         })
 
         this.client.on('messageCreate', message => {
-            database.storemessage(message)
+            database.storeMessage(message)
 
             // look for the b! meaning bot command
             if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)) {
@@ -55,7 +55,7 @@ class Bot {
 
                 logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
 
-                if (this.isUserAllowed(message) || message.member.permissions.has("ADMINISTRATOR")) {
+                if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message)) {
                     if (command in this.commands) {
                         return this.commands[command].function(message)
                     } else if (command in this.admincommands) {
@@ -81,7 +81,7 @@ class Bot {
                         this.lastMessageSent = currentTimestamp
                         this.messageCounter = 0
                     } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
-                        if (this.isUserAllowed(message))
+                        if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message))
                             this.commands['speak'].function(message)
                     }
                 }

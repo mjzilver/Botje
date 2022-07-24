@@ -25,7 +25,7 @@ function catalog(channel, messageid, amount, loop = 0) {
     }).then(messages => messages.forEach(
         (message) => {
             itemsProcessed++
-            database.storemessage(message)
+            database.storeMessage(message)
             
             if (itemsProcessed === messages.size) {
                 if (itemsProcessed == 100) {

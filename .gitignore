@@ -72,6 +72,9 @@ discord.db-journal
 discord.db.sqbpro
 discord.db*
 
+# dont include the words
+assets/words.json
+
 # no backups
 backups/
 

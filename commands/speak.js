@@ -21,7 +21,7 @@ function findByWord(message) {
     editedText = editedText.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '')
     editedText = editedText.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '')
     editedText = editedText.textOnly()
-    editedText = editedText.replace(database.getNonSelectorsRegex(), '').trim()
+    editedText = editedText.replace(nonselector.getNonSelectorsRegex(), '').trim()
 
     var words = editedText.split(' ')
     if (words[0] == 'speak')
@@ -52,7 +52,7 @@ function findByWord(message) {
                     throw err
                 else {
                     if (rows) {
-                        logger.console(`Sending message with '${words.join(",")}' in it`)
+                        logger.debug(`Sending message with '${words.join(",")}' in it`)
 
                         var highestAmount = 0
                         var chosenMessage = ''
@@ -71,7 +71,7 @@ function findByWord(message) {
                             }
                         }
 
-                        logger.console(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
+                        logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
                         message.channel.send(chosenMessage)
                     } 
                 }
@@ -89,7 +89,7 @@ function findByWord(message) {
                     throw err
                 else {
                     if (row) {
-                        logger.console(`Sending message with '${words[0]}' in it`)
+                        logger.debug(`Sending message with '${words[0]}' in it`)
                         message.channel.send(row['message'].normalizeSpaces())
                     }
                 }
@@ -100,7 +100,7 @@ function findByWord(message) {
 }
 
 function findRandom(message) {
-    logger.console(`Sending randomly selected message`)
+    logger.debug(`Sending randomly selected message`)
 
     var earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
@@ -131,7 +131,7 @@ function findTopic(message, topic) {
             throw err
 
         if (rows.length < 3) {
-            logger.console(`Not enough info about topic -- redirecting to the regular method`)
+            logger.debug(`Not enough info about topic -- redirecting to the regular method`)
             message.content = message.content.replace(/(about|think|of)/ig, "")
             return findByWord(message)
         }
@@ -142,7 +142,7 @@ function findTopic(message, topic) {
         var second = rows[1].message
         var third = rows[2].message
 
-        logger.console(`Picked terms related to '${topic}', first '${first}', second '${second}', third '${third}'`)
+        logger.debug(`Picked terms related to '${topic}', first '${first}', second '${second}', third '${third}'`)
 
         first = first.substring(first.indexOf(topic.toLowerCase()))
         second = second.substring(second.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), '')

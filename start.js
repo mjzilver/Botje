@@ -3,6 +3,9 @@ global.discord = require('discord.js')
 global.package = require('./package.json')
 global.config = require('./config.json')
 
+global.request = require('request')
+global.fs = require('fs')
+
 global.logger = require('./systems/logger.js')
 global.database = require('./systems/database.js')
 global.logic = require('./systems/logic.js')
@@ -13,9 +16,7 @@ global.backupsystem = require('./systems/backup.js')
 global.replysystem = require('./systems/reply.js')
 global.webhook = require('./systems/webhook.js')
 global.spellcheck = require('./systems/spellcheck.js')
-
-global.fs = require('fs')
-global.request = require('request')
+global.nonselector = require('./systems/nonselector.js')
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1).toLocaleLowerCase()

@@ -46,7 +46,6 @@ function mention(message, mentioned) {
         userdata['score'] = Math.round(userdata['total'] * userdata['quality'])
 
         message.channel.send(`${mentioned.username}'s post score is ${userdata['score']}`)
-
     })
 }
 
@@ -71,7 +70,6 @@ function perPerson(message) {
                 }
 
             userdata[user_name]['points'] += calculateScore(rows[i]['message'])
-
             userdata[user_name]['total'] += rows[i]['message'].length
         }
 
