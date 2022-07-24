@@ -21,16 +21,7 @@ function findByWord(message) {
     editedText = editedText.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '')
     editedText = editedText.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '')
     editedText = editedText.textOnly()
-
-    var nonSelectors = database.getNonSelectors()
-    var nonSelectorsRegex = `\\b((`
-    for (var i = 0; i < nonSelectors.length; i++) {
-        nonSelectorsRegex += nonSelectors[i][0]
-        if (i != nonSelectors.length - 1)
-            nonSelectorsRegex += '|'
-    }
-    nonSelectorsRegex += `)\\s)\\b`
-    editedText = editedText.replace(new RegExp(nonSelectorsRegex, "gmi"), '').trim()
+    editedText = editedText.replace(database.getNonSelectorsRegex(), '').trim()
 
     var words = editedText.split(' ')
     if (words[0] == 'speak')
@@ -82,8 +73,7 @@ function findByWord(message) {
 
                         logger.console(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
                         message.channel.send(chosenMessage)
-                    } else
-                        findRandom(message)
+                    } 
                 }
             })
         } else {
@@ -101,13 +91,11 @@ function findByWord(message) {
                     if (row) {
                         logger.console(`Sending message with '${words[0]}' in it`)
                         message.channel.send(row['message'].normalizeSpaces())
-                    } else
-                        findRandom(message)
+                    }
                 }
             })
         }
-    } else
-        findRandom(message)
+    }
 
 }
 

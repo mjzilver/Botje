@@ -53,6 +53,18 @@ class Database {
         return returnArray
     }
 
+    getNonSelectorsRegex(amount = 100) {
+        var nonSelectorsRegex = ''
+        var max = (this.nonSelectors.length < amount) ? this.nonSelectors.length : amount
+        for (var i = 0; i < max; i++) {
+            nonSelectorsRegex += this.nonSelectors[i][0] 
+            if (i != max - 1)
+                nonSelectorsRegex += '|'
+        }
+        console.log(nonSelectorsRegex)
+        return new RegExp(`\\b((${nonSelectorsRegex})\\s)\\b`, "gmi")
+    }
+
     query(selectSQL, parameters = [], callback) {
         database.db.all(selectSQL, parameters, (err, rows) => {
             if (err)
