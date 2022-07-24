@@ -4,6 +4,7 @@ class NonSelector {
         this.nonSelectorPath = './assets/words.json'
         this.initializeNonselectors()
     }
+    
     initializeNonselectors() {
         if (fs.existsSync(this.nonSelectorPath)) {
             this.nonSelectors = JSON.parse(fs.readFileSync(this.nonSelectorPath))
