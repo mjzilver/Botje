@@ -6,7 +6,7 @@ module.exports = {
 		const args = message.content.split(' ')
 		const mentioned = message.mentions.users.first()
 		var page = (args[2] ? args[2] - 1 : 0)
-	
+
 		if (args.length == 1) {
 			total(message)
 		} else if (mentioned) {

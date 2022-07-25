@@ -1,5 +1,5 @@
 class Backup {
-    constructor() {}
+    constructor() { }
 
     saveEmoji(emoji, filename = "") {
         var guildpath = './backups/emotes/' + emoji.guild.id

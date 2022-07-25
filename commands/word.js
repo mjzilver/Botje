@@ -86,11 +86,11 @@ function percentage(message, word) {
         var resultArray = []
         for (var i = 0; (i < rows.length && i <= 10); i++) {
             var percentage = ((parseInt(rows[i]['count']) / parseInt(rows[i]['total'])) * 100).toFixed(3)
-            resultArray.push({'percentage': percentage, 'user_name': rows[i]['user_name']})
+            resultArray.push({ 'percentage': percentage, 'user_name': rows[i]['user_name'] })
         }
-        resultArray.sort(function(a, b){return b.percentage - a.percentage});
+        resultArray.sort(function (a, b) { return b.percentage - a.percentage });
 
-        for (var i = 0; i < resultArray.length; i++) 
+        for (var i = 0; i < resultArray.length; i++)
             result += `${resultArray[i]['user_name']} has said ${word} in ${resultArray[i]['percentage']}% of their messages! \n`
 
         if (result == "")

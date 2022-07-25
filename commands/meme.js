@@ -16,8 +16,8 @@ module.exports = {
             url = getURL(message)
         }
 
-        if (args[0].indexOf("http") == 0) 
-        url = args.shift()
+        if (args[0].indexOf("http") == 0)
+            url = args.shift()
 
         args = args.join(' ').split('-')
         var top = args[0]?.trim() ?? ''
@@ -28,8 +28,8 @@ module.exports = {
         } else {
             var path = './assets/meme_templates'
             var files = fs.readdirSync(path)
-            let chosenFile = files[Math.floor(Math.random() * files.length)] 
-            
+            let chosenFile = files[Math.floor(Math.random() * files.length)]
+
             processPicture(`${path}/${chosenFile}`, top, bottom, message)
         }
     }

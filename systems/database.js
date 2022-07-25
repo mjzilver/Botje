@@ -27,7 +27,7 @@ class Database {
                 (result) => {
                     this.insertMessage(message)
                 },
-                (error) => {})
+                (error) => { })
         }
     }
 

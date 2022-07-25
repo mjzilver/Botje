@@ -17,11 +17,11 @@ var commands = {
    'talk': require('../commands/talk.js'),
    'draw': require('../commands/draw.js'),
    "hangman": require('../commands/hangmanholder.js'),
-   'choose' : require('../commands/choose.js'),
-   'match' : require('../commands/match.js'),
-   'roll' : require('../commands/roll.js'),
-   'youtube' : require('../commands/youtube.js'),
-   'getemote' : require('../commands/getemote.js'),
+   'choose': require('../commands/choose.js'),
+   'match': require('../commands/match.js'),
+   'roll': require('../commands/roll.js'),
+   'youtube': require('../commands/youtube.js'),
+   'getemote': require('../commands/getemote.js'),
    'meme': require('../commands/meme.js')
 }
 

@@ -4,7 +4,7 @@ class NonSelector {
         this.nonSelectorPath = './assets/words.json'
         this.initializeNonselectors()
     }
-    
+
     initializeNonselectors() {
         if (fs.existsSync(this.nonSelectorPath)) {
             this.nonSelectors = JSON.parse(fs.readFileSync(this.nonSelectorPath))
@@ -57,7 +57,7 @@ class NonSelector {
         var nonSelectorsRegex = ''
         var max = (this.nonSelectors.length < amount) ? this.nonSelectors.length : amount
         for (var i = 0; i < max; i++) {
-            nonSelectorsRegex += this.nonSelectors[i][0] 
+            nonSelectorsRegex += this.nonSelectors[i][0]
             if (i != max - 1)
                 nonSelectorsRegex += '|'
         }

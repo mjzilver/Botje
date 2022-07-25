@@ -37,7 +37,7 @@ class Command {
             var timepassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes()
 
             if (!replysystem.process(message)) {
-                if ((this.messageCounter >= config.speakEvery || randomBetween(1, 20) == 1) && timepassed >= randomBetween(20, 60)) {
+                if ((this.messageCounter >= config.speakEvery || logic.randomBetween(1, 20) == 1) && timepassed >= logic.randomBetween(20, 60)) {
                     if (message.attachments.size >= 1 || message.embeds.length >= 1) {
                         this.commands['meme'].function(message)
                     } else {

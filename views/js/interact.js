@@ -16,10 +16,10 @@ function guildSelected() {
     var selectedGuild = $(`#guildSelect`).val()
     var first = null
 
-    $('#channelSelect > option').each(function() {
+    $('#channelSelect > option').each(function () {
         if ($(this).attr('guild') == selectedGuild) {
             $(this).show()
-            if(!first)
+            if (!first)
                 first = $(this)
         } else {
             $(this).hide()
@@ -29,6 +29,6 @@ function guildSelected() {
     $(first).prop("selected", "selected")
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     guildSelected()
 })

@@ -33,15 +33,15 @@ module.exports = {
                 }
 
                 var sentence = ""
-                var sentenceLength = randomBetween(8, 15)
+                var sentenceLength = logic.randomBetween(8, 15)
 
                 if (chain[""]) {
-                    var previousWord = chain[""][randomBetween(0, chain[""].length - 1)]
+                    var previousWord = chain[""][logic.randomBetween(0, chain[""].length - 1)]
                     sentence += previousWord
 
                     for (i = 0; i < sentenceLength - 1; i++) {
                         if (chain[previousWord]) {
-                            var currentWord = chain[previousWord][randomBetween(0, chain[previousWord].length - 1)]
+                            var currentWord = chain[previousWord][logic.randomBetween(0, chain[previousWord].length - 1)]
 
                             sentence += " " + currentWord
                             previousWord = currentWord

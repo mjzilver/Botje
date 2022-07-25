@@ -30,7 +30,7 @@ module.exports = {
                         .setTitle(`Top 10 most used emotes in ${message.guild.name}`)
                         .setDescription(result)
 
-                    message.channel.send({embeds: [top]})
+                    message.channel.send({ embeds: [top] })
                 }
             })
         } else if (args.length == 2 && mention) {
@@ -56,7 +56,7 @@ module.exports = {
                         .setTitle(`Top 10 most used emotes in ${message.guild.name} used by ${mention.username}`)
                         .setDescription(result)
 
-                    message.channel.send({embeds: [top]})
+                    message.channel.send({ embeds: [top] })
                 }
             })
         }

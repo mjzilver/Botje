@@ -12,9 +12,9 @@ module.exports = {
         var time = 'month'
         var channel = message.channel
 
-        if (['top', 'hot', 'new'].includes(args[2])) 
+        if (['top', 'hot', 'new'].includes(args[2]))
             sort = args[2]
-        if (['hour', 'day', 'week', 'month', 'year', 'all'].includes(args[3])) 
+        if (['hour', 'day', 'week', 'month', 'year', 'all'].includes(args[3]))
             time = args[3]
 
         const options = {
@@ -57,30 +57,30 @@ module.exports = {
                                 .setImage(`${post.url}`)
                                 .setURL(`https://reddit.com${post.permalink}`)
                                 .setFooter(`From: reddit/r/${sub}`)
-                            channel.send({embeds: [image]})
-                        } else if (post.url.match(/v\.redd\.it/gi)) {        
+                            channel.send({ embeds: [image] })
+                        } else if (post.url.match(/v\.redd\.it/gi)) {
                             const options = {
                                 url: post.url,
                                 json: true,
                                 followAllRedirects: true,
                             }
-                            
+
                             request(options, (err, res, body) => {
                                 if (err)
                                     throw err
-                                
-                                    logger.console(`Redirected to ${res.request.uri.href}`)
 
-                                    const options = {
-                                        url: res.request.uri.href + ".json",
-                                        json: true,
-                                    }
+                                logger.console(`Redirected to ${res.request.uri.href}`)
 
-                                    request(options, (err, res, body) => {
-                                        var videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
+                                const options = {
+                                    url: res.request.uri.href + ".json",
+                                    json: true,
+                                }
 
-                                        channel.send(`${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
-                                    })
+                                request(options, (err, res, body) => {
+                                    var videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
+
+                                    channel.send(`${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
+                                })
                             })
                         } else {
                             channel.send(`${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)

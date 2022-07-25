@@ -10,10 +10,10 @@ class Reply {
         var match = false
         for (const reply of this.replyPatterns) {
             if (message.content.match(new RegExp(reply["regex"], "gi")) && this.checkTime(reply)) {
-                logger.debug( `Replying to message '${message.content}' that matched ReplyPattern '${reply["name"]}'`)
-                if(reply["reply"])
+                logger.debug(`Replying to message '${message.content}' that matched ReplyPattern '${reply["name"]}'`)
+                if (reply["reply"])
                     message.reply(reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
-                else 
+                else
                     message.channel.send(reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
 
                 match = true

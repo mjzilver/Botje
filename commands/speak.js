@@ -32,7 +32,7 @@ function findByWord(message) {
             words.sort(function (a, b) {
                 return b.length - a.length
             })
-            if (randomBetween(0, 1))
+            if (logic.randomBetween(0, 1))
                 words.sort(function (a, b) {
                     let al = a.match(/(?:[aeiouy]{1,2})/gi)
                     let bl = b.match(/(?:[aeiouy]{1,2})/gi)
@@ -73,7 +73,7 @@ function findByWord(message) {
 
                         logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
                         message.channel.send(chosenMessage)
-                    } 
+                    }
                 }
             })
         } else {
@@ -150,7 +150,7 @@ function findTopic(message, topic) {
 
         var linkerwords = ['and', 'or', 'but', 'also']
 
-        var picker = randomBetween(0, 2)
+        var picker = logic.randomBetween(0, 2)
 
         if (picker == 0)
             message.reply(`${first}`.normalizeSpaces())

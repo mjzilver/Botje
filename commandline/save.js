@@ -26,7 +26,7 @@ function catalog(channel, messageid, amount, loop = 0) {
         (message) => {
             itemsProcessed++
             database.storeMessage(message)
-            
+
             if (itemsProcessed === messages.size) {
                 if (itemsProcessed == 100) {
                     if ((amount - ((loop * 100) + itemsProcessed)) > 0) {

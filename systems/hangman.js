@@ -50,9 +50,9 @@ class hangman {
                 for (let i = 0; i < this.word.length; i++)
                     this.visibleWord += '―'
 
-                if (this.word.length > 2 && this.word.length <= 12) { 
+                if (this.word.length > 2 && this.word.length <= 12) {
                     message.channel.send('Starting new hangman game.')
-                    logger.debug( `Starting new hangman game the word is ${this.word}`)
+                    logger.debug(`Starting new hangman game the word is ${this.word}`)
 
                     this.hasEnded = false
                     this.sendEmbed(message)

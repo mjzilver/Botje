@@ -15,7 +15,7 @@ class WebServer {
 
         expressapp.use(express.static(__dirname + '/../views'))
         expressapp.use(express.json())
-        expressapp.use(express.urlencoded({extended: true}))
+        expressapp.use(express.urlencoded({ extended: true }))
 
         expressapp.get('/log', function (req, res) {
             const options = { limit: 10000, order: 'desc' }
@@ -26,10 +26,10 @@ class WebServer {
 
                 var logs = []
                 if (req.query.level) {
-                    for (var i = 0; i < results.file.length; i++) 
+                    for (var i = 0; i < results.file.length; i++)
                         if (results.file[i].level == req.query.level)
                             logs.push(results.file[i])
-                } else 
+                } else
                     logs = results.file
 
                 res.render('log', {
@@ -49,13 +49,13 @@ class WebServer {
             var commands = (require('../commandholders/commands.js'))
 
             database.db.all(selectSQL, [], async (err, rows) => {
-                rows.unshift({'user_id' : '542721460033028117', 'user_name' : 'Botje'})
+                rows.unshift({ 'user_id': '542721460033028117', 'user_name': 'Botje' })
 
                 res.render('interact', {
-                    'guilds' : guilds,
+                    'guilds': guilds,
                     'channels': channels,
-                    'users' : rows,
-                    'commandNames' : commands
+                    'users': rows,
+                    'commandNames': commands
                 })
             })
         })
@@ -155,7 +155,7 @@ class WebServer {
                     var currentTimestamp = new Date()
                     var edited_at = web.editPerPerson[id][index]
                     var time_passed = (new Date(currentTimestamp.getTime() - edited_at.getTime())).getTime()
-                    
+
                     if (time_passed < 200)
                         count++
                 }
