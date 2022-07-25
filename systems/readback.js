@@ -2,7 +2,7 @@ class Readback {
     constructor() {
         bot.client.on('ready', () => {
             for (const [channelId, channel] of bot.client.channels.cache.entries())
-                if (channel.type == "GUILD_TEXT")
+                if (channel.type == "GUILD_TEXT" && channel.viewable)
                     this.readMessages(channel)
         })
     }
