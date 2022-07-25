@@ -2,7 +2,7 @@ var moment = require('moment')
 
 module.exports = {
     'name': 'age',
-    'description': 'shows how long botje has been living in this server',
+    'description': 'shows how long bot has been living in this server',
     'format': 'age',
     'function': function age(message) {
         var joined = moment(message.guild.members.cache.find(u => u.id === bot.client.user.id).joinedAt)

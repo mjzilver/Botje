@@ -2,7 +2,7 @@ var moment = require('moment')
 
 module.exports = {
     'name': 'uptime',
-    'description': 'show how long botje has been online in this session',
+    'description': 'show how long bot has been online in this session',
     'format': 'uptime',
     'function': function uptime(message) {
         var login = moment(bot.client.readyTimestamp)

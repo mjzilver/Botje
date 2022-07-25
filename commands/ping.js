@@ -1,6 +1,6 @@
 module.exports = {
     'name': 'ping',
-    'description': 'prints the current reaction speed of botje in milliseconds',
+    'description': 'prints the current reaction speed of bot in milliseconds',
     'format': 'ping',
     'function': async function ping(message) {
         const m = await message.channel.send("Ping?")

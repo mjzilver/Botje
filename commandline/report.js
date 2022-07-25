@@ -1,6 +1,6 @@
 module.exports = {
     'name': 'report',
-    'description': 'reports information about botjes process',
+    'description': 'reports information about bots process',
     'format': 'report',
     'function': function report(input) {
         const used = process.memoryUsage()

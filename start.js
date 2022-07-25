@@ -21,11 +21,11 @@ global.nonselector = require('./systems/nonselector.js')
 global.readback = require('./systems/readback.js')
 
 process.on('exit', function () {
-    logger.info( `=== Botje shutting down, goodbye ===`)
+    logger.info(`=== Bot shutting down, goodbye ===`)
 })
 
 process.on('SIGINT', function () {
-    logger.info( `=== Botje forced to shut down, goodbye ===`)
+    logger.info(`=== Bot forced to shut down, goodbye ===`)
 })
 
 process.on('uncaughtException', function (error) {
