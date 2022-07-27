@@ -18,8 +18,9 @@ function findByWord(message) {
     var editedText = message.content
     earliest.setMonth(earliest.getMonth() - 5)
 
-    editedText = editedText.replace(new RegExp(/(\b|^| )(:.+:|<.+>)( *|$)/, "gi"), '')
-    editedText = editedText.replace(new RegExp(/(\b)(bot(je)?)( *|\b)/, "gi"), '')
+    editedText = editedText.replace(new RegExp(/(:.+:|<.+>)(?:\s*|$)/, "gi"), '')
+    editedText = editedText.replace(new RegExp(/(?:\b)(bot(?:je)?)(?:\s|\b)/, "gi"), '')
+    editedText = editedText.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), '')
     editedText = editedText.textOnly()
     editedText = editedText.replace(nonselector.getNonSelectorsRegex(), '').trim()
 
@@ -71,6 +72,7 @@ function findByWord(message) {
                             }
                         }
 
+                        chosenMessage = chosenMessage.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), '')
                         logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
                         message.channel.send(chosenMessage)
                     }

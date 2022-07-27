@@ -8,7 +8,8 @@ const loggerLevels = {
     info: 2,
     debug: 3,
     console: 4,
-    admin: 5
+    admin: 5,
+    startup: 6
 }
 
 Winston.loggers.add('logger', {
@@ -16,7 +17,7 @@ Winston.loggers.add('logger', {
     transports: [
         new (Winston.transports.Console)({
             colorize: true,
-            level: 'admin',
+            level: 'startup',
             format: combine(
                 timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
                 colorize(),
@@ -36,7 +37,8 @@ Winston.loggers.add('logger', {
 
 Winston.addColors({
     console: 'grey',
-    admin: 'yellow'
+    admin: 'yellow',
+    startup: 'magenta'
 })
 
 module.exports = Winston.loggers.get('logger')

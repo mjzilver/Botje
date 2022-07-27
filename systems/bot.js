@@ -24,8 +24,8 @@ class Bot {
                     name: `Running Version ${global.package.version}`
                 }]
             })
-            logger.console(`Logged in as: ${this.client.user.username} - ${this.client.user.id}`)
-            logger.console(`Running Version ${global.package.version}`)
+            logger.startup(`Logged in as: ${this.client.user.username} - ${this.client.user.id}`)
+            logger.startup(`Running Version ${global.package.version}`)
         })
 
         this.client.login(config.discord_api_key)
