@@ -5,6 +5,7 @@ module.exports = {
     'description': 'turn an image into a meme, include picture by uploading, replying or URL',
     'format': 'meme (link to image) (top text) - (bottom text)',
     'function': async function roll(message) {
+        message.content = message.content.replaceFancyQuotes()
         var args = message.content.split(' ')
         args.shift()
         var url = ''
@@ -16,26 +17,41 @@ module.exports = {
             url = getURL(message)
         }
 
-        if (args[0].indexOf("http") == 0)
+        if (args[0]?.indexOf("http") == 0)
             url = args.shift()
 
-        args = args.join(' ').split('-')
+        args = args.join(' ').split('|')
         var top = args[0]?.trim() ?? ''
         var bottom = args[1]?.trim() ?? ''
 
-        if (url.match(/\.(jpeg|jpg|gif|png)/gi)) {
-            processPicture(url, top, bottom, message)
+        if (args[0]) {
+            if (url.match(/\.(jpeg|jpg|gif|png)/gi))
+                processPicture(url, top, bottom, message)
+            else
+                processPicture(null, top, bottom, message)
         } else {
-            var path = './assets/meme_templates'
-            var files = fs.readdirSync(path)
-            let chosenFile = files[Math.floor(Math.random() * files.length)]
-
-            processPicture(`${path}/${chosenFile}`, top, bottom, message)
+            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces 
+            FROM messages
+            WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+            AND message NOT LIKE "%<%" AND message NOT LIKE
+            AND len < 60 AND (len - spaces) >= 2 
+            ORDER BY RANDOM()
+            LIMIT 2`
+            await database.query(selectSQL, [], (rows) => {
+                processPicture(null, rows[0]['message'], rows[1]['message'], message)
+            })
         }
     }
 }
 
 async function processPicture(url, top, bottom, message) {
+    if (!url) {
+        var path = './assets/meme_templates'
+        var files = fs.readdirSync(path)
+        let chosenFile = files[Math.floor(Math.random() * files.length)]
+        url = `${path}/${chosenFile}`
+    }
+
     var image = await Jimp.read(url)
     const font = await Jimp.loadFont('./assets/font.fnt')
 
