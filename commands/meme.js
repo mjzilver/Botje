@@ -33,7 +33,7 @@ module.exports = {
             var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces 
             FROM messages
             WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
-            AND message NOT LIKE "%<%" AND message NOT LIKE
+            AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
             AND len < 60 AND (len - spaces) >= 2 
             ORDER BY RANDOM()
             LIMIT 2`
