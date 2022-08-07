@@ -12,5 +12,6 @@ module.exports = async function deletafter(message) {
             }
         ))
     }
+    logger.warn(`Deleting up to 100 messages after "${message.content}"`)
     message.delete({ timeout: 5000 })
 }

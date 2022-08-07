@@ -11,7 +11,6 @@ class Command {
     }
 
     handleCommand(message) {
-        // look for the b! meaning bot command
         if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)) {
             message.content = message.content.replace(new RegExp(config.prefix, "i"), '')
             message.content = message.content.normalizeSpaces()
