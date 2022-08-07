@@ -28,7 +28,7 @@ Winston.loggers.add('logger', {
             filename: 'bot.log',
             level: 'admin',
             format: combine(
-                timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+                timestamp(),
                 json()
             )
         })
