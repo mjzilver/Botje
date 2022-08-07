@@ -18,20 +18,24 @@ class Bot {
             autoReconnect: true
         })
 
+        this.login()
+        setInterval(this.login.bind(this), 60 * 1000)
+
         this.client.on('ready', () => {
             this.client.user.setPresence({
                 activities: [{
                     name: `Running Version ${global.package.version}`
                 }]
             })
-            logger.startup(`Logged in as: ${this.client.user.username} - ${this.client.user.id}`)
-            logger.startup(`Running Version ${global.package.version}`)
+            logger.startup(`Logged in as: ${this.client.user.username} - ${global.package.version} - ${this.client.user.id}`)
         })
 
-        this.client.login(config.discord_api_key)
+        this.client.on('shardError', function (error) {
+            logger.error(`Shard error: ${error.message}`)
+        })
 
         this.client.on('error', function (error) {
-            logger.error(error.message)
+            logger.error(`Client error: ${error.message}`)
         })
 
         this.client.on('messageCreate', message => {
@@ -55,6 +59,13 @@ class Bot {
             backupsystem.saveEmoji(oldEmoji, new Date().getTime())
             backupsystem.saveEmoji(newEmoji)
         })
+    }
+
+    login() {
+        if (!this.client.isReady()) {
+            logger.startup(`Attempting to log in`)
+            this.client.login(config.discord_api_key)
+        }
     }
 }
 module.exports = new Bot()
