@@ -5,7 +5,6 @@ module.exports = {
     'description': 'turn an image into a meme, include picture by uploading, replying or URL',
     'format': 'meme (link to image) (top text) - (bottom text)',
     'function': async function meme(message) {
-        message.content = message.content.replaceFancyQuotes()
         var args = message.content.split(' ')
         args.shift()
         var url = ''
@@ -38,7 +37,7 @@ module.exports = {
             ORDER BY RANDOM()
             LIMIT 2`
             await database.query(selectSQL, [], (rows) => {
-                processPicture(null, rows[0]['message'], rows[1]['message'], message)
+                processPicture(url ?? null, rows[0]['message'], rows[1]['message'], message)
             })
         }
     }
@@ -51,8 +50,8 @@ async function processPicture(url, top, bottom, message) {
         let chosenFile = files[Math.floor(Math.random() * files.length)]
         url = `${path}/${chosenFile}`
     }
-    top = top.toUpperCase().trim()
-    bottom = bottom.toUpperCase().trim()
+    top = top.toUpperCase().trim().replaceFancyQuotes()
+    bottom = bottom.toUpperCase().trim().replaceFancyQuotes()
 
     var image = await Jimp.read(url)
     const font = await Jimp.loadFont('./assets/font.fnt')

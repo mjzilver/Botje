@@ -18,7 +18,12 @@ class WebServer {
         expressapp.use(express.urlencoded({ extended: true }))
 
         expressapp.get('/log', function (req, res) {
-            const options = { limit: 10000, order: 'desc' }
+            const options = {
+                limit: 10000,
+                order: 'desc',
+                from: new Date(0),
+                until: new Date,
+            }
 
             logger.query(options, async function (err, results) {
                 if (err)

@@ -13,7 +13,7 @@ module.exports = async function addmeme(message) {
     if (args[0]?.indexOf("http") == 0)
         url = args.shift()
 
-    var filename = args[0] + ".png" ?? url.split('/').pop()
+    var filename = args[0] ? args[0] + ".png" : new Date().getTime() + ".png"
 
     if (url) {
         var path = './assets/meme_templates'
