@@ -72,7 +72,7 @@ String.prototype.replaceAt = function (index, replacement) {
 
 Object.defineProperty(Array.prototype, "pickRandom", {
     enumerable: false,
-    value: function (array) { return this[logic.randomBetween(0, this.length - 1)] }
+    value: function (array) { return this[bot.logic.randomBetween(0, this.length - 1)] }
 })
 
 process.on('exit', function () {
@@ -84,7 +84,7 @@ process.on('SIGINT', function () {
 })
 
 process.on('uncaughtException', function (error) {
-    logger.error(`Uncaught error "${error.message}" STACK: "${error.stack}"`)
+    logger.error(`Uncaught error "${error.message}"\n === STACK === \n"${error.stack}"`)
 })
 
 

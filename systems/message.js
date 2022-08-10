@@ -5,15 +5,19 @@ class Message {
     }
 
     send(call, content) {
-        call.channel.send(content).then((reply) => {
+        var promise = call.channel.send(content)
+        promise.then((reply) => {
             this.addCommandCall(call, reply)
         })
+        return promise
     }
 
     reply(call, content) {
-        call.reply(content).then((reply) => {
+        var promise = call.reply(content)
+        promise.then((reply) => {
             this.addCommandCall(call, reply)
         })
+        return promise
     }
 
     complete(call) {
