@@ -24,6 +24,11 @@ class Bot {
         this.message = require('./message.js')
         this.eventListener = require('./eventListener.js')(this)
         this.command = require('./command.js')
+        this.logic = require('./logic.js')
+        this.backup = require('./backup.js')
+        this.reply = require('./reply.js')
+        this.spellcheck = require('./spellcheck.js')
+        this.nonselector = require('./nonselector.js')
 
         this.client.on('ready', () => {
             this.client.user.setPresence({

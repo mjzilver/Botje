@@ -22,7 +22,7 @@ function findByWord(message) {
     editedText = editedText.replace(new RegExp(/(?:\b)(bot(?:je)?)(?:\s|\b)/, "gi"), '')
     editedText = editedText.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), '')
     editedText = editedText.textOnly()
-    editedText = editedText.replace(nonselector.getNonSelectorsRegex(), '').trim()
+    editedText = editedText.replace(bot.nonselector.getNonSelectorsRegex(), '').trim()
 
     var words = editedText.split(' ')
     if (words[0] == 'speak')
@@ -33,7 +33,7 @@ function findByWord(message) {
             words.sort(function (a, b) {
                 return b.length - a.length
             })
-            if (logic.randomBetween(0, 1))
+            if (bot.logic.randomBetween(0, 1))
                 words.sort(function (a, b) {
                     let al = a.match(/(?:[aeiouy]{1,2})/gi)
                     let bl = b.match(/(?:[aeiouy]{1,2})/gi)
@@ -65,7 +65,7 @@ function findByWord(message) {
                                     amount += 30 - (j * j)
                             }
                             if (amount > highestAmount) {
-                                if (logic.levenshtein(rows[i]['message'], message.content) > 15) {
+                                if (bot.logic.levenshtein(rows[i]['message'], message.content) > 15) {
                                     chosenMessage = rows[i]['message']
                                     highestAmount = amount
                                 }
@@ -153,7 +153,7 @@ function findTopic(message, topic) {
 
         var linkerwords = ['and', 'or', 'but', 'also']
 
-        var picker = logic.randomBetween(0, 2)
+        var picker = bot.logic.randomBetween(0, 2)
 
         if (picker == 0)
             bot.message.reply(message, `${first}`.normalizeSpaces())

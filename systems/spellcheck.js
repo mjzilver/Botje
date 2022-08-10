@@ -62,7 +62,7 @@ class Spellcheck {
 
         for (const [wordlistword, wordlistamount] of Object.entries(this.wordList)) {
             if (wordlistamount >= 5) {
-                var currentdifference = logic.levenshtein(word, wordlistword)
+                var currentdifference = bot.logic.levenshtein(word, wordlistword)
                 if (currentdifference < difference) {
                     difference = currentdifference
                     closestMatch = wordlistword

@@ -7,9 +7,9 @@ module.exports = {
 
         if (args[1] && !isNaN(args[1])) {
             if (args[2] && !isNaN(args[2])) {
-                bot.message.reply(message, `You rolled ${logic.randomBetween(parseInt(args[1]), parseInt(args[2]))} between ${args[1]} and ${args[2]}`)
+                bot.message.reply(message, `You rolled ${bot.logic.randomBetween(parseInt(args[1]), parseInt(args[2]))} between ${args[1]} and ${args[2]}`)
             } else {
-                bot.message.reply(message, `You rolled ${logic.randomBetween(0, args[1])} out of ${args[1]}`)
+                bot.message.reply(message, `You rolled ${bot.logic.randomBetween(0, args[1])} out of ${args[1]}`)
             }
         } else {
             date = Date.now()

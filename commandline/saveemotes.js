@@ -13,7 +13,7 @@ module.exports = {
                 fs.mkdirSync(guildpath)
 
             for (const [emojiId, emoji] of guild.emojis.cache.entries())
-                backupsystem.saveEmoji(emoji)
+                bot.backup.saveEmoji(emoji)
         }
     }
 } 
