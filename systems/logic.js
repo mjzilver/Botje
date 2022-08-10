@@ -75,4 +75,17 @@ Object.defineProperty(Array.prototype, "pickRandom", {
     value: function (array) { return this[logic.randomBetween(0, this.length - 1)] }
 })
 
+process.on('exit', function () {
+    logger.info(`=== Bot shutting down, goodbye ===`)
+})
+
+process.on('SIGINT', function () {
+    logger.info(`=== Bot forced to shut down, goodbye ===`)
+})
+
+process.on('uncaughtException', function (error) {
+    logger.error(`Uncaught error "${error.message}" STACK: "${error.stack}"`)
+})
+
+
 module.exports = new Logic()

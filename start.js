@@ -18,15 +18,3 @@ global.replysystem = require('./systems/reply.js')
 global.webhook = require('./systems/webhook.js')
 global.spellcheck = require('./systems/spellcheck.js')
 global.nonselector = require('./systems/nonselector.js')
-
-process.on('exit', function () {
-    logger.info(`=== Bot shutting down, goodbye ===`)
-})
-
-process.on('SIGINT', function () {
-    logger.info(`=== Bot forced to shut down, goodbye ===`)
-})
-
-process.on('uncaughtException', function (error) {
-    logger.error(`Uncaught error "${error.message}" STACK: "${error.stack}"`)
-})
