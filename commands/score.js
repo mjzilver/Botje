@@ -45,7 +45,7 @@ function mention(message, mentioned) {
         userdata['quality'] = ((userdata['points'] / userdata['total']) / 2)
         userdata['score'] = Math.round(userdata['total'] * userdata['quality'])
 
-        message.channel.send(`${mentioned.username}'s post score is ${userdata['score']}`)
+        bot.message.send(message, `${mentioned.username}'s post score is ${userdata['score']}`)
     })
 }
 
@@ -95,7 +95,7 @@ function perPerson(message) {
             .setTitle(`Top 10 posters in ${message.guild.name}`)
             .setDescription(result)
 
-        message.channel.send({
+        bot.message.send(message, {
             embeds: [top]
         })
     })

@@ -18,7 +18,6 @@ global.replysystem = require('./systems/reply.js')
 global.webhook = require('./systems/webhook.js')
 global.spellcheck = require('./systems/spellcheck.js')
 global.nonselector = require('./systems/nonselector.js')
-global.readback = require('./systems/readback.js')
 
 process.on('exit', function () {
     logger.info(`=== Bot shutting down, goodbye ===`)

@@ -29,7 +29,7 @@ class hangman {
 
     start(message) {
         if (!this.hasEnded)
-            return message.channel.send("A game of hangman is still ongoing use b!guess to guess!")
+            return bot.message.send(message, "A game of hangman is still ongoing use b!guess to guess!")
 
         let selectSQL = `SELECT message
         FROM messages 
@@ -51,7 +51,7 @@ class hangman {
                     this.visibleWord += '―'
 
                 if (this.word.length > 2 && this.word.length <= 12) {
-                    message.channel.send('Starting new hangman game.')
+                    bot.message.send(message, 'Starting new hangman game.')
                     logger.debug(`Starting new hangman game the word is ${this.word}`)
 
                     this.hasEnded = false
@@ -65,20 +65,20 @@ class hangman {
 
     guess(message, geussedContent) {
         if (this.hasEnded)
-            return message.channel.send('This hangman game has ended...')
+            return bot.message.send(message, 'This hangman game has ended...')
 
         if (geussedContent) {
             if (geussedContent.length > 1) {
                 if (geussedContent == this.word) {
-                    message.channel.send(`You guessed the word ${this.word} after ${this.tries} tries -- You have won!`)
+                    bot.message.send(message, `You guessed the word ${this.word} after ${this.tries} tries -- You have won!`)
                     this.hasEnded = true
                 } else {
-                    message.channel.send(`Wrong! The word is not ${geussedContent}`)
+                    bot.message.send(message, `Wrong! The word is not ${geussedContent}`)
                     this.tries++
                 }
             } else {
                 if (this.alreadyGuessed.includes(geussedContent)) {
-                    message.channel.send(`${geussedContent} has already been guessed.`)
+                    bot.message.send(message, `${geussedContent} has already been guessed.`)
                 } else {
                     if (this.word.includes(geussedContent)) {
                         for (let i = 0; i < this.word.length; i++) {
@@ -87,7 +87,7 @@ class hangman {
                             }
                         }
                     } else {
-                        message.channel.send(`The word does not contain ${geussedContent}!`)
+                        bot.message.send(message, `The word does not contain ${geussedContent}!`)
                         this.alreadyGuessed.push(geussedContent)
                         this.tries++
                     }
@@ -95,21 +95,21 @@ class hangman {
             }
 
             if (this.tries == this.maxTries) {
-                message.channel.send(`Oh no! You have been hanged! The word was ${this.word}`)
+                bot.message.send(message, `Oh no! You have been hanged! The word was ${this.word}`)
                 this.hasEnded = true
             } else if (this.visibleWord == this.word) {
-                message.channel.send(`You've won by guessing all the letters!`)
+                bot.message.send(message, `You've won by guessing all the letters!`)
                 this.hasEnded = true
             }
 
             this.sendEmbed(message)
         } else {
-            message.channel.send(`Not a valid guess!`)
+            bot.message.send(message, `Not a valid guess!`)
         }
     }
 
     help(message) {
-        message.channel.send(`Use \`b!hangman start\` to start a round \nUse \`b!hangman guess [letter]\` to guess`)
+        bot.message.send(message, `Use \`b!hangman start\` to start a round \nUse \`b!hangman guess [letter]\` to guess`)
     }
 
     sendEmbed(message) {
@@ -137,7 +137,7 @@ class hangman {
         else
             hangmanEmbed.setFooter(` Use b!hangman guess to guess`)
 
-        message.channel.send({
+        bot.message.send(message, {
             files: [attachment],
             embeds: [hangmanEmbed]
         })

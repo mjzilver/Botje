@@ -41,7 +41,7 @@ function mention(message, mentioned) {
         }
 
         userdata['average'] = Math.round(userdata['syllables'] / userdata['total'])
-        message.channel.send(`${mentioned.username} has an average of ${userdata['average']} syllables per post`)
+        bot.message.send(message, `${mentioned.username} has an average of ${userdata['average']} syllables per post`)
     })
 
 }
@@ -90,7 +90,7 @@ function perPerson(message) {
             .setTitle(`Top 10 most intellectual posters in ${message.guild.name}`)
             .setDescription(result)
 
-        message.channel.send({
+        bot.message.send(message, {
             embeds: [top]
         })
     })

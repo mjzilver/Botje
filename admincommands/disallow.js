@@ -12,7 +12,7 @@ module.exports = function disallow(message) {
         disallowed[mention.id] = true
         logger.warn(`${mention.username} is no longer allowed to use the bot`)
     } else {
-        return message.channel.send('You need to @ someone to disallow them')
+        returnbot.message.send(message, 'You need to @ someone to disallow them')
     }
 
     fs.writeFile(filepath, JSON.stringify(disallowed), function (err) {

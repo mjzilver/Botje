@@ -16,7 +16,7 @@ module.exports = {
 		} else if (args[1] == "%") {
 			percentage(message, page)
 		} else {
-			message.channel.send(`I have no idea what you want, format is as follows: '${module.exports.format}'`)
+			bot.message.send(message, `I have no idea what you want, format is as follows: '${module.exports.format}'`)
 		}
 	}
 }
@@ -25,7 +25,7 @@ function total(message) {
 	let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE server = ?'
 
 	database.query(selectSQL, [message.guild.id], (rows) => {
-		message.channel.send(`Ive found ${rows[0]['count']} messages in ${message.guild.name}`)
+		bot.message.send(message, `Ive found ${rows[0]['count']} messages in ${message.guild.name}`)
 	})
 }
 
@@ -33,7 +33,7 @@ function mention(message, mentioned) {
 	let selectSQL = 'SELECT COUNT(*) as count FROM messages WHERE server = ? AND user_id = ?'
 
 	database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
-		message.channel.send(`Ive found ${rows[0]['count']} messages by ${mentioned.username} in this server`)
+		bot.message.send(message, `Ive found ${rows[0]['count']} messages by ${mentioned.username} in this server`)
 	})
 }
 
@@ -56,7 +56,7 @@ function perPerson(message, page) {
 			.setDescription(result)
 			.setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
-		message.channel.send({
+		bot.message.send(message, {
 			embeds: [top]
 		})
 	})
@@ -83,7 +83,7 @@ function percentage(message, page) {
 			.setDescription(result)
 			.setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
-		message.channel.send({
+		bot.message.send(message, {
 			embeds: [top]
 		})
 

@@ -29,6 +29,6 @@ module.exports = {
             .setDescription(helpMessage)
             .setFooter(`Page ${pageNum}/${pageAmount} \nCurrent Version: ${package.version}`)
 
-        message.channel.send({ embeds: [help] })
+        return bot.message.send(message, { embeds: [help] })
     }
 }

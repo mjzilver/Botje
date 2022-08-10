@@ -17,7 +17,7 @@ module.exports = {
                 return logger.error(err)
 
             var video = body.items[0]
-            message.reply(`https://www.youtube.com/watch?v=${video.id.videoId}`)
+            bot.message.reply(message, `https://www.youtube.com/watch?v=${video.id.videoId}`)
         })
     }
 }

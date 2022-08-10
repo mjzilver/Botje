@@ -14,23 +14,23 @@ class Lister {
         } else if (args[1] == "%") {
             percentage(message)
         } else {
-            message.reply('Incorrect format')
+            bot.message.reply(message, 'Incorrect format')
         }
     }
 
     total(message) {
-        message.reply('This command does not work without a target')
+        bot.message.reply(message, 'This command does not work without a target')
     }
 
     mention(message, mentioned) {
-        message.reply('This command does not work with @')
+        bot.message.reply(message, 'This command does not work with @')
     }
 
     perPerson(message) {
-        message.reply('This command does not work with ?')
+        bot.message.reply(message, 'This command does not work with ?')
     }
 
     percentage(message) {
-        message.reply('This command does not work with %')
+        bot.message.reply(message, 'This command does not work with %')
     }
 }

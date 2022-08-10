@@ -19,7 +19,9 @@ class Bot {
         })
 
         this.login()
-        setInterval(this.login.bind(this), 60 * 1000)
+        setInterval(this.login.bind(this), 5 * 60 * 1000)
+
+        this.message = require('./message.js')
 
         this.client.on('ready', () => {
             this.client.user.setPresence({

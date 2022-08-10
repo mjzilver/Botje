@@ -10,6 +10,7 @@ class Database {
         this.db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
         this.db.run(`CREATE TABLE IF NOT EXISTS messages (user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, server TEXT, PRIMARY KEY(user_id, date, channel))`)
         this.db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER, y INTEGER, red INTEGER, green INTEGER, blue INTEGER, PRIMARY KEY(x,y))`)
+        this.db.run(`CREATE TABLE IF NOT EXISTS command_calls (call_id TEXT, reply_id TEXT, timestamp TEXT, PRIMARY KEY(call_id))`)
     }
 
     query(selectSQL, parameters = [], callback) {
@@ -27,7 +28,9 @@ class Database {
                 (result) => {
                     this.insertMessage(message)
                 },
-                (error) => { })
+                (error) => {
+                    logger.error(err)
+                })
         }
     }
 

@@ -15,13 +15,13 @@ module.exports = {
                 result += `${files[i]}, `
             }
 
-            message.reply(`Emotes backed up for this server: ${result}`)
+            bot.message.reply(message, `Emotes backed up for this server: ${result}`)
         } else if (args[0]) {
             path += `${args[0]}.png`
             if (fs.existsSync(path))
-                message.reply({ files: [path] })
+                bot.message.reply(message, { files: [path] })
             else
-                message.reply(`No emote named ${args[0]} found`)
+                bot.message.reply(message, `No emote named ${args[0]} found`)
         }
     }
 }

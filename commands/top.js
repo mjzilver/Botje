@@ -34,7 +34,7 @@ function perPerson(message) {
             .setTitle(`Top 10 must used sentences in ${message.guild.name}`)
             .setDescription(result)
 
-        message.channel.send({
+        bot.message.send(message, {
             embeds: [top]
         })
     })
@@ -61,7 +61,7 @@ function mention(message, mentioned) {
             .setTitle(`Top 10 must used sentences in ${message.guild.name} by ${mentioned.username}`)
             .setDescription(result)
 
-        message.channel.send({
+        bot.message.send(message, {
             embeds: [top]
         })
     })

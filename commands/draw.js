@@ -30,7 +30,7 @@ module.exports = {
                     })
 
             image.writeImage('./views/images/image.png', function (err) {
-                message.channel.send("Current image", {
+                bot.message.send(message, "Current image", {
                     files: ["./views/images/image.png"]
                 })
             })

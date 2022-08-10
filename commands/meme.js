@@ -25,9 +25,9 @@ module.exports = {
 
         if (args[0]) {
             if (url.match(/\.(jpeg|jpg|gif|png)/gi))
-                processPicture(url, top, bottom, message)
+                return processPicture(url, top, bottom, message)
             else
-                processPicture(null, top, bottom, message)
+                return processPicture(null, top, bottom, message)
         } else {
             var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces 
             FROM messages
@@ -36,8 +36,8 @@ module.exports = {
             AND len < 60 AND (len - spaces) >= 2 
             ORDER BY RANDOM()
             LIMIT 2`
-            await database.query(selectSQL, [], (rows) => {
-                processPicture(url ?? null, rows[0]['message'], rows[1]['message'], message)
+            database.query(selectSQL, [], (rows) => {
+                return processPicture(url ?? null, rows[0]['message'], rows[1]['message'], message)
             })
         }
     }
@@ -70,7 +70,7 @@ async function processPicture(url, top, bottom, message) {
     }, image.bitmap.width, image.bitmap.height * 0.1)
     await image.writeAsync('./assets/meme.png')
 
-    message.reply({
+    bot.message.reply(message, {
         files: ["./assets/meme.png"]
     })
 }

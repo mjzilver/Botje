@@ -21,14 +21,14 @@ class Command {
 
             if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message)) {
                 if (command in this.commands) {
-                    return this.commands[command].function(message)
+                    this.commands[command].function(message)
                 } else if (command in this.admincommands) {
                     if (message.author.id === config.owner || message.member.permissions.has("ADMINISTRATOR"))
                         return this.admincommands[command](message)
                     else
-                        message.channel.send(`${command.capitalize()} is an admin command, you are not allowed`)
+                        bot.message.send(message, `${command.capitalize()} is an admin command, you are not allowed`)
                 } else {
-                    message.channel.send(`${command.capitalize()} is not a command, retard`)
+                    bot.message.send(message, `${command.capitalize()} is not a command, retard`)
                 }
             }
         } else if (!message.author.bot) {
@@ -65,7 +65,7 @@ class Command {
         } else {
             if ((currentTimestamp - this.lastRequest[message.author.username] < (config.timeoutDuration * 1000))) {
                 var difference = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime())
-                message.channel.send(`You need to wait ${(config.timeoutDuration - difference.getSeconds())} seconds`)
+                bot.message.send(message, `You need to wait ${(config.timeoutDuration - difference.getSeconds())} seconds`)
                 return false
             } else {
                 this.lastRequest[message.author.username] = currentTimestamp

@@ -10,7 +10,6 @@ module.exports = {
         var sub = args[1]
         var sort = 'hot'
         var time = 'month'
-        var channel = message.channel
 
         if (['top', 'hot', 'new'].includes(args[2]))
             sort = args[2]
@@ -57,7 +56,7 @@ module.exports = {
                                 .setImage(`${post.url}`)
                                 .setURL(`https://reddit.com${post.permalink}`)
                                 .setFooter(`From: reddit/r/${sub}`)
-                            channel.send({ embeds: [image] })
+                            bot.message.send(message, { embeds: [image] })
                         } else if (post.url.match(/v\.redd\.it/gi)) {
                             const options = {
                                 url: post.url,
@@ -79,11 +78,11 @@ module.exports = {
                                 request(options, (err, res, body) => {
                                     var videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
 
-                                    channel.send(`${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
+                                    bot.message.send(message, `${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
                                 })
                             })
                         } else {
-                            channel.send(`${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
+                            bot.message.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
                         }
 
                         var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [post.url, sub])
@@ -99,11 +98,11 @@ module.exports = {
                             logger.debug('Finding posts before post ' + body.data.children[body.data.children.length - 1].data.title)
                             getRedditImage(message, body.data.children[body.data.children.length - 1].data.name)
                         } else
-                            channel.send("I have ran out of images to show you")
+                            bot.message.send(message, "I have ran out of images to show you")
                     }
                 })
             } else
-                channel.send("No images were found")
+                bot.message.send(message, "No images were found")
         })
     }
 }

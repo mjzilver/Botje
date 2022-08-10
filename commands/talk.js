@@ -48,7 +48,7 @@ module.exports = {
                         }
                     }
 
-                    message.channel.send(sentence.capitalize())
+                    bot.message.send(message, sentence.capitalize())
                 }
             }
         })

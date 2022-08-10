@@ -43,7 +43,7 @@ function mention(message, mentioned) {
 
         userdata['quality'] = Math.round(((userdata['points'] / userdata['total']) * 100) / 2)
 
-        message.channel.send(`${mentioned.username}'s post quality is ${userdata['quality']}%`)
+        bot.message.send(message, `${mentioned.username}'s post quality is ${userdata['quality']}%`)
     })
 }
 
@@ -82,7 +82,7 @@ function perPerson(message, page) {
         })
 
         if (page > Math.ceil(sorted.length / 10))
-            return message.channel.send(`Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)} not found`)
+            return bot.message.send(message, `Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)} not found`)
 
         var result = ""
         for (var i = page * 10; i < sorted.length && i <= (page * 10) + 9; i++)
@@ -94,7 +94,7 @@ function perPerson(message, page) {
             .setDescription(result)
             .setFooter(`Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)}`)
 
-        message.channel.send({
+        bot.message.send(message, {
             embeds: [top]
         })
     })

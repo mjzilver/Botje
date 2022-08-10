@@ -3,7 +3,7 @@ module.exports = {
     'description': 'prints the current reaction speed of bot in milliseconds',
     'format': 'ping',
     'function': async function ping(message) {
-        const m = await message.channel.send("Ping?")
-        m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms.`)
+        const m = await bot.message.send(message, "Ping?")
+        return m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms.`)
     }
 }

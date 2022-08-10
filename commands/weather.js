@@ -13,7 +13,7 @@ module.exports = {
             if (args[2])
                 city += args[2]
         } else
-            return message.channel.send('You need to enter a city')
+            return bot.message.send(message, 'You need to enter a city')
 
         request(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${config.weather_api_key}&units=metric&mode=JSON`,
             (err, res, body) => {
@@ -43,9 +43,9 @@ module.exports = {
                         .addField('Sunrise', sunrise, true)
                         .addField('Sunset', sunset, true)
 
-                    message.channel.send({ embeds: [weatherEmbed] })
+                    bot.message.send(message, { embeds: [weatherEmbed] })
                 } else {
-                    message.channel.send(result.message.capitalize())
+                    bot.message.send(message, result.message.capitalize())
                     logger.warn(`Weather error on ${city}`)
                 }
             })

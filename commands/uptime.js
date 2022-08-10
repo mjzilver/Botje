@@ -12,6 +12,6 @@ module.exports = {
         minutes = now.subtract(hours, 'hours').diff(login, 'minutes')
         seconds = now.subtract(minutes, 'minutes').diff(login, 'seconds')
 
-        message.channel.send(`I have been online for ${days ? `${days} days, ` : ''}${hours ? `${hours} hours, ` : ''}${minutes} minutes and ${seconds} seconds`)
+        bot.message.send(message, `I have been online for ${days ? `${days} days, ` : ''}${hours ? `${hours} hours, ` : ''}${minutes} minutes and ${seconds} seconds`)
     }
 }

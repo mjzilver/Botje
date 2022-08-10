@@ -12,9 +12,9 @@ class Reply {
             if (message.content.match(new RegExp(reply["regex"], "gi")) && this.checkTime(reply)) {
                 logger.debug(`Replying to message '${message.content}' that matched ReplyPattern '${reply["name"]}'`)
                 if (reply["reply"])
-                    message.reply(reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
+                    bot.message.reply(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
                 else
-                    message.channel.send(reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
+                    bot.message.send(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
 
                 match = true
             }

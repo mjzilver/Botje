@@ -33,14 +33,14 @@ function perPerson(message, word) {
             result += `${rows[i]['user_name']} has said ${word} ${rows[i]['count']} times! \n`
 
         if (result == "")
-            return message.channel.send(`Nothing found for ${word} in ${message.guild.name} `)
+            return bot.message.send(message, `Nothing found for ${word} in ${message.guild.name} `)
 
         const top = new discord.MessageEmbed()
             .setColor(config.color_hex)
             .setTitle(`Top 10 users for the word ${word} in ${message.guild.name} `)
             .setDescription(result)
 
-        message.channel.send({
+        bot.message.send(message, {
             embeds: [top]
         })
     })
@@ -52,7 +52,7 @@ function total(message, word) {
         WHERE message LIKE ? AND server = ? `
 
     database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
-        message.channel.send(`Ive found ${rows[0]['count']} messages in this server that contain ${word}`)
+        bot.message.send(message, `Ive found ${rows[0]['count']} messages in this server that contain ${word}`)
     })
 }
 
@@ -63,7 +63,7 @@ function mention(message, mentioned, word) {
     AND server = ? AND user_id = ? `
 
     database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id], (rows) => {
-        message.channel.send(`Ive found ${rows[0]['count']} messages from ${mentioned.username} in this server that contain ${word}`)
+        bot.message.send(message, `Ive found ${rows[0]['count']} messages from ${mentioned.username} in this server that contain ${word}`)
     })
 }
 
@@ -94,14 +94,14 @@ function percentage(message, word) {
             result += `${resultArray[i]['user_name']} has said ${word} in ${resultArray[i]['percentage']}% of their messages! \n`
 
         if (result == "")
-            return message.channel.send(`Nothing found for ${word} in ${message.guild.name} `)
+            return bot.message.send(message, `Nothing found for ${word} in ${message.guild.name} `)
 
         const top = new discord.MessageEmbed()
             .setColor(config.color_hex)
             .setTitle(`Top 10 users for the word ${word} in ${message.guild.name} `)
             .setDescription(result)
 
-        message.channel.send({
+        bot.message.send(message, {
             embeds: [top]
         })
     })

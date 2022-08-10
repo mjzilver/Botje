@@ -34,7 +34,7 @@ module.exports = {
                     result += ' '
                 }
             }
-            message.channel.send(result)
+            bot.message.send(message, result)
         }
     }
 }
