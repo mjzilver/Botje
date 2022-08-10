@@ -52,11 +52,11 @@ class Bot {
         })
 
         this.client.on('emojiDelete', emoji => {
-            backupsystem.saveEmoji(emoji, new Date().getTime())
+            backupsystem.saveEmoji(emoji, "_deleted")
         })
 
         this.client.on('emojiUpdate', (oldEmoji, newEmoji) => {
-            backupsystem.saveEmoji(oldEmoji, new Date().getTime())
+            backupsystem.saveEmoji(oldEmoji, "_old")
             backupsystem.saveEmoji(newEmoji)
         })
     }
