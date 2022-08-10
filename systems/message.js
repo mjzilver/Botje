@@ -16,6 +16,17 @@ class Message {
         })
     }
 
+    complete(call) {
+        this.commandCalls[call.id] = 0
+        var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
+            [call.id, call.createdAt.getTime()])
+        insert.run(function (err) {
+            if (err) {
+                logger.error(err)
+            }
+        })
+    }
+
     addCommandCall(call, reply) {
         this.commandCalls[call.id] = reply.id
         var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, reply_id, timestamp) VALUES (?, ?, ?)',

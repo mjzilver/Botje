@@ -9,7 +9,8 @@ const loggerLevels = {
     debug: 3,
     console: 4,
     admin: 5,
-    startup: 6
+    deletion: 6,
+    startup: 7
 }
 
 Winston.loggers.add('logger', {
@@ -38,6 +39,7 @@ Winston.loggers.add('logger', {
 Winston.addColors({
     console: 'grey',
     admin: 'yellow',
+    deletion: 'yellow',
     startup: 'magenta'
 })
 

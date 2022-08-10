@@ -3,7 +3,8 @@ var commands = {
     "disallow": require('../admincommands/disallow.js'),
     "nuke": require('../admincommands/nuke.js'),
     "deleteafter": require('../admincommands/deleteafter.js'),
-    "addmeme": require('../admincommands/addmeme.js')
+    "addmeme": require('../admincommands/addmeme.js'),
+    "spamchecker": require('../admincommands/spamchecker.js')
 }
 
 module.exports = commands

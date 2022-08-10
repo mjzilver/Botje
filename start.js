@@ -28,5 +28,5 @@ process.on('SIGINT', function () {
 })
 
 process.on('uncaughtException', function (error) {
-    logger.error(error.message)
+    logger.error(`Uncaught error "${error.message}" STACK: "${error.stack}"`)
 })

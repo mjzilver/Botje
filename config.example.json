@@ -6,5 +6,8 @@
 	"speakEvery": 20,
 	"timeoutDuration": 5,
 	"bot_avatar": "direct link to img",
-	"color_hex": "#bab3be"
+	"color_hex": "#bab3be",
+	"port": 100,
+	"spamchecker": 1,
+	"image" : { "size" : 150, "magnification" : 3}
 }

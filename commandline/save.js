@@ -5,14 +5,16 @@ module.exports = {
     'function': function save(input) {
         let channels = bot.client.channels.cache
 
-        var channelId = input[0]
-        var amount = (input[1].length !== 0 ? input[1] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
-        var channel = channels.find(c => c.id === channelId)
+        if (input[0]) {
+            var channelId = input[0]
+            var amount = (input[1]?.length !== 0 ? input[1] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
+            var channel = channels.find(c => c.id === channelId)
 
-        if (channel && channel.type == "GUILD_TEXT")
-            catalog(channel, channel.lastMessageId, amount)
-        else
-            logger.console('Channel not found')
+            if (channel && channel.type == "GUILD_TEXT")
+                catalog(channel, channel.lastMessageId, amount)
+            else
+                logger.console('Channel not found')
+        }
     }
 }
 

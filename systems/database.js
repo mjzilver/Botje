@@ -29,7 +29,8 @@ class Database {
                     this.insertMessage(message)
                 },
                 (error) => {
-                    logger.error(err)
+                    // will give an error if it sees message by someone not in the guild anymore
+                    // however I do not want to save these messages
                 })
         }
     }
