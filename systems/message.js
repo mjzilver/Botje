@@ -54,7 +54,7 @@ class Message {
                                 if (messageTime > yesterday) {
                                     if (message.content.match(new RegExp(config.prefix, "i"))) {
                                         if (!(message.id in this.commandCalls)) {
-                                            command.handleCommand(message)
+                                            command.handleCommand(message, true)
                                         }
                                     }
                                 }

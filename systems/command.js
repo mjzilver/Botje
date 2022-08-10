@@ -10,24 +10,24 @@ class Command {
         this.lastMessageSent = new Date()
     }
 
-    handleCommand(message) {
+    handleCommand(message, readback = false) {
         if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)) {
             message.content = message.content.replace(new RegExp(config.prefix, "i"), '')
             message.content = message.content.normalizeSpaces()
             const args = message.content.split(' ')
             const command = args.shift().toLowerCase()
 
-            logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
+            logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${readback ? 'is a readback command' : ''}`)
 
-            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message)) {
+            if (message.member.permissions.has("ADMINISTRATOR") || (this.isUserAllowed(message) || readback)) {
                 if (command in this.commands) {
                     this.commands[command].function(message)
-                } else if (command in this.admincommands) {
+                } else if (command in this.admincommands && !readback) {
                     if (message.author.id === config.owner || message.member.permissions.has("ADMINISTRATOR"))
                         return this.admincommands[command](message)
                     else
                         bot.message.send(message, `${command.capitalize()} is an admin command, you are not allowed`)
-                } else {
+                } else if (!readback) {
                     bot.message.send(message, `${command.capitalize()} is not a command, retard`)
                 }
             }
