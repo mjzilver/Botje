@@ -97,8 +97,9 @@ function findByWord(message) {
                 }
             })
         }
+    } else {
+        findRandom(message)
     }
-
 }
 
 function findRandom(message) {
