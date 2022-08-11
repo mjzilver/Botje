@@ -18,16 +18,16 @@ class EventListener {
         })
 
         bot.client.on('emojiCreate', emoji => {
-            backup.saveEmoji(emoji)
+            bot.backup.saveEmoji(emoji)
         })
 
         bot.client.on('emojiDelete', emoji => {
-            backup.saveEmoji(emoji, "_deleted")
+            bot.backup.saveEmoji(emoji, "_deleted")
         })
 
         bot.client.on('emojiUpdate', (oldEmoji, newEmoji) => {
-            backup.saveEmoji(oldEmoji, "_old")
-            backup.saveEmoji(newEmoji)
+            bot.backup.saveEmoji(oldEmoji, "_old")
+            bot.backup.saveEmoji(newEmoji)
         })
     }
 }
