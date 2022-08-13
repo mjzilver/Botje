@@ -8,7 +8,7 @@ class Database {
 
     initializeDatabase() {
         this.db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
-        this.db.run(`CREATE TABLE IF NOT EXISTS messages (user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, server TEXT, PRIMARY KEY(user_id, date, channel))`)
+        this.db.run(`CREATE TABLE IF NOT EXISTS messages (id TEXT, user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, server TEXT, PRIMARY KEY(text, date))`)
         this.db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER, y INTEGER, red INTEGER, green INTEGER, blue INTEGER, PRIMARY KEY(x,y))`)
         this.db.run(`CREATE TABLE IF NOT EXISTS command_calls (call_id TEXT, reply_id TEXT, timestamp TEXT, PRIMARY KEY(call_id))`)
     }
@@ -36,8 +36,8 @@ class Database {
     }
 
     insertMessage(message) {
-        var insert = this.db.prepare('INSERT OR IGNORE INTO messages (user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?)',
-            [message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
+        var insert = this.db.prepare('INSERT OR IGNORE INTO messages (id, user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {
                 logger.error(`failed to insert: ${message.content} posted by ${message.author.username}`)

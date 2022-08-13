@@ -20,7 +20,7 @@ class Message {
         return promise
     }
 
-    complete(call) {
+    markComplete(call) {
         this.commandCalls[call.id] = 0
         var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
             [call.id, call.createdAt.getTime()])
