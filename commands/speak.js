@@ -21,6 +21,7 @@ function findByWord(message) {
     editedText = editedText.replace(new RegExp(/(:.+:|<.+>)(?:\s*|$)/, "gi"), '')
     editedText = editedText.replace(new RegExp(/(?:\b)(bot(?:je)?)(?:\s|\b)/, "gi"), '')
     editedText = editedText.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), '')
+    editedText = editedText.replace(new RegExp(/(?:\b)([a-z] )(?:\s|\b|$)/, "gi"), '')
     editedText = editedText.textOnly()
     editedText = editedText.replace(bot.nonselector.getNonSelectorsRegex(), '').trim()
 
@@ -43,7 +44,8 @@ function findByWord(message) {
 
         if (words.length > 1) {
             var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
-                WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+                WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" 
+                AND message NOT LIKE "%bot%" AND message IS NOT NULL
                 AND len < 100 AND (len - spaces) >= 2 
                 AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
                 ORDER BY RANDOM()`

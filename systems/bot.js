@@ -2,6 +2,8 @@ class Bot {
     constructor() {
         this.client = new discord.Client({
             intents: [
+                'DIRECT_MESSAGES',
+                'DIRECT_MESSAGE_TYPING',
                 'GUILDS',
                 'GUILD_MEMBERS',
                 'GUILD_BANS',

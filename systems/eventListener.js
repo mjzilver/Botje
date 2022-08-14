@@ -13,6 +13,10 @@ class EventListener {
             bot.command.handleCommand(message)
         })
 
+        bot.client.on('interactionCreate', async interaction => {
+            console.log(interaction)
+        })
+
         bot.client.on('messageDelete', message => {
             logger.deletion(`This Message has been deleted: ${message.author.username}: ${message.content} == Posted in channel '${message.channel.name}' in server '${message.channel.guild.name} == Send at: ${new Date(message.createdTimestamp).toUTCString()}`)
         })
