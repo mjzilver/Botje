@@ -6,10 +6,9 @@ module.exports = {
         var args = message.content.split(' ')
         args.shift()
         var path = `./backups/emotes/${message.guild.id}/`
-
+        var files = fs.readdirSync(path)
 
         if (args[0] == "?") {
-            var files = fs.readdirSync(path)
             var result = ""
             for (let i = 0; i < files.length; i++) {
                 result += `${files[i]}, `
@@ -17,11 +16,13 @@ module.exports = {
 
             bot.message.reply(message, `Emotes backed up for this server: ${result}`)
         } else if (args[0]) {
-            path += `${args[0]}.png`
-            if (fs.existsSync(path))
+            var filename = `${args[0]}.png`
+            if (fs.existsSync(path + filename)) {
                 bot.message.reply(message, { files: [path] })
-            else
-                bot.message.reply(message, `No emote named ${args[0]} found`)
+            } else {
+                var closestFilename = bot.spellcheck.findClosestMatchInList(filename, files)
+                bot.message.reply(message, { files: [path + closestFilename] })
+            }
         }
     }
 }

@@ -78,6 +78,41 @@ class Spellcheck {
         }
         return closestMatch
     }
+
+    findClosestMatchInList(word, wordList) {
+        if (word == 0) return ''
+
+        if (Array.isArray(wordList)) {
+            var oldWordList = wordList
+            wordList = {}
+            oldWordList.forEach((item) => {
+                wordList[item] = 1
+            })
+        }
+
+        word = word.toLowerCase()
+        var closestMatch = ""
+        var difference = Number.MAX_VALUE
+        var chosenAmount = 0
+
+        for (const [wordlistword, wordlistamount] of Object.entries(wordList)) {
+            var currentdifference = bot.logic.levenshtein(word, wordlistword)
+            if (currentdifference < difference) {
+                difference = currentdifference
+                closestMatch = wordlistword
+                chosenAmount = wordlistamount
+            } else if (currentdifference == difference) {
+                if (wordlistamount < chosenAmount) {
+                    difference = currentdifference
+                    closestMatch = wordlistword
+                    chosenAmount = wordlistamount
+                }
+            }
+
+        }
+        return closestMatch
+    }
+
 }
 
 module.exports = new Spellcheck()
