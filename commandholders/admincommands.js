@@ -2,7 +2,6 @@ var commands = {
     "purge": require('../admincommands/purge.js'),
     "disallow": require('../admincommands/disallow.js'),
     "nuke": require('../admincommands/nuke.js'),
-    "crash": require('../admincommands/crash.js'),
     "reboot": require('../admincommands/reboot.js'),
     "report": require('../admincommands/report.js'),
     "deleteafter": require('../admincommands/deleteafter.js'),

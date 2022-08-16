@@ -53,25 +53,26 @@ async function processPicture(url, top, bottom, message) {
     top = top.toUpperCase().trim().replaceFancyQuotes()
     bottom = bottom.toUpperCase().trim().replaceFancyQuotes()
 
-    var image = await Jimp.read(url)
-    const font = await Jimp.loadFont('./assets/font.fnt')
+    Jimp.read(url, (err, image) => {
+        Jimp.loadFont('./assets/font.fnt').then(font => {
+            image = image.resize(800, Jimp.AUTO)
 
-    image = image.resize(800, Jimp.AUTO)
-
-    image.print(font, 0, 0, {
-        text: top,
-        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
-        alignmentY: Jimp.VERTICAL_ALIGN_TOP
-    }, image.bitmap.width, image.bitmap.height * 0.1)
-    image.print(font, 0, image.bitmap.height * 0.9, {
-        text: bottom,
-        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
-        alignmentY: Jimp.VERTICAL_ALIGN_BOTTOM
-    }, image.bitmap.width, image.bitmap.height * 0.1)
-    await image.writeAsync('./assets/meme.png')
-
-    bot.message.reply(message, {
-        files: ["./assets/meme.png"]
+            image.print(font, 0, 0, {
+                text: top,
+                alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+                alignmentY: Jimp.VERTICAL_ALIGN_TOP
+            }, image.bitmap.width, image.bitmap.height * 0.1)
+            image.print(font, 0, image.bitmap.height * 0.9, {
+                text: bottom,
+                alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+                alignmentY: Jimp.VERTICAL_ALIGN_BOTTOM
+            }, image.bitmap.width, image.bitmap.height * 0.1)
+            image.write('./assets/meme.png', () => {
+                bot.message.reply(message, {
+                    files: ["./assets/meme.png"]
+                })
+            })
+        })
     })
 }
 
