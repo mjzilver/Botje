@@ -1,7 +1,7 @@
 class NonSelector {
     constructor() {
         this.nonSelectors = []
-        this.nonSelectorPath = './assets/words.json'
+        this.nonSelectorPath = './json/words.json'
         this.initializeNonselectors()
     }
 

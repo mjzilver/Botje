@@ -29,6 +29,8 @@ class Command {
                         bot.message.send(message, `${command.capitalize()} is an admin command, you are not allowed`)
                 } else if (!readback) {
                     bot.message.send(message, `${command.capitalize()} is not a command, retard`)
+                } else {
+                    bot.message.markComplete(message)
                 }
             }
         } else if (!message.author.bot) {
@@ -74,6 +76,13 @@ class Command {
             }
         }
         return true
+    }
+
+    handleDM(message) {
+        if (!message.author.bot) {
+            console.log(message)
+            this.commands['speak'].function(message)
+        }
     }
 }
 

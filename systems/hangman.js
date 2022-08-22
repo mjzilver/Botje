@@ -29,39 +29,34 @@ class hangman {
 
     start(message) {
         if (!this.hasEnded)
-            return bot.message.send(message, "A game of hangman is still ongoing use b!guess to guess!")
-
-        let selectSQL = `SELECT message
-        FROM messages 
-        WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%"
-        ORDER BY random()
-        LIMIT 1`
+            return bot.message.send(message, "A game of hangman is still ongoing")
 
         this.word = ""
         this.visibleWord = ""
         this.tries = 0
         this.alreadyGuessed = []
+        var words = require('../json/words.json')
 
-        database.db.get(selectSQL, [], (err, row) => {
-            if (err)
-                throw err
-            else {
-                this.word = row.message.toLowerCase().textOnly().split(' ').pickRandom()
-                for (let i = 0; i < this.word.length; i++)
-                    this.visibleWord += '―'
+        var chosenword = ''
 
-                if (this.word.length > 2 && this.word.length <= 12) {
-                    bot.message.send(message, 'Starting new hangman game.')
-                    logger.debug(`Starting new hangman game the word is ${this.word}`)
-
-                    this.hasEnded = false
-                    this.sendEmbed(message)
-                } else {
-                    this.start(message)
-                }
+        while (this.word == "") {
+            chosenword = words.pickRandom()
+            chosenword[0] = chosenword[0].replace(bot.nonselector.getNonSelectorsRegex(), '').trim()
+            if (chosenword[1] > 10 && chosenword[0].length > 5 && chosenword[0].length <= 20 && chosenword[0].match(/[a-z]+/i)) {
+                this.word = chosenword[0]
             }
-        })
+        }
+
+        for (let i = 0; i < this.word.length; i++)
+            this.visibleWord += '―'
+
+        bot.message.send(message, 'Starting new hangman game.')
+        logger.debug(`Starting new hangman game the word is ${this.word}`)
+
+        this.hasEnded = false
+        this.sendEmbed(message)
     }
+
 
     guess(message, geussedContent) {
         if (this.hasEnded)

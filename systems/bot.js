@@ -17,6 +17,7 @@ class Bot {
                 'GUILD_MESSAGE_REACTIONS',
                 'GUILD_MESSAGE_TYPING',
             ],
+            partials: ["CHANNEL"],
             autoReconnect: true
         })
 

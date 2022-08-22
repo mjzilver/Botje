@@ -9,8 +9,12 @@ class EventListener {
         })
 
         bot.client.on('messageCreate', message => {
-            database.storeMessage(message)
-            bot.command.handleCommand(message)
+            if (message.channel.type == 'DM') {
+                bot.command.handleDM(message)
+            } else {
+                database.storeMessage(message)
+                bot.command.handleCommand(message)
+            }
         })
 
         bot.client.on('interactionCreate', async interaction => {

@@ -54,6 +54,9 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
+#vscode
+.vs/
+
 # dotenv environment variables file
 .env
 
@@ -73,7 +76,7 @@ discord.db.sqbpro
 discord.db*
 
 # dont include the words
-assets/words.json
+json/words.json
 
 # no backups
 backups/
