@@ -32,6 +32,7 @@ class Bot {
         this.reply = require('./reply.js')
         this.spellcheck = require('./spellcheck.js')
         this.nonselector = require('./nonselector.js')
+        this.hangman = require('../systems/hangman.js')
 
         this.client.on('ready', () => {
             this.client.user.setPresence({
