@@ -1,20 +1,17 @@
-class NonSelector {
+class Dictionary {
     constructor() {
-        this.nonSelectors = []
-        this.nonSelectorPath = './json/words.json'
-        this.initializeNonselectors()
-    }
+        this.words = []
+        this.wordsPath = './json/words.json'
 
-    initializeNonselectors() {
-        if (fs.existsSync(this.nonSelectorPath)) {
-            this.nonSelectors = JSON.parse(fs.readFileSync(this.nonSelectorPath))
+        if (fs.existsSync(this.wordsPath)) {
+            this.words = JSON.parse(fs.readFileSync(this.wordsPath))
         } else {
-            this.generateNonselectors()
+            this.generateWordsFile()
             logger.console('NonSelector JSON not found, generating new file')
         }
     }
 
-    generateNonselectors() {
+    generateWordsFile() {
         let selectSQL = `SELECT LOWER(message) as message
         FROM messages
         WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND message NOT LIKE ""`
@@ -34,30 +31,38 @@ class NonSelector {
             }
 
             for (var word in wordHolder) {
-                this.nonSelectors.push([word, wordHolder[word]]);
+                this.words.push([word, wordHolder[word]]);
             }
-            this.nonSelectors.sort(function (a, b) {
+            this.words.sort(function (a, b) {
                 return b[1] - a[1]
             })
 
-            fs.writeFile(this.nonSelectorPath, JSON.stringify(this.nonSelectors), function (err) {
+            fs.writeFile(this.wordsPath, JSON.stringify(this.words), function (err) {
                 if (err)
                     logger.error(err)
             })
         })
     }
 
-    getNonSelectors(amount = 100) {
-        var returnArray = [...this.nonSelectors]
-        returnArray.length = amount
-        return returnArray
+    getWordsByLength(length) {
+        var result = []
+
+        for (var i in this.words) {
+            var processedWord = this.words[i][0]
+            processedWord = processedWord.textOnly()
+            if (processedWord.length == length && this.words[i][1] > 20) {
+                result.push(processedWord)
+            }
+        }
+
+        return result
     }
 
     getNonSelectorsRegex(amount = 100) {
         var nonSelectorsRegex = ''
-        var max = (this.nonSelectors.length < amount) ? this.nonSelectors.length : amount
+        var max = (this.words.length < amount) ? this.words.length : amount
         for (var i = 0; i < max; i++) {
-            nonSelectorsRegex += this.nonSelectors[i][0]
+            nonSelectorsRegex += this.words[i][0]
             if (i != max - 1)
                 nonSelectorsRegex += '|'
         }
@@ -65,4 +70,4 @@ class NonSelector {
     }
 }
 
-module.exports = new NonSelector()
+module.exports = new Dictionary()

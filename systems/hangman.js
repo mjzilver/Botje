@@ -42,7 +42,7 @@ class hangman {
         while (this.word == "") {
             chosenword = words.pickRandom()
             chosenword[0] = chosenword[0].textOnly()
-            chosenword[0] = chosenword[0].replace(bot.nonselector.getNonSelectorsRegex(), '').trim()
+            chosenword[0] = chosenword[0].replace(bot.dictionary.getNonSelectorsRegex(), '').trim()
             if (chosenword[1] > 10 && chosenword[0].length >= 5 && chosenword[0].length <= 20 && chosenword[0].match(/[a-z]+/i)) {
                 this.word = chosenword[0]
             }

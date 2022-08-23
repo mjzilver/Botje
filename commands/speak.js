@@ -23,7 +23,7 @@ function findByWord(message) {
     editedText = editedText.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), '')
     editedText = editedText.replace(new RegExp(/(?:\b)([a-z] )(?:\s|\b|$)/, "gi"), '')
     editedText = editedText.textOnly()
-    editedText = editedText.replace(bot.nonselector.getNonSelectorsRegex(), '').trim()
+    editedText = editedText.replace(bot.dictionary.getNonSelectorsRegex(), '').trim()
 
     var words = editedText.split(' ')
     if (words[0] == 'speak')
