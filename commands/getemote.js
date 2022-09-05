@@ -17,8 +17,9 @@ module.exports = {
             bot.message.reply(message, `Emotes backed up for this server: ${result}`)
         } else if (args[0]) {
             var filename = `${args[0]}.png`
+
             if (fs.existsSync(path + filename)) {
-                bot.message.reply(message, { files: [path] })
+                bot.message.reply(message, { files: [path + filename] })
             } else {
                 var closestFilename = bot.spellcheck.findClosestMatchInList(filename, files)
                 bot.message.reply(message, { files: [path + closestFilename] })
