@@ -8,6 +8,8 @@ class Message {
         var promise = call.channel.send(content)
         promise.then((reply) => {
             this.addCommandCall(call, reply)
+            reply.react(config.positive_emoji)
+            reply.react(config.negative_emoji)
         })
         return promise
     }
@@ -16,8 +18,17 @@ class Message {
         var promise = call.reply(content)
         promise.then((reply) => {
             this.addCommandCall(call, reply)
+            reply.react(config.positive_emoji)
+            reply.react(config.negative_emoji)
         })
         return promise
+    }
+
+    // under construction
+    delete(reply) {
+        console.log(this.commandCalls[reply.id])
+        reply.channel.messages.fetch(this.commandCalls[reply.id]).then((message) => { })
+        reply.delete({ timeout: 5000 })
     }
 
     markComplete(call) {

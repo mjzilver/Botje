@@ -19,7 +19,7 @@ class Command {
 
             logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${readback ? 'is a readback command' : ''}`)
 
-            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message)) {
+            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, readback)) {
                 if (command in this.commands) {
                     this.commands[command].function(message)
                 } else if (command in this.admincommands) {
@@ -47,7 +47,7 @@ class Command {
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
                 } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
-                    if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message))
+                    if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false))
                         this.commands['speak'].function(message)
                 }
             }
@@ -55,7 +55,7 @@ class Command {
         }
     }
 
-    isUserAllowed(message) {
+    isUserAllowed(message, canSendMessage) {
         var disallowed = JSON.parse(fs.readFileSync('./json/disallowed.json'))
         if (message.author.id in disallowed)
             return false
@@ -69,7 +69,8 @@ class Command {
         } else {
             if ((currentTimestamp - this.lastRequest[message.author.username] < (config.timeoutDuration * 1000))) {
                 var difference = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime())
-                bot.message.send(message, `You need to wait ${(config.timeoutDuration - difference.getSeconds())} seconds`)
+                if (canSendMessage)
+                    bot.message.send(message, `You need to wait ${(config.timeoutDuration - difference.getSeconds())} seconds`)
                 return false
             } else {
                 this.lastRequest[message.author.username] = currentTimestamp

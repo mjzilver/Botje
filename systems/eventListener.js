@@ -17,6 +17,19 @@ class EventListener {
             }
         })
 
+        bot.client.on('messageReactionAdd', async (reaction, user) => {
+            if (reaction.message.author.equals(bot.client.user)) {
+                if (reaction.emoji.name == config.positive_emoji) {
+                } else if (reaction.emoji.name == config.negative_emoji) {
+                    if (reaction.count >= 3 && reaction.count > reaction.message.reactions.resolve(config.positive_emoji).count) {
+                        logger.warn(`Post gets deleted due to downvotes - ${reaction.message.content}`)
+
+                        reaction.message.delete({ timeout: 5000 })
+                    }
+                }
+            }
+        })
+
         bot.client.on('interactionCreate', async interaction => {
             console.log(interaction)
         })
