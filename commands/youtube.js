@@ -13,11 +13,14 @@ module.exports = {
         logger.debug(`"${message.author.username}" requested youtube video with keyword "${keyword}"`)
 
         request(options, (err, res, body) => {
-            if (err)
-                return logger.error(err)
-
-            var video = body.items[0]
-            bot.message.reply(message, `https://www.youtube.com/watch?v=${video.id.videoId}`)
+            if (err) {
+                logger.error(err)
+            } else if (!body.items[0]) {
+                bot.message.reply(message, `Nothing found for "${keyword}"`)
+            } else {
+                var video = body.items[0]
+                bot.message.reply(message, `https://www.youtube.com/watch?v=${video.id.videoId}`)
+            }
         })
     }
 }

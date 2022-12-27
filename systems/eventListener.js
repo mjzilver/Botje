@@ -23,9 +23,10 @@ class EventListener {
                 } else if (reaction.emoji.name == config.negative_emoji) {
                     if (reaction.count >= 3 && reaction.count > reaction.message.reactions.resolve(config.positive_emoji).count) {
                         logger.warn(`Post gets deleted due to downvotes - ${reaction.message.content}`)
-
                         reaction.message.delete({ timeout: 5000 })
                     }
+                } else if (reaction.emoji.name == config.redo_emoji) {
+                    bot.command.redo(reaction.message)
                 }
             }
         })

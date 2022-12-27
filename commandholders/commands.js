@@ -23,8 +23,7 @@ var commands = {
    'roll': require('../commands/roll.js'),
    'youtube': require('../commands/youtube.js'),
    'getemote': require('../commands/getemote.js'),
-   'meme': require('../commands/meme.js'),
-   'polyword': require('../commands/polyword.js')
+   'meme': require('../commands/meme.js')
 }
 
 module.exports = commands

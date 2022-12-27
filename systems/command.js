@@ -12,9 +12,10 @@ class Command {
 
     handleCommand(message, readback = false) {
         if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)) {
-            message.content = message.content.replace(new RegExp(config.prefix, "i"), '')
-            message.content = message.content.normalizeSpaces()
-            const args = message.content.split(' ')
+            var msgContent = message.content
+            msgContent = msgContent.replace(new RegExp(config.prefix, "i"), '')
+            msgContent = msgContent.normalizeSpaces()
+            const args = msgContent.split(' ')
             const command = args.shift().toLowerCase()
 
             logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${readback ? 'is a readback command' : ''}`)
@@ -26,9 +27,9 @@ class Command {
                     if (message.author.id === config.owner || message.member.permissions.has("ADMINISTRATOR"))
                         return this.admincommands[command](message)
                     else
-                        bot.message.send(message, `${command.capitalize()} is an admin command, you are not allowed`)
+                        bot.message.reply(message, `${command.capitalize()} is an admin command, you are not allowed`)
                 } else if (!readback) {
-                    bot.message.send(message, `${command.capitalize()} is not a command, retard`)
+                    bot.message.reply(message, `${command.capitalize()} is not a command, retard`)
                 } else {
                     bot.message.markComplete(message)
                 }
@@ -39,11 +40,7 @@ class Command {
 
             if (!bot.reply.process(message)) {
                 if ((this.messageCounter >= config.speakEvery || bot.logic.randomBetween(1, 20) == 1) && timepassed >= bot.logic.randomBetween(20, 60)) {
-                    if (message.attachments.size >= 1 || message.embeds.length >= 1) {
-                        this.commands['meme'].function(message)
-                    } else {
-                        this.commands['speak'].function(message)
-                    }
+                    this.commands['speak'].function(message)
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
                 } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
@@ -53,6 +50,24 @@ class Command {
             }
             this.messageCounter++
         }
+    }
+
+    redo(message) {
+        message.channel.messages.fetch(bot.message.findFromReply(message))
+            .then(callMessage => {
+                var msgContent = callMessage.content
+                msgContent = msgContent.replace(new RegExp(config.prefix, "i"), '')
+                msgContent = msgContent.normalizeSpaces()
+                const args = msgContent.split(' ')
+                const command = args.shift().toLowerCase()
+
+                logger.debug(`Redoing this command == '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
+
+                if (command in this.commands)
+                    this.commands[command].function(callMessage)
+
+                message.delete()
+            })
     }
 
     isUserAllowed(message, canSendMessage) {

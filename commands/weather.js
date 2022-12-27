@@ -9,9 +9,8 @@ module.exports = {
         var args = message.content.split(' ')
 
         if (args[1]) {
-            city = args[1]
-            if (args[2])
-                city += args[2]
+            args.shift()
+            city = args.join(" ")
         } else
             return bot.message.send(message, 'You need to enter a city')
 

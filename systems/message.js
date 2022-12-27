@@ -24,6 +24,14 @@ class Message {
         return promise
     }
 
+    findFromReply(replyMessage) {
+        for (const [call, reply] of Object.entries(this.commandCalls)) {
+            if (reply == replyMessage.id) {
+                return call
+            }
+        }
+    }
+
     // under construction
     delete(reply) {
         console.log(this.commandCalls[reply.id])
@@ -32,7 +40,7 @@ class Message {
     }
 
     markComplete(call) {
-        this.commandCalls[call.id] = 0
+        //this.commandCalls[call.id] = 0
         var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
             [call.id, call.createdAt.getTime()])
         insert.run(function (err) {
@@ -44,6 +52,7 @@ class Message {
 
     addCommandCall(call, reply) {
         this.commandCalls[call.id] = reply.id
+
         var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, reply_id, timestamp) VALUES (?, ?, ?)',
             [call.id, reply.id, reply.createdAt.getTime()])
         insert.run(function (err) {
@@ -68,6 +77,7 @@ class Message {
 
     scanForCommands() {
         bot.client.on('ready', () => {
+            logger.startup(`Reading messages since startup`)
             for (const [channelId, channel] of bot.client.channels.cache.entries()) {
                 if (channel.type == "GUILD_TEXT" && channel.viewable) {
                     channel.messages.fetch({
