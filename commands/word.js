@@ -14,6 +14,8 @@ module.exports = {
             percentage(message, args[2].removeQuotes())
         } else if (args[1]) {
             total(message, args[1].removeQuotes())
+        } else {
+            bot.message.send(message, `I have no idea what you want, format is as follows: '${module.exports.format}'`)
         }
     }
 }

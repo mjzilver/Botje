@@ -60,14 +60,18 @@ String.prototype.removeQuotes = function () {
     return this.replace(new RegExp(/"/gi, "gi"), '')
 }
 
+String.prototype.removePrefix = function () {
+    return this.replace(new RegExp(config.prefix, "i"), '')
+}
+
 String.prototype.replaceFancyQuotes = function () {
     var str = this.valueOf()
-    str = str.replace(new RegExp(/(“|”)/gi, "gi"), '"')
+    str = str.replace(new RegExp(/(“|”|„)/gi, "gi"), '"')
     return str.replace(new RegExp(/(`|‘|’)/gi, "gi"), "'")
 }
 
 String.prototype.replaceAt = function (index, replacement) {
-    return this.substr(0, index) + replacement + this.substr(index + replacement.length)
+    return this.substring(0, index) + replacement + this.substring(index + replacement.length)
 }
 
 Object.defineProperty(Array.prototype, "pickRandom", {

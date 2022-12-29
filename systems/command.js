@@ -12,10 +12,7 @@ class Command {
 
     handleCommand(message, readback = false) {
         if (message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)) {
-            var msgContent = message.content
-            msgContent = msgContent.replace(new RegExp(config.prefix, "i"), '')
-            msgContent = msgContent.normalizeSpaces()
-            const args = msgContent.split(' ')
+            var args = message.content.removePrefix().normalizeSpaces().split(' ')
             const command = args.shift().toLowerCase()
 
             logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${readback ? 'is a readback command' : ''}`)
@@ -55,10 +52,7 @@ class Command {
     redo(message) {
         message.channel.messages.fetch(bot.message.findFromReply(message))
             .then(callMessage => {
-                var msgContent = callMessage.content
-                msgContent = msgContent.replace(new RegExp(config.prefix, "i"), '')
-                msgContent = msgContent.normalizeSpaces()
-                const args = msgContent.split(' ')
+                var args = callMessage.content.removePrefix().normalizeSpaces().split(' ')
                 const command = args.shift().toLowerCase()
 
                 logger.debug(`Redoing this command == '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)

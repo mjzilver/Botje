@@ -19,26 +19,40 @@ module.exports = {
         if (args[0]?.indexOf("http") == 0)
             url = args.shift()
 
-        args = args.join(' ').split('|')
-        var top = args[0] ?? ''
-        var bottom = args[1] ?? ''
+        var topbottom = args.join(' ').split('|')
+        var top = topbottom[0] ?? ''
+        var bottom = topbottom[1] ?? ''
 
-        if (args[0]) {
+        if (args[0] == "?" || !args[0]) {
+            var keyword = ''
+            if (args[0] == "?" && args[1])
+                keyword = args[1]
+
+            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces 
+                FROM messages
+                WHERE ${keyword ? `message LIKE "%${keyword}%" AND` : ''} message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
+                AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
+                AND len < 60 AND (len - spaces) >= 2 
+                ORDER BY RANDOM()
+                LIMIT 1`
+
+            database.query(selectSQL, [], (rows) => {
+                if (rows && rows[0]) {
+                    var content = rows[0]['message']
+                    var middle = content.lastIndexOf(' ', content.length / 2);
+                    var top = content.substring(0, middle);
+                    var bottom = content.substring(middle + 1);
+
+                    return processPicture(url ?? null, top, bottom, message)
+                } else {
+                    bot.message.reply(message, `Can't find anything related, but this is your fault`)
+                }
+            })
+        } else if (top) {
             if (url.match(/\.(jpeg|jpg|gif|png)/gi))
                 return processPicture(url, top, bottom, message)
             else
                 return processPicture(null, top, bottom, message)
-        } else {
-            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces 
-            FROM messages
-            WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
-            AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
-            AND len < 60 AND (len - spaces) >= 2 
-            ORDER BY RANDOM()
-            LIMIT 2`
-            database.query(selectSQL, [], (rows) => {
-                return processPicture(url ?? null, rows[0]['message'], rows[1]['message'], message)
-            })
         }
     }
 }
