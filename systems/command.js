@@ -57,10 +57,10 @@ class Command {
 
                 logger.debug(`Redoing this command == '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
 
-                if (command in this.commands)
+                if (command in this.commands) {
                     this.commands[command].function(callMessage)
-
-                message.delete()
+                    message.delete()
+                }
             })
     }
 
