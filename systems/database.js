@@ -23,15 +23,12 @@ class Database {
     }
 
     storeMessage(message) {
-        if (message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")) && !message.content.match(new RegExp("^t!", "i"))) {
+        if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i"))) {
             message.guild.members.fetch(message.author.id).then(
                 (result) => {
                     this.insertMessage(message)
                 },
-                (error) => {
-                    // will give an error if it sees message by someone not in the guild anymore
-                    // however I do not want to save these messages
-                })
+                (error) => { })
         }
     }
 

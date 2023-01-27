@@ -5,23 +5,33 @@ class Message {
     }
 
     send(call, content) {
-        var promise = call.channel.send(content)
-        promise.then((reply) => {
-            this.addCommandCall(call, reply)
-            reply.react(config.positive_emoji)
-            reply.react(config.negative_emoji)
-        })
-        return promise
+        if (content) {
+            var promise = call.channel.send(content)
+            promise.then((reply) => {
+                this.addCommandCall(call, reply)
+                reply.react(config.positive_emoji)
+                reply.react(config.negative_emoji)
+            })
+            return promise
+        } else {
+            logger.error(`Content empty could not send, call: "${call}"`)
+            markComplete(call)
+        }
     }
 
     reply(call, content) {
-        var promise = call.reply(content)
-        promise.then((reply) => {
-            this.addCommandCall(call, reply)
-            reply.react(config.positive_emoji)
-            reply.react(config.negative_emoji)
-        })
-        return promise
+        if (content) {
+            var promise = call.reply(content)
+            promise.then((reply) => {
+                this.addCommandCall(call, reply)
+                reply.react(config.positive_emoji)
+                reply.react(config.negative_emoji)
+            })
+            return promise
+        } else {
+            logger.error(`Content empty could not send, call: "${call}"`)
+            markComplete(call)
+        }
     }
 
     findFromReply(replyMessage) {
@@ -32,7 +42,6 @@ class Message {
         }
     }
 
-    // under construction
     delete(reply) {
         console.log(this.commandCalls[reply.id])
         reply.channel.messages.fetch(this.commandCalls[reply.id]).then((message) => { })
@@ -40,7 +49,6 @@ class Message {
     }
 
     markComplete(call) {
-        //this.commandCalls[call.id] = 0
         var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
             [call.id, call.createdAt.getTime()])
         insert.run(function (err) {
