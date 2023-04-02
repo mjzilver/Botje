@@ -15,7 +15,7 @@ module.exports = {
 
 function findByWord(message) {
     var earliest = new Date()
-    var editedText = message.content
+    var editedText = message.content.removePrefix()
     earliest.setMonth(earliest.getMonth() - 5)
 
     editedText = editedText.replace(new RegExp(/(:.+:|<.+>)(?:\s*|$)/, "gi"), '')
