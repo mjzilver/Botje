@@ -1,3 +1,5 @@
+let discord = require('discord.js')
+
 class Bot {
     constructor() {
         this.client = new discord.Client({
@@ -24,17 +26,8 @@ class Bot {
         this.login()
         setInterval(this.login.bind(this), 5 * 60 * 1000)
 
-        this.message = require('./message.js')
-        this.eventListener = require('./eventListener.js')(this)
-        this.command = require('./command.js')
-        this.logic = require('./logic.js')
-        this.backup = require('./backup.js')
-        this.reply = require('./reply.js')
-        this.spellcheck = require('./spellcheck.js')
-        this.dictionary = require('./dictionary.js')
-        this.hangman = require('../systems/hangman.js')
-
         this.client.on('ready', () => {
+            this.loadSystems()
             this.client.user.setPresence({
                 activities: [{
                     name: `Running Version ${global.package.version}`
@@ -49,6 +42,17 @@ class Bot {
             logger.startup(`Attempting to log in`)
             this.client.login(config.discord_api_key)
         }
+    }
+
+    loadSystems() {
+        this.message = require('./message.js')
+        this.eventListener = require('./eventListener.js')
+        this.command = require('./command.js')
+        this.logic = require('./logic.js')
+        this.backup = require('./backup.js')
+        this.reply = require('./reply.js')
+        this.spellcheck = require('./spellcheck.js')
+        this.dictionary = require('./dictionary.js')
     }
 }
 module.exports = new Bot()

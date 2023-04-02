@@ -1,4 +1,5 @@
 var request = require('request')
+let discord = require('discord.js')
 
 module.exports = {
     'name': 'reddit',

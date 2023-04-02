@@ -1,3 +1,5 @@
+let discord = require('discord.js')
+
 module.exports = {
     'name': 'word',
     'description': 'shows how many times a word has been said in the current channel, ? per user or from mentioned user',

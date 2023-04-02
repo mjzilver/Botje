@@ -1,5 +1,5 @@
 class EventListener {
-    constructor(bot) {
+    constructor() {
         bot.client.on('shardError', function (error) {
             logger.error(`Shard error: ${error.message}`)
         })
@@ -54,4 +54,4 @@ class EventListener {
     }
 }
 
-module.exports = (bot) => new EventListener(bot)
+module.exports = new EventListener()

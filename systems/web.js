@@ -1,3 +1,5 @@
+let webhook = require('./webhook.js') 
+
 class WebServer {
     constructor() {
         var express = require('express')

@@ -1,3 +1,5 @@
+webhook = require('../systems/webhook.js') 
+
 class Webhook {
     constructor() { }
 

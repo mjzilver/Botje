@@ -1,3 +1,5 @@
+let discord = require('discord.js')
+
 module.exports = {
     'name': 'emotes',
     'description': 'shows the top 10 emotes in the current channel or from the mentioned user',

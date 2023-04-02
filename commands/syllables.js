@@ -1,3 +1,5 @@
+let discord = require('discord.js')
+
 function calculateSyllables(message) {
     var message = message.replace(/e /i)
     var message = message.replace(/ y/i)

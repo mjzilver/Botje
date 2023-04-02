@@ -39,9 +39,9 @@ module.exports = {
             database.query(selectSQL, [], (rows) => {
                 if (rows && rows[0]) {
                     var content = rows[0]['message']
-                    var middle = content.lastIndexOf(' ', content.length / 2);
-                    var top = content.substring(0, middle);
-                    var bottom = content.substring(middle + 1);
+                    var middle = content.lastIndexOf(' ', content.length / 2)
+                    var top = content.substring(0, middle)
+                    var bottom = content.substring(middle + 1)
 
                     return processPicture(url ?? null, top, bottom, message)
                 } else {

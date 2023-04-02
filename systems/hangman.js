@@ -1,3 +1,5 @@
+let discord = require('discord.js')
+
 class hangman {
     constructor() {
         this.word = ""

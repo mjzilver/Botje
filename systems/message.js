@@ -84,30 +84,28 @@ class Message {
     }
 
     scanForCommands() {
-        bot.client.on('ready', () => {
-            logger.startup(`Reading messages since startup`)
-            for (const [channelId, channel] of bot.client.channels.cache.entries()) {
-                if (channel.type == "GUILD_TEXT" && channel.viewable) {
-                    channel.messages.fetch({
-                        limit: 100
-                    }).then(messages => {
-                        var yesterday = new Date() - 24 * 60 * 60 * 1000
-                        messages.forEach(
-                            (message) => {
-                                var messageTime = new Date(message.createdTimestamp)
-                                if (messageTime > yesterday) {
-                                    if (message.content.match(new RegExp(config.prefix, "i"))) {
-                                        if (!(message.id in this.commandCalls)) {
-                                            bot.command.handleCommand(message, true)
-                                        }
+        logger.startup(`Reading messages since startup`)
+        for (const [channelId, channel] of bot.client.channels.cache.entries()) {
+            if (channel.type == "GUILD_TEXT" && channel.viewable) {
+                channel.messages.fetch({
+                    limit: 100
+                }).then(messages => {
+                    var yesterday = new Date() - 24 * 60 * 60 * 1000
+                    messages.forEach(
+                        (message) => {
+                            var messageTime = new Date(message.createdTimestamp)
+                            if (messageTime > yesterday) {
+                                if (message.content.match(new RegExp(config.prefix, "i"))) {
+                                    if (!(message.id in this.commandCalls)) {
+                                        bot.command.handleCommand(message, true)
                                     }
                                 }
                             }
-                        )
-                    })
-                }
+                        }
+                    )
+                })
             }
-        })
+        }
     }
 }
 

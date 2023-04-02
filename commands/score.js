@@ -1,4 +1,5 @@
 var letter_values = require('../json/letter_values.json')
+let discord = require('discord.js')
 
 function calculateScore(message) {
     var score = 0

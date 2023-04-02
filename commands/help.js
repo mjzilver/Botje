@@ -1,3 +1,5 @@
+let discord = require('discord.js')
+
 module.exports = {
     'name': 'help',
     'description': 'sends this helpful message',

@@ -1,3 +1,5 @@
+let webhook = require('../systems/webhook')
+
 module.exports = {
     'name': 'cleanwebhooks',
     'description': 'removes all webhooks from all channels',
