@@ -84,7 +84,6 @@ class CountLister extends Lister {
 			bot.message.send(message, {
 				embeds: [top]
 			})
-
 		})
 	}
 }

@@ -20,7 +20,7 @@ class syllableLister extends Lister {
     mention(message, mentioned) {
         let selectSQL = `SELECT user_id, user_name, message
         FROM messages 
-        WHERE server = ${message.guild.id} AND user_id = ${mentioned.id} `
+        WHERE server = ? AND user_id = ? `
 
         let userdata = {
             'syllables': 0,
@@ -28,7 +28,7 @@ class syllableLister extends Lister {
             'average': 0
         }
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
                 let syllables = this.calculateSyllables(rows[i]['message'])
                 if (syllables >= 1) {
@@ -46,12 +46,12 @@ class syllableLister extends Lister {
     perPerson(message) {
         let selectSQL = `SELECT user_id, user_name, message
         FROM messages 
-        WHERE server = ${message.guild.id}
+        WHERE server = ?
         ORDER BY user_id`
 
         let userdata = {}
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [message.guild.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
                 let user_name = rows[i]['user_name']
 

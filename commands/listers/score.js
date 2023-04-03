@@ -21,7 +21,7 @@ class ScoreLister extends Lister {
     mention(message, mentioned) {
         let selectSQL = `SELECT user_id, user_name, message
         FROM messages 
-        WHERE server = ${message.guild.id} AND user_id = ${mentioned.id} `
+        WHERE server = ? AND user_id = ? `
 
         let userdata = {
             'points': 0,
@@ -30,7 +30,7 @@ class ScoreLister extends Lister {
             'score': 0
         }
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
                 userdata['points'] += this.calculateScore(rows[i]['message'])
                 userdata['total'] += rows[i]['message'].length
@@ -46,12 +46,12 @@ class ScoreLister extends Lister {
     perPerson(message) {
         let selectSQL = `SELECT user_id, user_name, message
         FROM messages 
-        WHERE server = ${message.guild.id}
+        WHERE server = ?
         ORDER BY user_id`
 
         let userdata = {}
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [message.guild.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
                 let user_name = rows[i]['user_name']
 

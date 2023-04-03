@@ -44,12 +44,12 @@ class QualityLister extends Lister {
     perPerson(message, page = 0) {
         let selectSQL = `SELECT user_id, user_name, message
         FROM messages 
-        WHERE server = ${message.guild.id}
+        WHERE server = ?
         ORDER BY user_id`;
 
         let userdata = {};
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [message.guild.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
                 let user_name = rows[i]['user_name'];
 
