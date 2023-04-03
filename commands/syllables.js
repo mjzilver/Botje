@@ -3,9 +3,9 @@ let config = require('../config.json')
 let database = require('../systems/database.js')
 
 function calculateSyllables(message) {
-    var message = message.replace(/e /i)
-    var message = message.replace(/ y/i)
-    var score = message.match(/(?:[aeiouy]{1,2})/gi)
+    message = message.replace(/e /i)
+    message = message.replace(/ y/i)
+    let score = message.match(/(?:[aeiouy]{1,2})/gi)
     return score ? score.length : 0
 }
 
@@ -29,15 +29,15 @@ function mention(message, mentioned) {
     FROM messages 
     WHERE server = ${message.guild.id} AND user_id = ${mentioned.id} `
 
-    var userdata = {
+    let userdata = {
         'syllables': 0,
         'total': 0,
         'average': 0
     }
 
     database.query(selectSQL, [], (rows) => {
-        for (var i = 0; i < rows.length; i++) {
-            var syllables = calculateSyllables(rows[i]['message'])
+        for (let i = 0; i < rows.length; i++) {
+            let syllables = calculateSyllables(rows[i]['message'])
             if (syllables >= 1) {
                 userdata['syllables'] += syllables
                 userdata['total'] += 1
@@ -56,11 +56,11 @@ function perPerson(message) {
     WHERE server = ${message.guild.id}
     ORDER BY user_id`
 
-    var userdata = {}
+    let userdata = {}
 
     database.query(selectSQL, [], (rows) => {
-        for (var i = 0; i < rows.length; i++) {
-            var user_name = rows[i]['user_name']
+        for (let i = 0; i < rows.length; i++) {
+            let user_name = rows[i]['user_name']
 
             if (!userdata[user_name])
                 userdata[user_name] = {
@@ -69,15 +69,15 @@ function perPerson(message) {
                     'average': 0
                 }
 
-            var syllables = calculateSyllables(rows[i]['message'])
+            let syllables = calculateSyllables(rows[i]['message'])
             if (syllables >= 1) {
                 userdata[user_name]['syllables'] += syllables
                 userdata[user_name]['total'] += 1
             }
         }
 
-        var sorted = []
-        for (var user in userdata) {
+        let sorted = []
+        for (let user in userdata) {
             // magical calculation
             userdata[user]['average'] = Math.round(userdata[user]['syllables'] / userdata[user]['total'])
             sorted.push([user, userdata[user]['average']])
@@ -85,8 +85,8 @@ function perPerson(message) {
 
         sorted.sort(function (a, b) { return b[1] - a[1] })
 
-        var result = ""
-        for (var i = 0; (i < sorted.length && i <= 10); i++)
+        let result = ""
+        for (let i = 0; (i < sorted.length && i <= 10); i++)
             result += `${sorted[i][0]} has an average of ${sorted[i][1]} syllables per post \n`
 
         const top = new discord.MessageEmbed()

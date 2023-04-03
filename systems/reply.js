@@ -7,7 +7,7 @@ class Reply {
     }
 
     process(message) {
-        var match = false
+        let match = false
         for (const reply of this.replyPatterns) {
             if (message.content.match(new RegExp(reply["regex"], "gi")) && this.checkTime(reply)) {
                 logger.debug(`Replying to message '${message.content}' that matched ReplyPattern '${reply["name"]}'`)
@@ -23,7 +23,7 @@ class Reply {
     }
 
     checkTime(reply) {
-        var currentTimestamp = new Date()
+        let currentTimestamp = new Date()
 
         if (!(reply["name"] in this.lastRequest)) {
             this.lastRequest[reply["name"]] = currentTimestamp

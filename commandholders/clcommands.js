@@ -1,4 +1,4 @@
-var commands = {
+let commands = {
     'say': require('../commandline/say.js'),
     'list': require('../commandline/list.js'),
     'save': require('../commandline/save.js'),

@@ -8,7 +8,7 @@ module.exports = {
 	'function': function count(message) {
 		const args = message.content.split(' ')
 		const mentioned = message.mentions.users.first()
-		var page = (args[2] ? args[2] - 1 : 0)
+		let page = (args[2] ? args[2] - 1 : 0)
 
 		if (args.length == 1) {
 			total(message)
@@ -49,8 +49,8 @@ function perPerson(message, page) {
 	ORDER BY count DESC`
 
 	database.query(selectSQL, [message.guild.id], (rows) => {
-		var result = ""
-		for (var i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
+		let result = ""
+		for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
 			result += `${rows[i]['user_name']} has posted ${rows[i]['count']} messages! \n`
 
 		const top = new discord.MessageEmbed()
@@ -76,8 +76,8 @@ function percentage(message, page) {
 		LIMIT 10`
 
 	database.query(selectSQL, [message.guild.id, message.guild.id], (rows) => {
-		var result = ""
-		for (var i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
+		let result = ""
+		for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
 			result += `${rows[i]['user_name']} has posted ${Math.round((parseInt(rows[i]['count']) / parseInt(rows[i]['total'])) * 100)}% of all messages! \n`
 
 		const top = new discord.MessageEmbed()

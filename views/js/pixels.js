@@ -1,8 +1,8 @@
-var socket = io()
+let socket = io()
 
 function pixelClick(x, y) {
-    var colorHex = $(`#color`).val()
-    var colorRGB = hexToRgb(colorHex)
+    let colorHex = $(`#color`).val()
+    let colorRGB = hexToRgb(colorHex)
     socket.emit('pixelChange', {
         x: x,
         y: y,
@@ -18,7 +18,7 @@ socket.on('pixelChanged', function (pixel) {
 })
 
 function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
@@ -27,7 +27,7 @@ function hexToRgb(hex) {
 }
 
 function zoomIn() {
-    var styleTag = $('<style> .pixel {padding: 0;width: 0.5vw !important;height: 0.5vw !important;}</style>')
+    let styleTag = $('<style> .pixel {padding: 0;width: 0.5vw !important;height: 0.5vw !important;}</style>')
     $('html > head').append(styleTag)
 }
 

@@ -34,8 +34,8 @@ function perPerson(message, word) {
     LIMIT 10`
 
     database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
-        var result = ""
-        for (var i = 0; (i < rows.length && i <= 10); i++)
+        let result = ""
+        for (let i = 0; (i < rows.length && i <= 10); i++)
             result += `${rows[i]['user_name']} has said ${word} ${rows[i]['count']} times! \n`
 
         if (result == "")
@@ -88,15 +88,15 @@ function percentage(message, word) {
     LIMIT 10`
 
     database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
-        var result = ""
-        var resultArray = []
-        for (var i = 0; (i < rows.length && i <= 10); i++) {
-            var percentage = ((parseInt(rows[i]['count']) / parseInt(rows[i]['total'])) * 100).toFixed(3)
+        let result = ""
+        let resultArray = []
+        for (let i = 0; (i < rows.length && i <= 10); i++) {
+            let percentage = ((parseInt(rows[i]['count']) / parseInt(rows[i]['total'])) * 100).toFixed(3)
             resultArray.push({ 'percentage': percentage, 'user_name': rows[i]['user_name'] })
         }
         resultArray.sort(function (a, b) { return b.percentage - a.percentage });
 
-        for (var i = 0; i < resultArray.length; i++)
+        for (let i = 0; i < resultArray.length; i++)
             result += `${resultArray[i]['user_name']} has said ${word} in ${resultArray[i]['percentage']}% of their messages! \n`
 
         if (result == "")

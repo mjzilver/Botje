@@ -1,4 +1,4 @@
-var PNGImage = require('pngjs-image')
+let PNGImage = require('pngjs-image')
 let database = require('../systems/database.js')
 let config = require('../config.json')
 
@@ -9,7 +9,7 @@ module.exports = {
     'function': function draw(message) {
         const db = database.db
         const totalImageSize = config.image.size * config.image.magnification
-        var image = PNGImage.createImage(totalImageSize, totalImageSize)
+        let image = PNGImage.createImage(totalImageSize, totalImageSize)
         image.fillRect(0, 0, totalImageSize, totalImageSize, {
             red: 255,
             green: 255,
@@ -22,7 +22,7 @@ module.exports = {
         db.all(selectSQL, [], async (err, rows) => {
             if (err)
                 throw err
-            for (var i = 0; i < rows.length; i++)
+            for (let i = 0; i < rows.length; i++)
                 if (rows[i].x >= 0 && rows[i].x < config.image.size && rows[i].y >= 0 && rows[i].y < config.image.size)
                     image.fillRect(rows[i].x * config.image.magnification, rows[i].y * config.image.magnification, config.image.magnification, config.image.magnification, {
                         red: rows[i].red,

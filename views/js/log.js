@@ -1,5 +1,5 @@
 function selectLevel() {
-	var selectedLevel = $('#levelSelect').val()
+	let selectedLevel = $('#levelSelect').val()
 
 	if (selectedLevel == 'none')
 		window.location.href = window.location.href.split('?')[0]

@@ -1,11 +1,11 @@
-var letter_values = require('../json/letter_values.json')
+let letter_values = require('../json/letter_values.json')
 let discord = require('discord.js')
 let config = require('../config.json')
 let database = require('../systems/database.js')
 
 function calculateScore(message) {
-    var score = 0
-    for (var i = 0; i < message.length; i++) {
+    let score = 0
+    for (let i = 0; i < message.length; i++) {
         score += letter_values[message.charAt(i)] === undefined ? 0 : letter_values[message.charAt(i)]
     }
     return score
@@ -32,7 +32,7 @@ function mention(message, mentioned) {
     FROM messages 
     WHERE server = ${message.guild.id} AND user_id = ${mentioned.id} `
 
-    var userdata = {
+    let userdata = {
         'points': 0,
         'total': 0,
         'quality': 0,
@@ -40,7 +40,7 @@ function mention(message, mentioned) {
     }
 
     database.query(selectSQL, [], (rows) => {
-        for (var i = 0; i < rows.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
             userdata['points'] += calculateScore(rows[i]['message'])
             userdata['total'] += rows[i]['message'].length
         }
@@ -58,11 +58,11 @@ function perPerson(message) {
     WHERE server = ${message.guild.id}
     ORDER BY user_id`
 
-    var userdata = {}
+    let userdata = {}
 
     database.query(selectSQL, [], (rows) => {
-        for (var i = 0; i < rows.length; i++) {
-            var user_name = rows[i]['user_name']
+        for (let i = 0; i < rows.length; i++) {
+            let user_name = rows[i]['user_name']
 
             if (!userdata[user_name])
                 userdata[user_name] = {
@@ -76,8 +76,8 @@ function perPerson(message) {
             userdata[user_name]['total'] += rows[i]['message'].length
         }
 
-        var sorted = []
-        for (var user in userdata) {
+        let sorted = []
+        for (let user in userdata) {
             // magical calculation
             userdata[user]['quality'] = (userdata[user]['points'] / userdata[user]['total']) / 2
             userdata[user]['score'] = Math.round(userdata[user]['total'] * userdata[user]['quality'])
@@ -89,8 +89,8 @@ function perPerson(message) {
             return b[1] - a[1]
         })
 
-        var result = ""
-        for (var i = 0; (i < sorted.length && i <= 10); i++)
+        let result = ""
+        for (let i = 0; (i < sorted.length && i <= 10); i++)
             result += `${sorted[i][0]}'s post score is ${sorted[i][1]} \n`
 
         const top = new discord.MessageEmbed()

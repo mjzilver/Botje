@@ -6,7 +6,7 @@ class Webhook {
 
     async fetch(channel) {
         if (channel && channel.type == "GUILD_TEXT") {
-            var webhooks = await channel.fetchWebhooks()
+            let webhooks = await channel.fetchWebhooks()
             for (const [id, webhook] of webhooks) {
                 if (webhook.name == projectPackage.name) {
                     logger.console('Found webhook')
@@ -19,8 +19,8 @@ class Webhook {
     }
 
     async sendMessage(channelid, text, userid) {
-        var channel = bot.client.channels.cache.get(channelid)
-        var webhook = await this.fetch(channel)
+        let channel = bot.client.channels.cache.get(channelid)
+        let webhook = await this.fetch(channel)
 
         channel.guild.members.fetch(userid).then(
             async (member) => {

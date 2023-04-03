@@ -35,7 +35,7 @@ class Database {
     }
 
     insertMessage(message) {
-        var insert = this.db.prepare('INSERT OR IGNORE INTO messages (id, user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        let insert = this.db.prepare('INSERT OR IGNORE INTO messages (id, user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {

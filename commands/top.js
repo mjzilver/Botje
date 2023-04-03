@@ -28,8 +28,8 @@ function perPerson(message) {
     LIMIT 10`
 
     database.query(selectSQL, [message.guild.id], (rows) => {
-        var result = ""
-        for (var i = 0;
+        let result = ""
+        for (let i = 0;
             (i < rows.length && i <= 10); i++)
             result += `${rows[i]['message']} was said ${rows[i]['count']} times \n`
 
@@ -55,8 +55,8 @@ function mention(message, mentioned) {
     LIMIT 10`
 
     database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
-        var result = ""
-        for (var i = 0;
+        let result = ""
+        for (let i = 0;
             (i < rows.length && i <= 10); i++)
             result += `${rows[i]['message']} was said ${rows[i]['count']} times \n`
 

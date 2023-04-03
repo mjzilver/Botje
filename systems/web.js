@@ -3,12 +3,12 @@ let config = require('../config.json')
 
 class WebServer {
     constructor() {
-        var express = require('express')
-        var expressapp = express()
+        let express = require('express')
+        let expressapp = express()
         expressapp.set('view engine', 'pug')
 
-        var server = require('http').createServer(expressapp)
-        var io = require('socket.io').listen(server)
+        let server = require('http').createServer(expressapp)
+        let io = require('socket.io').listen(server)
         global.io = io
         this.moment = require('moment')
 
@@ -32,9 +32,9 @@ class WebServer {
                 if (err)
                     logger.warn('Error in query' + err)
 
-                var logs = []
+                let logs = []
                 if (req.query.level) {
-                    for (var i = 0; i < results.file.length; i++)
+                    for (let i = 0; i < results.file.length; i++)
                         if (results.file[i].level == req.query.level)
                             logs.push(results.file[i])
                 } else
@@ -53,8 +53,8 @@ class WebServer {
             ORDER BY amount DESC`
 
             const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == 'GUILD_TEXT'))
-            var guilds = Object.fromEntries(bot.client.guilds.cache)
-            var commands = (require('../commandholders/commands.js'))
+            let guilds = Object.fromEntries(bot.client.guilds.cache)
+            let commands = (require('../commandholders/commands.js'))
 
             database.db.all(selectSQL, [], async (err, rows) => {
                 rows.unshift({ 'user_id': '542721460033028117', 'user_name': 'Botje' })
@@ -75,10 +75,10 @@ class WebServer {
         expressapp.get('/draw', function (req, res) {
             let selectSQL = 'SELECT * FROM colors ORDER BY y, x ASC'
 
-            var pixels = new Array(config.image.size)
-            for (var i = 0; i < pixels.length; i++) {
+            let pixels = new Array(config.image.size)
+            for (let i = 0; i < pixels.length; i++) {
                 pixels[i] = new Array(config.image.size)
-                for (var j = 0; j < pixels[i].length; j++) {
+                for (let j = 0; j < pixels[i].length; j++) {
                     pixels[i][j] = {
                         y: i,
                         x: j,
@@ -119,7 +119,7 @@ class WebServer {
 
             socket.on('pixelChange', function (pixel) {
                 if (web.spamChecker(socket.id) && (pixel.x >= 0 && pixel.x < config.image.size && pixel.y >= 0 && pixel.y < config.image.size)) {
-                    var insert = database.db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue])
+                    let insert = database.db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue])
 
                     insert.run(function (err) {
                         if (err) {
@@ -158,11 +158,11 @@ class WebServer {
                 delete web.editPerPerson[id]
                 return true
             } else {
-                var count = 0
+                let count = 0
                 for (const index in web.editPerPerson[id]) {
-                    var currentTimestamp = new Date()
-                    var edited_at = web.editPerPerson[id][index]
-                    var time_passed = (new Date(currentTimestamp.getTime() - edited_at.getTime())).getTime()
+                    let currentTimestamp = new Date()
+                    let edited_at = web.editPerPerson[id][index]
+                    let time_passed = (new Date(currentTimestamp.getTime() - edited_at.getTime())).getTime()
 
                     if (time_passed < 200)
                         count++

@@ -6,7 +6,7 @@ module.exports = {
     'description': 'searches for a youtube video',
     'format': 'youtube [keyword]',
     'function': function youtube(message) {
-        var keyword = message.content.replace(/youtube /g, '')
+        let keyword = message.content.replace(/youtube /g, '')
 
         const options = {
             url: `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${keyword}&key=${config.youtube_api_key}`,
@@ -21,7 +21,7 @@ module.exports = {
             } else if (!body.items[0]) {
                 bot.message.reply(message, `Nothing found for "${keyword}"`)
             } else {
-                var video = body.items[0]
+                let video = body.items[0]
                 bot.message.reply(message, `https://www.youtube.com/watch?v=${video.id.videoId}`)
             }
         })

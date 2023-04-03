@@ -1,4 +1,4 @@
-var request = require('request')
+let request = require('request')
 let discord = require('discord.js')
 let config = require('../config.json')
 let database = require('../systems/database.js')
@@ -10,9 +10,9 @@ module.exports = {
     'function': async function getRedditImage(message, last = '') {
         const db = database.db
         const args = message.content.split(' ')
-        var sub = args[1]
-        var sort = 'hot'
-        var time = 'month'
+        let sub = args[1]
+        let sort = 'hot'
+        let time = 'month'
 
         if (['top', 'hot', 'new'].includes(args[2]))
             sort = args[2]
@@ -31,24 +31,24 @@ module.exports = {
 
             if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined' && typeof (body.data.children) !== 'undefined') {
                 let selectSQL = 'SELECT * FROM images WHERE sub = "' + sub + '"'
-                var foundImages = {}
+                let foundImages = {}
 
                 db.all(selectSQL, [], async (err, rows) => {
                     if (err)
                         throw err
 
-                    for (var i = 0; i < rows.length; i++)
+                    for (let i = 0; i < rows.length; i++)
                         foundImages[rows[i].link] = true
 
-                    var filteredImages = []
+                    let filteredImages = []
 
-                    for (var i = 0; i < body.data.children.length; i++)
+                    for (let i = 0; i < body.data.children.length; i++)
                         if (!(body.data.children[i].data.url in foundImages) && body.data.children[i].data.url.isLink())
                             filteredImages.push(body.data.children[i])
 
                     if (filteredImages.length > 0) {
-                        var chosen = Math.floor(Math.random() * filteredImages.length)
-                        var post = filteredImages[chosen].data
+                        let chosen = Math.floor(Math.random() * filteredImages.length)
+                        let post = filteredImages[chosen].data
 
                         if (post.url && post.url.isImage()) {
                             const image = new discord.MessageEmbed()
@@ -79,7 +79,7 @@ module.exports = {
                                 }
 
                                 request(options, (err, res, body) => {
-                                    var videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
+                                    let videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
 
                                     bot.message.send(message, `${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
                                 })
@@ -88,7 +88,7 @@ module.exports = {
                             bot.message.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
                         }
 
-                        var insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [post.url, sub])
+                        let insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [post.url, sub])
                         insert.run(function (err) {
                             if (err) {
                                 logger.error(`failed to insert: ${post.url} - ${sub}`)

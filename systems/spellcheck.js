@@ -3,7 +3,7 @@ let database = require('./database.js')
 class Spellcheck {
     constructor() {
         this.wordList = {}
-        var earliest = new Date()
+        let earliest = new Date()
         earliest.setMonth(earliest.getMonth() - 3)
 
         const selectSQL = `SELECT LOWER(message) AS message, COUNT(*) AS amount 
@@ -30,15 +30,15 @@ class Spellcheck {
     }
 
     checkSentence(sentence) {
-        var words = []
-        var mistakes = 0
+        let words = []
+        let mistakes = 0
 
-        for (var word of sentence.split(' ')) {
+        for (let word of sentence.split(' ')) {
             word = word.textOnly()
             if (this.checkWord(word)) {
                 words.push(word)
             } else {
-                var result = this.findClosestWord(word)
+                let result = this.findClosestWord(word)
                 mistakes++
                 words.push(result)
             }
@@ -58,13 +58,13 @@ class Spellcheck {
 
         word = word.toLowerCase()
 
-        var closestMatch = ""
-        var difference = Number.MAX_VALUE
-        var chosenAmount = 0
+        let closestMatch = ""
+        let difference = Number.MAX_VALUE
+        let chosenAmount = 0
 
         for (const [wordlistword, wordlistamount] of Object.entries(this.wordList)) {
             if (wordlistamount >= 5) {
-                var currentdifference = bot.logic.levenshtein(word, wordlistword)
+                let currentdifference = bot.logic.levenshtein(word, wordlistword)
                 if (currentdifference < difference) {
                     difference = currentdifference
                     closestMatch = wordlistword
@@ -85,7 +85,7 @@ class Spellcheck {
         if (word == 0) return ''
 
         if (Array.isArray(wordList)) {
-            var oldWordList = wordList
+            let oldWordList = wordList
             wordList = {}
             oldWordList.forEach((item) => {
                 wordList[item] = 1
@@ -93,12 +93,12 @@ class Spellcheck {
         }
 
         word = word.toLowerCase()
-        var closestMatch = ""
-        var difference = Number.MAX_VALUE
-        var chosenAmount = 0
+        let closestMatch = ""
+        let difference = Number.MAX_VALUE
+        let chosenAmount = 0
 
         for (const [wordlistword, wordlistamount] of Object.entries(wordList)) {
-            var currentdifference = bot.logic.levenshtein(word, wordlistword)
+            let currentdifference = bot.logic.levenshtein(word, wordlistword)
             if (currentdifference < difference) {
                 difference = currentdifference
                 closestMatch = wordlistword

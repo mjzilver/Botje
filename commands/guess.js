@@ -5,7 +5,7 @@ module.exports = {
     'description': 'guess in hangman - see hangman help',
     'format': 'guess [letter]',
     'function': function guess(message) {
-        var args = message.cleanContent.toLowerCase().split(' ')
+        let args = message.cleanContent.toLowerCase().split(' ')
         hangman.guess(message, args[1])
     }
 }

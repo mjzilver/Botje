@@ -9,7 +9,7 @@ class Message {
 
     send(call, content) {
         if (content) {
-            var promise = call.channel.send(content)
+            let promise = call.channel.send(content)
             promise.then((reply) => {
                 this.addCommandCall(call, reply)
                 reply.react(config.positive_emoji)
@@ -24,7 +24,7 @@ class Message {
 
     reply(call, content) {
         if (content) {
-            var promise = call.reply(content)
+            let promise = call.reply(content)
             promise.then((reply) => {
                 this.addCommandCall(call, reply)
                 reply.react(config.positive_emoji)
@@ -52,7 +52,7 @@ class Message {
     }
 
     markComplete(call) {
-        var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
+        let insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
             [call.id, call.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {
@@ -64,7 +64,7 @@ class Message {
     addCommandCall(call, reply) {
         this.commandCalls[call.id] = reply.id
 
-        var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, reply_id, timestamp) VALUES (?, ?, ?)',
+        let insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, reply_id, timestamp) VALUES (?, ?, ?)',
             [call.id, reply.id, reply.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {
@@ -79,7 +79,7 @@ class Message {
         ORDER BY timestamp DESC`
 
         database.query(selectSQL, [], (rows) => {
-            for (var i = 0; i < rows.length; i++) {
+            for (let i = 0; i < rows.length; i++) {
                 this.commandCalls[rows[i]['call_id']] = rows[i]['reply_id']
             }
             this.scanForCommands()
@@ -93,10 +93,10 @@ class Message {
                 channel.messages.fetch({
                     limit: 100
                 }).then(messages => {
-                    var yesterday = new Date() - 24 * 60 * 60 * 1000
+                    let yesterday = new Date() - 24 * 60 * 60 * 1000
                     messages.forEach(
                         (message) => {
-                            var messageTime = new Date(message.createdTimestamp)
+                            let messageTime = new Date(message.createdTimestamp)
                             if (messageTime > yesterday) {
                                 if (message.content.match(new RegExp(config.prefix, "i"))) {
                                     if (!(message.id in this.commandCalls)) {

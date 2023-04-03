@@ -1,11 +1,11 @@
-var moment = require('moment')
+let moment = require('moment')
 
 module.exports = {
     'name': 'age',
     'description': 'shows how long bot has been living in this server',
     'format': 'age',
     'function': function age(message) {
-        var joined = moment(message.guild.members.cache.find(u => u.id === bot.client.user.id).joinedAt)
+        let joined = moment(message.guild.members.cache.find(u => u.id === bot.client.user.id).joinedAt)
         const now = moment()
         years = now.diff(joined, 'years')
         days = now.subtract(years, 'years').diff(joined, 'days')

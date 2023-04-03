@@ -1,7 +1,7 @@
 function sendMessage() {
-    var selectedChannel = $(`#channelSelect`).val()
-    var selectedUser = $(`#userSelect`).val()
-    var textToSend = $(`#textToSend`).val()
+    let selectedChannel = $(`#channelSelect`).val()
+    let selectedUser = $(`#userSelect`).val()
+    let textToSend = $(`#textToSend`).val()
 
     if (textToSend != '') {
         $.post('/interact', {
@@ -13,8 +13,8 @@ function sendMessage() {
 }
 
 function guildSelected() {
-    var selectedGuild = $(`#guildSelect`).val()
-    var first = null
+    let selectedGuild = $(`#guildSelect`).val()
+    let first = null
 
     $('#channelSelect > option').each(function () {
         if ($(this).attr('guild') == selectedGuild) {

@@ -19,11 +19,11 @@ class Dictionary {
         FROM messages
         WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND message NOT LIKE ""`
 
-        var wordHolder = {}
+        let wordHolder = {}
 
         database.db.all(selectSQL, [], (err, rows) => {
-            for (var i = 0; i < rows.length; i++) {
-                var words = rows[i]['message'].split(/\s+/)
+            for (let i = 0; i < rows.length; i++) {
+                let words = rows[i]['message'].split(/\s+/)
 
                 for (let j = 0; j < words.length; j++) {
                     if (!wordHolder[words[j]])
@@ -33,7 +33,7 @@ class Dictionary {
                 }
             }
 
-            for (var word in wordHolder) {
+            for (let word in wordHolder) {
                 this.words.push([word, wordHolder[word]]);
             }
             this.words.sort(function (a, b) {
@@ -48,10 +48,10 @@ class Dictionary {
     }
 
     getWordsByLength(length) {
-        var result = []
+        let result = []
 
-        for (var i in this.words) {
-            var processedWord = this.words[i][0]
+        for (let i in this.words) {
+            let processedWord = this.words[i][0]
             processedWord = processedWord.textOnly()
             if (processedWord.length == length && this.words[i][1] > 20) {
                 result.push(processedWord)
@@ -62,9 +62,9 @@ class Dictionary {
     }
 
     getNonSelectorsRegex(amount = 100) {
-        var nonSelectorsRegex = ''
-        var max = (this.words.length < amount) ? this.words.length : amount
-        for (var i = 0; i < max; i++) {
+        let nonSelectorsRegex = ''
+        let max = (this.words.length < amount) ? this.words.length : amount
+        for (let i = 0; i < max; i++) {
             nonSelectorsRegex += this.words[i][0]
             if (i != max - 1)
                 nonSelectorsRegex += '|'

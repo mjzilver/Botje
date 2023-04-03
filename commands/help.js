@@ -7,19 +7,19 @@ module.exports = {
     'description': 'sends this helpful message',
     'format': 'help',
     'function': function help(message) {
-        var helpMessage = `**Here is a list of all the commands *you* can use: **
+        let helpMessage = `**Here is a list of all the commands *you* can use: **
         Format: \`()\` = optional argument, \`[]\` = required argument\n`
         const args = message.content.split(' ')
 
-        commands = require('../commandholders/commands.js')
-        var pageAmount = Math.ceil(Object.entries(commands).length / 10)
-        var pageNum = args[1] ? args[1] : 1
+        let commands = require('../commandholders/commands.js')
+        let pageAmount = Math.ceil(Object.entries(commands).length / 10)
+        let pageNum = args[1] ? args[1] : 1
 
         if (pageNum > pageAmount)
             pageNum = pageAmount
 
-        var start = (pageNum - 1) * 10
-        var count = 0
+        let start = (pageNum - 1) * 10
+        let count = 0
 
         for (const [name, command] of Object.entries(commands)) {
             count++
