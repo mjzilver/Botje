@@ -1,4 +1,5 @@
 let config = require('../config.json')
+const logger = require('./logger')
 
 class Database {
     constructor() {
@@ -7,6 +8,7 @@ class Database {
 
         this.initializeDatabase()
         this.setCacheSize(20000)
+        logger.startup("Database loaded")
     }
 
     initializeDatabase() {

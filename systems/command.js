@@ -20,7 +20,7 @@ class Command {
 
             logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${readback ? 'is a readback command' : ''}`)
 
-            if (message.member.permissions.has("ADMINISTRATOR") || isUserAllowed(message, readback)) {
+            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, readback)) {
                 this.handleCommandType(command, args, readback, message)
             }
         } else if (!message.author.bot) {
