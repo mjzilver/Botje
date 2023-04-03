@@ -7,11 +7,28 @@ class Dictionary {
         this.wordsPath = './json/words.json'
 
         if (fs.existsSync(this.wordsPath)) {
-            this.words = JSON.parse(fs.readFileSync(this.wordsPath))
+            this.loadWordsFromFile()
         } else {
             this.generateWordsFile()
             logger.console('NonSelector JSON not found, generating new file')
         }
+    }
+
+    loadWordsFromFile() {
+        const stream = fs.createReadStream(this.wordsPath, { encoding: 'utf8' })
+        let rawData = ''
+
+        stream.on('data', chunk => {
+            rawData += chunk
+        })
+
+        stream.on('end', () => {
+            this.words = JSON.parse(rawData)
+        })
+
+        stream.on('error', err => {
+            logger.error(err)
+        })
     }
 
     generateWordsFile() {

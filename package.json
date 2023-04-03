@@ -11,6 +11,7 @@
   "dependencies": {
     "discord.js": "^13.1.0",
     "express": "^4.16.4",
+    "heapdump": "^0.3.15",
     "jimp": "^0.16.1",
     "moment": "^2.24.0",
     "npm": "^7.24.0",

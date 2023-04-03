@@ -12,7 +12,8 @@ let commands = {
     'cleanwebhooks': require('../commandline/cleanwebhooks.js'),
     'webhooks': require('../commandline/webhooks.js'),
     'match': require('../commandline/match.js'),
-    'report': require('../commandline/report.js')
+    'report': require('../commandline/report.js'),
+    'heapdump': require('../commandline/heapdump.js'),
 }
 
 module.exports = commands

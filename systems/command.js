@@ -98,18 +98,21 @@ class Command {
         const currentTimestamp = new Date()
 
         if (!(message.author.username in this.lastRequest)) {
-            this.lastRequest[message.author.username] = currentTimestamp
-        } else {
-            if ((currentTimestamp - this.lastRequest[message.author.username] < (config.timeoutDuration * 1000))) {
-                let difference = new Date(currentTimestamp.getTime() - this.lastRequest[message.author.username].getTime())
-                if (canSendMessage)
-                    bot.message.send(message, `You need to wait ${(config.timeoutDuration - difference.getSeconds())} seconds`)
-                return false
-            } else {
-                this.lastRequest[message.author.username] = currentTimestamp
-            }
+            this.lastRequest[message.author.username] = currentTimestamp;
+            return true; // no previous request found, return true
         }
-        return true
+
+        const elapsedTime = currentTimestamp - this.lastRequest[message.author.username];
+        if (elapsedTime < config.timeoutDuration * 1000) {
+            const remainingTime = Math.ceil((config.timeoutDuration * 1000 - elapsedTime) / 1000);
+            if (canSendMessage) {
+                bot.message.send(message, `Please wait ${remainingTime} second${remainingTime > 1 ? 's' : ''} before making another request.`);
+            }
+            return false; // too soon, return false
+        }
+
+        this.lastRequest[message.author.username] = currentTimestamp;
+        return true; // enough time has elapsed, return true          
     }
 
     handleDM(message) {

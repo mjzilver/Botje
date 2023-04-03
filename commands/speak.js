@@ -60,12 +60,17 @@ function findByWord(message) {
                         let highestAmount = 0
                         let chosenMessage = ''
 
+                        const regexPatterns = words.map(w => new RegExp(w, 'gmi'));
+
                         for (let i = 0; i < rows.length; i++) {
                             let amount = 0
-                            for (let j = 0; j < words.length; j++) {
-                                if (rows[i]['message'].match(new RegExp(words[j], 'gmi')))
-                                    amount += 30 - (j * j)
+
+                            for (let j = 0; j < regexPatterns.length; j++) {
+                                if (rows[i]['message'].match(regexPatterns[j])) {
+                                    amount += 30 - (j * j);
+                                }
                             }
+
                             if (amount > highestAmount) {
                                 if (bot.logic.levenshtein(rows[i]['message'], message.content) > 15) {
                                     chosenMessage = rows[i]['message']
