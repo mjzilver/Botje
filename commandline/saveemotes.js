@@ -1,3 +1,5 @@
+let fs = require('fs')
+
 module.exports = {
     'name': 'saveemotes',
     'description': 'saves all emotes to /backups/emotes/guildid',

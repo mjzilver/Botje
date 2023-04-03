@@ -1,3 +1,6 @@
+let config = require('../config.json')
+let fs = require('fs')
+
 class Command {
     constructor() {
         this.commands = require('../commandholders/commands.js')

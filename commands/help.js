@@ -1,4 +1,6 @@
 let discord = require('discord.js')
+let projectPackage = require('../package.json')
+let config = require('../config.json')
 
 module.exports = {
     'name': 'help',
@@ -29,7 +31,7 @@ module.exports = {
             .setColor(config.color_hex)
             .setTitle(`:robot: Current commands: :robot:`)
             .setDescription(helpMessage)
-            .setFooter(`Page ${pageNum}/${pageAmount} \nCurrent Version: ${package.version}`)
+            .setFooter(`Page ${pageNum}/${pageAmount} \nCurrent Version: ${projectPackage.version}`)
 
         return bot.message.send(message, { embeds: [help] })
     }

@@ -1,3 +1,5 @@
+let database = require('../systems/database.js')
+
 module.exports = {
     'name': 'save',
     'description': 'lists all commands currently available',

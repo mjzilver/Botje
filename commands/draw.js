@@ -1,4 +1,6 @@
 var PNGImage = require('pngjs-image')
+let database = require('../systems/database.js')
+let config = require('../config.json')
 
 module.exports = {
     'name': 'draw',
@@ -30,7 +32,7 @@ module.exports = {
                     })
 
             image.writeImage('./views/images/image.png', function (err) {
-                bot.message.send(message, "Current image", {
+                bot.message.reply(message, "Current image", {
                     files: ["./views/images/image.png"]
                 })
             })

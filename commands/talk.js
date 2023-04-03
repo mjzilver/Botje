@@ -1,3 +1,5 @@
+let database = require('../systems/database.js')
+
 module.exports = {
     'name': 'talk',
     'description': 'makes the bot talk via predictive text or as if it were the mentioned user',

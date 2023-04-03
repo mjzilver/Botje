@@ -1,3 +1,6 @@
+let config = require('../config.json')
+let database = require('./database.js')
+
 class EventListener {
     constructor() {
         bot.client.on('shardError', function (error) {

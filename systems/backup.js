@@ -1,3 +1,6 @@
+let fs = require('fs')
+let request = require('request')
+
 class Backup {
     constructor() { }
 

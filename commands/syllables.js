@@ -1,4 +1,6 @@
 let discord = require('discord.js')
+let config = require('../config.json')
+let database = require('../systems/database.js')
 
 function calculateSyllables(message) {
     var message = message.replace(/e /i)

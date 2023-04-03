@@ -1,5 +1,7 @@
 var request = require('request')
 let discord = require('discord.js')
+let config = require('../config.json')
+let database = require('../systems/database.js')
 
 module.exports = {
     'name': 'reddit',

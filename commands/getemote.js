@@ -1,3 +1,5 @@
+let fs = require('fs')
+
 module.exports = {
     'name': 'getemote',
     'description': 'gets the emote',

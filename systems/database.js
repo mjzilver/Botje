@@ -1,3 +1,5 @@
+let config = require('../config.json')
+
 class Database {
     constructor() {
         this.sqlite3 = require('sqlite3')
@@ -14,7 +16,7 @@ class Database {
     }
 
     query(selectSQL, parameters = [], callback) {
-        database.db.all(selectSQL, parameters, (err, rows) => {
+        this.db.all(selectSQL, parameters, (err, rows) => {
             if (err)
                 throw err
             else

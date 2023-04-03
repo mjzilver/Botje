@@ -1,3 +1,5 @@
+let fs = require('fs')
+
 module.exports = async function spamchecker(message) {
     path = "./config.json"
 

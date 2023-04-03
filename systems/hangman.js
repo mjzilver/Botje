@@ -1,4 +1,5 @@
 let discord = require('discord.js')
+let config = require('../config.json')
 
 class hangman {
     constructor() {

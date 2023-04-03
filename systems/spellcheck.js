@@ -1,3 +1,5 @@
+let database = require('./database.js')
+
 class Spellcheck {
     constructor() {
         this.wordList = {}

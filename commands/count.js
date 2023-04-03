@@ -1,3 +1,6 @@
+let config = require('../config.json')
+let database = require('../systems/database.js')
+
 module.exports = {
 	'name': 'count',
 	'description': 'counts messages in the current channel or from the mentioned user',

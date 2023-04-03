@@ -1,3 +1,5 @@
+let config = require('../config.json')
+
 class Logic {
     constructor() { }
 

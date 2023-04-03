@@ -1,3 +1,6 @@
+let fs = require('fs')
+let request = require('request')
+
 module.exports = async function addmeme(message) {
     var args = message.content.split(' ')
     args.shift()

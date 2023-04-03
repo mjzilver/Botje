@@ -1,4 +1,6 @@
 var Jimp = require("jimp")
+let fs = require('fs')
+let database = require('../systems/database.js')
 
 module.exports = {
     'name': 'meme',

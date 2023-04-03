@@ -1,4 +1,5 @@
 let webhook = require('./webhook.js') 
+let config = require('../config.json')
 
 class WebServer {
     constructor() {
@@ -144,8 +145,8 @@ class WebServer {
             })
         })
 
-        server.listen(global.config.port, () => {
-            logger.startup('Webserver running on port ' + global.config.port)
+        server.listen(config.port, () => {
+            logger.startup('Webserver running on port ' + config.port)
         })
     }
 

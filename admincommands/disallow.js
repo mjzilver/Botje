@@ -1,3 +1,5 @@
+let fs = require('fs')
+
 module.exports = function disallow(message) {
     const mention = message.mentions.users.first()
     const args = message.content.split(' ')

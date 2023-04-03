@@ -1,3 +1,5 @@
+let config = require('../config.json')
+
 module.exports = async function purge(message) {
     message.channel.messages.fetch()
         .then(messages => messages.forEach(

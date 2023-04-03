@@ -1,3 +1,5 @@
+let database = require('../systems/database.js')
+
 module.exports = {
     'name': 'speak',
     'description': 'makes the bot speak via recycled messages',

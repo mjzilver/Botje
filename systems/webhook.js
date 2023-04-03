@@ -1,4 +1,5 @@
 webhook = require('../systems/webhook.js') 
+webhook = require('../package.json') 
 
 class Webhook {
     constructor() { }
@@ -7,13 +8,13 @@ class Webhook {
         if (channel && channel.type == "GUILD_TEXT") {
             var webhooks = await channel.fetchWebhooks()
             for (const [id, webhook] of webhooks) {
-                if (webhook.name == global.package.name) {
+                if (webhook.name == projectPackage.name) {
                     logger.console('Found webhook')
                     return webhook
                 }
             }
             logger.console('making new webhook')
-            return await channel.createWebhook(global.package.name)
+            return await channel.createWebhook(projectPackage.name)
         }
     }
 

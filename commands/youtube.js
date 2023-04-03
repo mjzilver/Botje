@@ -1,3 +1,6 @@
+let config = require('../config.json')
+let request = require('request')
+
 module.exports = {
     'name': 'youtube',
     'description': 'searches for a youtube video',

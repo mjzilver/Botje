@@ -1,3 +1,6 @@
+let fs = require('fs')
+let database = require('./database.js')
+
 class Dictionary {
     constructor() {
         this.words = []

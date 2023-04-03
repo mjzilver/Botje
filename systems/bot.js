@@ -1,4 +1,6 @@
 let discord = require('discord.js')
+let projectPackage = require('../package.json')
+let config = require('../config.json')
 
 class Bot {
     constructor() {
@@ -30,10 +32,10 @@ class Bot {
             this.loadSystems()
             this.client.user.setPresence({
                 activities: [{
-                    name: `Running Version ${global.package.version}`
+                    name: `Running Version ${projectPackage.version}`
                 }]
             })
-            logger.startup(`Logged in as: ${this.client.user.username} - ${global.package.version} - ${this.client.user.id}`)
+            logger.startup(`Logged in as: ${this.client.user.username} - ${projectPackage.version} - ${this.client.user.id}`)
         })
     }
 
