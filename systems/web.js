@@ -1,4 +1,4 @@
-let webhook = require('./webhook.js') 
+let webhook = require('./webhook.js')
 let config = require('../config.json')
 
 class WebServer {
@@ -10,7 +10,6 @@ class WebServer {
         let server = require('http').createServer(expressapp)
         let io = require('socket.io').listen(server)
         global.io = io
-        this.moment = require('moment')
 
         // logs the edits per peron
         this.editPerPerson = []

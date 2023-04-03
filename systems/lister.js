@@ -1,18 +1,22 @@
 class Lister {
-    constructor() { }
+    constructor() {
+        if (this.constructor === Lister) {
+            throw new Error("Can't instantiate abstract class!")
+        }
+    }
 
     process(message) {
         const mentioned = message.mentions.users.first()
         const args = message.content.split(' ')
 
         if (args.length == 1) {
-            total(message)
+            this.total(message)
         } else if (mentioned) {
-            mention(message, mentioned)
+            this.mention(message, mentioned)
         } else if (args[1] == "?") {
-            perPerson(message)
+            this.perPerson(message)
         } else if (args[1] == "%") {
-            percentage(message)
+            this.percentage(message)
         } else {
             bot.message.reply(message, 'Incorrect format')
         }
