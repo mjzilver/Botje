@@ -1,25 +1,24 @@
 let webhook = require('./webhook.js')
 let config = require('../config.json')
+let database = require('./database.js')
 
 class WebServer {
     constructor() {
-        let express = require('express')
-        let expressapp = express()
-        expressapp.set('view engine', 'pug')
+        const express = require('express');
+        const app = express();
+        app.set('view engine', 'pug');
+        app.use(express.static(__dirname + '/../views'));
+        app.use(express.json());
+        app.use(express.urlencoded({ extended: true }));
 
-        let server = require('http').createServer(expressapp)
-        let io = require('socket.io').listen(server)
-        global.io = io
+        const server = require('http').createServer(app);
+        const io = require('socket.io').listen(server);
+        global.io = io;
 
-        // logs the edits per peron
-        this.editPerPerson = []
-        this.connectCounter = 0
+        this.editPerPerson = [];
+        this.connectCounter = 0;
 
-        expressapp.use(express.static(__dirname + '/../views'))
-        expressapp.use(express.json())
-        expressapp.use(express.urlencoded({ extended: true }))
-
-        expressapp.get('/log', function (req, res) {
+        app.get('/log', function (req, res) {
             const options = {
                 limit: 10000,
                 order: 'desc',
@@ -45,7 +44,7 @@ class WebServer {
             })
         })
 
-        expressapp.get('/interact', function (req, res) {
+        app.get('/interact', function (req, res) {
             let selectSQL = `SELECT user_id, user_name, COUNT(message) AS amount 
             FROM messages
             GROUP BY user_id 
@@ -67,11 +66,11 @@ class WebServer {
             })
         })
 
-        expressapp.post('/interact', function (req, res) {
+        app.post('/interact', function (req, res) {
             webhook.sendMessage(req.body.channel, req.body.text, req.body.user)
         })
 
-        expressapp.get('/draw', function (req, res) {
+        app.get('/draw', function (req, res) {
             let selectSQL = 'SELECT * FROM colors ORDER BY y, x ASC'
 
             let pixels = new Array(config.image.size)
@@ -109,68 +108,65 @@ class WebServer {
         })
 
         // needs to be last
-        expressapp.use('/', function (req, res) {
+        app.use('/', function (req, res) {
             res.render('index')
         })
 
-        io.on('connection', function (socket) {
-            io.emit('connectCounter', ++web.connectCounter)
+        io.on('connection', (socket) => {
+            io.emit('connectCounter', ++this.connectCounter)
 
-            socket.on('pixelChange', function (pixel) {
-                if (web.spamChecker(socket.id) && (pixel.x >= 0 && pixel.x < config.image.size && pixel.y >= 0 && pixel.y < config.image.size)) {
-                    let insert = database.db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue])
+            socket.on('pixelChange', async (pixel) => {
+                const { editPerPerson } = this
+                if (this.spamChecker(socket.id, editPerPerson) && (pixel.x >= 0 && pixel.x < config.image.size && pixel.y >= 0 && pixel.y < config.image.size)) {
+                    const insert = database.db.prepare('INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)', [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue])
 
-                    insert.run(function (err) {
-                        if (err) {
-                            logger.info("failed to insert pixel")
-                            socket.disconnect() // user gets kicked
+                    try {
+                        await insert.run()
+                        io.emit('pixelChanged', pixel)
+                        if (editPerPerson[socket.id] == undefined) {
+                            editPerPerson[socket.id] = [new Date()]
                         } else {
-                            io.emit('pixelChanged', pixel)
-                            if (web.editPerPerson[socket.id] == undefined)
-                                web.editPerPerson[socket.id] = [new Date()]
-                            else
-                                web.editPerPerson[socket.id].push(new Date())
+                            editPerPerson[socket.id].push(new Date())
                         }
-                    })
+                    } catch (err) {
+                        logger.info("failed to insert pixel")
+                        socket.disconnect() // user gets kicked
+                    }
                 } else {
                     logger.warn("User kicked for invalid emit")
                     socket.disconnect() // user gets kicked
                 }
             })
 
-            socket.on('disconnect', function () {
-                io.emit('connectCounter', --web.connectCounter)
-                delete web.editPerPerson[socket.id]
+            socket.on('disconnect', () => {
+                io.emit('connectCounter', --this.connectCounter)
+                const { editPerPerson } = this
+                if (editPerPerson && editPerPerson[socket.id]) {
+                    delete editPerPerson[socket.id]
+                }
             })
         })
 
         server.listen(config.port, () => {
-            logger.startup('Webserver running on port ' + config.port)
+            logger.startup(`Webserver running on port ${config.port}`)
         })
     }
 
-    spamChecker(id) {
-        if (web.editPerPerson[id] == undefined)
-            return true
-        else {
-            if (web.editPerPerson[id].length >= 10) {
-                delete web.editPerPerson[id]
+    spamChecker(id, editPerPerson) {
+        if (editPerPerson[id]) {
+            if (editPerPerson[id].length >= 10) {
+                delete editPerPerson[id]
                 return true
             } else {
-                let count = 0
-                for (const index in web.editPerPerson[id]) {
-                    let currentTimestamp = new Date()
-                    let edited_at = web.editPerPerson[id][index]
-                    let time_passed = (new Date(currentTimestamp.getTime() - edited_at.getTime())).getTime()
-
-                    if (time_passed < 200)
-                        count++
-                }
-                if (count >= 2)
-                    return false
+                const recentEdits = editPerPerson[id].filter(timestamp => {
+                    const currentTime = new Date()
+                    const timePassed = currentTime.getTime() - timestamp.getTime()
+                    return timePassed < 200;
+                })
+                return recentEdits.length < 2
             }
-            return true
         }
+        return true
     }
 }
 

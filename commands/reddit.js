@@ -30,10 +30,10 @@ module.exports = {
             }
 
             if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined' && typeof (body.data.children) !== 'undefined') {
-                let selectSQL = 'SELECT * FROM images WHERE sub = "' + sub + '"'
+                let selectSQL = 'SELECT * FROM images WHERE sub = ?'
                 let foundImages = {}
 
-                db.all(selectSQL, [], async (err, rows) => {
+                db.all(selectSQL, [sub], async (err, rows) => {
                     if (err)
                         throw err
 

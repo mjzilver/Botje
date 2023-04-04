@@ -138,7 +138,7 @@ class hangman {
         if (this.hasEnded)
             hangmanEmbed.setFooter(`Use b!hangman start to start a new game!`)
         else
-            hangmanEmbed.setFooter(` Use b!hangman guess to guess`)
+            hangmanEmbed.setFooter(`Use b!hangman guess to guess`)
 
         bot.message.send(message, {
             files: [attachment],
