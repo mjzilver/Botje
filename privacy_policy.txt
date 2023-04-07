@@ -29,6 +29,5 @@ Users have the right to request access to their data or to have their data delet
 **Contact Me**
 If you have any questions about this privacy policy or our data collection practices, please contact me at Mick#5327 at discord.
 
-By using Botje, you consent to the collection and use of your data as described in this privacy policy, if you wish to opt-out* send a message in DM to Botje saying "b!opt-out".
-
-* if you opt-out you CANNOT use any features from this bot. Upon opting-out all your data will be deleted and never stored again.
+By using Botje, you consent to the collection and use of your data as described in this privacy policy, if you wish to opt-out send a message in DM to Botje saying "b!opt-out".
+If you opt-out you CANNOT use any features from this bot, because it requires user data to function. Upon opting-out all your data will be deleted and never stored again.
