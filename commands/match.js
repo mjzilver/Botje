@@ -11,7 +11,7 @@ module.exports = {
         let spellchecked = bot.spellcheck.checkSentence(words.join(' '))
 
         if (spellchecked.mistakes >= 1) {
-            return bot.message.reply(message, `You made a mistake retard, it should be: \n"${spellchecked.result}"`)
+            return bot.message.reply(message, `You made a mistake, it should be: \n"${spellchecked.result}"`)
         }
     }
 }
