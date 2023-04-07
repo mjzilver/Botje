@@ -117,8 +117,7 @@ class Command {
 
     handleDM(message) {
         if (!message.author.bot) {
-            console.log(message)
-            this.commands['speak'].function(message)
+
         }
     }
 }

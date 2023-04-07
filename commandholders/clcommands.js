@@ -1,5 +1,4 @@
 let commands = {
-    'say': require('../commandline/say.js'),
     'list': require('../commandline/list.js'),
     'save': require('../commandline/save.js'),
     'exit': require('../commandline/exit.js'),
@@ -9,9 +8,6 @@ let commands = {
     'scan': require('../commandline/scan.js'),
     'saveemotes': require('../commandline/saveemotes.js'),
     'vacuum': require('../commandline/vacuum.js'),
-    'cleanwebhooks': require('../commandline/cleanwebhooks.js'),
-    'webhooks': require('../commandline/webhooks.js'),
-    'match': require('../commandline/match.js'),
     'report': require('../commandline/report.js'),
     'heapdump': require('../commandline/heapdump.js'),
 }

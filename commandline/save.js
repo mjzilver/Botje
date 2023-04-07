@@ -2,7 +2,7 @@ let database = require('../systems/database.js')
 
 module.exports = {
     'name': 'save',
-    'description': 'lists all commands currently available',
+    'description': 'saves a set of messages from a given channel',
     'format': 'save [channelid] [amount]?',
     'function': function save(input) {
         let channels = bot.client.channels.cache
