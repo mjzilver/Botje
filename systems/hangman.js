@@ -1,3 +1,6 @@
+let discord = require('discord.js')
+let config = require('../config.json')
+
 class hangman {
     constructor() {
         this.word = ""
@@ -9,7 +12,7 @@ class hangman {
     }
 
     run(message) {
-        var args = message.cleanContent.toLowerCase().split(' ')
+        let args = message.cleanContent.toLowerCase().split(' ')
 
         switch (args[1]) {
             case "start":
@@ -35,9 +38,9 @@ class hangman {
         this.visibleWord = ""
         this.tries = 0
         this.alreadyGuessed = []
-        var words = require('../json/words.json')
+        let words = require('../json/words.json')
 
-        var chosenword = ''
+        let chosenword = ''
 
         while (this.word == "") {
             chosenword = words.pickRandom()
@@ -113,9 +116,9 @@ class hangman {
     }
 
     sendEmbed(message) {
-        const attachment = new discord.MessageAttachment(`${__dirname}/../hangman/${this.tries}.png`, "hangman.png")
+        const attachment = new discord.MessageAttachment(`${__dirname}/../assets/hangman/${this.tries}.png`, "hangman.png")
 
-        var showVisibleWord = ""
+        let showVisibleWord = ""
         for (let i = 0; i < this.visibleWord.length; i++)
             showVisibleWord += this.visibleWord[i].toUpperCase() + " "
 
@@ -126,7 +129,7 @@ class hangman {
             .addField('Word', showVisibleWord, false)
 
         if (this.alreadyGuessed.length > 0) {
-            var alreadyGuessedString = ""
+            let alreadyGuessedString = ""
             for (let i = 0; i < this.alreadyGuessed.length; i++)
                 alreadyGuessedString += this.alreadyGuessed[i].toUpperCase() + " "
             hangmanEmbed.addField('Already guessed letters', alreadyGuessedString, false)
@@ -135,7 +138,7 @@ class hangman {
         if (this.hasEnded)
             hangmanEmbed.setFooter(`Use b!hangman start to start a new game!`)
         else
-            hangmanEmbed.setFooter(` Use b!hangman guess to guess`)
+            hangmanEmbed.setFooter(`Use b!hangman guess to guess`)
 
         bot.message.send(message, {
             files: [attachment],

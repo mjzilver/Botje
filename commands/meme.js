@@ -1,16 +1,18 @@
-var Jimp = require("jimp")
+let Jimp = require("jimp")
+let fs = require('fs')
+let database = require('../systems/database.js')
 
 module.exports = {
     'name': 'meme',
     'description': 'turn an image into a meme, include picture by uploading, replying or URL',
     'format': 'meme (link to image) (top text) - (bottom text)',
     'function': async function meme(message) {
-        var args = message.content.split(' ')
+        let args = message.content.split(' ')
         args.shift()
-        var url = ''
+        let url = ''
 
         if (message.reference && message.reference.messageId) {
-            var repliedTo = await message.channel.messages.fetch(message.reference.messageId)
+            let repliedTo = await message.channel.messages.fetch(message.reference.messageId)
             url = getURL(repliedTo)
         } else {
             url = getURL(message)
@@ -19,16 +21,16 @@ module.exports = {
         if (args[0]?.indexOf("http") == 0)
             url = args.shift()
 
-        var topbottom = args.join(' ').split('|')
-        var top = topbottom[0] ?? ''
-        var bottom = topbottom[1] ?? ''
+        let topbottom = args.join(' ').split('|')
+        let top = topbottom[0] ?? ''
+        let bottom = topbottom[1] ?? ''
 
         if (args[0] == "?" || !args[0]) {
-            var keyword = ''
+            let keyword = ''
             if (args[0] == "?" && args[1])
                 keyword = args[1]
 
-            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces 
+            let selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces 
                 FROM messages
                 WHERE ${keyword ? `message LIKE "%${keyword}%" AND` : ''} message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
                 AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
@@ -38,10 +40,10 @@ module.exports = {
 
             database.query(selectSQL, [], (rows) => {
                 if (rows && rows[0]) {
-                    var content = rows[0]['message']
-                    var middle = content.lastIndexOf(' ', content.length / 2);
-                    var top = content.substring(0, middle);
-                    var bottom = content.substring(middle + 1);
+                    let content = rows[0]['message']
+                    let middle = content.lastIndexOf(' ', content.length / 2)
+                    let top = content.substring(0, middle)
+                    let bottom = content.substring(middle + 1)
 
                     return processPicture(url ?? null, top, bottom, message)
                 } else {
@@ -59,8 +61,8 @@ module.exports = {
 
 async function processPicture(url, top, bottom, message) {
     if (!url) {
-        var path = './assets/meme_templates'
-        var files = fs.readdirSync(path)
+        let path = './assets/meme_templates'
+        let files = fs.readdirSync(path)
         let chosenFile = files[Math.floor(Math.random() * files.length)]
         url = `${path}/${chosenFile}`
     }

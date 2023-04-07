@@ -1,3 +1,5 @@
+let fs = require('fs')
+
 module.exports = {
     'name': 'saveemotes',
     'description': 'saves all emotes to /backups/emotes/guildid',
@@ -7,7 +9,7 @@ module.exports = {
         const path = './backups/emotes'
 
         for (const [guildId, guild] of bot.client.guilds.cache.entries()) {
-            var guildpath = path + '/' + guildId
+            let guildpath = path + '/' + guildId
 
             if (!fs.existsSync(guildpath))
                 fs.mkdirSync(guildpath)

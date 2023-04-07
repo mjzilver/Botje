@@ -2,6 +2,7 @@
 	"prefix": "^(b! ?)",
 	"discord_api_key": "discord bot api key",
 	"weather_api_key" : "openweathermap api key",
+	"youtube_api_key": "youtube_api_key",
 	"owner": "owner discord UUID",
 	"speakEvery": 20,
 	"timeoutDuration": 5,
@@ -9,5 +10,8 @@
 	"color_hex": "#bab3be",
 	"port": 100,
 	"spamchecker": 1,
-	"image" : { "size" : 150, "magnification" : 3}
+	"image" : { "size" : 150, "magnification" : 3},
+	"positive_emoji": "⬆️",
+    "negative_emoji": "⬇️",
+    "redo_emoji": "🔁"
 }

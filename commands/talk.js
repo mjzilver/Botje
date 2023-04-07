@@ -1,10 +1,12 @@
+let database = require('../systems/database.js')
+
 module.exports = {
     'name': 'talk',
     'description': 'makes the bot talk via predictive text or as if it were the mentioned user',
     'format': 'talk (@user)',
     'function': function talk(message) {
-        var mention = message.mentions ? message.mentions.users.first() : null
-        var chain = {}
+        let mention = message.mentions ? message.mentions.users.first() : null
+        let chain = {}
 
         let selectSQL = `SELECT message FROM messages
         WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" `
@@ -16,12 +18,12 @@ module.exports = {
             if (err)
                 throw err
             else {
-                for (var i = 0; i < rows.length; i++) {
+                for (let i = 0; i < rows.length; i++) {
                     const words = rows[i]['message'].split(' ')
-                    var prevWord = ""
+                    let prevWord = ""
 
-                    for (var j = 0; j < words.length; j++) {
-                        var word = words[j].toLowerCase()
+                    for (let j = 0; j < words.length; j++) {
+                        let word = words[j].toLowerCase()
 
                         if (!chain[prevWord]) {
                             chain[prevWord] = [word]
@@ -32,16 +34,16 @@ module.exports = {
                     }
                 }
 
-                var sentence = ""
-                var sentenceLength = bot.logic.randomBetween(8, 15)
+                let sentence = ""
+                let sentenceLength = bot.logic.randomBetween(8, 15)
 
                 if (chain[""]) {
-                    var previousWord = chain[""][bot.logic.randomBetween(0, chain[""].length - 1)]
+                    let previousWord = chain[""][bot.logic.randomBetween(0, chain[""].length - 1)]
                     sentence += previousWord
 
                     for (i = 0; i < sentenceLength - 1; i++) {
                         if (chain[previousWord]) {
-                            var currentWord = chain[previousWord][bot.logic.randomBetween(0, chain[previousWord].length - 1)]
+                            let currentWord = chain[previousWord][bot.logic.randomBetween(0, chain[previousWord].length - 1)]
 
                             sentence += " " + currentWord
                             previousWord = currentWord

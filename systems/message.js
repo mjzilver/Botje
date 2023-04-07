@@ -1,3 +1,6 @@
+let config = require('../config.json')
+let database = require('./database.js')
+
 class Message {
     constructor() {
         this.commandCalls = {}
@@ -6,7 +9,7 @@ class Message {
 
     send(call, content) {
         if (content) {
-            var promise = call.channel.send(content)
+            let promise = call.channel.send(content)
             promise.then((reply) => {
                 this.addCommandCall(call, reply)
                 reply.react(config.positive_emoji)
@@ -21,7 +24,7 @@ class Message {
 
     reply(call, content) {
         if (content) {
-            var promise = call.reply(content)
+            let promise = call.reply(content)
             promise.then((reply) => {
                 this.addCommandCall(call, reply)
                 reply.react(config.positive_emoji)
@@ -49,7 +52,7 @@ class Message {
     }
 
     markComplete(call) {
-        var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
+        let insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
             [call.id, call.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {
@@ -61,7 +64,7 @@ class Message {
     addCommandCall(call, reply) {
         this.commandCalls[call.id] = reply.id
 
-        var insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, reply_id, timestamp) VALUES (?, ?, ?)',
+        let insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, reply_id, timestamp) VALUES (?, ?, ?)',
             [call.id, reply.id, reply.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {
@@ -76,7 +79,7 @@ class Message {
         ORDER BY timestamp DESC`
 
         database.query(selectSQL, [], (rows) => {
-            for (var i = 0; i < rows.length; i++) {
+            for (let i = 0; i < rows.length; i++) {
                 this.commandCalls[rows[i]['call_id']] = rows[i]['reply_id']
             }
             this.scanForCommands()
@@ -84,30 +87,26 @@ class Message {
     }
 
     scanForCommands() {
-        bot.client.on('ready', () => {
-            logger.startup(`Reading messages since startup`)
-            for (const [channelId, channel] of bot.client.channels.cache.entries()) {
-                if (channel.type == "GUILD_TEXT" && channel.viewable) {
-                    channel.messages.fetch({
-                        limit: 100
-                    }).then(messages => {
-                        var yesterday = new Date() - 24 * 60 * 60 * 1000
-                        messages.forEach(
-                            (message) => {
-                                var messageTime = new Date(message.createdTimestamp)
-                                if (messageTime > yesterday) {
-                                    if (message.content.match(new RegExp(config.prefix, "i"))) {
-                                        if (!(message.id in this.commandCalls)) {
-                                            bot.command.handleCommand(message, true)
-                                        }
-                                    }
-                                }
+        logger.startup(`Reading messages since startup`);
+
+        bot.client.channels.cache
+            .filter(channel => channel.type === "GUILD_TEXT" && channel.viewable)
+            .each(async channel => {
+                const messages = await channel.messages.fetch({ limit: 100 })
+                const yesterday = Date.now() - 24 * 60 * 60 * 1000
+
+                messages.each(async message => {
+                    const messageTime = message.createdTimestamp
+
+                    if (bot.command.isUserAllowed(message), false) {
+                        if (messageTime > yesterday && message.content.match(new RegExp(config.prefix, "i"))) {
+                            if (!(message.id in this.commandCalls)) {
+                                await bot.command.handleCommand(message, true)
                             }
-                        )
-                    })
-                }
-            }
-        })
+                        }
+                    }
+                })
+            })
     }
 }
 

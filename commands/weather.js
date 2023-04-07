@@ -1,12 +1,14 @@
-var request = require('request')
+let request = require('request')
+let discord = require('discord.js')
+let config = require('../config.json')
 
 module.exports = {
     'name': 'weather',
     'description': 'shows the current weather and weather info from the mentioned city',
     'format': 'weather [city]',
     'function': function weather(message) {
-        var city = "Leiden" // default city to avoid errors
-        var args = message.content.split(' ')
+        let city = "Leiden" // default city to avoid errors
+        let args = message.content.split(' ')
 
         if (args[1]) {
             args.shift()
@@ -22,11 +24,11 @@ module.exports = {
                 const result = JSON.parse(body)
 
                 if (result.cod == 200) {
-                    var options = {
+                    let options = {
                         timeZone: 'UTC'
                     }
-                    var sunrise = new Date((result.sys.sunrise + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
-                    var sunset = new Date((result.sys.sunset + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
+                    let sunrise = new Date((result.sys.sunrise + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
+                    let sunset = new Date((result.sys.sunset + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
 
                     const weatherEmbed = new discord.MessageEmbed()
                         .setColor(config.color_hex)

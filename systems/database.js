@@ -1,9 +1,14 @@
+let config = require('../config.json')
+const logger = require('./logger')
+
 class Database {
     constructor() {
-        this.sqlite3 = require('sqlite3')
+        this.sqlite3 = require('sqlite3').verbose()
         this.db = new this.sqlite3.Database("./discord.db")
 
         this.initializeDatabase()
+        this.setCacheSize(20000)
+        logger.startup("Database loaded")
     }
 
     initializeDatabase() {
@@ -13,8 +18,14 @@ class Database {
         this.db.run(`CREATE TABLE IF NOT EXISTS command_calls (call_id TEXT, reply_id TEXT, timestamp TEXT, PRIMARY KEY(call_id))`)
     }
 
+    setCacheSize(cacheSize) {
+        this.db.serialize(() => {
+            this.db.run(`PRAGMA cache_size = ${cacheSize};`)
+        })
+    }
+
     query(selectSQL, parameters = [], callback) {
-        database.db.all(selectSQL, parameters, (err, rows) => {
+        this.db.all(selectSQL, parameters, (err, rows) => {
             if (err)
                 throw err
             else
@@ -33,7 +44,7 @@ class Database {
     }
 
     insertMessage(message) {
-        var insert = this.db.prepare('INSERT OR IGNORE INTO messages (id, user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        let insert = this.db.prepare('INSERT OR IGNORE INTO messages (id, user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {

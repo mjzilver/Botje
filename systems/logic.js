@@ -1,3 +1,5 @@
+let config = require('../config.json')
+
 class Logic {
     constructor() { }
 
@@ -5,15 +7,15 @@ class Logic {
         if (a.length == 0) return b.length
         if (b.length == 0) return a.length
 
-        var matrix = []
+        let matrix = []
 
-        for (var i = 0; i <= b.length; i++)
+        for (let i = 0; i <= b.length; i++)
             matrix[i] = [i]
-        for (var j = 0; j <= a.length; j++)
+        for (let j = 0; j <= a.length; j++)
             matrix[0][j] = j
 
-        for (i = 1; i <= b.length; i++) {
-            for (j = 1; j <= a.length; j++) {
+        for (var i = 1; i <= b.length; i++) {
+            for (var j = 1; j <= a.length; j++) {
                 if (b.charAt(i - 1) == a.charAt(j - 1)) {
                     matrix[i][j] = matrix[i - 1][j - 1]
                 } else {
@@ -65,7 +67,7 @@ String.prototype.removePrefix = function () {
 }
 
 String.prototype.replaceFancyQuotes = function () {
-    var str = this.valueOf()
+    let str = this.valueOf()
     str = str.replace(new RegExp(/(“|”|„)/gi, "gi"), '"')
     return str.replace(new RegExp(/(`|‘|’)/gi, "gi"), "'")
 }

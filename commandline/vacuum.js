@@ -1,3 +1,5 @@
+let database = require('../systems/database.js')
+
 module.exports = {
     'name': 'vacuum',
     'description': 'removes leftover data from the database',

@@ -1,14 +1,34 @@
+let fs = require('fs')
+let database = require('./database.js')
+
 class Dictionary {
     constructor() {
         this.words = []
         this.wordsPath = './json/words.json'
 
         if (fs.existsSync(this.wordsPath)) {
-            this.words = JSON.parse(fs.readFileSync(this.wordsPath))
+            this.loadWordsFromFile()
         } else {
             this.generateWordsFile()
             logger.console('NonSelector JSON not found, generating new file')
         }
+    }
+
+    loadWordsFromFile() {
+        const stream = fs.createReadStream(this.wordsPath, { encoding: 'utf8' })
+        let rawData = ''
+
+        stream.on('data', chunk => {
+            rawData += chunk
+        })
+
+        stream.on('end', () => {
+            this.words = JSON.parse(rawData)
+        })
+
+        stream.on('error', err => {
+            logger.error(err)
+        })
     }
 
     generateWordsFile() {
@@ -16,11 +36,11 @@ class Dictionary {
         FROM messages
         WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND message NOT LIKE ""`
 
-        var wordHolder = {}
+        let wordHolder = {}
 
         database.db.all(selectSQL, [], (err, rows) => {
-            for (var i = 0; i < rows.length; i++) {
-                var words = rows[i]['message'].split(/\s+/)
+            for (let i = 0; i < rows.length; i++) {
+                let words = rows[i]['message'].split(/\s+/)
 
                 for (let j = 0; j < words.length; j++) {
                     if (!wordHolder[words[j]])
@@ -30,7 +50,7 @@ class Dictionary {
                 }
             }
 
-            for (var word in wordHolder) {
+            for (let word in wordHolder) {
                 this.words.push([word, wordHolder[word]]);
             }
             this.words.sort(function (a, b) {
@@ -45,10 +65,10 @@ class Dictionary {
     }
 
     getWordsByLength(length) {
-        var result = []
+        let result = []
 
-        for (var i in this.words) {
-            var processedWord = this.words[i][0]
+        for (let i in this.words) {
+            let processedWord = this.words[i][0]
             processedWord = processedWord.textOnly()
             if (processedWord.length == length && this.words[i][1] > 20) {
                 result.push(processedWord)
@@ -59,9 +79,9 @@ class Dictionary {
     }
 
     getNonSelectorsRegex(amount = 100) {
-        var nonSelectorsRegex = ''
-        var max = (this.words.length < amount) ? this.words.length : amount
-        for (var i = 0; i < max; i++) {
+        let nonSelectorsRegex = ''
+        let max = (this.words.length < amount) ? this.words.length : amount
+        for (let i = 0; i < max; i++) {
             nonSelectorsRegex += this.words[i][0]
             if (i != max - 1)
                 nonSelectorsRegex += '|'

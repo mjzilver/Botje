@@ -1,5 +1,5 @@
 module.exports = async function deletafter(message) {
-    var refenceId = message.reference?.messageId
+    let refenceId = message.reference?.messageId
     if (refenceId) {
         if (message.reference.messageId) {
             message.channel.messages.fetch({

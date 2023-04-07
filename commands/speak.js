@@ -1,9 +1,11 @@
+let database = require('../systems/database.js')
+
 module.exports = {
     'name': 'speak',
     'description': 'makes the bot speak via recycled messages',
     'format': 'speak (sentence)',
     'function': function speak(message) {
-        var matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
+        let matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
 
         if (matches && matches[1] != '') {
             findTopic(message, matches[1])
@@ -14,18 +16,16 @@ module.exports = {
 }
 
 function findByWord(message) {
-    var earliest = new Date()
-    var editedText = message.content.removePrefix()
+    let earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
 
-    editedText = editedText.replace(new RegExp(/(:.+:|<.+>)(?:\s*|$)/, "gi"), '')
-    editedText = editedText.replace(new RegExp(/(?:\b)(bot(?:je)?)(?:\s|\b)/, "gi"), '')
-    editedText = editedText.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), '')
-    editedText = editedText.replace(new RegExp(/(?:\b)([a-z] )(?:\s|\b|$)/, "gi"), '')
-    editedText = editedText.textOnly()
-    editedText = editedText.replace(bot.dictionary.getNonSelectorsRegex(), '').trim()
+    let words = message.content.removePrefix()
+        .replace(new RegExp(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b)/, "gi"), '')
+        .textOnly()
+        .replace(bot.dictionary.getNonSelectorsRegex(), '')
+        .trim()
+        .split(' ')
 
-    var words = editedText.split(' ')
     if (words[0] == 'speak')
         words.shift()
 
@@ -43,7 +43,7 @@ function findByWord(message) {
         }
 
         if (words.length > 1) {
-            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
+            let selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
                 WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" 
                 AND message NOT LIKE "%bot%" AND message IS NOT NULL
                 AND len < 100 AND (len - spaces) >= 2 
@@ -57,15 +57,20 @@ function findByWord(message) {
                     if (rows) {
                         logger.debug(`Sending message with '${words.join(",")}' in it`)
 
-                        var highestAmount = 0
-                        var chosenMessage = ''
+                        let highestAmount = 0
+                        let chosenMessage = ''
 
-                        for (var i = 0; i < rows.length; i++) {
-                            var amount = 0
-                            for (var j = 0; j < words.length; j++) {
-                                if (rows[i]['message'].match(new RegExp(words[j], 'gmi')))
-                                    amount += 30 - (j * j)
+                        const regexPatterns = words.map(w => new RegExp(w, 'gmi'));
+
+                        for (let i = 0; i < rows.length; i++) {
+                            let amount = 0
+
+                            for (let j = 0; j < regexPatterns.length; j++) {
+                                if (rows[i]['message'].match(regexPatterns[j])) {
+                                    amount += 30 - (j * j);
+                                }
                             }
+
                             if (amount > highestAmount) {
                                 if (bot.logic.levenshtein(rows[i]['message'], message.content) > 15) {
                                     chosenMessage = rows[i]['message']
@@ -81,7 +86,7 @@ function findByWord(message) {
                 }
             })
         } else {
-            var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
+            let selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
                 WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
                 AND len < 100 AND (len - spaces) >= 2 
                 AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
@@ -107,10 +112,10 @@ function findByWord(message) {
 function findRandom(message) {
     logger.debug(`Sending randomly selected message`)
 
-    var earliest = new Date()
+    let earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
 
-    var selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
+    let selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
     WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
     AND len < 100 AND (len - spaces) >= 2 AND date < ${earliest.getTime()}
     ORDER BY RANDOM()
@@ -125,7 +130,7 @@ function findRandom(message) {
 }
 
 function findTopic(message, topic) {
-    var selectSQL = `SELECT LOWER(message) as message
+    let selectSQL = `SELECT LOWER(message) as message
     FROM messages
     WHERE message LIKE "%${topic} is%" OR message LIKE "%${topic} are%" 
     AND message NOT LIKE "%<%" AND message NOT LIKE "%:%"
@@ -141,11 +146,11 @@ function findTopic(message, topic) {
             return findByWord(message)
         }
 
-        var regStr = `\\b(is|are)\\b`
+        let regStr = `\\b(is|are)\\b`
 
-        var first = rows[0].message
-        var second = rows[1].message
-        var third = rows[2].message
+        let first = rows[0].message
+        let second = rows[1].message
+        let third = rows[2].message
 
         logger.debug(`Picked terms related to '${topic}', first '${first}', second '${second}', third '${third}'`)
 
@@ -153,9 +158,9 @@ function findTopic(message, topic) {
         second = second.substring(second.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), '')
         third = third.substring(third.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), '')
 
-        var linkerwords = ['and', 'or', 'but', 'also']
+        let linkerwords = ['and', 'or', 'but', 'also']
 
-        var picker = bot.logic.randomBetween(0, 2)
+        let picker = bot.logic.randomBetween(0, 2)
 
         if (picker == 0)
             bot.message.reply(message, `${first}`.normalizeSpaces())

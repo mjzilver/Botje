@@ -23,7 +23,7 @@ function nukeguild(message) {
 
 function nukechannel(channelId) {
     let channels = bot.client.channels.cache
-    var channel = channels.find(c => c.id === channelId)
+    let channel = channels.find(c => c.id === channelId)
 
     if (channel && channel.type == "GUILD_TEXT") {
         nukemessages(channel, channel.lastMessageId)
@@ -34,7 +34,7 @@ function nukechannel(channelId) {
 }
 
 function nukemessages(channel, messageid, loop = 0) {
-    var itemsProcessed = 0
+    let itemsProcessed = 0
 
     channel.messages.fetch({
         limit: 100,

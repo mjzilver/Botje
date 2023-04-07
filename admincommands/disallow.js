@@ -1,9 +1,11 @@
+let fs = require('fs')
+
 module.exports = function disallow(message) {
     const mention = message.mentions.users.first()
     const args = message.content.split(' ')
 
-    var filepath = './json/disallowed.json'
-    var disallowed = JSON.parse(fs.readFileSync(filepath))
+    let filepath = './json/disallowed.json'
+    let disallowed = JSON.parse(fs.readFileSync(filepath))
 
     if (args[2] && args[2] == "remove") {
         delete disallowed[mention.id]

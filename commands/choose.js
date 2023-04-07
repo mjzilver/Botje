@@ -6,7 +6,7 @@ module.exports = {
         const filtered = message.content.removePrefix().replace(/choose /g, '')
         const items = filtered.split('|')
 
-        var presets = ["You should", "You ought to", "I pick", "I tell you", "An Angel told me in a dream that", "The tarot card reads"]
+        let presets = ["You should", "You ought to", "I pick", "I tell you", "An Angel told me in a dream that", "The tarot card reads"]
 
         return bot.message.reply(message, `${presets.pickRandom()} \`${items.pickRandom().trim()}\``)
     }
