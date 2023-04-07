@@ -1,6 +1,6 @@
 let discord = require('discord.js')
-let projectPackage = require('../package.json')
 let config = require('../config.json')
+let fs = require('fs')
 
 module.exports = {
     'name': 'opt-out',
@@ -13,7 +13,7 @@ module.exports = {
 
         message.channel.awaitMessages({ filter, max: 1, time: 60000 })
             .then(collected => {
-                bot.message.send(message, `You are not opted-out and botje will delete your data and you will not be able to give it commands.`)
+                bot.message.send(message, `You are now opted-out and botje will delete your data and you will not be able to give it commands.`)
                 deleteUserData(message)
             })
 
@@ -38,5 +38,17 @@ If you still wish to opt-out completely you need to type 'b!accept'
 `
 
 function deleteUserData(message) {
-    console.log('delete')
+    let filepath = './json/disallowed.json'
+    let disallowed = JSON.parse(fs.readFileSync(filepath))
+    disallowed[message.author.id] = true
+    logger.warn(`${message.author.username} is no longer allowed to use the bot`)
+
+    fs.writeFile(filepath, JSON.stringify(disallowed), function (err) {
+        if (err)
+            logger.error(err)
+    })
+
+    let deleteSQL = `DELETE FROM messages WHERE messages.user_id = ?`
+
+    database.query(deleteSQL, [message.author.id], null)
 }

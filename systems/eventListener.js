@@ -1,5 +1,6 @@
 let config = require('../config.json')
 let database = require('./database.js')
+let fs = require('fs')
 
 class Eventlistener {
     constructor() {
@@ -12,11 +13,15 @@ class Eventlistener {
         })
 
         bot.client.on('messageCreate', message => {
-            if (message.channel.type == 'DM') {
-                bot.command.handleDM(message)
-            } else {
-                database.storeMessage(message)
-                bot.command.handleCommand(message)
+            let disallowed = JSON.parse(fs.readFileSync('./json/disallowed.json'))
+
+            if (!(message.author.id in disallowed)) {
+                if (message.channel.type == 'DM') {
+                    bot.command.handleDM(message)
+                } else {
+                    database.storeMessage(message)
+                    bot.command.handleCommand(message)
+                }
             }
         })
 

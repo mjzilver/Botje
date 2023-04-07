@@ -93,8 +93,6 @@ class Command {
         let disallowed = JSON.parse(fs.readFileSync('./json/disallowed.json'))
         if (message.author.id in disallowed)
             return false
-        else if (config.spamchecker === 0)
-            return true
 
         const currentTimestamp = new Date()
 
@@ -122,7 +120,7 @@ class Command {
 
             if (command in this.dmcommands)
                 this.dmcommands[command].function(message)
-            else
+            else if (message.content.match(new RegExp(config.prefix, "i")))
                 bot.message.reply(message, `Use the command b!help for more information`)
         }
     }

@@ -98,9 +98,11 @@ class Message {
                 messages.each(async message => {
                     const messageTime = message.createdTimestamp
 
-                    if (messageTime > yesterday && message.content.match(new RegExp(config.prefix, "i"))) {
-                        if (!(message.id in this.commandCalls)) {
-                            await bot.command.handleCommand(message, true)
+                    if (bot.command.isUserAllowed(message), false) {
+                        if (messageTime > yesterday && message.content.match(new RegExp(config.prefix, "i"))) {
+                            if (!(message.id in this.commandCalls)) {
+                                await bot.command.handleCommand(message, true)
+                            }
                         }
                     }
                 })

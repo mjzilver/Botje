@@ -19,13 +19,13 @@ class EmotesLister extends Lister {
 
     total(message) {
         let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-              FROM messages
-              WHERE (message LIKE "%<%" OR message LIKE "%:%") AND message NOT LIKE "%@%"
-              AND server = ?
-              GROUP BY LOWER(message)
-              HAVING count > 1
-              ORDER BY count DESC 
-              LIMIT 10`
+            FROM messages
+            WHERE (message LIKE "%<%" OR message LIKE "%:%") AND message NOT LIKE "%@%"
+            AND server = ?
+            GROUP BY LOWER(message)
+            HAVING count > 1
+            ORDER BY count DESC 
+            LIMIT 10`
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             let result = ""
@@ -43,13 +43,13 @@ class EmotesLister extends Lister {
 
     mention(message, mentioned) {
         let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-              FROM messages
-              WHERE (message LIKE "%<%" OR message LIKE "%:%" ) AND message NOT LIKE "%@%"
-              AND server = ? AND user_id = ?
-              GROUP BY LOWER(message)
-              HAVING count > 1
-              ORDER BY count DESC 
-              LIMIT 10`
+            FROM messages
+            WHERE (message LIKE "%<%" OR message LIKE "%:%" ) AND message NOT LIKE "%@%"
+            AND server = ? AND user_id = ?
+            GROUP BY LOWER(message)
+            HAVING count > 1
+            ORDER BY count DESC 
+            LIMIT 10`
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             let result = ""
@@ -67,11 +67,11 @@ class EmotesLister extends Lister {
 
     perPerson(message, page) {
         let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
-      FROM messages
-      WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?
-      GROUP BY LOWER(user_id)
-      HAVING count > 1
-      ORDER BY count DESC`
+            FROM messages
+            WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?
+            GROUP BY LOWER(user_id)
+            HAVING count > 1
+            ORDER BY count DESC`
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             let result = ""

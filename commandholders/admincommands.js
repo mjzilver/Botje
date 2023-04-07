@@ -4,8 +4,7 @@ let commands = {
     "nuke": require('../admincommands/nuke.js'),
     "reboot": require('../admincommands/reboot.js'),
     "deleteafter": require('../admincommands/deleteafter.js'),
-    "addmeme": require('../admincommands/addmeme.js'),
-    "spamchecker": require('../admincommands/spamchecker.js')
+    "addmeme": require('../admincommands/addmeme.js')
 }
 
 module.exports = commands
