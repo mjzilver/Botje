@@ -53,7 +53,6 @@ class Bot {
         this.logic = require('./logic.js')
         this.backup = require('./backup.js')
         this.reply = require('./reply.js')
-        //this.spellcheck = require('./spellcheck.js')
         this.dictionary = require('./dictionary.js')
     }
 }

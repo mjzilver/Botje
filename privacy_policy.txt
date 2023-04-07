@@ -7,13 +7,13 @@ Botje collects all chat messages in the Discord server in which it is installed.
 Botje do not collect any personal information about that is not available to any other users of the server, such as their IP address, real information, location, etc.
 Data that is collected from every chat message is as follows: 
 ```
-	"user_id"	the unique ID associated with the user's discord account
-	"user_name"	the current nickname of the person in the current server
-	"message"	the plain text of the message the user has sent
-	"date"	    the data at which the message was sent
-	"channel"	the unique ID associated with the channel in which the message was sent
-	"server"	the unique ID associated with the server in which the message was sent
-	"id"	    the unique ID associated with the message
+"user_id"   unique ID of user's discord account
+"user_name" current nickname of the person
+"message"   plain text of the message
+"date"      datetime at which the message was sent
+"channel"   unique ID of channel belonging to the message 
+"server"    unique ID of server belonging to the message 
+"id"        unique ID of the message
 ```
 Please note that ALL above data can be accessed by any user of the server in which Botje is installed.
 
@@ -31,4 +31,4 @@ If you have any questions about this privacy policy or our data collection pract
 
 By using Botje, you consent to the collection and use of your data as described in this privacy policy, if you wish to opt-out* send a message in DM to Botje saying "b!opt-out".
 
-* if you opt-out you CANNOT use any features from this bot. Upon all your data will be deleted and never stored again.
+* if you opt-out you CANNOT use any features from this bot. Upon opting-out all your data will be deleted and never stored again.

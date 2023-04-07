@@ -5,6 +5,7 @@ class Command {
     constructor() {
         this.commands = require('../commandholders/commands.js')
         this.admincommands = require('../commandholders/admincommands.js')
+        this.dmcommands = require('../commandholders/dmcommands.js')
 
         // person as key -> time as value
         this.lastRequest = []
@@ -117,7 +118,12 @@ class Command {
 
     handleDM(message) {
         if (!message.author.bot) {
+            const { command } = this.parseMessageArguments(message)
 
+            if (command in this.dmcommands)
+                this.dmcommands[command].function(message)
+            else
+                bot.message.reply(message, `Use the command b!help for more information`)
         }
     }
 }
