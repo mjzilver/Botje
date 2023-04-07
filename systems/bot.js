@@ -48,7 +48,7 @@ class Bot {
 
     loadSystems() {
         this.message = require('./message.js')
-        this.eventListener = require('./eventlistener.js')
+        this.eventlistener = require('./eventlistener.js')
         this.command = require('./command.js')
         this.logic = require('./logic.js')
         this.backup = require('./backup.js')

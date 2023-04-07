@@ -1,7 +1,7 @@
 let config = require('../config.json')
 let database = require('./database.js')
 
-class EventListener {
+class Eventlistener {
     constructor() {
         bot.client.on('shardError', function (error) {
             logger.error(`Shard error: ${error.message}`)
@@ -56,4 +56,4 @@ class EventListener {
     }
 }
 
-module.exports = new EventListener()
+module.exports = new Eventlistener()
