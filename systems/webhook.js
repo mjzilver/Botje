@@ -1,5 +1,4 @@
-webhook = require('../systems/webhook.js') 
-webhook = require('../package.json') 
+let projectPackage = require('../package.json') 
 
 class Webhook {
     constructor() { }

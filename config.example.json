@@ -12,6 +12,6 @@
 	"spamchecker": 1,
 	"image" : { "size" : 150, "magnification" : 3},
 	"positive_emoji": "⬆️",
-    "negative_emoji": "⬇️",
-    "redo_emoji": "🔁"
+	"negative_emoji": "⬇️",
+	"redo_emoji": "🔁"
 }
