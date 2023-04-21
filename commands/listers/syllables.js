@@ -5,7 +5,7 @@ const Lister = require('./lister');
 
 module.exports = {
     'name': 'syllables',
-    'description': 'shows the top 10 users with the most syllables per post in the current channel or from mentioned user',
+    'description': 'shows the top 10 users with the most syllables',
     'format': 'syllables (@user)',
     'function': (message) => {
         new syllableLister().process(message)

@@ -5,7 +5,7 @@ const Lister = require('./lister');
 
 module.exports = {
     'name': 'top',
-    'description': 'shows the top 10 emotes in the current channel or from mentioned user',
+    'description': 'shows the top 10 emotes in the current channel or mentioned user',
     'format': 'top (@user)',
     'function': (message) => {
         new TopLister().process(message)
