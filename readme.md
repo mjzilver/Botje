@@ -12,6 +12,14 @@ However, please note that this bot is not intended for public use, and I cannot 
 - Fun games like Hangman 
 - Moderation tools for admin users
 
+# Stack used
+- Node.js - body of the bot
+- Discord.js - interface to discord API
+- Sqlite - the database
+- Express - the website 
+- Pug - templating web-pages
+- Winston - logging
+
 # License
 You are free to use, modify, and distribute the code for any purpose, as long as you comply with the terms of the AGPL. See the LICENSE file for more details.
 
