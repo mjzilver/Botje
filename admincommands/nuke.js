@@ -1,12 +1,15 @@
+let bot = require("../systems/bot.js")
+let logger = require("../systems/logger.js")
+
 module.exports = async function nuke(message) {
     if (message.author.id == message.guild.ownerId) {
         const filter = launchMessage => {
-            return (launchMessage.content.startsWith('launch') && launchMessage.author.id == message.author.id)
+            return (launchMessage.content.startsWith("launch") && launchMessage.author.id == message.author.id)
         }
 
         message.channel.awaitMessages({ filter, max: 1, time: 60000 })
-            .then(collected => {
-                bot.message.send(message, `Nuke launched. Blowout soon, fellow stalker.`)
+            .then(() => {
+                bot.message.send(message, "Nuke launched. Blowout soon, fellow stalker.")
                 nukeguild(message)
             })
         bot.message.send(message, "Nuke armed to confirm launch type 'launch' to launch the nuke, this cannot be cancelled.")
@@ -30,7 +33,7 @@ function nukechannel(channelId) {
         channel.lastMessage?.delete({ timeout: 100 })
         logger.deletion(`NUKING channel: ${channel.name}`)
     } else
-        logger.console('Channel not found')
+        logger.console("Channel not found")
 }
 
 function nukemessages(channel, messageid, loop = 0) {

@@ -1,20 +1,21 @@
-let discord = require('discord.js')
-let config = require('../../config.json')
-let database = require('../../systems/database.js')
-const Lister = require('./lister');
+let discord = require("discord.js")
+let config = require("../../config.json")
+let database = require("../../systems/database.js")
+const Lister = require("./lister")
+let bot = require("../../systems/bot.js")
 
 module.exports = {
-    'name': 'top',
-    'description': 'shows the top 10 emotes in the current channel or mentioned user',
-    'format': 'top (@user)',
-    'function': (message) => {
+    "name": "top",
+    "description": "shows the top 10 emotes in the current channel or mentioned user",
+    "format": "top (@user)",
+    "function": (message) => {
         new TopLister().process(message)
     }
 }
 
 class TopLister extends Lister {
     constructor() {
-        super();
+        super()
     }
 
     perPerson(message) {
@@ -30,7 +31,7 @@ class TopLister extends Lister {
             let result = ""
             for (let i = 0;
                 (i < rows.length && i <= 10); i++)
-                result += `${rows[i]['message']} was said ${rows[i]['count']} times \n`
+                result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
 
             const top = new discord.MessageEmbed()
                 .setColor(config.color_hex)
@@ -57,7 +58,7 @@ class TopLister extends Lister {
             let result = ""
             for (let i = 0;
                 (i < rows.length && i <= 10); i++)
-                result += `${rows[i]['message']} was said ${rows[i]['count']} times \n`
+                result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
 
             const top = new discord.MessageEmbed()
                 .setColor(config.color_hex)

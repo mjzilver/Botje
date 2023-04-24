@@ -1,20 +1,21 @@
-let discord = require('discord.js')
-let config = require('../../config.json')
-let database = require('../../systems/database.js')
-const Lister = require('./lister');
+let discord = require("discord.js")
+let config = require("../../config.json")
+let database = require("../../systems/database.js")
+const Lister = require("./lister")
+let bot = require("../../systems/bot.js")
 
 module.exports = {
-    'name': 'syllables',
-    'description': 'shows the top 10 users with the most syllables',
-    'format': 'syllables (@user)',
-    'function': (message) => {
+    "name": "syllables",
+    "description": "shows the top 10 users with the most syllables",
+    "format": "syllables (@user)",
+    "function": (message) => {
         new syllableLister().process(message)
     }
 }
 
 class syllableLister extends Lister {
     constructor() {
-        super();
+        super()
     }
 
     mention(message, mentioned) {
@@ -23,22 +24,22 @@ class syllableLister extends Lister {
         WHERE server = ? AND user_id = ? `
 
         let userdata = {
-            'syllables': 0,
-            'total': 0,
-            'average': 0
+            "syllables": 0,
+            "total": 0,
+            "average": 0
         }
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
-                let syllables = this.calculateSyllables(rows[i]['message'])
+                let syllables = this.calculateSyllables(rows[i]["message"])
                 if (syllables >= 1) {
-                    userdata['syllables'] += syllables
-                    userdata['total'] += 1
+                    userdata["syllables"] += syllables
+                    userdata["total"] += 1
                 }
             }
 
-            userdata['average'] = Math.round(userdata['syllables'] / userdata['total'])
-            bot.message.send(message, `${mentioned.username} has an average of ${userdata['average']} syllables per post`)
+            userdata["average"] = Math.round(userdata["syllables"] / userdata["total"])
+            bot.message.send(message, `${mentioned.username} has an average of ${userdata["average"]} syllables per post`)
         })
 
     }
@@ -53,27 +54,27 @@ class syllableLister extends Lister {
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
-                let user_name = rows[i]['user_name']
+                let user_name = rows[i]["user_name"]
 
                 if (!userdata[user_name])
                     userdata[user_name] = {
-                        'syllables': 0,
-                        'total': 0,
-                        'average': 0
+                        "syllables": 0,
+                        "total": 0,
+                        "average": 0
                     }
 
-                let syllables = this.calculateSyllables(rows[i]['message'])
+                let syllables = this.calculateSyllables(rows[i]["message"])
                 if (syllables >= 1) {
-                    userdata[user_name]['syllables'] += syllables
-                    userdata[user_name]['total'] += 1
+                    userdata[user_name]["syllables"] += syllables
+                    userdata[user_name]["total"] += 1
                 }
             }
 
             let sorted = []
             for (let user in userdata) {
                 // magical calculation
-                userdata[user]['average'] = Math.round(userdata[user]['syllables'] / userdata[user]['total'])
-                sorted.push([user, userdata[user]['average']])
+                userdata[user]["average"] = Math.round(userdata[user]["syllables"] / userdata[user]["total"])
+                sorted.push([user, userdata[user]["average"]])
             }
 
             sorted.sort(function (a, b) { return b[1] - a[1] })

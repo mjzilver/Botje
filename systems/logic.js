@@ -1,4 +1,6 @@
-let config = require('../config.json')
+let config = require("../config.json")
+let bot = require("./bot.js")
+let logger = require("./logger.js")
 
 class Logic {
     constructor() { }
@@ -32,6 +34,40 @@ class Logic {
     randomBetween = function (min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
+
+    findClosestMatchInList(word, wordList) {
+        if (word == 0) return ""
+
+        if (Array.isArray(wordList)) {
+            let oldWordList = wordList
+            wordList = {}
+            oldWordList.forEach((item) => {
+                wordList[item] = 1
+            })
+        }
+
+        word = word.toLowerCase()
+        let closestMatch = ""
+        let difference = Number.MAX_VALUE
+        let chosenAmount = 0
+
+        for (const [wordlistword, wordlistamount] of Object.entries(wordList)) {
+            let currentdifference = bot.logic.levenshtein(word, wordlistword)
+            if (currentdifference < difference) {
+                difference = currentdifference
+                closestMatch = wordlistword
+                chosenAmount = wordlistamount
+            } else if (currentdifference == difference) {
+                if (wordlistamount < chosenAmount) {
+                    difference = currentdifference
+                    closestMatch = wordlistword
+                    chosenAmount = wordlistamount
+                }
+            }
+
+        }
+        return closestMatch
+    }
 }
 
 String.prototype.capitalize = function () {
@@ -47,28 +83,28 @@ String.prototype.isLink = function () {
 }
 
 String.prototype.normalizeSpaces = function () {
-    return this.replace(new RegExp(/(^ +| +$|  +)/gi, "gi"), ' ')
+    return this.replace(new RegExp(/(^ +| +$|  +)/gi, "gi"), " ")
 }
 
 String.prototype.textOnly = function () {
-    return this.replace(new RegExp(/[^a-zA-Z ]/gi, "gi"), '')
+    return this.replace(new RegExp(/[^a-zA-Z ]/gi, "gi"), "")
 }
 
 String.prototype.chatCharsOnly = function () {
-    return this.replace(new RegExp(/[^a-zA-Z .,!?]/gi, "gi"), '')
+    return this.replace(new RegExp(/[^a-zA-Z .,!?]/gi, "gi"), "")
 }
 
 String.prototype.removeQuotes = function () {
-    return this.replace(new RegExp(/"/gi, "gi"), '')
+    return this.replace(new RegExp(/"/gi, "gi"), "")
 }
 
 String.prototype.removePrefix = function () {
-    return this.replace(new RegExp(config.prefix, "i"), '')
+    return this.replace(new RegExp(config.prefix, "i"), "")
 }
 
 String.prototype.replaceFancyQuotes = function () {
     let str = this.valueOf()
-    str = str.replace(new RegExp(/(“|”|„)/gi, "gi"), '"')
+    str = str.replace(new RegExp(/(“|”|„)/gi, "gi"), "\"")
     return str.replace(new RegExp(/(`|‘|’)/gi, "gi"), "'")
 }
 
@@ -78,20 +114,19 @@ String.prototype.replaceAt = function (index, replacement) {
 
 Object.defineProperty(Array.prototype, "pickRandom", {
     enumerable: false,
-    value: function (array) { return this[bot.logic.randomBetween(0, this.length - 1)] }
+    value: function () { return this[bot.logic.randomBetween(0, this.length - 1)] }
 })
 
-process.on('exit', function () {
-    logger.info(`=== Bot shutting down, goodbye ===`)
+process.on("exit", function () {
+    logger.info("=== Bot shutting down, goodbye ===")
 })
 
-process.on('SIGINT', function () {
-    logger.info(`=== Bot forced to shut down, goodbye ===`)
+process.on("SIGINT", function () {
+    logger.info("=== Bot forced to shut down, goodbye ===")
 })
 
-process.on('uncaughtException', function (error) {
+process.on("uncaughtException", function (error) {
     logger.error(`Uncaught error "${error.message}"\n === STACK === \n"${error.stack}"`)
 })
-
 
 module.exports = new Logic()

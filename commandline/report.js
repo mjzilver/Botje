@@ -1,7 +1,9 @@
+let logger = require("../systems/logger.js")
+
 module.exports = {
-    name: 'report',
-    description: 'reports information about bot\'s process',
-    format: 'report',
+    name: "report",
+    description: "reports information about bot's process",
+    format: "report",
     function: () => {
         try {
             const { rss, heapUsed, heapTotal } = process.memoryUsage()

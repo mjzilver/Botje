@@ -1,13 +1,15 @@
-let database = require('../systems/database.js')
+let database = require("../systems/database.js")
+let bot = require("../systems/bot.js")
+let logger = require("../systems/logger.js")
 
 module.exports = {
-    'name': 'speak',
-    'description': 'makes the bot speak via recycled messages',
-    'format': 'speak (sentence)',
-    'function': function speak(message) {
+    "name": "speak",
+    "description": "makes the bot speak via recycled messages",
+    "format": "speak (sentence)",
+    "function": function speak(message) {
         let matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
 
-        if (matches && matches[1] != '') {
+        if (matches && matches[1] != "") {
             findTopic(message, matches[1])
         } else {
             findByWord(message)
@@ -20,13 +22,13 @@ function findByWord(message) {
     earliest.setMonth(earliest.getMonth() - 5)
 
     let words = message.content.removePrefix()
-        .replace(new RegExp(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b)/, "gi"), '')
+        .replace(new RegExp(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b)/, "gi"), "")
         .textOnly()
-        .replace(bot.dictionary.getNonSelectorsRegex(), '')
+        .replace(bot.dictionary.getNonSelectorsRegex(), "")
         .trim()
-        .split(' ')
+        .split(" ")
 
-    if (words[0] == 'speak')
+    if (words[0] == "speak")
         words.shift()
 
     if (words && words.length >= 1 && words[0]) {
@@ -58,28 +60,28 @@ function findByWord(message) {
                         logger.debug(`Sending message with '${words.join(",")}' in it`)
 
                         let highestAmount = 0
-                        let chosenMessage = ''
+                        let chosenMessage = ""
 
-                        const regexPatterns = words.map(w => new RegExp(w, 'gmi'));
+                        const regexPatterns = words.map(w => new RegExp(w, "gmi"))
 
                         for (let i = 0; i < rows.length; i++) {
                             let amount = 0
 
                             for (let j = 0; j < regexPatterns.length; j++) {
-                                if (rows[i]['message'].match(regexPatterns[j])) {
-                                    amount += 30 - (j * j);
+                                if (rows[i]["message"].match(regexPatterns[j])) {
+                                    amount += 30 - (j * j)
                                 }
                             }
 
                             if (amount > highestAmount) {
-                                if (bot.logic.levenshtein(rows[i]['message'], message.content) > 15) {
-                                    chosenMessage = rows[i]['message']
+                                if (bot.logic.levenshtein(rows[i]["message"], message.content) > 15) {
+                                    chosenMessage = rows[i]["message"]
                                     highestAmount = amount
                                 }
                             }
                         }
 
-                        chosenMessage = chosenMessage.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), '')
+                        chosenMessage = chosenMessage.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), "")
                         logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
                         bot.message.send(message, chosenMessage)
                     }
@@ -99,7 +101,7 @@ function findByWord(message) {
                 else {
                     if (row) {
                         logger.debug(`Sending message with '${words[0]}' in it`)
-                        bot.message.send(message, row['message'].normalizeSpaces())
+                        bot.message.send(message, row["message"].normalizeSpaces())
                     }
                 }
             })
@@ -110,7 +112,7 @@ function findByWord(message) {
 }
 
 function findRandom(message) {
-    logger.debug(`Sending randomly selected message`)
+    logger.debug("Sending randomly selected message")
 
     let earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
@@ -125,7 +127,7 @@ function findRandom(message) {
         if (err)
             throw err
         else
-            bot.message.send(message, row['message'].normalizeSpaces())
+            bot.message.send(message, row["message"].normalizeSpaces())
     })
 }
 
@@ -141,12 +143,12 @@ function findTopic(message, topic) {
             throw err
 
         if (rows.length < 3) {
-            logger.debug(`Not enough info about topic -- redirecting to the regular method`)
+            logger.debug("Not enough info about topic -- redirecting to the regular method")
             message.content = message.content.replace(/(about|think|of)/ig, "")
             return findByWord(message)
         }
 
-        let regStr = `\\b(is|are)\\b`
+        let regStr = "\\b(is|are)\\b"
 
         let first = rows[0].message
         let second = rows[1].message
@@ -155,10 +157,10 @@ function findTopic(message, topic) {
         logger.debug(`Picked terms related to '${topic}', first '${first}', second '${second}', third '${third}'`)
 
         first = first.substring(first.indexOf(topic.toLowerCase()))
-        second = second.substring(second.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), '')
-        third = third.substring(third.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), '')
+        second = second.substring(second.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), "")
+        third = third.substring(third.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), "")
 
-        let linkerwords = ['and', 'or', 'but', 'also']
+        let linkerwords = ["and", "or", "but", "also"]
 
         let picker = bot.logic.randomBetween(0, 2)
 

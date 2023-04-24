@@ -1,9 +1,9 @@
-let config = require('../config.json')
-const logger = require('./logger')
+let config = require("../config.json")
+const logger = require("./logger")
 
 class Database {
     constructor() {
-        this.sqlite3 = require('sqlite3').verbose()
+        this.sqlite3 = require("sqlite3").verbose()
         this.db = new this.sqlite3.Database("./discord.db")
 
         this.initializeDatabase()
@@ -12,10 +12,10 @@ class Database {
     }
 
     initializeDatabase() {
-        this.db.run(`CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)`)
-        this.db.run(`CREATE TABLE IF NOT EXISTS messages (id TEXT, user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, server TEXT, PRIMARY KEY(text, date))`)
-        this.db.run(`CREATE TABLE IF NOT EXISTS colors (x INTEGER, y INTEGER, red INTEGER, green INTEGER, blue INTEGER, PRIMARY KEY(x,y))`)
-        this.db.run(`CREATE TABLE IF NOT EXISTS command_calls (call_id TEXT, reply_id TEXT, timestamp TEXT, PRIMARY KEY(call_id))`)
+        this.db.run("CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)")
+        this.db.run("CREATE TABLE IF NOT EXISTS messages (id TEXT, user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, server TEXT, PRIMARY KEY(text, date))")
+        this.db.run("CREATE TABLE IF NOT EXISTS colors (x INTEGER, y INTEGER, red INTEGER, green INTEGER, blue INTEGER, PRIMARY KEY(x,y))")
+        this.db.run("CREATE TABLE IF NOT EXISTS command_calls (call_id TEXT, reply_id TEXT, timestamp TEXT, PRIMARY KEY(call_id))")
     }
 
     setCacheSize(cacheSize) {
@@ -36,15 +36,14 @@ class Database {
     storeMessage(message) {
         if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i"))) {
             message.guild.members.fetch(message.author.id).then(
-                (result) => {
+                () => {
                     this.insertMessage(message)
-                },
-                (error) => { })
+                })
         }
     }
 
     insertMessage(message) {
-        let insert = this.db.prepare('INSERT OR IGNORE INTO messages (id, user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        let insert = this.db.prepare("INSERT OR IGNORE INTO messages (id, user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?, ?)",
             [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {

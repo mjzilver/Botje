@@ -1,10 +1,12 @@
-let database = require('../systems/database.js')
+let database = require("../systems/database.js")
+let bot = require("../systems/bot.js")
+let logger = require("../systems/logger.js")
 
 module.exports = {
-    'name': 'save',
-    'description': 'saves a set of messages from a given channel',
-    'format': 'save [channelid] [amount]?',
-    'function': function save(input) {
+    "name": "save",
+    "description": "saves a set of messages from a given channel",
+    "format": "save [channelid] [amount]?",
+    "function": function save(input) {
         let channels = bot.client.channels.cache
 
         if (input[0]) {
@@ -15,7 +17,7 @@ module.exports = {
             if (channel && channel.type == "GUILD_TEXT")
                 catalog(channel, channel.lastMessageId, amount)
             else
-                logger.console('Channel not found')
+                logger.console("Channel not found")
         }
     }
 }

@@ -1,21 +1,22 @@
-let letter_values = require('../../json/letter_values.json')
-let discord = require('discord.js')
-let config = require('../../config.json')
-let database = require('../../systems/database.js')
-const Lister = require('./lister');
+let letter_values = require("../../json/letter_values.json")
+let discord = require("discord.js")
+let config = require("../../config.json")
+let database = require("../../systems/database.js")
+const Lister = require("./lister")
+let bot = require("../../systems/bot.js")
 
 module.exports = {
-    'name': 'score',
-    'description': 'shows the top scoring posters in the channel or mentioned user',
-    'format': 'score (@user)',
-    'function': (message) => {
+    "name": "score",
+    "description": "shows the top scoring posters in the channel or mentioned user",
+    "format": "score (@user)",
+    "function": (message) => {
         new ScoreLister().process(message)
     }
 }
 
 class ScoreLister extends Lister {
     constructor() {
-        super();
+        super()
     }
 
     mention(message, mentioned) {
@@ -24,22 +25,22 @@ class ScoreLister extends Lister {
         WHERE server = ? AND user_id = ? `
 
         let userdata = {
-            'points': 0,
-            'total': 0,
-            'quality': 0,
-            'score': 0
+            "points": 0,
+            "total": 0,
+            "quality": 0,
+            "score": 0
         }
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
-                userdata['points'] += this.calculateScore(rows[i]['message'])
-                userdata['total'] += rows[i]['message'].length
+                userdata["points"] += this.calculateScore(rows[i]["message"])
+                userdata["total"] += rows[i]["message"].length
             }
 
-            userdata['quality'] = ((userdata['points'] / userdata['total']) / 2)
-            userdata['score'] = Math.round(userdata['total'] * userdata['quality'])
+            userdata["quality"] = ((userdata["points"] / userdata["total"]) / 2)
+            userdata["score"] = Math.round(userdata["total"] * userdata["quality"])
 
-            bot.message.send(message, `${mentioned.username}'s post score is ${userdata['score']}`)
+            bot.message.send(message, `${mentioned.username}'s post score is ${userdata["score"]}`)
         })
     }
 
@@ -53,27 +54,27 @@ class ScoreLister extends Lister {
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
-                let user_name = rows[i]['user_name']
+                let user_name = rows[i]["user_name"]
 
                 if (!userdata[user_name])
                     userdata[user_name] = {
-                        'points': 0,
-                        'total': 0,
-                        'quality': 0,
-                        'score': 0
+                        "points": 0,
+                        "total": 0,
+                        "quality": 0,
+                        "score": 0
                     }
 
-                userdata[user_name]['points'] += this.calculateScore(rows[i]['message'])
-                userdata[user_name]['total'] += rows[i]['message'].length
+                userdata[user_name]["points"] += this.calculateScore(rows[i]["message"])
+                userdata[user_name]["total"] += rows[i]["message"].length
             }
 
             let sorted = []
             for (let user in userdata) {
                 // magical calculation
-                userdata[user]['quality'] = (userdata[user]['points'] / userdata[user]['total']) / 2
-                userdata[user]['score'] = Math.round(userdata[user]['total'] * userdata[user]['quality'])
+                userdata[user]["quality"] = (userdata[user]["points"] / userdata[user]["total"]) / 2
+                userdata[user]["score"] = Math.round(userdata[user]["total"] * userdata[user]["quality"])
 
-                sorted.push([user, userdata[user]['score']])
+                sorted.push([user, userdata[user]["score"]])
             }
 
             sorted.sort(function (a, b) {

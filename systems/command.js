@@ -1,11 +1,13 @@
-let config = require('../config.json')
-let fs = require('fs')
+let config = require("../config.json")
+let fs = require("fs")
+let bot = require("./bot.js")
+let logger = require("./logger.js")
 
 class Command {
     constructor() {
-        this.commands = require('../commandholders/commands.js')
-        this.admincommands = require('../commandholders/admincommands.js')
-        this.dmcommands = require('../commandholders/dmcommands.js')
+        this.commands = require("../commandholders/commands.js")
+        this.admincommands = require("../commandholders/admincommands.js")
+        this.dmcommands = require("../commandholders/dmcommands.js")
 
         // person as key -> time as value
         this.lastRequest = []
@@ -19,7 +21,7 @@ class Command {
         if (isCommand) {
             const { command, args } = this.parseMessageArguments(message)
 
-            logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${readback ? 'is a readback command' : ''}`)
+            logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ""} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${readback ? "is a readback command" : ""}`)
 
             if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, readback)) {
                 this.handleCommandType(command, args, readback, message)
@@ -30,7 +32,7 @@ class Command {
     }
 
     parseMessageArguments(message) {
-        const args = message.content.removePrefix().normalizeSpaces().split(' ')
+        const args = message.content.removePrefix().normalizeSpaces().split(" ")
         const command = args.shift().toLowerCase()
         return { command, args }
     }
@@ -62,12 +64,12 @@ class Command {
 
             if (!bot.reply.process(message)) {
                 if ((this.messageCounter >= config.speakEvery || bot.logic.randomBetween(1, 20) == 1) && timePassed >= bot.logic.randomBetween(20, 60)) {
-                    this.commands['speak'].function(message)
+                    this.commands["speak"].function(message)
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
                 } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
                     if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false))
-                        this.commands['speak'].function(message)
+                        this.commands["speak"].function(message)
                 }
             }
             this.messageCounter++
@@ -77,10 +79,10 @@ class Command {
     redo(message) {
         message.channel.messages.fetch(bot.message.findFromReply(message))
             .then(callMessage => {
-                let args = callMessage.content.removePrefix().normalizeSpaces().split(' ')
+                let args = callMessage.content.removePrefix().normalizeSpaces().split(" ")
                 const command = args.shift().toLowerCase()
 
-                logger.debug(`Redoing this command == '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ''} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
+                logger.debug(`Redoing this command == '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ""} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
 
                 if (command in this.commands) {
                     this.commands[command].function(callMessage)
@@ -90,28 +92,28 @@ class Command {
     }
 
     isUserAllowed(message, canSendMessage) {
-        let disallowed = JSON.parse(fs.readFileSync('./json/disallowed.json'))
+        let disallowed = JSON.parse(fs.readFileSync("./json/disallowed.json"))
         if (message.author.id in disallowed)
             return false
 
         const currentTimestamp = new Date()
 
         if (!(message.author.username in this.lastRequest)) {
-            this.lastRequest[message.author.username] = currentTimestamp;
-            return true; // no previous request found, return true
+            this.lastRequest[message.author.username] = currentTimestamp
+            return true // no previous request found, return true
         }
 
-        const elapsedTime = currentTimestamp - this.lastRequest[message.author.username];
+        const elapsedTime = currentTimestamp - this.lastRequest[message.author.username]
         if (elapsedTime < config.timeoutDuration * 1000) {
-            const remainingTime = Math.ceil((config.timeoutDuration * 1000 - elapsedTime) / 1000);
+            const remainingTime = Math.ceil((config.timeoutDuration * 1000 - elapsedTime) / 1000)
             if (canSendMessage) {
-                bot.message.send(message, `Please wait ${remainingTime} second${remainingTime > 1 ? 's' : ''} before making another request.`);
+                bot.message.send(message, `Please wait ${remainingTime} second${remainingTime > 1 ? "s" : ""} before making another request.`)
             }
-            return false; // too soon, return false
+            return false // too soon, return false
         }
 
-        this.lastRequest[message.author.username] = currentTimestamp;
-        return true; // enough time has elapsed, return true          
+        this.lastRequest[message.author.username] = currentTimestamp
+        return true // enough time has elapsed, return true          
     }
 
     handleDM(message) {
@@ -121,7 +123,7 @@ class Command {
             if (command in this.dmcommands)
                 this.dmcommands[command].function(message)
             else if (message.content.match(new RegExp(config.prefix, "i")))
-                bot.message.reply(message, `Use the command b!help for more information`)
+                bot.message.reply(message, "Use the command b!help for more information")
         }
     }
 }

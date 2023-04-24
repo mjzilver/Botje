@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "14.0.2",
+  "version": "14.1.0",
   "description": "Discordbot made for private use",
   "main": "start.js",
   "author": "Mick Jari",
@@ -29,5 +29,8 @@
       "start.js"
     ],
     "signal": "SIGINT"
+  },
+  "devDependencies": {
+    "eslint": "^8.39.0"
   }
 }

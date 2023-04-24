@@ -1,12 +1,13 @@
-let PNGImage = require('pngjs-image')
-let database = require('../systems/database.js')
-let config = require('../config.json')
+let PNGImage = require("pngjs-image")
+let database = require("../systems/database.js")
+let config = require("../config.json")
+let bot = require("../systems/bot.js")
 
 module.exports = {
-    'name': 'draw',
-    'description': 'prints the drawboard image',
-    'format': 'draw',
-    'function': function draw(message) {
+    "name": "draw",
+    "description": "prints the drawboard image",
+    "format": "draw",
+    "function": function draw(message) {
         const db = database.db
         const totalImageSize = config.image.size * config.image.magnification
         let image = PNGImage.createImage(totalImageSize, totalImageSize)
@@ -17,7 +18,7 @@ module.exports = {
             alpha: 255
         })
 
-        let selectSQL = 'SELECT * FROM colors'
+        let selectSQL = "SELECT * FROM colors"
 
         db.all(selectSQL, [], async (err, rows) => {
             if (err)
@@ -31,7 +32,7 @@ module.exports = {
                         alpha: 255
                     })
 
-            image.writeImage('./views/images/image.png', function (err) {
+            image.writeImage("./views/images/image.png", function () {
                 bot.message.reply(message, "Current image", {
                     files: ["./views/images/image.png"]
                 })

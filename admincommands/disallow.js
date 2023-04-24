@@ -1,10 +1,12 @@
-let fs = require('fs')
+let fs = require("fs")
+let bot = require("../systems/bot.js")
+let logger = require("../systems/logger.js")
 
 module.exports = function disallow(message) {
     const mention = message.mentions.users.first()
-    const args = message.content.split(' ')
+    const args = message.content.split(" ")
 
-    let filepath = './json/disallowed.json'
+    let filepath = "./json/disallowed.json"
     let disallowed = JSON.parse(fs.readFileSync(filepath))
 
     if (args[2] && args[2] == "remove") {
@@ -16,7 +18,7 @@ module.exports = function disallow(message) {
         logger.warn(`${mention.username} is no longer allowed to use the bot`)
         bot.message.markComplete(message)
     } else {
-        return bot.message.send(message, 'You need to @ someone to disallow them')
+        return bot.message.send(message, "You need to @ someone to disallow them")
     }
 
     fs.writeFile(filepath, JSON.stringify(disallowed), function (err) {

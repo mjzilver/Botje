@@ -1,32 +1,33 @@
-let fs = require('fs')
-let database = require('./database.js')
+let fs = require("fs")
+let database = require("./database.js")
+let logger = require("./logger.js")
 
 class Dictionary {
     constructor() {
         this.words = []
-        this.wordsPath = './json/words.json'
+        this.wordsPath = "./json/words.json"
 
         if (fs.existsSync(this.wordsPath)) {
             this.loadWordsFromFile()
         } else {
             this.generateWordsFile()
-            logger.console('NonSelector JSON not found, generating new file')
+            logger.console("NonSelector JSON not found, generating new file")
         }
     }
 
     loadWordsFromFile() {
-        const stream = fs.createReadStream(this.wordsPath, { encoding: 'utf8' })
-        let rawData = ''
+        const stream = fs.createReadStream(this.wordsPath, { encoding: "utf8" })
+        let rawData = ""
 
-        stream.on('data', chunk => {
+        stream.on("data", chunk => {
             rawData += chunk
         })
 
-        stream.on('end', () => {
+        stream.on("end", () => {
             this.words = JSON.parse(rawData)
         })
 
-        stream.on('error', err => {
+        stream.on("error", err => {
             logger.error(err)
         })
     }
@@ -40,7 +41,7 @@ class Dictionary {
 
         database.db.all(selectSQL, [], (err, rows) => {
             for (let i = 0; i < rows.length; i++) {
-                let words = rows[i]['message'].split(/\s+/)
+                let words = rows[i]["message"].split(/\s+/)
 
                 for (let j = 0; j < words.length; j++) {
                     if (!wordHolder[words[j]])
@@ -51,7 +52,7 @@ class Dictionary {
             }
 
             for (let word in wordHolder) {
-                this.words.push([word, wordHolder[word]]);
+                this.words.push([word, wordHolder[word]])
             }
             this.words.sort(function (a, b) {
                 return b[1] - a[1]
@@ -79,12 +80,12 @@ class Dictionary {
     }
 
     getNonSelectorsRegex(amount = 100) {
-        let nonSelectorsRegex = ''
+        let nonSelectorsRegex = ""
         let max = (this.words.length < amount) ? this.words.length : amount
         for (let i = 0; i < max; i++) {
             nonSelectorsRegex += this.words[i][0]
             if (i != max - 1)
-                nonSelectorsRegex += '|'
+                nonSelectorsRegex += "|"
         }
         return new RegExp(`\\b((${nonSelectorsRegex})\\s)\\b`, "gmi")
     }

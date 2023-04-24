@@ -1,20 +1,22 @@
-let request = require('request')
-let discord = require('discord.js')
-let config = require('../config.json')
+let request = require("request")
+let discord = require("discord.js")
+let config = require("../config.json")
+let bot = require("../systems/bot.js")
+let logger = require("../systems/logger.js")
 
 module.exports = {
-    'name': 'weather',
-    'description': 'shows the current weather and weather info from the mentioned city',
-    'format': 'weather [city]',
-    'function': function weather(message) {
+    "name": "weather",
+    "description": "shows the current weather and weather info from the mentioned city",
+    "format": "weather [city]",
+    "function": function weather(message) {
         let city = "Leiden" // default city to avoid errors
-        let args = message.content.split(' ')
+        let args = message.content.split(" ")
 
         if (args[1]) {
             args.shift()
             city = args.join(" ")
         } else
-            return bot.message.send(message, 'You need to enter a city')
+            return bot.message.send(message, "You need to enter a city")
 
         request(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${config.weather_api_key}&units=metric&mode=JSON`,
             (err, res, body) => {
@@ -25,24 +27,24 @@ module.exports = {
 
                 if (result.cod == 200) {
                     let options = {
-                        timeZone: 'UTC'
+                        timeZone: "UTC"
                     }
-                    let sunrise = new Date((result.sys.sunrise + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
-                    let sunset = new Date((result.sys.sunset + result.timezone) * 1000).toLocaleTimeString('en-UK', options)
+                    let sunrise = new Date((result.sys.sunrise + result.timezone) * 1000).toLocaleTimeString("en-UK", options)
+                    let sunset = new Date((result.sys.sunset + result.timezone) * 1000).toLocaleTimeString("en-UK", options)
 
                     const weatherEmbed = new discord.MessageEmbed()
                         .setColor(config.color_hex)
                         .setTitle(`Weather in ${result.name} ${result.sys.country}`)
                         .setThumbnail(`https://openweathermap.org/img/wn/${result.weather[0].icon}@2x.png`)
-                        .addField('Current Weather', result.weather[0].description.capitalize())
-                        .addField('Temperature', `${result.main.temp}°C`, true)
-                        .addField('Feels like', `${result.main.feels_like}°C`, true)
-                        .addField('Humidity', `${result.main.humidity}%`, true)
-                        .addField('Wind', `${result.wind.speed}m/s`, true)
-                        .addField('Clouds', `${result.clouds.all}%`, true)
-                        .addField('Pressure', `${result.main.pressure}hPa`, true)
-                        .addField('Sunrise', sunrise, true)
-                        .addField('Sunset', sunset, true)
+                        .addField("Current Weather", result.weather[0].description.capitalize())
+                        .addField("Temperature", `${result.main.temp}°C`, true)
+                        .addField("Feels like", `${result.main.feels_like}°C`, true)
+                        .addField("Humidity", `${result.main.humidity}%`, true)
+                        .addField("Wind", `${result.wind.speed}m/s`, true)
+                        .addField("Clouds", `${result.clouds.all}%`, true)
+                        .addField("Pressure", `${result.main.pressure}hPa`, true)
+                        .addField("Sunrise", sunrise, true)
+                        .addField("Sunset", sunset, true)
 
                     bot.message.send(message, { embeds: [weatherEmbed] })
                 } else {

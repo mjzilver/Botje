@@ -1,5 +1,7 @@
-let config = require('../config.json')
-let database = require('./database.js')
+let config = require("../config.json")
+let database = require("./database.js")
+let bot = require("./bot.js")
+let logger = require("./logger.js")
 
 class Message {
     constructor() {
@@ -18,7 +20,7 @@ class Message {
             return promise
         } else {
             logger.error(`Content empty could not send, call: "${call}"`)
-            markComplete(call)
+            this.markComplete(call)
         }
     }
 
@@ -33,7 +35,7 @@ class Message {
             return promise
         } else {
             logger.error(`Content empty could not send, call: "${call}"`)
-            markComplete(call)
+            this.markComplete(call)
         }
     }
 
@@ -47,12 +49,12 @@ class Message {
 
     delete(reply) {
         console.log(this.commandCalls[reply.id])
-        reply.channel.messages.fetch(this.commandCalls[reply.id]).then((message) => { })
+        reply.channel.messages.fetch(this.commandCalls[reply.id]).then(() => { })
         reply.delete({ timeout: 5000 })
     }
 
     markComplete(call) {
-        let insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)',
+        let insert = database.db.prepare("INSERT OR IGNORE INTO command_calls (call_id, timestamp) VALUES (?, ?)",
             [call.id, call.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {
@@ -64,7 +66,7 @@ class Message {
     addCommandCall(call, reply) {
         this.commandCalls[call.id] = reply.id
 
-        let insert = database.db.prepare('INSERT OR IGNORE INTO command_calls (call_id, reply_id, timestamp) VALUES (?, ?, ?)',
+        let insert = database.db.prepare("INSERT OR IGNORE INTO command_calls (call_id, reply_id, timestamp) VALUES (?, ?, ?)",
             [call.id, reply.id, reply.createdAt.getTime()])
         insert.run(function (err) {
             if (err) {
@@ -80,14 +82,14 @@ class Message {
 
         database.query(selectSQL, [], (rows) => {
             for (let i = 0; i < rows.length; i++) {
-                this.commandCalls[rows[i]['call_id']] = rows[i]['reply_id']
+                this.commandCalls[rows[i]["call_id"]] = rows[i]["reply_id"]
             }
             this.scanForCommands()
         })
     }
 
     scanForCommands() {
-        logger.startup(`Reading messages since startup`);
+        logger.startup("Reading messages since startup")
 
         bot.client.channels.cache
             .filter(channel => channel.type === "GUILD_TEXT" && channel.viewable)
@@ -98,9 +100,9 @@ class Message {
                 messages.each(async message => {
                     const messageTime = message.createdTimestamp
 
-                    if (bot.command.isUserAllowed(message), false) {
-                        if (messageTime > yesterday && message.content.match(new RegExp(config.prefix, "i"))) {
-                            if (!(message.id in this.commandCalls)) {
+                    if (messageTime > yesterday && message.content.match(new RegExp(config.prefix, "i"))) {
+                        if (!(message.id in this.commandCalls)) {
+                            if(bot.command.isUserAllowed(message)) {
                                 await bot.command.handleCommand(message, true)
                             }
                         }

@@ -1,6 +1,9 @@
+let bot = require("./bot.js")
+let logger = require("./logger.js")
+
 class Reply {
     constructor() {
-        this.replyPatterns = require('../json/reply.json')
+        this.replyPatterns = require("../json/reply.json")
 
         // replyPattern name as key -> time as value
         this.lastRequest = []
@@ -12,9 +15,9 @@ class Reply {
             if (message.content.match(new RegExp(reply["regex"], "gi")) && this.checkTime(reply)) {
                 logger.debug(`Replying to message '${message.content}' that matched ReplyPattern '${reply["name"]}'`)
                 if (reply["reply"])
-                    bot.message.reply(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
+                    bot.message.reply(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ""))
                 else
-                    bot.message.send(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ''))
+                    bot.message.send(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ""))
 
                 match = true
             }

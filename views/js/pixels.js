@@ -1,9 +1,9 @@
 let socket = io()
 
 function pixelClick(x, y) {
-    let colorHex = $(`#color`).val()
+    let colorHex = $("#color").val()
     let colorRGB = hexToRgb(colorHex)
-    socket.emit('pixelChange', {
+    socket.emit("pixelChange", {
         x: x,
         y: y,
         red: colorRGB.r,
@@ -12,7 +12,7 @@ function pixelClick(x, y) {
     })
 }
 
-socket.on('pixelChanged', function (pixel) {
+socket.on("pixelChanged", function (pixel) {
     $(`#${pixel.x}-${pixel.y}`).attr("style", "")
     $(`#${pixel.x}-${pixel.y}`).attr("style", `background-color: rgb(${pixel.red}, ${pixel.green}, ${pixel.blue}) !important;`)
 })
@@ -27,21 +27,21 @@ function hexToRgb(hex) {
 }
 
 function zoomIn() {
-    let styleTag = $('<style> .pixel {padding: 0;width: 0.5vw !important;height: 0.5vw !important;}</style>')
-    $('html > head').append(styleTag)
+    let styleTag = $("<style> .pixel {padding: 0;width: 0.5vw !important;height: 0.5vw !important;}</style>")
+    $("html > head").append(styleTag)
 }
 
 function zoomOut() {
-    $('style').remove()
+    $("style").remove()
 }
 
-socket.on('connectCounter', function (connectCounter) {
+socket.on("connectCounter", function (connectCounter) {
     $("#connectCounter").text(connectCounter)
 })
 
-socket.on('disconnect', (reason) => {
-    if (reason === 'io server disconnect') {
-        $("#errorlabel").text('You got kicked')
+socket.on("disconnect", (reason) => {
+    if (reason === "io server disconnect") {
+        $("#errorlabel").text("You got kicked")
     }
     // else the socket will automatically try to reconnect
 })

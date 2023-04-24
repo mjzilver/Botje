@@ -1,5 +1,7 @@
-let discord = require('discord.js')
-let config = require('../config.json')
+let discord = require("discord.js")
+let config = require("../config.json")
+let bot = require("./bot.js")
+let logger = require("./logger.js")
 
 class hangman {
     constructor() {
@@ -12,21 +14,21 @@ class hangman {
     }
 
     run(message) {
-        let args = message.cleanContent.toLowerCase().split(' ')
+        let args = message.cleanContent.toLowerCase().split(" ")
 
         switch (args[1]) {
-            case "start":
-                this.start(message)
-                break
-            case "guess":
-                this.guess(message, args[2])
-                break
-            case "help":
-                this.help(message)
-                break
-            default:
-                this.help(message)
-                break
+        case "start":
+            this.start(message)
+            break
+        case "guess":
+            this.guess(message, args[2])
+            break
+        case "help":
+            this.help(message)
+            break
+        default:
+            this.help(message)
+            break
         }
     }
 
@@ -38,23 +40,23 @@ class hangman {
         this.visibleWord = ""
         this.tries = 0
         this.alreadyGuessed = []
-        let words = require('../json/words.json')
+        let words = require("../json/words.json")
 
-        let chosenword = ''
+        let chosenword = ""
 
         while (this.word == "") {
             chosenword = words.pickRandom()
             chosenword[0] = chosenword[0].textOnly()
-            chosenword[0] = chosenword[0].replace(bot.dictionary.getNonSelectorsRegex(), '').trim()
+            chosenword[0] = chosenword[0].replace(bot.dictionary.getNonSelectorsRegex(), "").trim()
             if (chosenword[1] > 10 && chosenword[0].length >= 5 && chosenword[0].length <= 20 && chosenword[0].match(/[a-z]+/i)) {
                 this.word = chosenword[0]
             }
         }
 
         for (let i = 0; i < this.word.length; i++)
-            this.visibleWord += '―'
+            this.visibleWord += "―"
 
-        bot.message.send(message, 'Starting new hangman game.')
+        bot.message.send(message, "Starting new hangman game.")
         logger.debug(`Starting new hangman game the word is ${this.word}`)
 
         this.hasEnded = false
@@ -64,7 +66,7 @@ class hangman {
 
     guess(message, geussedContent) {
         if (this.hasEnded)
-            return bot.message.send(message, 'This hangman game has ended...')
+            return bot.message.send(message, "This hangman game has ended...")
 
         if (geussedContent) {
             if (geussedContent.length > 1) {
@@ -97,13 +99,13 @@ class hangman {
                 bot.message.send(message, `Oh no! You have been hanged! The word was ${this.word}`)
                 this.hasEnded = true
             } else if (this.visibleWord == this.word) {
-                bot.message.send(message, `You've won by guessing all the letters!`)
+                bot.message.send(message, "You've won by guessing all the letters!")
                 this.hasEnded = true
             }
 
             this.sendEmbed(message)
         } else {
-            bot.message.send(message, `Not a valid guess!`)
+            bot.message.send(message, "Not a valid guess!")
         }
     }
 
@@ -126,19 +128,19 @@ class hangman {
             .setColor(config.color_hex)
             .setTitle(`Hangman -- ${this.tries}/${this.maxTries} tries`)
             .setImage("attachment://hangman.png")
-            .addField('Word', showVisibleWord, false)
+            .addField("Word", showVisibleWord, false)
 
         if (this.alreadyGuessed.length > 0) {
             let alreadyGuessedString = ""
             for (let i = 0; i < this.alreadyGuessed.length; i++)
                 alreadyGuessedString += this.alreadyGuessed[i].toUpperCase() + " "
-            hangmanEmbed.addField('Already guessed letters', alreadyGuessedString, false)
+            hangmanEmbed.addField("Already guessed letters", alreadyGuessedString, false)
         }
 
         if (this.hasEnded)
-            hangmanEmbed.setFooter(`Use b!hangman start to start a new game!`)
+            hangmanEmbed.setFooter("Use b!hangman start to start a new game!")
         else
-            hangmanEmbed.setFooter(`Use b!hangman guess to guess`)
+            hangmanEmbed.setFooter("Use b!hangman guess to guess")
 
         bot.message.send(message, {
             files: [attachment],

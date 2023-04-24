@@ -1,10 +1,11 @@
-let database = require('../systems/database.js')
+let database = require("../systems/database.js")
+let bot = require("../systems/bot.js")
 
 module.exports = {
-    'name': 'talk',
-    'description': 'makes the bot talk via predictive text or as if it were the mentioned user',
-    'format': 'talk (@user)',
-    'function': function talk(message) {
+    "name": "talk",
+    "description": "makes the bot talk via predictive text or as if it were the mentioned user",
+    "format": "talk (@user)",
+    "function": function talk(message) {
         let mention = message.mentions ? message.mentions.users.first() : null
         let chain = {}
 
@@ -19,7 +20,7 @@ module.exports = {
                 throw err
             else {
                 for (let i = 0; i < rows.length; i++) {
-                    const words = rows[i]['message'].split(' ')
+                    const words = rows[i]["message"].split(" ")
                     let prevWord = ""
 
                     for (let j = 0; j < words.length; j++) {
@@ -41,7 +42,7 @@ module.exports = {
                     let previousWord = chain[""][bot.logic.randomBetween(0, chain[""].length - 1)]
                     sentence += previousWord
 
-                    for (i = 0; i < sentenceLength - 1; i++) {
+                    for (let i = 0; i < sentenceLength - 1; i++) {
                         if (chain[previousWord]) {
                             let currentWord = chain[previousWord][bot.logic.randomBetween(0, chain[previousWord].length - 1)]
 

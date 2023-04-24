@@ -1,4 +1,6 @@
-let projectPackage = require('../package.json') 
+let projectPackage = require("../package.json") 
+let bot = require("./bot.js")
+let logger = require("./logger.js")
 
 class Webhook {
     constructor() { }
@@ -6,13 +8,13 @@ class Webhook {
     async fetch(channel) {
         if (channel && channel.type == "GUILD_TEXT") {
             let webhooks = await channel.fetchWebhooks()
-            for (const [id, webhook] of webhooks) {
+            for (const [, webhook] of webhooks) {
                 if (webhook.name == projectPackage.name) {
-                    logger.console('Found webhook')
+                    logger.console("Found webhook")
                     return webhook
                 }
             }
-            logger.console('making new webhook')
+            logger.console("making new webhook")
             return await channel.createWebhook(projectPackage.name)
         }
     }

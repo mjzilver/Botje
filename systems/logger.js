@@ -1,4 +1,4 @@
-const Winston = require('winston')
+const Winston = require("winston")
 
 const { combine, timestamp, colorize, printf, json } = Winston.format
 
@@ -13,21 +13,21 @@ const loggerLevels = {
     startup: 7
 }
 
-Winston.loggers.add('logger', {
+Winston.loggers.add("logger", {
     levels: loggerLevels,
     transports: [
         new (Winston.transports.Console)({
             colorize: true,
-            level: 'startup',
+            level: "startup",
             format: combine(
-                timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+                timestamp({ format: "DD-MM-YYYY HH:mm:ss" }),
                 colorize(),
                 printf(output => `${output.timestamp} ${output.level}: ${output.message}`)
             )
         }),
         new (Winston.transports.File)({
-            filename: 'bot.log',
-            level: 'admin',
+            filename: "bot.log",
+            level: "admin",
             format: combine(
                 timestamp(),
                 json()
@@ -37,10 +37,10 @@ Winston.loggers.add('logger', {
 })
 
 Winston.addColors({
-    console: 'grey',
-    admin: 'yellow',
-    deletion: 'yellow',
-    startup: 'magenta'
+    console: "grey",
+    admin: "yellow",
+    deletion: "yellow",
+    startup: "magenta"
 })
 
-module.exports = Winston.loggers.get('logger')
+module.exports = Winston.loggers.get("logger")

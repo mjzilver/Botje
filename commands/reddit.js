@@ -1,22 +1,24 @@
-let request = require('request')
-let discord = require('discord.js')
-let config = require('../config.json')
-let database = require('../systems/database.js')
+let request = require("request")
+let discord = require("discord.js")
+let config = require("../config.json")
+let database = require("../systems/database.js")
+let bot = require("../systems/bot.js")
+let logger = require("../systems/logger.js")
 
 module.exports = {
-    'name': 'reddit',
-    'description': 'gets a random link from the given subreddit use top|hot|new to sort and the timeframe (only for top)',
-    'format': 'reddit [subreddit] (top|hot|new) (hour|day|week|month|year|all)',
-    'function': async function getRedditImage(message, last = '') {
+    "name": "reddit",
+    "description": "gets a random link from the given subreddit use top|hot|new to sort and the timeframe (only for top)",
+    "format": "reddit [subreddit] (top|hot|new) (hour|day|week|month|year|all)",
+    "function": async function getRedditImage(message, last = "") {
         const db = database.db
-        const args = message.content.split(' ')
+        const args = message.content.split(" ")
         let sub = args[1]
-        let sort = 'hot'
-        let time = 'month'
+        let sort = "hot"
+        let time = "month"
 
-        if (['top', 'hot', 'new'].includes(args[2]))
+        if (["top", "hot", "new"].includes(args[2]))
             sort = args[2]
-        if (['hour', 'day', 'week', 'month', 'year', 'all'].includes(args[3]))
+        if (["hour", "day", "week", "month", "year", "all"].includes(args[3]))
             time = args[3]
 
         const options = {
@@ -29,8 +31,8 @@ module.exports = {
                 return logger.error(err)
             }
 
-            if (typeof (body) !== 'undefined' && typeof (body.data) !== 'undefined' && typeof (body.data.children) !== 'undefined') {
-                let selectSQL = 'SELECT * FROM images WHERE sub = ?'
+            if (typeof (body) !== "undefined" && typeof (body.data) !== "undefined" && typeof (body.data.children) !== "undefined") {
+                let selectSQL = "SELECT * FROM images WHERE sub = ?"
                 let foundImages = {}
 
                 db.all(selectSQL, [sub], async (err, rows) => {
@@ -54,8 +56,8 @@ module.exports = {
                             const image = new discord.MessageEmbed()
                                 .setColor(`${config.color_hex}`)
                                 .setTitle(`${post.title}`)
-                                .addField('Updoots', `${post.score}`, true)
-                                .addField('Posted by', `${post.author}`, true)
+                                .addField("Updoots", `${post.score}`, true)
+                                .addField("Posted by", `${post.author}`, true)
                                 .setImage(`${post.url}`)
                                 .setURL(`https://reddit.com${post.permalink}`)
                                 .setFooter(`From: reddit/r/${sub}`)
@@ -67,7 +69,7 @@ module.exports = {
                                 followAllRedirects: true,
                             }
 
-                            request(options, (err, res, body) => {
+                            request(options, (err, res) => {
                                 if (err)
                                     throw err
 
@@ -88,7 +90,7 @@ module.exports = {
                             bot.message.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
                         }
 
-                        let insert = db.prepare('INSERT INTO images (link, sub) VALUES (?, ?)', [post.url, sub])
+                        let insert = db.prepare("INSERT INTO images (link, sub) VALUES (?, ?)", [post.url, sub])
                         insert.run(function (err) {
                             if (err) {
                                 logger.error(`failed to insert: ${post.url} - ${sub}`)
@@ -98,7 +100,7 @@ module.exports = {
                         })
                     } else {
                         if (body.data.children.length >= 100) {
-                            logger.debug('Finding posts before post ' + body.data.children[body.data.children.length - 1].data.title)
+                            logger.debug("Finding posts before post " + body.data.children[body.data.children.length - 1].data.title)
                             getRedditImage(message, body.data.children[body.data.children.length - 1].data.name)
                         } else
                             bot.message.send(message, "I have ran out of images to show you")

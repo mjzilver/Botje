@@ -1,20 +1,21 @@
-let discord = require('discord.js')
-let config = require('../../config.json')
-let database = require('../../systems/database.js')
-const Lister = require('./lister');
+let discord = require("discord.js")
+let config = require("../../config.json")
+let database = require("../../systems/database.js")
+const Lister = require("./lister")
+let bot = require("../../systems/bot.js")
 
 module.exports = {
-    'name': 'word',
-    'description': 'shows how many times a word has been said in the current channel, ? per user or from mentioned user',
-    'format': 'word (@user | ?) [word]',
-    'function': (message) => {
+    "name": "word",
+    "description": "shows how many times a word has been said in the current channel, ? per user or from mentioned user",
+    "format": "word (@user | ?) [word]",
+    "function": (message) => {
         new WordLister().process(message)
     }
 }
 
 class WordLister extends Lister {
     constructor() {
-        super();
+        super()
     }
 
     process(message) {
@@ -46,7 +47,7 @@ class WordLister extends Lister {
         database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
             let result = ""
             for (let i = 0; (i < rows.length && i <= 10); i++)
-                result += `${rows[i]['user_name']} has said ${word} ${rows[i]['count']} times! \n`
+                result += `${rows[i]["user_name"]} has said ${word} ${rows[i]["count"]} times! \n`
 
             if (result == "")
                 return bot.message.send(message, `Nothing found for ${word} in ${message.guild.name} `)
@@ -68,7 +69,7 @@ class WordLister extends Lister {
         WHERE message LIKE ? AND server = ? `
 
         database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
-            bot.message.send(message, `Ive found ${rows[0]['count']} messages in this server that contain ${word}`)
+            bot.message.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
         })
     }
 
@@ -79,7 +80,7 @@ class WordLister extends Lister {
         AND server = ? AND user_id = ? `
 
         database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id], (rows) => {
-            bot.message.send(message, `Ive found ${rows[0]['count']} messages from ${mentioned.username} in this server that contain ${word}`)
+            bot.message.send(message, `Ive found ${rows[0]["count"]} messages from ${mentioned.username} in this server that contain ${word}`)
         })
     }
 
@@ -101,13 +102,13 @@ class WordLister extends Lister {
             let result = ""
             let resultArray = []
             for (let i = 0; (i < rows.length && i <= 10); i++) {
-                let percentage = ((parseInt(rows[i]['count']) / parseInt(rows[i]['total'])) * 100).toFixed(3)
-                resultArray.push({ 'percentage': percentage, 'user_name': rows[i]['user_name'] })
+                let percentage = ((parseInt(rows[i]["count"]) / parseInt(rows[i]["total"])) * 100).toFixed(3)
+                resultArray.push({ "percentage": percentage, "user_name": rows[i]["user_name"] })
             }
-            resultArray.sort(function (a, b) { return b.percentage - a.percentage });
+            resultArray.sort(function (a, b) { return b.percentage - a.percentage })
 
             for (let i = 0; i < resultArray.length; i++)
-                result += `${resultArray[i]['user_name']} has said ${word} in ${resultArray[i]['percentage']}% of their messages! \n`
+                result += `${resultArray[i]["user_name"]} has said ${word} in ${resultArray[i]["percentage"]}% of their messages! \n`
 
             if (result == "")
                 return bot.message.send(message, `Nothing found for ${word} in ${message.guild.name} `)

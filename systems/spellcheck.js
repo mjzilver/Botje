@@ -1,4 +1,5 @@
-let database = require('./database.js')
+let database = require("./database.js")
+let bot = require("./bot.js")
 
 class Spellcheck {
     constructor() {
@@ -17,7 +18,7 @@ class Spellcheck {
                 throw err
             } else {
                 rows.forEach(row => {
-                    row.message.split(' ').forEach(word => {
+                    row.message.split(" ").forEach(word => {
                         if (!(word in this.wordList)) {
                             this.wordList[word] = 1
                         } else {
@@ -33,7 +34,7 @@ class Spellcheck {
         let words = []
         let mistakes = 0
 
-        for (let word of sentence.split(' ')) {
+        for (let word of sentence.split(" ")) {
             word = word.textOnly()
             if (this.checkWord(word)) {
                 words.push(word)
@@ -44,8 +45,8 @@ class Spellcheck {
             }
         }
         return {
-            'result': words.join(' '),
-            'mistakes': mistakes
+            "result": words.join(" "),
+            "mistakes": mistakes
         }
     }
 
@@ -54,7 +55,7 @@ class Spellcheck {
     }
 
     findClosestWord(word) {
-        if (word == 0) return ''
+        if (word == 0) return ""
 
         word = word.toLowerCase()
 
@@ -82,7 +83,7 @@ class Spellcheck {
     }
 
     findClosestMatchInList(word, wordList) {
-        if (word == 0) return ''
+        if (word == 0) return ""
 
         if (Array.isArray(wordList)) {
             let oldWordList = wordList
@@ -114,7 +115,6 @@ class Spellcheck {
         }
         return closestMatch
     }
-
 }
 
 module.exports = new Spellcheck()

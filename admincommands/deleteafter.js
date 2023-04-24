@@ -1,3 +1,5 @@
+let logger = require("../systems/logger.js")
+
 module.exports = async function deletafter(message) {
     let refenceId = message.reference?.messageId
     if (refenceId) {
@@ -16,6 +18,6 @@ module.exports = async function deletafter(message) {
         logger.warn(`Deleting up to 100 messages after "${message.content}"`)
         message.delete({ timeout: 5000 })
     } else {
-        message.reply(`You need to reply to a manage to delete after the replied to message`)
+        message.reply("You need to reply to a manage to delete after the replied to message")
     }
 }

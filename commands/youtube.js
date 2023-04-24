@@ -1,12 +1,14 @@
-let config = require('../config.json')
-let request = require('request')
+let config = require("../config.json")
+let request = require("request")
+let bot = require("../systems/bot.js")
+let logger = require("../systems/logger.js")
 
 module.exports = {
-    'name': 'youtube',
-    'description': 'searches for a youtube video',
-    'format': 'youtube [keyword]',
-    'function': function youtube(message) {
-        let keyword = message.content.replace(/youtube /g, '')
+    "name": "youtube",
+    "description": "searches for a youtube video",
+    "format": "youtube [keyword]",
+    "function": function youtube(message) {
+        let keyword = message.content.replace(/youtube /g, "")
 
         const options = {
             url: `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${keyword}&key=${config.youtube_api_key}`,
