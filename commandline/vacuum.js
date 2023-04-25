@@ -1,5 +1,5 @@
-let database = require("../systems/database.js")
-let logger = require("../systems/logger.js")
+let database = require("systems/database.js")
+let logger = require("systems/logger.js")
 
 module.exports = {
     "name": "vacuum",

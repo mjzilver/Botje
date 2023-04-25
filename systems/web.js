@@ -1,15 +1,15 @@
-let webhook = require("./webhook.js")
-let config = require("../config.json")
-let database = require("./database.js")
-let bot = require("./bot.js")
-let logger = require("./logger.js")
+let webhook = require("systems/webhook.js")
+let config = require("config.json")
+let database = require("systems/database.js")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 class WebServer {
     constructor() {
         const express = require("express")
         const app = express()
         app.set("view engine", "pug")
-        app.use(express.static(__dirname + "/../views"))
+        app.use(express.static(__dirname + "/views"))
         app.use(express.json())
         app.use(express.urlencoded({ extended: true }))
 
@@ -54,7 +54,7 @@ class WebServer {
 
             const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == "GUILD_TEXT"))
             let guilds = Object.fromEntries(bot.client.guilds.cache)
-            let commands = (require("../commandholders/commands.js"))
+            let commands = (require("commandholders/commands.js"))
 
             database.db.all(selectSQL, [], async (err, rows) => {
                 rows.unshift({ "user_id": "542721460033028117", "user_name": "Botje" })

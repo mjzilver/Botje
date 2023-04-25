@@ -1,5 +1,5 @@
-let database = require("../systems/database.js")
-let bot = require("../systems/bot.js")
+let database = require("systems/database.js")
+let bot = require("systems/bot.js")
 
 module.exports = {
     "name": "talk",

@@ -1,5 +1,5 @@
-let database = require("./database.js")
-let bot = require("./bot.js")
+let database = require("systems/database.js")
+let bot = require("systems/bot.js")
 
 class Spellcheck {
     constructor() {
@@ -78,40 +78,6 @@ class Spellcheck {
                     }
                 }
             }
-        }
-        return closestMatch
-    }
-
-    findClosestMatchInList(word, wordList) {
-        if (word == 0) return ""
-
-        if (Array.isArray(wordList)) {
-            let oldWordList = wordList
-            wordList = {}
-            oldWordList.forEach((item) => {
-                wordList[item] = 1
-            })
-        }
-
-        word = word.toLowerCase()
-        let closestMatch = ""
-        let difference = Number.MAX_VALUE
-        let chosenAmount = 0
-
-        for (const [wordlistword, wordlistamount] of Object.entries(wordList)) {
-            let currentdifference = bot.logic.levenshtein(word, wordlistword)
-            if (currentdifference < difference) {
-                difference = currentdifference
-                closestMatch = wordlistword
-                chosenAmount = wordlistamount
-            } else if (currentdifference == difference) {
-                if (wordlistamount < chosenAmount) {
-                    difference = currentdifference
-                    closestMatch = wordlistword
-                    chosenAmount = wordlistamount
-                }
-            }
-
         }
         return closestMatch
     }

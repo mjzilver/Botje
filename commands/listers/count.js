@@ -1,9 +1,9 @@
 let discord = require("discord.js")
-let config = require("../../config.json")
-let database = require("../../systems/database.js")
-let Lister = require("./lister.js")
-let bot = require("../../systems/bot.js")
-let logger = require("../../systems/logger.js")
+let config = require("config.json")
+let database = require("systems/database.js")
+const Lister = require("./lister.js")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 module.exports = {
     "name": "count",

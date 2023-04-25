@@ -1,8 +1,8 @@
 let request = require("request")
 let discord = require("discord.js")
-let config = require("../config.json")
-let bot = require("../systems/bot.js")
-let logger = require("../systems/logger.js")
+let config = require("config.json")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 module.exports = {
     "name": "weather",

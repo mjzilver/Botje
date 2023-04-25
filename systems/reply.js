@@ -1,9 +1,9 @@
-let bot = require("./bot.js")
-let logger = require("./logger.js")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 class Reply {
     constructor() {
-        this.replyPatterns = require("../json/reply.json")
+        this.replyPatterns = require("json/reply.json")
 
         // replyPattern name as key -> time as value
         this.lastRequest = []

@@ -1,7 +1,7 @@
 let Jimp = require("jimp")
 let fs = require("fs")
-let database = require("../systems/database.js")
-let bot = require("../systems/bot.js")
+let database = require("systems/database.js")
+let bot = require("systems/bot.js")
 
 module.exports = {
     "name": "meme",
@@ -62,7 +62,7 @@ module.exports = {
 
 async function processPicture(url, top, bottom, message) {
     if (!url) {
-        let path = "./assets/meme_templates"
+        let path = "assets/meme_templates"
         let files = fs.readdirSync(path)
         let chosenFile = files[Math.floor(Math.random() * files.length)]
         url = `${path}/${chosenFile}`
@@ -71,7 +71,7 @@ async function processPicture(url, top, bottom, message) {
     bottom = bottom.toUpperCase().trim().replaceFancyQuotes()
 
     Jimp.read(url, (err, image) => {
-        Jimp.loadFont("./assets/font.fnt").then(font => {
+        Jimp.loadFont("assets/font.fnt").then(font => {
             image = image.resize(800, Jimp.AUTO)
 
             image.print(font, 0, 0, {
@@ -84,9 +84,9 @@ async function processPicture(url, top, bottom, message) {
                 alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
                 alignmentY: Jimp.VERTICAL_ALIGN_BOTTOM
             }, image.bitmap.width, image.bitmap.height * 0.1)
-            image.write("./assets/meme.png", () => {
+            image.write("assets/meme.png", () => {
                 bot.message.reply(message, {
-                    files: ["./assets/meme.png"]
+                    files: ["assets/meme.png"]
                 })
             })
         })

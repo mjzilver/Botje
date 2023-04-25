@@ -1,15 +1,15 @@
 let discord = require("discord.js")
-let projectPackage = require("../package.json")
-let config = require("../config.json")
+let projectPackage = require("package.json")
+let config = require("config.json")
 const fs = require("fs")
-let bot = require("../systems/bot.js")
+let bot = require("systems/bot.js")
 
 module.exports = {
     "name": "privacy",
     "description": "sends your botje's full privacy policy",
     "format": "privacy",
     "function": (message) => {
-        fs.readFile("__dirname/../privacy_policy.txt", "utf8", (err, data) => {
+        fs.readFile("__dirname/privacy_policy.txt", "utf8", (err, data) => {
             if (err) {
                 console.error(err)
                 return

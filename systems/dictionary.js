@@ -1,11 +1,11 @@
 let fs = require("fs")
-let database = require("./database.js")
-let logger = require("./logger.js")
+let database = require("systems/database.js")
+let logger = require("systems/logger.js")
 
 class Dictionary {
     constructor() {
         this.words = []
-        this.wordsPath = "./json/words.json"
+        this.wordsPath = "json/words.json"
 
         if (fs.existsSync(this.wordsPath)) {
             this.loadWordsFromFile()

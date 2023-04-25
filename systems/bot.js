@@ -1,7 +1,7 @@
 let discord = require("discord.js")
-let projectPackage = require("../package.json")
-let config = require("../config.json")
-let logger = require("./logger.js")
+let projectPackage = require("package.json")
+let config = require("config.json")
+let logger = require("systems/logger.js")
 
 class Bot {
     constructor() {
@@ -48,13 +48,13 @@ class Bot {
     }
 
     loadSystems() {
-        this.message = require("./message.js")
-        this.eventlistener = require("./eventlistener.js")
-        this.command = require("./command.js")
-        this.logic = require("./logic.js")
-        this.backup = require("./backup.js")
-        this.reply = require("./reply.js")
-        this.dictionary = require("./dictionary.js")
+        this.message = require("systems/message.js")
+        this.eventlistener = require("systems/eventlistener.js")
+        this.command = require("systems/command.js")
+        this.logic = require("systems/logic.js")
+        this.backup = require("systems/backup.js")
+        this.reply = require("systems/reply.js")
+        this.dictionary = require("systems/dictionary.js")
     }
 }
 module.exports = new Bot()

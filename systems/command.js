@@ -1,13 +1,13 @@
-let config = require("../config.json")
+let config = require("config.json")
 let fs = require("fs")
-let bot = require("./bot.js")
-let logger = require("./logger.js")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 class Command {
     constructor() {
-        this.commands = require("../commandholders/commands.js")
-        this.admincommands = require("../commandholders/admincommands.js")
-        this.dmcommands = require("../commandholders/dmcommands.js")
+        this.commands = require("commandholders/commands.js")
+        this.admincommands = require("commandholders/admincommands.js")
+        this.dmcommands = require("commandholders/dmcommands.js")
 
         // person as key -> time as value
         this.lastRequest = []
@@ -92,7 +92,7 @@ class Command {
     }
 
     isUserAllowed(message, canSendMessage) {
-        let disallowed = JSON.parse(fs.readFileSync("./json/disallowed.json"))
+        let disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
         if (message.author.id in disallowed)
             return false
 

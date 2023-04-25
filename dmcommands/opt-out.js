@@ -1,9 +1,9 @@
 let discord = require("discord.js")
-let config = require("../config.json")
+let config = require("config.json")
 let fs = require("fs")
-let bot = require("../systems/bot.js")
-let logger = require("../systems/logger.js")
-let database = require("../systems/database.js")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
+let database = require("systems/database.js")
 
 module.exports = {
     "name": "opt-out",
@@ -41,7 +41,7 @@ If you still wish to opt-out completely you need to type 'b!accept'
 `
 
 function deleteUserData(message) {
-    let filepath = "./json/disallowed.json"
+    let filepath = "json/disallowed.json"
     let disallowed = JSON.parse(fs.readFileSync(filepath))
     disallowed[message.author.id] = true
     logger.warn(`${message.author.username} is no longer allowed to use the bot`)

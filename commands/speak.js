@@ -1,6 +1,6 @@
-let database = require("../systems/database.js")
-let bot = require("../systems/bot.js")
-let logger = require("../systems/logger.js")
+let database = require("systems/database.js")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 module.exports = {
     "name": "speak",

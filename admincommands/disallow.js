@@ -1,12 +1,12 @@
 let fs = require("fs")
-let bot = require("../systems/bot.js")
-let logger = require("../systems/logger.js")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 module.exports = function disallow(message) {
     const mention = message.mentions.users.first()
     const args = message.content.split(" ")
 
-    let filepath = "./json/disallowed.json"
+    let filepath = "json/disallowed.json"
     let disallowed = JSON.parse(fs.readFileSync(filepath))
 
     if (args[2] && args[2] == "remove") {

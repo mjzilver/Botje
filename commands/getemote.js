@@ -1,5 +1,5 @@
 let fs = require("fs")
-let bot = require("../systems/bot.js")
+let bot = require("systems/bot.js")
 
 module.exports = {
     "name": "getemote",
@@ -8,7 +8,7 @@ module.exports = {
     "function": async function getemote(message) {
         let args = message.content.split(" ")
         args.shift()
-        let path = `./backups/emotes/${message.guild.id}/`
+        let path = `backups/emotes/${message.guild.id}/`
         let files = fs.readdirSync(path)
 
         if (args[0] == "?") {

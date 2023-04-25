@@ -74,6 +74,7 @@ discord.db
 discord.db-journal
 discord.db.sqbpro
 discord.db*
+discord_test.db
 
 # dont include the words
 json/words.json
@@ -91,3 +92,4 @@ views/images/image.png
 assets/meme.png
 assets/meme_templates/*
 package-lock.json
+

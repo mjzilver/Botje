@@ -1,9 +1,9 @@
-let letter_values = require("../../json/letter_values.json")
+let letter_values = require("json/letter_values.json")
 let discord = require("discord.js")
-let config = require("../../config.json")
-let database = require("../../systems/database.js")
-const Lister = require("./lister")
-let bot = require("../../systems/bot.js")
+let config = require("config.json")
+let database = require("systems/database.js")
+const Lister = require("./lister.js")
+let bot = require("systems/bot.js")
 
 module.exports = {
     "name": "quality",

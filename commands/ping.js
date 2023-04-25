@@ -1,4 +1,4 @@
-let bot = require("../systems/bot.js")
+let bot = require("systems/bot.js")
 
 module.exports = {
     "name": "ping",

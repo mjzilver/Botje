@@ -1,4 +1,4 @@
-let logger = require("../systems/logger.js")
+let logger = require("systems/logger.js")
 
 module.exports = {
     "name": "clear",

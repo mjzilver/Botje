@@ -1,6 +1,6 @@
-let config = require("../config.json")
-let bot = require("../systems/bot.js")
-let logger = require("../systems/logger.js")
+let config = require("config.json")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 module.exports = async function purge(message) {
     message.channel.messages.fetch()

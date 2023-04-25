@@ -1,10 +1,10 @@
-let config = require("../config.json")
-const logger = require("./logger")
+let config = require("config.json")
+const logger = require("systems/logger")
 
 class Database {
     constructor() {
         this.sqlite3 = require("sqlite3").verbose()
-        this.db = new this.sqlite3.Database("./discord.db")
+        this.db = new this.sqlite3.Database("discord.db")
 
         this.initializeDatabase()
         this.setCacheSize(20000)

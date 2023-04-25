@@ -1,7 +1,7 @@
-let config = require("../config.json")
+let config = require("config.json")
 let request = require("request")
-let bot = require("../systems/bot.js")
-let logger = require("../systems/logger.js")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 module.exports = {
     "name": "youtube",

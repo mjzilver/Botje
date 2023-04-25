@@ -1,12 +1,12 @@
 let fs = require("fs")
 let request = require("request")
-let logger = require("./logger.js")
+let logger = require("systems/logger.js")
 
 class Backup {
     constructor() { }
 
     saveEmoji(emoji, filename = "") {
-        let guildpath = "./backups/emotes/" + emoji.guild.id
+        let guildpath = "backups/emotes/" + emoji.guild.id
         let emojilink = `https://cdn.discordapp.com/emojis/${emoji.id}.png`
         let emojipath = guildpath + "/" + emoji.name + filename + ".png"
 

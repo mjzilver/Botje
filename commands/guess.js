@@ -1,4 +1,4 @@
-let hangman = require("../systems/hangman")
+let hangman = require("systems/hangman")
 
 module.exports = {
     "name": "guess",

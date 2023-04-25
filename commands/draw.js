@@ -1,7 +1,7 @@
 let PNGImage = require("pngjs-image")
-let database = require("../systems/database.js")
-let config = require("../config.json")
-let bot = require("../systems/bot.js")
+let database = require("systems/database.js")
+let config = require("config.json")
+let bot = require("systems/bot.js")
 
 module.exports = {
     "name": "draw",
@@ -32,9 +32,9 @@ module.exports = {
                         alpha: 255
                     })
 
-            image.writeImage("./views/images/image.png", function () {
+            image.writeImage("views/images/image.png", function () {
                 bot.message.reply(message, "Current image", {
-                    files: ["./views/images/image.png"]
+                    files: ["views/images/image.png"]
                 })
             })
         })

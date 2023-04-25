@@ -1,5 +1,5 @@
-let emoji_values = require("../json/emoji.json")
-let bot = require("../systems/bot.js")
+let emoji_values = require("json/emoji.json")
+let bot = require("systems/bot.js")
 
 module.exports = {
     "name": "emoji",

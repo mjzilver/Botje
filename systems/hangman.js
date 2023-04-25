@@ -1,7 +1,7 @@
 let discord = require("discord.js")
-let config = require("../config.json")
-let bot = require("./bot.js")
-let logger = require("./logger.js")
+let config = require("config.json")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 class hangman {
     constructor() {
@@ -40,7 +40,7 @@ class hangman {
         this.visibleWord = ""
         this.tries = 0
         this.alreadyGuessed = []
-        let words = require("../json/words.json")
+        let words = require("json/words.json")
 
         let chosenword = ""
 
@@ -118,7 +118,7 @@ class hangman {
     }
 
     sendEmbed(message) {
-        const attachment = new discord.MessageAttachment(`${__dirname}/../assets/hangman/${this.tries}.png`, "hangman.png")
+        const attachment = new discord.MessageAttachment(`${__dirname}/assets/hangman/${this.tries}.png`, "hangman.png")
 
         let showVisibleWord = ""
         for (let i = 0; i < this.visibleWord.length; i++)

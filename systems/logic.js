@@ -1,6 +1,6 @@
-let config = require("../config.json")
-let bot = require("./bot.js")
-let logger = require("./logger.js")
+let config = require("config.json")
+let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 class Logic {
     constructor() { }
