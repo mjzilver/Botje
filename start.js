@@ -3,5 +3,7 @@ require("module").Module._initPaths()
 
 // start up the 3 main systems
 require("systems/bot.js")
-require("./systems/web.js")
+require("systems/web.js")
 require("systems/commandline.js")
+
+require("scripts/database_transfer.js")

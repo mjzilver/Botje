@@ -44,6 +44,7 @@ function deleteUserData(message) {
     let filepath = "json/disallowed.json"
     let disallowed = JSON.parse(fs.readFileSync(filepath))
     disallowed[message.author.id] = true
+    bot.disallowed[message.author.id] = true
     logger.warn(`${message.author.username} is no longer allowed to use the bot`)
 
     fs.writeFile(filepath, JSON.stringify(disallowed), function (err) {

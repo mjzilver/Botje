@@ -15,6 +15,7 @@ module.exports = function disallow(message) {
         bot.message.markComplete(message)
     } else if (mention) {
         disallowed[mention.id] = true
+        bot.disallowed[mention.id] = true
         logger.warn(`${mention.username} is no longer allowed to use the bot`)
         bot.message.markComplete(message)
     } else {

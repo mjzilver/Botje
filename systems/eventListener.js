@@ -1,6 +1,5 @@
 let config = require("config.json")
 let database = require("systems/database.js")
-let fs = require("fs")
 let bot = require("systems/bot.js")
 let logger = require("systems/logger.js")
 
@@ -15,9 +14,7 @@ class Eventlistener {
         })
 
         bot.client.on("messageCreate", message => {
-            let disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
-
-            if (!(message.author.id in disallowed)) {
+            if (!(message.author.id in bot.disallowed)) {
                 if (message.channel.type == "DM") {
                     bot.command.handleDM(message)
                 } else {

@@ -92,8 +92,7 @@ class Command {
     }
 
     isUserAllowed(message, canSendMessage) {
-        let disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
-        if (message.author.id in disallowed)
+        if (message.author.id in bot.disallowed)
             return false
 
         const currentTimestamp = new Date()

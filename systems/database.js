@@ -53,12 +53,14 @@ class Database {
         if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i"))) {
             message.guild.members.fetch(message.author.id).then(() => {
                 this.insertMessage(message)
+            }).catch(() => {
+                // person is not a member (has left the server)
             })
         }
     }
 
     async insertMessage(message) {
-        this.client.query("INSERT INTO messages (id, user_id, user_name, message, channel_id, server_id, datetime) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO NOTHING",
+        this.client.query("INSERT INTO messages (id, user_id, user_name, message, channel_id, server_id, datetime) VALUES ($1::bigint, $2::bigint, $3, $4, $5::bigint, $6::bigint, $7::bigint) ON CONFLICT (id) DO NOTHING",
             [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
             .catch((err) => {
                 logger.error(`Failed to insert: ${message.content} posted by ${message.author.username}`)

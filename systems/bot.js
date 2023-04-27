@@ -2,6 +2,7 @@ let discord = require("discord.js")
 let projectPackage = require("package.json")
 let config = require("config.json")
 let logger = require("systems/logger.js")
+let fs = require("fs")
 
 class Bot {
     constructor() {
@@ -55,6 +56,8 @@ class Bot {
         this.backup = require("systems/backup.js")
         this.reply = require("systems/reply.js")
         this.dictionary = require("systems/dictionary.js")
+        this.disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
+
     }
 }
 module.exports = new Bot()

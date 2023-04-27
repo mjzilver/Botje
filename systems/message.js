@@ -54,14 +54,14 @@ class Message {
     }
 
     markComplete(call) {
-        let insertSQL = "INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1, $2, $3)"
+        let insertSQL = "INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint)"
         database.insert(insertSQL, [call.id, null, call.createdAt.getTime()])
     }
 
     addCommandCall(call, reply) {
-        this.commandCalls[call.id] = reply.id
+        this.commandCalls[call.id] = BigInt(reply.id)
 
-        let insertSQL = "INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1, $2, $3)"
+        let insertSQL = "INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint)"
         database.insert(insertSQL, [call.id, reply.id, reply.createdAt.getTime()])
     }
 
@@ -72,7 +72,7 @@ class Message {
 
         database.query(selectSQL, [], (rows) => {
             for (let i = 0; i < rows.length; i++) {
-                this.commandCalls[rows[i]["call_id"]] = rows[i]["reply_id"]
+                this.commandCalls[BigInt(rows[i]["call_id"])] = BigInt(rows[i]["reply_id"])
             }
             this.scanForCommands()
         })
