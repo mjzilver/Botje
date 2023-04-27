@@ -33,14 +33,14 @@ module.exports = {
 
             let selectSQL = `SELECT message
                 FROM messages
-                WHERE ${keyword ? `message LIKE "%${keyword}%" AND` : ""} 
+                WHERE message LIKE $1 AND
                 message NOT LIKE '%http%'
                 AND message NOT LIKE '%<%'
                 AND LENGTH(message) < 70 
                 ORDER BY RANDOM()
                 LIMIT 1`
 
-            database.query(selectSQL, [], (rows) => {
+            database.query(selectSQL, [`%${keyword}%`], (rows) => {
                 if (rows && rows[0]) {
                     let content = rows[0]["message"]
                     let middle = content.lastIndexOf(" ", content.length / 2)

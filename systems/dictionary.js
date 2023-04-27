@@ -35,7 +35,7 @@ class Dictionary {
     generateWordsFile() {
         let selectSQL = `SELECT LOWER(message) as message
         FROM messages
-        WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND message NOT LIKE ""`
+        WHERE message NOT LIKE '%<%' AND message NOT LIKE ''`
 
         let wordHolder = {}
 
@@ -57,8 +57,9 @@ class Dictionary {
             this.words.sort(function (a, b) {
                 return b[1] - a[1]
             })
+            const shortList = this.words.slice(0, 200)
 
-            fs.writeFile(this.wordsPath, JSON.stringify(this.words), function (err) {
+            fs.writeFile(this.wordsPath, JSON.stringify(shortList), function (err) {
                 if (err)
                     logger.error(err)
             })
