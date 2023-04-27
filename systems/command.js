@@ -1,5 +1,4 @@
 let config = require("config.json")
-let fs = require("fs")
 let bot = require("systems/bot.js")
 let logger = require("systems/logger.js")
 
