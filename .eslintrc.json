@@ -8,11 +8,15 @@
     "extends": "eslint:recommended",
     "overrides": [
     ],
+    "plugins": ["jest"],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
     "rules": {
+        "keyword-spacing": [
+            "error"
+        ],
         "indent": [
             "error",
             4
@@ -30,6 +34,9 @@
             "never"
         ],
         "no-unused-vars": [
+            "warn"
+        ],
+        "no-console":[
             "warn"
         ]
     }

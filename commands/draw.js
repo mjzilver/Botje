@@ -8,7 +8,6 @@ module.exports = {
     "description": "prints the drawboard image",
     "format": "draw",
     "function": function draw(message) {
-        const db = database.db
         const totalImageSize = config.image.size * config.image.magnification
         let image = PNGImage.createImage(totalImageSize, totalImageSize)
         image.fillRect(0, 0, totalImageSize, totalImageSize, {
@@ -20,9 +19,7 @@ module.exports = {
 
         let selectSQL = "SELECT * FROM colors"
 
-        db.all(selectSQL, [], async (err, rows) => {
-            if (err)
-                throw err
+        database.query(selectSQL, [], async (rows) => {
             for (let i = 0; i < rows.length; i++)
                 if (rows[i].x >= 0 && rows[i].x < config.image.size && rows[i].y >= 0 && rows[i].y < config.image.size)
                     image.fillRect(rows[i].x * config.image.magnification, rows[i].y * config.image.magnification, config.image.magnification, config.image.magnification, {

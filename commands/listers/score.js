@@ -22,7 +22,7 @@ class ScoreLister extends Lister {
     mention(message, mentioned) {
         let selectSQL = `SELECT user_id, user_name, message
         FROM messages 
-        WHERE server = ? AND user_id = ? `
+        WHERE server_id = $1 AND user_id = $2 `
 
         let userdata = {
             "points": 0,
@@ -47,7 +47,7 @@ class ScoreLister extends Lister {
     perPerson(message) {
         let selectSQL = `SELECT user_id, user_name, message
         FROM messages 
-        WHERE server = ?
+        WHERE server_id = $1
         ORDER BY user_id`
 
         let userdata = {}

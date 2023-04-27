@@ -21,10 +21,10 @@ class TopLister extends Lister {
     perPerson(message) {
         let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
         FROM messages
-        WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?
+        WHERE message NOT LIKE '%<%' AND server_id = $1
         GROUP BY LOWER(message)
-        HAVING count > 1
-        ORDER BY count DESC 
+        HAVING COUNT(*) > 1
+        ORDER BY COUNT(*) DESC 
         LIMIT 10`
 
         database.query(selectSQL, [message.guild.id], (rows) => {
@@ -47,11 +47,11 @@ class TopLister extends Lister {
     mention(message, mentioned) {
         let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
         FROM messages
-        WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
-        AND server = ? AND user_id = ?
+        WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' 
+        AND server_id = $1 AND user_id = $2
         GROUP BY LOWER(message)
-        HAVING count > 1
-        ORDER BY count DESC 
+        HAVING COUNT(*) > 1
+        ORDER BY COUNT(*) DESC 
         LIMIT 10`
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {

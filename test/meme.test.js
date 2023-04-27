@@ -1,9 +1,6 @@
 let bot
 let config = require("config.json")
 config.discord_api_key = config.discord_api_key_beta
-let database = require("systems/database")
-sqlite3 = require("sqlite3").verbose()
-database.db = new sqlite3.Database("discord_test.db")
 
 beforeAll(() => {
     bot = require("systems/bot")

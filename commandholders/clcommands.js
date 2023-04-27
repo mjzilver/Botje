@@ -7,7 +7,6 @@ let commands = {
     "help": require("commandline/help.js"),
     "scan": require("commandline/scan.js"),
     "saveemotes": require("commandline/saveemotes.js"),
-    "vacuum": require("commandline/vacuum.js"),
     "report": require("commandline/report.js"),
     "heapdump": require("commandline/heapdump.js"),
 }

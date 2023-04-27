@@ -3,6 +3,7 @@ let projectPackage = require("package.json")
 let config = require("config.json")
 const fs = require("fs")
 let bot = require("systems/bot.js")
+let logger = require("systems/logger.js")
 
 module.exports = {
     "name": "privacy",
@@ -11,7 +12,7 @@ module.exports = {
     "function": (message) => {
         fs.readFile("__dirname/privacy_policy.txt", "utf8", (err, data) => {
             if (err) {
-                console.error(err)
+                logger.error(err)
                 return
             }
             const privacyPolicy = data

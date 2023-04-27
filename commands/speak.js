@@ -45,64 +45,57 @@ function findByWord(message) {
         }
 
         if (words.length > 1) {
-            let selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
-                WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" 
-                AND message NOT LIKE "%bot%" AND message IS NOT NULL
-                AND len < 100 AND (len - spaces) >= 2 
-                AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
+            let selectSQL = `SELECT message FROM messages
+                WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
+                AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
+                AND LENGTH(message) < 150
+                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
                 ORDER BY RANDOM()`
 
-            database.db.all(selectSQL, [], (err, rows) => {
-                if (err)
-                    throw err
-                else {
-                    if (rows) {
-                        logger.debug(`Sending message with '${words.join(",")}' in it`)
+            database.query(selectSQL, [], (rows) => {
+                if (rows) {
+                    logger.debug(`Sending message with '${words.join(",")}' in it`)
 
-                        let highestAmount = 0
-                        let chosenMessage = ""
+                    let highestAmount = 0
+                    let chosenMessage = ""
 
-                        const regexPatterns = words.map(w => new RegExp(w, "gmi"))
+                    const regexPatterns = words.map(w => new RegExp(w, "gmi"))
 
-                        for (let i = 0; i < rows.length; i++) {
-                            let amount = 0
+                    for (let i = 0; i < rows.length; i++) {
+                        let amount = 0
 
-                            for (let j = 0; j < regexPatterns.length; j++) {
-                                if (rows[i]["message"].match(regexPatterns[j])) {
-                                    amount += 30 - (j * j)
-                                }
-                            }
-
-                            if (amount > highestAmount) {
-                                if (bot.logic.levenshtein(rows[i]["message"], message.content) > 15) {
-                                    chosenMessage = rows[i]["message"]
-                                    highestAmount = amount
-                                }
+                        for (let j = 0; j < regexPatterns.length; j++) {
+                            if (rows[i]["message"].match(regexPatterns[j])) {
+                                amount += 30 - (j * j)
                             }
                         }
 
-                        chosenMessage = chosenMessage.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), "")
-                        logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
-                        bot.message.send(message, chosenMessage)
+                        if (amount > highestAmount) {
+                            if (bot.logic.levenshtein(rows[i]["message"], message.content) > 15) {
+                                chosenMessage = rows[i]["message"]
+                                highestAmount = amount
+                            }
+                        }
                     }
+
+                    chosenMessage = chosenMessage.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), "")
+                    logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
+                    bot.message.send(message, chosenMessage)
                 }
             })
         } else {
-            let selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
-                WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
-                AND len < 100 AND (len - spaces) >= 2 
-                AND message LIKE "%${words[0]}%" AND date < ${message.createdAt.getTime()} AND date < ${earliest.getTime()}
+            let selectSQL = `SELECT message FROM messages
+                WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
+                AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
+                AND message LIKE '%${words[0]}%'
+                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
                 ORDER BY RANDOM()
                 LIMIT 1`
 
-            database.db.get(selectSQL, [], (err, row) => {
-                if (err)
-                    throw err
-                else {
-                    if (row) {
-                        logger.debug(`Sending message with '${words[0]}' in it`)
-                        bot.message.send(message, row["message"].normalizeSpaces())
-                    }
+            database.query(selectSQL, [], (rows) => {
+                if (rows) {
+                    logger.debug(`Sending message with '${words[0]}' in it`)
+                    bot.message.send(message, rows[0]["message"].normalizeSpaces())
                 }
             })
         }
@@ -117,31 +110,27 @@ function findRandom(message) {
     let earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
 
-    let selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces FROM messages
-    WHERE message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
-    AND len < 100 AND (len - spaces) >= 2 AND date < ${earliest.getTime()}
-    ORDER BY RANDOM()
-    LIMIT 1`
+    let selectSQL = `SELECT message FROM messages
+        WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
+        AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
+        AND datetime < ${earliest.getTime()}
+        ORDER BY RANDOM()
+        LIMIT 1`
 
-    database.db.get(selectSQL, [], (err, row) => {
-        if (err)
-            throw err
-        else
-            bot.message.send(message, row["message"].normalizeSpaces())
+    database.query(selectSQL, [], (rows) => {
+        if (rows)
+            bot.message.send(message, rows[0]["message"].normalizeSpaces())
     })
 }
 
 function findTopic(message, topic) {
     let selectSQL = `SELECT LOWER(message) as message
-    FROM messages
-    WHERE message LIKE "%${topic} is%" OR message LIKE "%${topic} are%" 
-    AND message NOT LIKE "%<%" AND message NOT LIKE "%:%"
-    ORDER BY random() `
+        FROM messages
+        WHERE message LIKE '%${topic} is%' OR message LIKE '%${topic} are%' 
+        AND message NOT LIKE '%<%'
+        ORDER BY random() `
 
-    database.db.all(selectSQL, [], (err, rows) => {
-        if (err)
-            throw err
-
+    database.query(selectSQL, [], (rows) => {
         if (rows.length < 3) {
             logger.debug("Not enough info about topic -- redirecting to the regular method")
             message.content = message.content.replace(/(about|think|of)/ig, "")

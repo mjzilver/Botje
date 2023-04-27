@@ -38,10 +38,10 @@ class WordLister extends Lister {
     perPerson(message, word) {
         let selectSQL = `SELECT user_id, user_name, count(message) as count
         FROM messages
-        WHERE message LIKE ? AND server = ?
-        GROUP BY user_id
-        HAVING count > 1
-        ORDER BY count DESC 
+        WHERE message LIKE $1 AND server_id = $2
+        GROUP BY user_id, user_name
+        HAVING count(message) > 1
+        ORDER BY count(message) DESC 
         LIMIT 10`
 
         database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
@@ -64,9 +64,9 @@ class WordLister extends Lister {
     }
 
     total(message, word) {
-        let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+        let selectSQL = `SELECT COUNT(*) as count
         FROM messages
-        WHERE message LIKE ? AND server = ? `
+        WHERE message LIKE $1 AND server_id = $2 `
 
         database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
             bot.message.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
@@ -74,10 +74,10 @@ class WordLister extends Lister {
     }
 
     mention(message, mentioned, word) {
-        let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+        let selectSQL = `SELECT COUNT(*) as count
         FROM messages
-        WHERE message LIKE ? 
-        AND server = ? AND user_id = ? `
+        WHERE message LIKE $1 
+        AND server_id = $2 AND user_id = $3 `
 
         database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id], (rows) => {
             bot.message.send(message, `Ive found ${rows[0]["count"]} messages from ${mentioned.username} in this server that contain ${word}`)
@@ -89,13 +89,13 @@ class WordLister extends Lister {
                 (SElECT COUNT(m2.message) 
                 FROM messages AS m2
                 WHERE m2.user_id = messages.user_id
-                AND m2.server = messages.server) as total
+                AND m2.server_id = messages.server_id) as total
             FROM messages
-            WHERE message LIKE ?
-            AND server = ?
-            GROUP BY messages.user_id
-            HAVING count > 1
-            ORDER BY count DESC 
+            WHERE message LIKE $1
+            AND server_id = $2
+            GROUP BY messages.user_id, messages.user_name, messages.server_id
+            HAVING count(message) > 1
+            ORDER BY count(message) DESC 
             LIMIT 10`
 
         database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {

@@ -20,7 +20,7 @@ class CountLister extends Lister {
     }
 
     total(message) {
-        let selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server = ?"
+        let selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1"
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             bot.message.send(message, `Ive found ${rows[0]["count"]} messages in ${message.guild.name}`)
@@ -28,7 +28,7 @@ class CountLister extends Lister {
     }
 
     mention(message, mentioned) {
-        let selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server = ? AND user_id = ?"
+        let selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1 AND user_id = $2"
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             bot.message.send(message, `Ive found ${rows[0]["count"]} messages by ${mentioned.username} in this server`)
@@ -38,7 +38,7 @@ class CountLister extends Lister {
     perPerson(message, page) {
         let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
 		FROM messages
-		WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?
+		WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1
 		GROUP BY LOWER(user_id)
 		HAVING count > 1
 		ORDER BY count DESC`
@@ -63,16 +63,16 @@ class CountLister extends Lister {
     }
 
     percentage(message, page) {
-        let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count,
-			(SElECT COUNT(message) FROM messages WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?) as total
+        let selectSQL = `SELECT user_id, user_name, COUNT(*) as count,
+			(SElECT COUNT(message) FROM messages WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1) as total
 			FROM messages
-			WHERE message NOT LIKE "%<%" AND message NOT LIKE "%:%" AND server = ?
-			GROUP BY LOWER(user_id)
-			HAVING count > 1
-			ORDER BY count DESC 
+			WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1
+			GROUP BY user_id, user_name
+			HAVING  COUNT(*) > 1
+			ORDER BY  COUNT(*) DESC 
 			LIMIT 10`
 
-        database.query(selectSQL, [message.guild.id, message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], (rows) => {
             let result = ""
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
                 result += `${rows[i]["user_name"]} has posted ${Math.round((parseInt(rows[i]["count"]) / parseInt(rows[i]["total"])) * 100)}% of all messages! \n`

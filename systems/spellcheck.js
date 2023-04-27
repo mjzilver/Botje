@@ -13,20 +13,16 @@ class Spellcheck {
         GROUP BY message 
         ORDER BY amount DESC `
 
-        database.db.all(selectSQL, [], (err, rows) => {
-            if (err) {
-                throw err
-            } else {
-                rows.forEach(row => {
-                    row.message.split(" ").forEach(word => {
-                        if (!(word in this.wordList)) {
-                            this.wordList[word] = 1
-                        } else {
-                            this.wordList[word] = this.wordList[word] + 1
-                        }
-                    })
+        database.query(selectSQL, [], (rows) => {
+            rows.forEach(row => {
+                row.message.split(" ").forEach(word => {
+                    if (!(word in this.wordList)) {
+                        this.wordList[word] = 1
+                    } else {
+                        this.wordList[word] = this.wordList[word] + 1
+                    }
                 })
-            }
+            })
         })
     }
 

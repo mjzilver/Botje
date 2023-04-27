@@ -31,11 +31,12 @@ module.exports = {
             if (args[0] == "?" && args[1])
                 keyword = args[1]
 
-            let selectSQL = `SELECT message, LENGTH(message) as len, LENGTH(REPLACE(message, ' ', '')) as spaces 
+            let selectSQL = `SELECT message
                 FROM messages
-                WHERE ${keyword ? `message LIKE "%${keyword}%" AND` : ""} message NOT LIKE "%http%" AND message NOT LIKE "%www%" AND message NOT LIKE "%bot%" 
-                AND message NOT LIKE "%<%" AND message NOT LIKE "%:%" 
-                AND len < 60 AND (len - spaces) >= 2 
+                WHERE ${keyword ? `message LIKE "%${keyword}%" AND` : ""} 
+                message NOT LIKE '%http%'
+                AND message NOT LIKE '%<%'
+                AND LENGTH(message) < 70 
                 ORDER BY RANDOM()
                 LIMIT 1`
 

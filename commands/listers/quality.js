@@ -22,7 +22,7 @@ class QualityLister extends Lister {
     mention(message, mentioned) {
         let selectSQL = `SELECT user_id, user_name, message 
         FROM messages 
-        WHERE server = ${message.guild.id} AND user_id = ${mentioned.id} `
+        WHERE server_id = $1 AND user_id = $2 `
 
         let userdata = {
             "points": 0,
@@ -30,7 +30,7 @@ class QualityLister extends Lister {
             "quality": 0
         }
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
                 userdata["points"] += this.calculateScore(rows[i]["message"])
                 userdata["total"] += rows[i]["message"].length
@@ -45,7 +45,7 @@ class QualityLister extends Lister {
     perPerson(message, page = 0) {
         let selectSQL = `SELECT user_id, user_name, message
         FROM messages 
-        WHERE server = ?
+        WHERE server_id = $1
         ORDER BY user_id`
 
         let userdata = {}

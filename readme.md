@@ -15,10 +15,13 @@ However, please note that this bot is not intended for public use, and I cannot 
 # Stack used
 - Node.js - body of the bot
 - Discord.js - interface to discord API
-- Sqlite - the database
-- Express - the website 
+- PostgreSQL - the new database from april 2023 onward
+- Express - webserver for drawing 
 - Pug - templating web-pages
-- Winston - logging
+- Winston - logging and debugging
+- jest - used for testing
+- eslint - used for code neatness 
+- Sqlite - used from feb 2019 - april 2023
 
 # License
 You are free to use, modify, and distribute the code for any purpose, as long as you comply with the terms of the AGPL. See the LICENSE file for more details.

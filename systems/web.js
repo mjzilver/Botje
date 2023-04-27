@@ -1,15 +1,15 @@
-let webhook = require("systems/webhook.js")
-let config = require("config.json")
-let database = require("systems/database.js")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+let webhook = require("./webhook.js")
+let config = require("../config.json")
+let database = require("./database.js")
+let bot = require("./bot.js")
+let logger = require("./logger.js")
 
 class WebServer {
     constructor() {
         const express = require("express")
         const app = express()
         app.set("view engine", "pug")
-        app.use(express.static(__dirname + "/views"))
+        app.use(express.static(__dirname + "/../views"))
         app.use(express.json())
         app.use(express.urlencoded({ extended: true }))
 
@@ -47,16 +47,16 @@ class WebServer {
         })
 
         app.get("/interact", function (req, res) {
-            let selectSQL = `SELECT user_id, user_name, COUNT(message) AS amount 
+            let selectSQL = `SELECT user_id, user_name, COUNT(message)
             FROM messages
             GROUP BY user_id 
-            ORDER BY amount DESC`
+            ORDER BY COUNT(message) DESC`
 
             const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == "GUILD_TEXT"))
             let guilds = Object.fromEntries(bot.client.guilds.cache)
             let commands = (require("commandholders/commands.js"))
 
-            database.db.all(selectSQL, [], async (err, rows) => {
+            database.query(selectSQL, [], async (rows) => {
                 rows.unshift({ "user_id": "542721460033028117", "user_name": "Botje" })
 
                 res.render("interact", {
@@ -89,7 +89,7 @@ class WebServer {
                 }
             }
 
-            database.db.all(selectSQL, [], async (err, rows) => {
+            database.query(selectSQL, [], async (rows) => {
                 for (let i = 0; i < rows.length; i++) {
                     const element = rows[i]
 
@@ -120,20 +120,17 @@ class WebServer {
             socket.on("pixelChange", async (pixel) => {
                 const { editPerPerson } = this
                 if (this.spamChecker(socket.id, editPerPerson) && (pixel.x >= 0 && pixel.x < config.image.size && pixel.y >= 0 && pixel.y < config.image.size)) {
-                    const insert = database.db.prepare("INSERT OR REPLACE INTO colors (x, y, red, green, blue) VALUES (?, ?, ?, ?, ?)", [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue])
+                    let insertSQL = `INSERT INTO colors (x, y, red, green, blue) VALUES ($1, $2, $3, $4, $5)
+                    ON CONFLICT (x, y) DO UPDATE SET red = EXCLUDED.red, green = EXCLUDED.green, blue = EXCLUDED.blue;`
 
-                    try {
-                        await insert.run()
+                    database.insert(insertSQL, [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue], () => {
                         io.emit("pixelChanged", pixel)
                         if (editPerPerson[socket.id] == undefined) {
                             editPerPerson[socket.id] = [new Date()]
                         } else {
                             editPerPerson[socket.id].push(new Date())
                         }
-                    } catch (err) {
-                        logger.info("failed to insert pixel")
-                        socket.disconnect() // user gets kicked
-                    }
+                    })
                 } else {
                     logger.warn("User kicked for invalid emit")
                     socket.disconnect() // user gets kicked

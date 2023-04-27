@@ -39,7 +39,7 @@ class Dictionary {
 
         let wordHolder = {}
 
-        database.db.all(selectSQL, [], (err, rows) => {
+        database.query(selectSQL, [], (rows) => {
             for (let i = 0; i < rows.length; i++) {
                 let words = rows[i]["message"].split(/\s+/)
 

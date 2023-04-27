@@ -1,56 +1,69 @@
-let config = require("config.json")
+const { Client } = require("pg")
+const config = require("config.json")
 const logger = require("systems/logger")
 
 class Database {
     constructor() {
-        this.sqlite3 = require("sqlite3").verbose()
-        this.db = new this.sqlite3.Database("discord.db")
+        this.client = new Client({
+            user: config.db.user,
+            host: config.db.host,
+            database: config.db.database,
+            password: config.db.password,
+            port: config.db.port,
+        })
 
-        this.initializeDatabase()
-        this.setCacheSize(20000)
-        logger.startup("Database loaded")
-    }
-
-    initializeDatabase() {
-        this.db.run("CREATE TABLE IF NOT EXISTS images (link TEXT PRIMARY KEY, sub TEXT)")
-        this.db.run("CREATE TABLE IF NOT EXISTS messages (id TEXT, user_id TEXT, user_name TEXT, message TEXT, date TEXT, channel TEXT, server TEXT, PRIMARY KEY(text, date))")
-        this.db.run("CREATE TABLE IF NOT EXISTS colors (x INTEGER, y INTEGER, red INTEGER, green INTEGER, blue INTEGER, PRIMARY KEY(x,y))")
-        this.db.run("CREATE TABLE IF NOT EXISTS command_calls (call_id TEXT, reply_id TEXT, timestamp TEXT, PRIMARY KEY(call_id))")
-    }
-
-    setCacheSize(cacheSize) {
-        this.db.serialize(() => {
-            this.db.run(`PRAGMA cache_size = ${cacheSize};`)
+        this.client.connect().then(() => {
+            this.initializeDatabase()
+            logger.startup("Postgres Database loaded")
         })
     }
 
+    async initializeDatabase() {
+        await this.client.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)")
+        await this.client.query(`CREATE TABLE IF NOT EXISTS messages 
+            (id bigint, user_id bigint, user_name text, message text, datetime bigint, channel_id bigint, server_id bigint, PRIMARY KEY(id))`)
+        await this.client.query("CREATE TABLE IF NOT EXISTS colors (x integer, y integer, red integer, green integer, blue integer, PRIMARY KEY(x,y))")
+        await this.client.query("CREATE TABLE IF NOT EXISTS command_calls (call_id bigint, reply_id bigint NULL, timestamp bigint, PRIMARY KEY(call_id))")
+    }
+
     query(selectSQL, parameters = [], callback) {
-        this.db.all(selectSQL, parameters, (err, rows) => {
-            if (err)
-                throw err
+        this.client.query(selectSQL, parameters, (err, result) => {
+            if (err) {
+                logger.error(selectSQL)
+                logger.error(err.stack)
+            }
             else
-                callback(rows)
+                callback(result.rows)
+        })
+    }
+
+    async insert(selectSQL, parameters = [], callback = null) {
+        this.client.query(selectSQL, parameters, (err) => {
+            if (err) {
+                logger.error(err.stack)
+                logger.error(selectSQL)
+            } else {
+                if (callback)
+                    callback()
+            }
         })
     }
 
     storeMessage(message) {
         if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i"))) {
-            message.guild.members.fetch(message.author.id).then(
-                () => {
-                    this.insertMessage(message)
-                })
+            message.guild.members.fetch(message.author.id).then(() => {
+                this.insertMessage(message)
+            })
         }
     }
 
-    insertMessage(message) {
-        let insert = this.db.prepare("INSERT OR IGNORE INTO messages (id, user_id, user_name, message, channel, server, date) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    async insertMessage(message) {
+        this.client.query("INSERT INTO messages (id, user_id, user_name, message, channel_id, server_id, datetime) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO NOTHING",
             [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
-        insert.run(function (err) {
-            if (err) {
-                logger.error(`failed to insert: ${message.content} posted by ${message.author.username}`)
-                logger.error(err)
-            }
-        })
+            .catch((err) => {
+                logger.error(`Failed to insert: ${message.content} posted by ${message.author.username}`)
+                logger.error(err.stack)
+            })
     }
 }
 

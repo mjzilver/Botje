@@ -10,7 +10,6 @@ module.exports = {
     "description": "gets a random link from the given subreddit use top|hot|new to sort and the timeframe (only for top)",
     "format": "reddit [subreddit] (top|hot|new) (hour|day|week|month|year|all)",
     "function": async function getRedditImage(message, last = "") {
-        const db = database.db
         const args = message.content.split(" ")
         let sub = args[1]
         let sort = "hot"
@@ -32,13 +31,10 @@ module.exports = {
             }
 
             if (typeof (body) !== "undefined" && typeof (body.data) !== "undefined" && typeof (body.data.children) !== "undefined") {
-                let selectSQL = "SELECT * FROM images WHERE sub = ?"
+                let selectSQL = "SELECT * FROM images WHERE sub = $1"
                 let foundImages = {}
 
-                db.all(selectSQL, [sub], async (err, rows) => {
-                    if (err)
-                        throw err
-
+                database.query(selectSQL, [sub], (rows) => {
                     for (let i = 0; i < rows.length; i++)
                         foundImages[rows[i].link] = true
 
@@ -90,13 +86,9 @@ module.exports = {
                             bot.message.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
                         }
 
-                        let insert = db.prepare("INSERT INTO images (link, sub) VALUES (?, ?)", [post.url, sub])
-                        insert.run(function (err) {
-                            if (err) {
-                                logger.error(`failed to insert: ${post.url} - ${sub}`)
-                                logger.error(err)
-                            } else
-                                logger.debug(`inserted: ${post.url} - ${sub}`)
+                        let insertSQL = "INSERT INTO images (link, sub) VALUES ($1, $2)"
+                        database.insert(insertSQL, [post.url, sub], () => {
+                            logger.debug(`inserted: ${post.url} - ${sub}`)
                         })
                     } else {
                         if (body.data.children.length >= 100) {
