@@ -5,5 +5,3 @@ require("module").Module._initPaths()
 require("systems/bot.js")
 require("systems/web.js")
 require("systems/commandline.js")
-
-require("scripts/database_transfer.js")
