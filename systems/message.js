@@ -59,7 +59,7 @@ class Message {
     }
 
     addCommandCall(call, reply) {
-        this.commandCalls[call.id] = BigInt(reply.id)
+        this.commandCalls[call.id] = reply.id
 
         let insertSQL = "INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint)"
         database.insert(insertSQL, [call.id, reply.id, reply.createdAt.getTime()])
@@ -90,10 +90,14 @@ class Message {
                 messages.each(async message => {
                     const messageTime = message.createdTimestamp
 
-                    if (messageTime > yesterday && message.content.match(new RegExp(config.prefix, "i"))) {
-                        if (!(message.id in this.commandCalls)) {
-                            if (bot.command.isUserAllowed(message)) {
-                                await bot.command.handleCommand(message, true)
+                    if (messageTime > yesterday) {
+                        database.storeMessage(message)
+
+                        if (message.content.match(new RegExp(config.prefix, "i"))) {
+                            if (!(message.id in this.commandCalls)) {
+                                if (bot.command.isUserAllowed(message)) {
+                                    await bot.command.handleCommand(message, true)
+                                }
                             }
                         }
                     }
