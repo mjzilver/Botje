@@ -1,3 +1,4 @@
+/* eslint-disable */
 function sendMessage() {
     let selectedChannel = $("#channelSelect").val()
     let selectedUser = $("#userSelect").val()

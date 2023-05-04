@@ -7,8 +7,7 @@ let commands = {
     "help": require("commandline/help.js"),
     "scan": require("commandline/scan.js"),
     "saveemotes": require("commandline/saveemotes.js"),
-    "report": require("commandline/report.js"),
-    "heapdump": require("commandline/heapdump.js"),
+    "report": require("commandline/report.js")
 }
 
 module.exports = commands

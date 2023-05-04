@@ -1,3 +1,4 @@
+/* eslint-disable */
 let socket = io()
 
 function pixelClick(x, y) {
