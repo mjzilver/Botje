@@ -72,7 +72,7 @@ class Message {
 
         database.query(selectSQL, [], (rows) => {
             for (let i = 0; i < rows.length; i++) {
-                this.commandCalls[BigInt(rows[i]["call_id"])] = BigInt(rows[i]["reply_id"])
+                this.commandCalls[rows[i]["call_id"]] = rows[i]["reply_id"]
             }
             this.scanForCommands()
         })

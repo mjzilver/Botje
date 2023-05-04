@@ -14,7 +14,7 @@ class Backup {
             logger.console(`Saving ${emoji.name} at ${emojipath} from ${emojilink}`)
 
             request(emojilink).pipe(fs.createWriteStream(emojipath, { flags: "w" })).on("error", function (err) {
-                console.error(err)
+                logger.error(err)
             })
         }
     }
