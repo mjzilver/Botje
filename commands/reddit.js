@@ -22,6 +22,9 @@ module.exports = {
 
         const options = {
             url: `https://www.reddit.com/r/${sub}/${sort}.json?sort=${sort}&t=${time}&limit=100&after=${last}`,
+            headers: {
+                "User-Agent": "Discord Bot -- " + config.bot_name + " -- " + config.bot_version + " -- " + config.bot_author   // This is required by reddit
+            },
             json: true
         }
 
@@ -72,13 +75,11 @@ module.exports = {
                                 logger.console(`Redirected to ${res.request.uri.href}`)
 
                                 const options = {
-                                    url: res.request.uri.href + ".json",
-                                    json: true,
+                                    url: res.request.uri.href + ".json", json: true,
                                 }
 
                                 request(options, (err, res, body) => {
                                     let videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
-
                                     bot.message.send(message, `${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
                                 })
                             })
