@@ -126,6 +126,9 @@ process.on("SIGINT", function () {
 })
 
 process.on("uncaughtException", function (error) {
+    if (bot.command.commandList.get())
+        bot.message.reply(bot.command.commandList.get(), "An error occured, this is probably your fault!")
+
     logger.error(`Uncaught error "${error.message}"\n === STACK === \n"${error.stack}"`)
 })
 

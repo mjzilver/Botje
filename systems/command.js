@@ -1,6 +1,7 @@
 let config = require("config.json")
 let bot = require("systems/bot.js")
 let logger = require("systems/logger.js")
+let LimitedList = require("systems/types/limitedlist.js")
 
 class Command {
     constructor() {
@@ -10,20 +11,23 @@ class Command {
 
         // person as key -> time as value
         this.lastRequest = []
+        this.commandList = new LimitedList(10)
 
         this.messageCounter = 0
         this.lastMessageSent = new Date()
     }
 
-    handleCommand(message, readback = false) {
+    handleCommand(message, isReadback = false) {
         const isCommand = message.content.match(new RegExp(config.prefix, "i")) && !message.author.equals(bot.user)
         if (isCommand) {
             const { command, args } = this.parseMessageArguments(message)
 
-            logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ""} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${readback ? "is a readback command" : ""}`)
+            logger.debug(`'${message.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ""} in channel '${message.channel.name}' in server '${message.channel.guild.name}' ${isReadback ? "is a readback command" : ""}`)
+            if (!isReadback)
+                this.commandList.push(message)
 
-            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, readback)) {
-                this.handleCommandType(command, args, readback, message)
+            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, !isReadback)) {
+                this.handleCommandType(command, args, isReadback, message)
             }
         } else if (!message.author.bot) {
             this.handleNonCommandMessage(message)
@@ -67,7 +71,7 @@ class Command {
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
                 } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
-                    if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false))
+                    if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false)) 
                         this.commands["speak"].function(message)
                 }
             }
