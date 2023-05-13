@@ -103,9 +103,15 @@ function handleRedirect(message, post) {
             throw err
 
         logger.console(`Redirected to ${res.request.uri.href}`)
+        let url = decodeURIComponent(res.request.uri.href)
+
+        if (res.request.uri.href.includes("over18")) {
+            logger.debug("NSFW post")
+            url = url.substring(url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length)
+        }
 
         const options = {
-            url: res.request.uri.href + ".json", 
+            url: url + ".json", 
             json: true,
             headers: bot_header
         }
@@ -118,9 +124,8 @@ function handleRedirect(message, post) {
 }
 
 function insertPost(post, sub) {
-    let insertSQL = "INSERT INTO images (link, sub) VALUES ($1, $2)"
+    let insertSQL = "INSERT INTO images (link, sub) VALUES ($1, $2) ON CONFLICT (link) DO UPDATE SET sub = EXCLUDED.sub;"
     database.insert(insertSQL, [post.url, sub], () => {
         logger.debug(`inserted: ${post.url} - ${sub}`)
     })
 }
-
