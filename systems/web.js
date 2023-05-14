@@ -49,7 +49,7 @@ class WebServer {
         app.get("/interact", function (req, res) {
             let selectSQL = `SELECT user_id, user_name, COUNT(message)
             FROM messages
-            GROUP BY user_id 
+            GROUP BY user_id, user_name
             ORDER BY COUNT(message) DESC`
 
             const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == "GUILD_TEXT"))

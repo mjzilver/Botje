@@ -19,18 +19,18 @@ class Webhook {
         }
     }
 
-    async sendMessage(channelid, text, userid) {
+    sendMessage(channelid, text, userid) {
         let channel = bot.client.channels.cache.get(channelid)
-        let webhook = await this.fetch(channel)
-
-        channel.guild.members.fetch(userid).then(
-            async (member) => {
-                webhook.send({
-                    content: text,
-                    username: member.user.nickname ? member.user.nickname : member.user.username,
-                    avatarURL: member.user.displayAvatarURL()
+        this.fetch(channel).then((webhook) => {
+            channel.guild.members.fetch(userid).then(
+                (member) => {
+                    webhook.send({
+                        content: text,
+                        username: member.user.nickname ? member.user.nickname : member.user.username,
+                        avatarURL: member.user.displayAvatarURL()
+                    })
                 })
-            })
+        })
     }
 }
 

@@ -57,7 +57,6 @@ class Bot {
         this.reply = require("systems/reply.js")
         this.dictionary = require("systems/dictionary.js")
         this.disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
-
     }
 }
 module.exports = new Bot()

@@ -24,7 +24,7 @@ class Eventlistener {
             }
         })
 
-        bot.client.on("messageReactionAdd", async (reaction) => {
+        bot.client.on("messageReactionAdd", (reaction) => {
             if (reaction.message.author.equals(bot.client.user)) {
                 switch (reaction.emoji.name) {
                 case config.positive_emoji:
@@ -32,7 +32,7 @@ class Eventlistener {
                     break
                 case config.negative_emoji:
                     if (reaction.count >= 3 && reaction.count > reaction.message.reactions.resolve(config.positive_emoji)?.count) {
-                        await reaction.message.delete({ timeout: 5000 })
+                        reaction.message.delete({ timeout: 5000 })
                         logger.warn(`Post gets deleted due to downvotes - ${reaction.message.content}`)
                     }
                     break

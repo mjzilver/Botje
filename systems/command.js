@@ -94,8 +94,14 @@ class Command {
             })
     }
 
-    isUserAllowed(message, canSendMessage) {
+    isUserBanned(message) {
         if (message.author.id in bot.disallowed)
+            return true
+        return false
+    }
+
+    isUserAllowed(message, canSendMessage = false) {
+        if (this.isUserBanned(message)) 
             return false
 
         const currentTimestamp = new Date()
