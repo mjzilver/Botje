@@ -22,26 +22,19 @@ function findByWord(message) {
     earliest.setMonth(earliest.getMonth() - 5)
 
     let words = message.content.removePrefix()
-        .replace(new RegExp(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b)/, "gi"), "")
+        .replace(new RegExp(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http(.*)|speak)\b/gi), "")
         .textOnly()
         .replace(bot.dictionary.getNonSelectorsRegex(), "")
         .trim()
         .split(" ")
 
-    if (words[0] == "speak")
-        words.shift()
-
     if (words && words.length >= 1 && words[0]) {
         if (words.length > 1) {
             words.sort(function (a, b) {
-                return b.length - a.length
+                let al = a.match(/(?:[aeiouy]{1,2})/gi)
+                let bl = b.match(/(?:[aeiouy]{1,2})/gi)
+                return (bl ? bl.length : 0) - (al ? al.length : 0)
             })
-            if (bot.logic.randomBetween(0, 1))
-                words.sort(function (a, b) {
-                    let al = a.match(/(?:[aeiouy]{1,2})/gi)
-                    let bl = b.match(/(?:[aeiouy]{1,2})/gi)
-                    return (bl ? bl.length : 0) - (al ? al.length : 0)
-                })
         }
 
         if (words.length > 1) {

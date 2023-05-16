@@ -14,6 +14,10 @@ class LimitedList {
     get() {
         return this.items[this.items.length - 1]
     }
+
+    remove(item) {
+        this.items.splice(this.items.indexOf(item), 1)
+    }
 }
   
 module.exports = LimitedList

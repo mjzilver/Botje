@@ -57,6 +57,7 @@ class Message {
         let insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, null, call.createdAt.getTime()])
+        bot.command.commandList.remove(call)
     }
 
     addCommandCall(call, reply) {
@@ -65,6 +66,7 @@ class Message {
         let insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, reply.id, reply.createdAt.getTime()])
+        bot.command.commandList.remove(call)
     }
 
     getCommandCalls() {
