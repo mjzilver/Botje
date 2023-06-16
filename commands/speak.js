@@ -41,7 +41,7 @@ function findByWord(message) {
             let selectSQL = `SELECT message FROM messages
                 WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
                 AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-                AND LENGTH(message) < 150
+                AND LENGTH(message) < 150 AND LENGTH(message) > 10
                 AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
                 ORDER BY RANDOM()`
 
@@ -80,7 +80,7 @@ function findByWord(message) {
             let selectSQL = `SELECT message FROM messages
                 WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
                 AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-                AND message LIKE '%${words[0]}%'
+                AND message LIKE '%${words[0]}%' AND LENGTH(message) > 10
                 AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
                 ORDER BY RANDOM()
                 LIMIT 1`
@@ -106,7 +106,7 @@ function findRandom(message) {
     let selectSQL = `SELECT message FROM messages
         WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
         AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-        AND datetime < ${earliest.getTime()}
+        AND datetime < ${earliest.getTime()} AND LENGTH(message) > 10
         ORDER BY RANDOM()
         LIMIT 1`
 
@@ -120,7 +120,7 @@ function findTopic(message, topic) {
     let selectSQL = `SELECT LOWER(message) as message
         FROM messages
         WHERE message LIKE '%${topic} is%' OR message LIKE '%${topic} are%' 
-        AND message NOT LIKE '%<%'
+        AND message NOT LIKE '%<%' AND LENGTH(message) > 10
         ORDER BY random() `
 
     database.query(selectSQL, [], (rows) => {

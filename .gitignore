@@ -94,3 +94,4 @@ assets/meme_templates/*
 package-lock.json
 
 scripts/
+assets/combined.png

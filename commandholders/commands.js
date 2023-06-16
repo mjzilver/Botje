@@ -22,6 +22,7 @@ let commands = {
     "roll": require("commands/roll.js"),
     "youtube": require("commands/youtube.js"),
     "getemote": require("commands/getemote.js"),
+    "combine": require("commands/combine.js"),
     "meme": require("commands/meme.js")
 }
 
