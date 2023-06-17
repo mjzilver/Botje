@@ -70,10 +70,7 @@ class Command {
                     this.commands["speak"].function(message)
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
-                } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
-                    if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false)) 
-                        this.commands["speak"].function(message)
-                }
+                } 
             }
             this.messageCounter++
         }
