@@ -6,7 +6,13 @@ let bot = require("systems/bot.js")
 let logger = require("systems/logger.js")
 
 const bot_header = {
-    "User-Agent": "Discord Bot -- " + config.bot_name + " -- " + config.bot_version + " -- " + config.bot_author   // This is required by reddit
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"  // This is required by reddit
+}
+
+const default_options = {
+    json: true,
+    followAllRedirects: true,
+    headers: bot_header
 }
 
 module.exports = {
@@ -29,8 +35,7 @@ async function getRedditImage(message, last = "") {
 
     const options = {
         url: `https://www.reddit.com/r/${sub}/${sort}.json?sort=${sort}&t=${time}&limit=100&after=${last}`,
-        headers: bot_header,
-        json: true
+        ...default_options
     }
 
     request(options, (err, res, body) => {
@@ -63,20 +68,11 @@ function handleRedditImages(message, sub, children) {
             let chosen = Math.floor(Math.random() * filteredImages.length)
             let post = filteredImages[chosen].data
 
-            if (post.url && post.url.isImage()) {
-                const image = new discord.MessageEmbed()
-                    .setColor(`${config.color_hex}`)
-                    .setTitle(`${post.title}`)
-                    .addField("Updoots", `${post.score}`, true)
-                    .addField("Posted by", `${post.author}`, true)
-                    .setImage(`${post.url}`)
-                    .setURL(`https://reddit.com${post.permalink}`)
-                    .setFooter(`From: reddit/r/${sub}`)
-                bot.message.send(message, { embeds: [image] })
-            } else if (post.url.match(/v\.redd\.it/gi)) {
-                handleRedirect(message, post)
+            // if post is imgur check redirects if it is removed.png
+            if (post.url.match(/imgur\.com/gi)) {
+                handleImgur(message, post, sub)
             } else {
-                bot.message.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
+                embedImage(message, post, sub)
             }
 
             insertPost(post, sub)
@@ -90,12 +86,48 @@ function handleRedditImages(message, sub, children) {
     })
 }
 
+function embedImage(message, post, sub) {
+    if (post.url.isImage()) {
+        const image = new discord.MessageEmbed()
+            .setColor(`${config.color_hex}`)
+            .setTitle(`${post.title}`)
+            .addField("Updoots", `${post.score}`, true)
+            .addField("Posted by", `${post.author}`, true)
+            .setImage(`${post.url}`)
+            .setURL(`https://reddit.com${post.permalink}`)
+            .setFooter(`From: reddit/r/${sub}`)
+        bot.message.send(message, { embeds: [image] })
+    } else if (post.url.match(/v\.redd\.it/gi)) {
+        handleRedirect(message, post)
+    } else if (post.url) {
+        bot.message.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
+    }
+}
+
+function handleImgur(message, post, sub) {
+    const options = {
+        url: post.url,
+        ...default_options
+    }
+
+    request(options, (err, res) => {
+        if (err)
+            throw err
+
+        if (res.request.uri.href.includes("removed.png")) {
+            logger.debug("Found removed.png, finding new image")
+            getRedditImage(message)
+        } else {
+            post.url = res.request.uri.href
+            embedImage(message, post, sub)
+        }
+    })
+}
+
 function handleRedirect(message, post) {
     const options = {
         url: post.url,
-        json: true,
-        followAllRedirects: true,
-        headers: bot_header
+        ...default_options
     }
 
     request(options, (err, res) => {
@@ -106,14 +138,12 @@ function handleRedirect(message, post) {
         let url = decodeURIComponent(res.request.uri.href)
 
         if (res.request.uri.href.includes("over18")) {
-            logger.debug("NSFW post")
             url = url.substring(url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length)
-        }
+        } 
 
         const options = {
             url: url + ".json", 
-            json: true,
-            headers: bot_header
+            ...default_options
         }
 
         request(options, (err, res, body) => {
