@@ -1,7 +1,7 @@
-let config = require("config.json")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
-let LimitedList = require("systems/types/limitedlist.js")
+const config = require("config.json")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
+const LimitedList = require("systems/types/limitedlist.js")
 
 class Command {
     constructor() {
@@ -62,8 +62,8 @@ class Command {
 
     handleNonCommandMessage(message) {
         if (!message.author.bot) {
-            let currentTimestamp = new Date()
-            let timePassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes()
+            const currentTimestamp = new Date()
+            const timePassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes()
 
             if (!bot.reply.process(message)) {
                 if ((this.messageCounter >= config.speakEvery || bot.logic.randomBetween(1, 20) == 1) && timePassed >= bot.logic.randomBetween(20, 60)) {
@@ -71,7 +71,7 @@ class Command {
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
                 } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
-                    if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false)) 
+                    if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false))
                         this.commands["speak"].function(message)
                 }
             }
@@ -82,7 +82,7 @@ class Command {
     redo(message) {
         message.channel.messages.fetch(bot.message.findFromReply(message))
             .then(callMessage => {
-                let args = callMessage.content.removePrefix().normalizeSpaces().split(" ")
+                const args = callMessage.content.removePrefix().normalizeSpaces().split(" ")
                 const command = args.shift().toLowerCase()
 
                 logger.debug(`Redoing this command == '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ""} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
@@ -101,7 +101,7 @@ class Command {
     }
 
     isUserAllowed(message, canSendMessage = false) {
-        if (this.isUserBanned(message)) 
+        if (this.isUserBanned(message))
             return false
 
         const currentTimestamp = new Date()
@@ -121,7 +121,7 @@ class Command {
         }
 
         this.lastRequest[message.author.username] = currentTimestamp
-        return true // enough time has elapsed, return true          
+        return true // enough time has elapsed, return true
     }
 
     handleDM(message) {

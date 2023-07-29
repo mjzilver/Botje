@@ -1,4 +1,4 @@
-let bot = require("systems/bot.js")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "roll",
@@ -14,7 +14,7 @@ module.exports = {
                 bot.message.reply(message, `You rolled ${bot.logic.randomBetween(0, args[1])} out of ${args[1]}`)
             }
         } else {
-            let date = Date.now()
+            const date = Date.now()
             bot.message.reply(message, `You rolled ${(date / 1000).toFixed(0)}`)
         }
     }

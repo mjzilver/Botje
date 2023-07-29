@@ -1,6 +1,6 @@
 const heapdump = require("heapdump")
 const path = require("path")
-let logger = require("systems/logger.js")
+const logger = require("systems/logger.js")
 
 module.exports = {
     name: "heapdump",

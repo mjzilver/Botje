@@ -1,5 +1,5 @@
-let logger = require("systems/logger.js")
-let database = require("systems/database.js")
+const logger = require("systems/logger.js")
+const database = require("systems/database.js")
 
 module.exports = {
     name: "report",
@@ -12,7 +12,7 @@ module.exports = {
             logger.debug(`Memory: heapUsed ${Math.round(heapUsed / 1024 / 1024 * 100) / 100} MB`)
             logger.debug(`Memory: heapTotal ${Math.round(heapTotal / 1024 / 1024 * 100) / 100} MB`)
 
-            let sql = `SELECT pg_size_pretty(pg_database_size('botdb')) AS size, 
+            const sql = `SELECT pg_size_pretty(pg_database_size('botdb')) AS size, 
             COUNT(messages.id) as count FROM messages`
 
             database.query(sql, null, (rows) => {

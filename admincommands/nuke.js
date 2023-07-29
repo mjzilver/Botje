@@ -1,5 +1,5 @@
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 module.exports = async function nuke(message) {
     if (message.author.id == message.guild.ownerId) {
@@ -25,8 +25,8 @@ function nukeguild(message) {
 }
 
 function nukechannel(channelId) {
-    let channels = bot.client.channels.cache
-    let channel = channels.find(c => c.id === channelId)
+    const channels = bot.client.channels.cache
+    const channel = channels.find(c => c.id === channelId)
 
     if (channel && channel.type == "GUILD_TEXT") {
         nukemessages(channel, channel.lastMessageId)

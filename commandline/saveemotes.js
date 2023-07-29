@@ -1,6 +1,6 @@
-let fs = require("fs")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const fs = require("fs")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 module.exports = {
     "name": "saveemotes",
@@ -11,7 +11,7 @@ module.exports = {
         const path = "backups/emotes"
 
         for (const [guildId, guild] of bot.client.guilds.cache.entries()) {
-            let guildpath = path + "/" + guildId
+            const guildpath = `${path }/${ guildId}`
 
             if (!fs.existsSync(guildpath))
                 fs.mkdirSync(guildpath)
@@ -20,4 +20,4 @@ module.exports = {
                 bot.backup.saveEmoji(emoji)
         }
     }
-} 
+}

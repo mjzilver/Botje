@@ -1,7 +1,7 @@
-let discord = require("discord.js")
-let config = require("config.json")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const discord = require("discord.js")
+const config = require("config.json")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 class hangman {
     constructor() {
@@ -14,7 +14,7 @@ class hangman {
     }
 
     run(message) {
-        let args = message.cleanContent.toLowerCase().split(" ")
+        const args = message.cleanContent.toLowerCase().split(" ")
 
         switch (args[1]) {
         case "start":
@@ -40,7 +40,7 @@ class hangman {
         this.visibleWord = ""
         this.tries = 0
         this.alreadyGuessed = []
-        let words = require("json/words.json")
+        const words = require("json/words.json")
 
         let chosenword = ""
 
@@ -122,7 +122,7 @@ class hangman {
 
         let showVisibleWord = ""
         for (let i = 0; i < this.visibleWord.length; i++)
-            showVisibleWord += this.visibleWord[i].toUpperCase() + " "
+            showVisibleWord += `${this.visibleWord[i].toUpperCase() } `
 
         const hangmanEmbed = new discord.MessageEmbed()
             .setColor(config.color_hex)
@@ -133,7 +133,7 @@ class hangman {
         if (this.alreadyGuessed.length > 0) {
             let alreadyGuessedString = ""
             for (let i = 0; i < this.alreadyGuessed.length; i++)
-                alreadyGuessedString += this.alreadyGuessed[i].toUpperCase() + " "
+                alreadyGuessedString += `${this.alreadyGuessed[i].toUpperCase() } `
             hangmanEmbed.addField("Already guessed letters", alreadyGuessedString, false)
         }
 

@@ -1,5 +1,5 @@
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 module.exports = {
     "name": "exit",

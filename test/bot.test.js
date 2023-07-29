@@ -1,5 +1,6 @@
 let bot
-let config = require("config.json")
+const config = require("config.json")
+// eslint-disable-next-line camelcase
 config.discord_api_key = config.discord_api_key_beta
 
 beforeAll(() => {

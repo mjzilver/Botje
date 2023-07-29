@@ -1,19 +1,19 @@
-let Jimp = require("jimp")
-let fs = require("fs")
-let database = require("systems/database.js")
-let bot = require("systems/bot.js")
+const Jimp = require("jimp")
+const fs = require("fs")
+const database = require("systems/database.js")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "meme",
     "description": "turn an image into a meme, include picture by uploading, replying or URL",
     "format": "meme (link to image) (top text) - (bottom text)",
     "function": async function meme(message) {
-        let args = message.content.split(" ")
+        const args = message.content.split(" ")
         args.shift()
         let url = ""
 
         if (message.reference && message.reference.messageId) {
-            let repliedTo = await message.channel.messages.fetch(message.reference.messageId)
+            const repliedTo = await message.channel.messages.fetch(message.reference.messageId)
             url = getURL(repliedTo)
         } else {
             url = getURL(message)
@@ -22,16 +22,16 @@ module.exports = {
         if (args[0]?.indexOf("http") == 0)
             url = args.shift()
 
-        let topbottom = args.join(" ").split("|")
-        let top = topbottom[0] ?? ""
-        let bottom = topbottom[1] ?? ""
+        const topbottom = args.join(" ").split("|")
+        const top = topbottom[0] ?? ""
+        const bottom = topbottom[1] ?? ""
 
         if (args[0] == "?" || !args[0]) {
             let keyword = ""
             if (args[0] == "?" && args[1])
                 keyword = args[1]
 
-            let selectSQL = `SELECT message
+            const selectSQL = `SELECT message
                 FROM messages
                 WHERE message LIKE $1 AND
                 message NOT LIKE '%http%'
@@ -42,30 +42,28 @@ module.exports = {
 
             database.query(selectSQL, [`%${keyword}%`], (rows) => {
                 if (rows && rows[0]) {
-                    let content = rows[0]["message"]
-                    let middle = content.lastIndexOf(" ", content.length / 2)
-                    let top = content.substring(0, middle)
-                    let bottom = content.substring(middle + 1)
+                    const content = rows[0]["message"]
+                    const middle = content.lastIndexOf(" ", content.length / 2)
+                    const top = content.substring(0, middle)
+                    const bottom = content.substring(middle + 1)
 
                     return processPicture(url ?? null, top, bottom, message)
-                } else {
-                    bot.message.reply(message, "Can't find anything related, but this is your fault")
                 }
+                bot.message.reply(message, "Can't find anything related, but this is your fault")
             })
         } else if (top) {
             if (url.match(/\.(jpeg|jpg|gif|png)/gi))
                 return processPicture(url, top, bottom, message)
-            else
-                return processPicture(null, top, bottom, message)
+            return processPicture(null, top, bottom, message)
         }
     }
 }
 
 async function processPicture(url, top, bottom, message) {
     if (!url) {
-        let path = "assets/meme_templates"
-        let files = fs.readdirSync(path)
-        let chosenFile = files[Math.floor(Math.random() * files.length)]
+        const path = "assets/meme_templates"
+        const files = fs.readdirSync(path)
+        const chosenFile = files[Math.floor(Math.random() * files.length)]
         url = `${path}/${chosenFile}`
     }
     top = top.toUpperCase().trim().replaceFancyQuotes()
@@ -99,6 +97,5 @@ function getURL(message) {
         return message.attachments.first().url
     else if (message.embeds.length >= 1)
         return message.embeds[0].url
-    else
-        return ""
+    return ""
 }

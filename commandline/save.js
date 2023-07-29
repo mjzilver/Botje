@@ -1,18 +1,18 @@
-let database = require("systems/database.js")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const database = require("systems/database.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 module.exports = {
     "name": "save",
     "description": "saves a set of messages from a given channel",
     "format": "save [channelid] [amount]?",
     "function": function save(input) {
-        let channels = bot.client.channels.cache
+        const channels = bot.client.channels.cache
 
         if (input[0]) {
-            let channelId = input[0]
-            let amount = (input[1]?.length !== 0 ? input[1] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
-            let channel = channels.find(c => c.id === channelId)
+            const channelId = input[0]
+            const amount = (input[1]?.length !== 0 ? input[1] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
+            const channel = channels.find(c => c.id === channelId)
 
             if (channel && channel.type == "GUILD_TEXT")
                 catalog(channel, channel.lastMessageId, amount)

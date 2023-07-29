@@ -1,8 +1,8 @@
-let discord = require("discord.js")
-let config = require("config.json")
-let database = require("systems/database.js")
+const discord = require("discord.js")
+const config = require("config.json")
+const database = require("systems/database.js")
 const Lister = require("./lister.js")
-let bot = require("systems/bot.js")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "word",
@@ -36,7 +36,7 @@ class WordLister extends Lister {
     }
 
     perPerson(message, word) {
-        let selectSQL = `SELECT user_id, user_name, count(message) as count
+        const selectSQL = `SELECT user_id, user_name, count(message) as count
         FROM messages
         WHERE message LIKE $1 AND server_id = $2
         GROUP BY user_id, user_name
@@ -64,7 +64,7 @@ class WordLister extends Lister {
     }
 
     total(message, word) {
-        let selectSQL = `SELECT COUNT(*) as count
+        const selectSQL = `SELECT COUNT(*) as count
         FROM messages
         WHERE message LIKE $1 AND server_id = $2 `
 
@@ -74,7 +74,7 @@ class WordLister extends Lister {
     }
 
     mention(message, mentioned, word) {
-        let selectSQL = `SELECT COUNT(*) as count
+        const selectSQL = `SELECT COUNT(*) as count
         FROM messages
         WHERE message LIKE $1 
         AND server_id = $2 AND user_id = $3 `
@@ -85,7 +85,7 @@ class WordLister extends Lister {
     }
 
     percentage(message, word) {
-        let selectSQL = `SELECT user_id, user_name, count(message) as count,
+        const selectSQL = `SELECT user_id, user_name, count(message) as count,
                 (SElECT COUNT(m2.message) 
                 FROM messages AS m2
                 WHERE m2.user_id = messages.user_id
@@ -100,12 +100,12 @@ class WordLister extends Lister {
 
         database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
             let result = ""
-            let resultArray = []
+            const resultArray = []
             for (let i = 0; (i < rows.length && i <= 10); i++) {
-                let percentage = ((parseInt(rows[i]["count"]) / parseInt(rows[i]["total"])) * 100).toFixed(3)
+                const percentage = ((parseInt(rows[i]["count"]) / parseInt(rows[i]["total"])) * 100).toFixed(3)
                 resultArray.push({ "percentage": percentage, "user_name": rows[i]["user_name"] })
             }
-            resultArray.sort(function (a, b) { return b.percentage - a.percentage })
+            resultArray.sort(function(a, b) { return b.percentage - a.percentage })
 
             for (let i = 0; i < resultArray.length; i++)
                 result += `${resultArray[i]["user_name"]} has said ${word} in ${resultArray[i]["percentage"]}% of their messages! \n`

@@ -1,18 +1,18 @@
-let request = require("request")
-let discord = require("discord.js")
-let config = require("config.json")
-let database = require("systems/database.js")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const request = require("request")
+const discord = require("discord.js")
+const config = require("config.json")
+const database = require("systems/database.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
-const bot_header = {
-    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"  // This is required by reddit
+const botHeader = {
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1" // This is required by reddit
 }
 
-const default_options = {
+const defaultOptions = {
     json: true,
     followAllRedirects: true,
-    headers: bot_header
+    headers: botHeader
 }
 
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
 
 async function getRedditImage(message, last = "") {
     const args = message.content.split(" ")
-    let sub = args[1]
+    const sub = args[1]
     let sort = "hot"
     let time = "month"
 
@@ -35,7 +35,7 @@ async function getRedditImage(message, last = "") {
 
     const options = {
         url: `https://www.reddit.com/r/${sub}/${sort}.json?sort=${sort}&t=${time}&limit=100&after=${last}`,
-        ...default_options
+        ...defaultOptions
     }
 
     request(options, (err, res, body) => {
@@ -51,22 +51,22 @@ async function getRedditImage(message, last = "") {
 }
 
 function handleRedditImages(message, sub, children) {
-    let selectSQL = "SELECT * FROM images WHERE sub = $1"
-    let foundImages = {}
+    const selectSQL = "SELECT * FROM images WHERE sub = $1"
+    const foundImages = {}
 
     database.query(selectSQL, [sub], (rows) => {
         for (let i = 0; i < rows.length; i++)
             foundImages[rows[i].link] = true
 
-        let filteredImages = []
+        const filteredImages = []
 
         for (let i = 0; i < children.length; i++)
             if (!(children[i].data.url in foundImages) && children[i].data.url.isLink())
                 filteredImages.push(children[i])
 
         if (filteredImages.length > 0) {
-            let chosen = Math.floor(Math.random() * filteredImages.length)
-            let post = filteredImages[chosen].data
+            const chosen = Math.floor(Math.random() * filteredImages.length)
+            const post = filteredImages[chosen].data
 
             // if post is imgur check redirects if it is removed.png
             if (post.url.match(/imgur\.com/gi)) {
@@ -78,7 +78,7 @@ function handleRedditImages(message, sub, children) {
             insertPost(post, sub)
         } else {
             if (children.length >= 100) {
-                logger.debug("Finding posts before post " + children[children.length - 1].data.title)
+                logger.debug(`Finding posts before post ${ children[children.length - 1].data.title}`)
                 getRedditImage(message, children[children.length - 1].data.name)
             } else
                 bot.message.send(message, "I have ran out of images to show you")
@@ -107,7 +107,7 @@ function embedImage(message, post, sub) {
 function handleImgur(message, post, sub) {
     const options = {
         url: post.url,
-        ...default_options
+        ...defaultOptions
     }
 
     request(options, (err, res) => {
@@ -127,7 +127,7 @@ function handleImgur(message, post, sub) {
 function handleRedirect(message, post) {
     const options = {
         url: post.url,
-        ...default_options
+        ...defaultOptions
     }
 
     request(options, (err, res) => {
@@ -139,22 +139,22 @@ function handleRedirect(message, post) {
 
         if (res.request.uri.href.includes("over18")) {
             url = url.substring(url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length)
-        } 
+        }
 
         const options = {
-            url: url + ".json", 
-            ...default_options
+            url: `${url }.json`,
+            ...defaultOptions
         }
 
         request(options, (err, res, body) => {
-            let videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
+            const videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
             bot.message.send(message, `${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
         })
     })
 }
 
 function insertPost(post, sub) {
-    let insertSQL = "INSERT INTO images (link, sub) VALUES ($1, $2) ON CONFLICT (link) DO UPDATE SET sub = EXCLUDED.sub;"
+    const insertSQL = "INSERT INTO images (link, sub) VALUES ($1, $2) ON CONFLICT (link) DO UPDATE SET sub = EXCLUDED.sub;"
     database.insert(insertSQL, [post.url, sub], () => {
         logger.debug(`inserted: ${post.url} - ${sub}`)
     })

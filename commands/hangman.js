@@ -1,4 +1,4 @@
-let hangman = require("systems/hangman")
+const hangman = require("systems/hangman")
 
 module.exports = {
     "name": "hangman",

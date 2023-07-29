@@ -1,8 +1,8 @@
-let discord = require("discord.js")
-let projectPackage = require("package.json")
-let config = require("config.json")
-let logger = require("systems/logger.js")
-let fs = require("fs")
+const discord = require("discord.js")
+const projectPackage = require("package.json")
+const config = require("config.json")
+const logger = require("systems/logger.js")
+const fs = require("fs")
 
 class Bot {
     constructor() {

@@ -1,5 +1,5 @@
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 class Reply {
     constructor() {
@@ -26,16 +26,15 @@ class Reply {
     }
 
     checkTime(reply) {
-        let currentTimestamp = new Date()
+        const currentTimestamp = new Date()
 
         if (!(reply["name"] in this.lastRequest)) {
             this.lastRequest[reply["name"]] = currentTimestamp
         } else {
             if ((currentTimestamp - this.lastRequest[reply["name"]] < (reply["timeout"] * 60 * 1000))) {
                 return false
-            } else {
-                this.lastRequest[reply["name"]] = currentTimestamp
             }
+            this.lastRequest[reply["name"]] = currentTimestamp
         }
         return true
     }

@@ -1,10 +1,10 @@
-let database = require("systems/database.js")
-let bot = require("systems/bot.js")
+const database = require("systems/database.js")
+const bot = require("systems/bot.js")
 
 class Spellcheck {
     constructor() {
         this.wordList = {}
-        let earliest = new Date()
+        const earliest = new Date()
         earliest.setMonth(earliest.getMonth() - 3)
 
         const selectSQL = `SELECT LOWER(message) AS message, COUNT(*) AS amount 
@@ -27,7 +27,7 @@ class Spellcheck {
     }
 
     checkSentence(sentence) {
-        let words = []
+        const words = []
         let mistakes = 0
 
         for (let word of sentence.split(" ")) {
@@ -35,7 +35,7 @@ class Spellcheck {
             if (this.checkWord(word)) {
                 words.push(word)
             } else {
-                let result = this.findClosestWord(word)
+                const result = this.findClosestWord(word)
                 mistakes++
                 words.push(result)
             }
@@ -61,7 +61,7 @@ class Spellcheck {
 
         for (const [wordlistword, wordlistamount] of Object.entries(this.wordList)) {
             if (wordlistamount >= 5) {
-                let currentdifference = bot.logic.levenshtein(word, wordlistword)
+                const currentdifference = bot.logic.levenshtein(word, wordlistword)
                 if (currentdifference < difference) {
                     difference = currentdifference
                     closestMatch = wordlistword

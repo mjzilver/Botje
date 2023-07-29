@@ -1,8 +1,8 @@
-let discord = require("discord.js")
-let config = require("config.json")
-let database = require("systems/database.js")
+const discord = require("discord.js")
+const config = require("config.json")
+const database = require("systems/database.js")
 const Lister = require("./lister.js")
-let bot = require("systems/bot.js")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "top",
@@ -19,7 +19,7 @@ class TopLister extends Lister {
     }
 
     perPerson(message) {
-        let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+        const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
         FROM messages
         WHERE message NOT LIKE '%<%' AND server_id = $1
         GROUP BY LOWER(message)
@@ -45,7 +45,7 @@ class TopLister extends Lister {
     }
 
     mention(message, mentioned) {
-        let selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
+        const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
         FROM messages
         WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' 
         AND server_id = $1 AND user_id = $2

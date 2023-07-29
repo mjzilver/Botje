@@ -1,4 +1,4 @@
-let commands = {
+const commands = {
     "help": require("commands/help.js"),
     "emoji": require("commands/emoji.js"),
     "count": require("commands/listers/count.js"),

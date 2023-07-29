@@ -1,7 +1,7 @@
-let logger = require("systems/logger.js")
+const logger = require("systems/logger.js")
 
 module.exports = async function deletafter(message) {
-    let refenceId = message.reference?.messageId
+    const refenceId = message.reference?.messageId
     if (refenceId) {
         if (message.reference.messageId) {
             message.channel.messages.fetch({

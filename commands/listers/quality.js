@@ -1,9 +1,9 @@
-let letter_values = require("json/letter_values.json")
-let discord = require("discord.js")
-let config = require("config.json")
-let database = require("systems/database.js")
+const letterValues = require("json/letter_values.json")
+const discord = require("discord.js")
+const config = require("config.json")
+const database = require("systems/database.js")
 const Lister = require("./lister.js")
-let bot = require("systems/bot.js")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "quality",
@@ -20,11 +20,11 @@ class QualityLister extends Lister {
     }
 
     mention(message, mentioned) {
-        let selectSQL = `SELECT user_id, user_name, message 
+        const selectSQL = `SELECT user_id, user_name, message 
         FROM messages 
         WHERE server_id = $1 AND user_id = $2 `
 
-        let userdata = {
+        const userdata = {
             "points": 0,
             "total": 0,
             "quality": 0
@@ -43,37 +43,37 @@ class QualityLister extends Lister {
     }
 
     perPerson(message, page = 0) {
-        let selectSQL = `SELECT user_id, user_name, message
+        const selectSQL = `SELECT user_id, user_name, message
         FROM messages 
         WHERE server_id = $1
         ORDER BY user_id`
 
-        let userdata = {}
+        const userdata = {}
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             for (let i = 0; i < rows.length; i++) {
-                let user_name = rows[i]["user_name"]
+                const userName = rows[i]["user_name"]
 
-                if (!userdata[user_name]) {
-                    userdata[user_name] = {
+                if (!userdata[userName]) {
+                    userdata[userName] = {
                         "points": 0,
                         "total": 0,
                         "quality": 0
                     }
                 }
 
-                userdata[user_name]["points"] += this.calculateScore(rows[i]["message"])
-                userdata[user_name]["total"] += rows[i]["message"].length
+                userdata[userName]["points"] += this.calculateScore(rows[i]["message"])
+                userdata[userName]["total"] += rows[i]["message"].length
             }
 
-            let sorted = []
-            for (let user in userdata) {
+            const sorted = []
+            for (const user in userdata) {
                 // magical calculation
                 userdata[user]["quality"] = Math.round(((userdata[user]["points"] / userdata[user]["total"]) * 100) / 2)
                 sorted.push([user, userdata[user]["quality"]])
             }
 
-            sorted.sort(function (a, b) {
+            sorted.sort(function(a, b) {
                 return b[1] - a[1]
             })
 
@@ -100,7 +100,7 @@ class QualityLister extends Lister {
     calculateScore(message) {
         let score = 0
         for (let i = 0; i < message.length; i++)
-            score += letter_values[message.charAt(i)] === undefined ? 0 : letter_values[message.charAt(i)]
+            score += letterValues[message.charAt(i)] === undefined ? 0 : letterValues[message.charAt(i)]
         return score
     }
 }

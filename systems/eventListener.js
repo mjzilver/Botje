@@ -1,21 +1,21 @@
-let config = require("config.json")
-let database = require("systems/database.js")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const config = require("config.json")
+const database = require("systems/database.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 class Eventlistener {
     constructor() {
-        bot.client.on("shardError", function (error) {
+        bot.client.on("shardError", function(error) {
             logger.error(`Shard error: ${error.message}`)
         })
 
-        bot.client.on("error", function (error) {
+        bot.client.on("error", function(error) {
             logger.error(`Client error: ${error.message}`)
         })
 
         bot.client.on("messageCreate", message => {
             if (!(message.author.id in bot.disallowed)) {
-                if (message.channel.type == "DM") {
+                if (message.channel.type === "DM") {
                     bot.command.handleDM(message)
                 } else {
                     database.storeMessage(message)

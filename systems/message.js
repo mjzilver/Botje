@@ -1,7 +1,7 @@
-let config = require("config.json")
-let database = require("systems/database.js")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const config = require("config.json")
+const database = require("systems/database.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 class Message {
     constructor() {
@@ -11,32 +11,30 @@ class Message {
 
     send(call, content) {
         if (content) {
-            let promise = call.channel.send(content)
+            const promise = call.channel.send(content)
             promise.then((reply) => {
                 this.addCommandCall(call, reply)
                 reply.react(config.positive_emoji)
                 reply.react(config.negative_emoji)
             })
             return promise
-        } else {
-            logger.error(`Content empty could not send, call: "${call}"`)
-            this.markComplete(call)
         }
+        logger.error(`Content empty could not send, call: "${call}"`)
+        this.markComplete(call)
     }
 
     reply(call, content) {
         if (content) {
-            let promise = call.reply(content)
+            const promise = call.reply(content)
             promise.then((reply) => {
                 this.addCommandCall(call, reply)
                 reply.react(config.positive_emoji)
                 reply.react(config.negative_emoji)
             })
             return promise
-        } else {
-            logger.error(`Content empty could not send, call: "${call}"`)
-            this.markComplete(call)
         }
+        logger.error(`Content empty could not send, call: "${call}"`)
+        this.markComplete(call)
     }
 
     findFromReply(replyMessage) {
@@ -54,7 +52,7 @@ class Message {
     }
 
     markComplete(call) {
-        let insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
+        const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, null, call.createdAt.getTime()])
         bot.command.commandList.remove(call)
@@ -63,14 +61,14 @@ class Message {
     addCommandCall(call, reply) {
         this.commandCalls[call.id] = reply.id
 
-        let insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
+        const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, reply.id, reply.createdAt.getTime()])
         bot.command.commandList.remove(call)
     }
 
     getCommandCalls() {
-        let selectSQL = `SELECT call_id, reply_id, timestamp FROM command_calls 
+        const selectSQL = `SELECT call_id, reply_id, timestamp FROM command_calls 
         WHERE timestamp > ${new Date() - 24 * 60 * 60 * 1000}
         ORDER BY timestamp DESC`
 

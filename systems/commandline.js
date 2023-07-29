@@ -1,4 +1,4 @@
-let logger = require("systems/logger.js")
+const logger = require("systems/logger.js")
 
 class commandline {
     constructor() {

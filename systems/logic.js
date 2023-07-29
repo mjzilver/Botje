@@ -1,6 +1,6 @@
-let config = require("config.json")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const config = require("config.json")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 class Logic {
     constructor() { }
@@ -9,7 +9,7 @@ class Logic {
         if (a.length == 0) return b.length
         if (b.length == 0) return a.length
 
-        let matrix = []
+        const matrix = []
 
         for (let i = 0; i <= b.length; i++)
             matrix[i] = [i]
@@ -31,7 +31,7 @@ class Logic {
         return matrix[b.length][a.length]
     }
 
-    randomBetween = function (min, max) {
+    randomBetween = function(min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
 
@@ -39,7 +39,7 @@ class Logic {
         if (word == 0) return ""
 
         if (Array.isArray(wordList)) {
-            let oldWordList = wordList
+            const oldWordList = wordList
             wordList = {}
             oldWordList.forEach((item) => {
                 wordList[item] = 1
@@ -52,7 +52,7 @@ class Logic {
         let chosenAmount = 0
 
         for (const [wordlistword, wordlistamount] of Object.entries(wordList)) {
-            let currentdifference = bot.logic.levenshtein(word, wordlistword)
+            const currentdifference = bot.logic.levenshtein(word, wordlistword)
             if (currentdifference < difference) {
                 difference = currentdifference
                 closestMatch = wordlistword
@@ -64,68 +64,67 @@ class Logic {
                     chosenAmount = wordlistamount
                 }
             }
-
         }
         return closestMatch
     }
 }
 
-String.prototype.capitalize = function () {
+String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1).toLocaleLowerCase()
 }
 
-String.prototype.isImage = function () {
+String.prototype.isImage = function() {
     return this.match(new RegExp(/(?:http(s?):)*\.(jpe?g|gif|png)$/i, "i"))
 }
 
-String.prototype.isLink = function () {
+String.prototype.isLink = function() {
     return this.match(new RegExp(/(http(s?):|www).*?/, "gi"))
 }
 
-String.prototype.normalizeSpaces = function () {
+String.prototype.normalizeSpaces = function() {
     return this.replace(new RegExp(/(^ +| +$|  +)/gi, "gi"), " ")
 }
 
-String.prototype.textOnly = function () {
+String.prototype.textOnly = function() {
     return this.replace(new RegExp(/[^a-zA-Z ]/gi, "gi"), "")
 }
 
-String.prototype.chatCharsOnly = function () {
+String.prototype.chatCharsOnly = function() {
     return this.replace(new RegExp(/[^a-zA-Z .,!?]/gi, "gi"), "")
 }
 
-String.prototype.removeQuotes = function () {
+String.prototype.removeQuotes = function() {
     return this.replace(new RegExp(/"/gi, "gi"), "")
 }
 
-String.prototype.removePrefix = function () {
+String.prototype.removePrefix = function() {
     return this.replace(new RegExp(config.prefix, "i"), "")
 }
 
-String.prototype.replaceFancyQuotes = function () {
+String.prototype.replaceFancyQuotes = function() {
     let str = this.valueOf()
     str = str.replace(new RegExp(/(“|”|„)/gi, "gi"), "\"")
     return str.replace(new RegExp(/(`|‘|’)/gi, "gi"), "'")
 }
 
-String.prototype.replaceAt = function (index, replacement) {
+String.prototype.replaceAt = function(index, replacement) {
     return this.substring(0, index) + replacement + this.substring(index + replacement.length)
 }
 
 Object.defineProperty(Array.prototype, "pickRandom", {
     enumerable: false,
-    value: function () { return this[bot.logic.randomBetween(0, this.length - 1)] }
+    value: function() { return this[bot.logic.randomBetween(0, this.length - 1)] }
 })
 
-process.on("exit", function () {
+process.on("exit", function() {
     logger.info("=== Bot shutting down, goodbye ===")
 })
 
-process.on("SIGINT", function () {
+process.on("SIGINT", function() {
     logger.info("=== Bot forced to shut down, goodbye ===")
 })
 
-process.on("uncaughtException", function (error) {
+process.on("uncaughtException", function(error) {
     if (bot.command.commandList.get())
         bot.message.reply(bot.command.commandList.get(), "An error occured, this is probably your fault!")
 
@@ -133,7 +132,7 @@ process.on("uncaughtException", function (error) {
 })
 
 // handle unhandled rejections
-process.on("unhandledRejection", function (error) {
+process.on("unhandledRejection", function(error) {
     logger.error(`Unhandled rejection "${error.message}"\n === STACK === \n"${error.stack}"`)
 })
 

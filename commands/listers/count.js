@@ -1,9 +1,9 @@
-let discord = require("discord.js")
-let config = require("config.json")
-let database = require("systems/database.js")
+const discord = require("discord.js")
+const config = require("config.json")
+const database = require("systems/database.js")
 const Lister = require("./lister.js")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 module.exports = {
     "name": "count",
@@ -20,7 +20,7 @@ class CountLister extends Lister {
     }
 
     total(message) {
-        let selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1"
+        const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1"
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             bot.message.send(message, `Ive found ${rows[0]["count"]} messages in ${message.guild.name}`)
@@ -28,7 +28,7 @@ class CountLister extends Lister {
     }
 
     mention(message, mentioned) {
-        let selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1 AND user_id = $2"
+        const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1 AND user_id = $2"
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             bot.message.send(message, `Ive found ${rows[0]["count"]} messages by ${mentioned.username} in this server`)
@@ -36,7 +36,7 @@ class CountLister extends Lister {
     }
 
     perPerson(message, page) {
-        let selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
+        const selectSQL = `SELECT LOWER(user_id) as user_id, user_name, COUNT(*) as count
 		FROM messages
 		WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1
 		GROUP BY LOWER(user_id)
@@ -63,7 +63,7 @@ class CountLister extends Lister {
     }
 
     percentage(message, page) {
-        let selectSQL = `SELECT user_id, user_name, COUNT(*) as count,
+        const selectSQL = `SELECT user_id, user_name, COUNT(*) as count,
 			(SElECT COUNT(message) FROM messages WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1) as total
 			FROM messages
 			WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1

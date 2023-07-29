@@ -1,7 +1,7 @@
-let PNGImage = require("pngjs-image")
-let database = require("systems/database.js")
-let config = require("config.json")
-let bot = require("systems/bot.js")
+const PNGImage = require("pngjs-image")
+const database = require("systems/database.js")
+const config = require("config.json")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "draw",
@@ -9,7 +9,7 @@ module.exports = {
     "format": "draw",
     "function": function draw(message) {
         const totalImageSize = config.image.size * config.image.magnification
-        let image = PNGImage.createImage(totalImageSize, totalImageSize)
+        const image = PNGImage.createImage(totalImageSize, totalImageSize)
         image.fillRect(0, 0, totalImageSize, totalImageSize, {
             red: 255,
             green: 255,
@@ -17,9 +17,9 @@ module.exports = {
             alpha: 255
         })
 
-        let selectSQL = "SELECT * FROM colors"
+        const selectSQL = "SELECT * FROM colors"
 
-        database.query(selectSQL, [], async (rows) => {
+        database.query(selectSQL, [], async(rows) => {
             for (let i = 0; i < rows.length; i++)
                 if (rows[i].x >= 0 && rows[i].x < config.image.size && rows[i].y >= 0 && rows[i].y < config.image.size)
                     image.fillRect(rows[i].x * config.image.magnification, rows[i].y * config.image.magnification, config.image.magnification, config.image.magnification, {
@@ -29,7 +29,7 @@ module.exports = {
                         alpha: 255
                     })
 
-            image.writeImage("views/images/image.png", function () {
+            image.writeImage("views/images/image.png", function() {
                 bot.message.reply(message, "Current image", {
                     files: ["views/images/image.png"]
                 })

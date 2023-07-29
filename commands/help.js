@@ -1,7 +1,7 @@
-let discord = require("discord.js")
-let projectPackage = require("package.json")
-let config = require("config.json")
-let bot = require("systems/bot.js")
+const discord = require("discord.js")
+const projectPackage = require("package.json")
+const config = require("config.json")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "help",
@@ -12,14 +12,14 @@ module.exports = {
         Format: \`()\` = optional argument, \`[]\` = required argument\n`
         const args = message.content.split(" ")
 
-        let commands = require("commandholders/commands.js")
-        let pageAmount = Math.ceil(Object.entries(commands).length / 10)
+        const commands = require("commandholders/commands.js")
+        const pageAmount = Math.ceil(Object.entries(commands).length / 10)
         let pageNum = args[1] ? args[1] : 1
 
         if (pageNum > pageAmount)
             pageNum = pageAmount
 
-        let start = (pageNum - 1) * 10
+        const start = (pageNum - 1) * 10
         let count = 0
 
         for (const [, command] of Object.entries(commands)) {

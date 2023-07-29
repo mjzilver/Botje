@@ -1,5 +1,5 @@
-let emoji_values = require("json/emoji.json")
-let bot = require("systems/bot.js")
+const emojiValues = require("json/emoji.json")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "emoji",
@@ -15,7 +15,7 @@ module.exports = {
 
                     for (let i = 0; i < sentence.length; i++) {
                         if (sentence.charAt(i) >= "a" && sentence.charAt(i) <= "z")
-                            replyMessage.react(emoji_values["letter_" + sentence.charAt(i)])
+                            replyMessage.react(emojiValues[`letter_${ sentence.charAt(i)}`])
                     }
 
                     message.delete({
@@ -31,7 +31,7 @@ module.exports = {
             if (sentence.length > 0) {
                 for (let i = 0; i < sentence.length; i++) {
                     if (sentence.charAt(i) >= "a" && sentence.charAt(i) <= "z")
-                        result += emoji_values["letter_" + sentence.charAt(i)]
+                        result += emojiValues[`letter_${ sentence.charAt(i)}`]
                     result += " "
                 }
             }

@@ -1,4 +1,4 @@
-let commands = {
+const commands = {
     "list": require("commandline/list.js"),
     "save": require("commandline/save.js"),
     "exit": require("commandline/exit.js"),

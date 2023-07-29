@@ -1,4 +1,4 @@
-let bot = require("systems/bot.js")
+const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "choose",
@@ -8,7 +8,7 @@ module.exports = {
         const filtered = message.content.removePrefix().replace(/choose /g, "")
         const items = filtered.split("|")
 
-        let presets = ["You should", "You ought to", "I pick", "I tell you", "An Angel told me in a dream that", "The tarot card reads"]
+        const presets = ["You should", "You ought to", "I pick", "I tell you", "An Angel told me in a dream that", "The tarot card reads"]
 
         return bot.message.reply(message, `${presets.pickRandom()} \`${items.pickRandom().trim()}\``)
     }

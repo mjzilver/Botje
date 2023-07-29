@@ -1,13 +1,13 @@
-let database = require("systems/database.js")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const database = require("systems/database.js")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 module.exports = {
     "name": "speak",
     "description": "makes the bot speak via recycled messages",
     "format": "speak (sentence)",
     "function": function speak(message) {
-        let matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
+        const matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
 
         if (matches && matches[1] != "") {
             findTopic(message, matches[1])
@@ -18,10 +18,10 @@ module.exports = {
 }
 
 function findByWord(message) {
-    let earliest = new Date()
+    const earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
 
-    let words = message.content.removePrefix()
+    const words = message.content.removePrefix()
         .replace(new RegExp(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http(.*)|speak)\b/gi), "")
         .textOnly()
         .replace(bot.dictionary.getNonSelectorsRegex(), "")
@@ -30,15 +30,15 @@ function findByWord(message) {
 
     if (words && words.length >= 1 && words[0]) {
         if (words.length > 1) {
-            words.sort(function (a, b) {
-                let al = a.match(/(?:[aeiouy]{1,2})/gi)
-                let bl = b.match(/(?:[aeiouy]{1,2})/gi)
+            words.sort(function(a, b) {
+                const al = a.match(/(?:[aeiouy]{1,2})/gi)
+                const bl = b.match(/(?:[aeiouy]{1,2})/gi)
                 return (bl ? bl.length : 0) - (al ? al.length : 0)
             })
         }
 
         if (words.length > 1) {
-            let selectSQL = `SELECT message FROM messages
+            const selectSQL = `SELECT message FROM messages
                 WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
                 AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
                 AND LENGTH(message) < 150 AND LENGTH(message) > 10
@@ -77,7 +77,7 @@ function findByWord(message) {
                 }
             })
         } else {
-            let selectSQL = `SELECT message FROM messages
+            const selectSQL = `SELECT message FROM messages
                 WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
                 AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
                 AND message LIKE '%${words[0]}%' AND LENGTH(message) > 10
@@ -100,10 +100,10 @@ function findByWord(message) {
 function findRandom(message) {
     logger.debug("Sending randomly selected message")
 
-    let earliest = new Date()
+    const earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
 
-    let selectSQL = `SELECT message FROM messages
+    const selectSQL = `SELECT message FROM messages
         WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
         AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
         AND datetime < ${earliest.getTime()} AND LENGTH(message) > 10
@@ -117,7 +117,7 @@ function findRandom(message) {
 }
 
 function findTopic(message, topic) {
-    let selectSQL = `SELECT LOWER(message) as message
+    const selectSQL = `SELECT LOWER(message) as message
         FROM messages
         WHERE message LIKE '%${topic} is%' OR message LIKE '%${topic} are%' 
         AND message NOT LIKE '%<%' AND LENGTH(message) > 10
@@ -130,7 +130,7 @@ function findTopic(message, topic) {
             return findByWord(message)
         }
 
-        let regStr = "\\b(is|are)\\b"
+        const regStr = "\\b(is|are)\\b"
 
         let first = rows[0].message
         let second = rows[1].message
@@ -142,9 +142,9 @@ function findTopic(message, topic) {
         second = second.substring(second.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), "")
         third = third.substring(third.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), "")
 
-        let linkerwords = ["and", "or", "but", "also"]
+        const linkerwords = ["and", "or", "but", "also"]
 
-        let picker = bot.logic.randomBetween(0, 2)
+        const picker = bot.logic.randomBetween(0, 2)
 
         if (picker == 0)
             bot.message.reply(message, `${first}`.normalizeSpaces())

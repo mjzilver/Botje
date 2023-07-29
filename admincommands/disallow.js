@@ -1,13 +1,13 @@
-let fs = require("fs")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const fs = require("fs")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 module.exports = function disallow(message) {
     const mention = message.mentions.users.first()
     const args = message.content.split(" ")
 
-    let filepath = "json/disallowed.json"
-    let disallowed = JSON.parse(fs.readFileSync(filepath))
+    const filepath = "json/disallowed.json"
+    const disallowed = JSON.parse(fs.readFileSync(filepath))
 
     if (args[2] && args[2] == "remove") {
         delete disallowed[mention.id]
@@ -22,7 +22,7 @@ module.exports = function disallow(message) {
         return bot.message.send(message, "You need to @ someone to disallow them")
     }
 
-    fs.writeFile(filepath, JSON.stringify(disallowed), function (err) {
+    fs.writeFile(filepath, JSON.stringify(disallowed), function(err) {
         if (err)
             logger.error(err)
     })

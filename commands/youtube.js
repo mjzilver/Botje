@@ -1,14 +1,14 @@
-let config = require("config.json")
-let request = require("request")
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const config = require("config.json")
+const request = require("request")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 module.exports = {
     "name": "youtube",
     "description": "searches for a youtube video",
     "format": "youtube [keyword]",
     "function": function youtube(message) {
-        let keyword = message.content.replace(/youtube /g, "")
+        const keyword = message.content.replace(/youtube /g, "")
 
         const options = {
             url: `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${keyword}&key=${config.youtube_api_key}`,
@@ -23,7 +23,7 @@ module.exports = {
             } else if (!body.items[0]) {
                 bot.message.reply(message, `Nothing found for "${keyword}"`)
             } else {
-                let video = body.items[0]
+                const video = body.items[0]
                 bot.message.reply(message, `https://www.youtube.com/watch?v=${video.id.videoId}`)
             }
         })

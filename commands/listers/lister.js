@@ -1,17 +1,16 @@
-let bot = require("systems/bot.js")
+const bot = require("systems/bot.js")
 
 class Lister {
     constructor() {
         if (this.constructor === Lister) {
             throw new Error("Can't instantiate abstract class!")
         }
-
     }
 
     process(message) {
         const mentioned = message.mentions.users.first()
         const args = message.content.split(" ")
-        let page = (args[2] ? args[2] - 1 : 0)
+        const page = (args[2] ? args[2] - 1 : 0)
 
         if (args.length == 1) {
             this.total(message, page)

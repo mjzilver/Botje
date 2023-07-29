@@ -1,13 +1,13 @@
-let projectPackage = require("package.json") 
-let bot = require("systems/bot.js")
-let logger = require("systems/logger.js")
+const projectPackage = require("package.json")
+const bot = require("systems/bot.js")
+const logger = require("systems/logger.js")
 
 class Webhook {
     constructor() { }
 
     async fetch(channel) {
         if (channel && channel.type == "GUILD_TEXT") {
-            let webhooks = await channel.fetchWebhooks()
+            const webhooks = await channel.fetchWebhooks()
             for (const [, webhook] of webhooks) {
                 if (webhook.name == projectPackage.name) {
                     logger.console("Found webhook")
@@ -20,7 +20,7 @@ class Webhook {
     }
 
     sendMessage(channelid, text, userid) {
-        let channel = bot.client.channels.cache.get(channelid)
+        const channel = bot.client.channels.cache.get(channelid)
         this.fetch(channel).then((webhook) => {
             channel.guild.members.fetch(userid).then(
                 (member) => {
