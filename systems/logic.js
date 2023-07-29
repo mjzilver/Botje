@@ -132,4 +132,9 @@ process.on("uncaughtException", function (error) {
     logger.error(`Uncaught error "${error.message}"\n === STACK === \n"${error.stack}"`)
 })
 
+// handle unhandled rejections
+process.on("unhandledRejection", function (error) {
+    logger.error(`Unhandled rejection "${error.message}"\n === STACK === \n"${error.stack}"`)
+})
+
 module.exports = new Logic()

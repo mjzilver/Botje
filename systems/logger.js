@@ -8,9 +8,7 @@ const loggerLevels = {
     info: 2,
     debug: 3,
     console: 4,
-    admin: 5,
-    deletion: 6,
-    startup: 7
+    startup: 5
 }
 
 Winston.loggers.add("logger", {
@@ -27,7 +25,7 @@ Winston.loggers.add("logger", {
         }),
         new (Winston.transports.File)({
             filename: "bot.log",
-            level: "admin",
+            level: "warn",
             format: combine(
                 timestamp(),
                 json()
@@ -38,7 +36,6 @@ Winston.loggers.add("logger", {
 
 Winston.addColors({
     console: "grey",
-    admin: "yellow",
     deletion: "yellow",
     startup: "magenta"
 })
