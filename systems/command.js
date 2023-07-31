@@ -1,5 +1,4 @@
 const { config } = require("./settings")
-
 const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 const LimitedList = require("systems/types/limitedlist.js")

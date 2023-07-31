@@ -9,7 +9,8 @@ const commands = {
     "saveemotes": require("commandline/saveemotes.js"),
     "heapdump": require("commandline/heapdump.js"),
     "report": require("commandline/report.js"),
-    "level": require("commandline/level.js")
+    "level": require("commandline/level.js"),
+    "settings": require("commandline/settings.js"),
 }
 
 module.exports = commands

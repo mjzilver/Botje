@@ -1,5 +1,4 @@
 const { config } = require("./settings")
-
 const database = require("systems/database.js")
 const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")

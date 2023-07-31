@@ -1,6 +1,5 @@
 const { Client } = require("pg")
 const { config } = require("./settings")
-
 const logger = require("systems/logger")
 
 class Database {

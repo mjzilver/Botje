@@ -1,5 +1,5 @@
 const webhook = require("./webhook.js")
-const config = require("../config.json")
+const { config } = require("./settings")
 const database = require("./database.js")
 const bot = require("./bot.js")
 const logger = require("./logger.js")

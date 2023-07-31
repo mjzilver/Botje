@@ -1,7 +1,6 @@
 const discord = require("discord.js")
 const projectPackage = require("package.json")
 const { config } = require("systems/settings")
-
 const fs = require("fs")
 const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")

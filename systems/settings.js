@@ -22,8 +22,8 @@ function saveConfigToFile() {
     }
 }
 
-function updateConfigVariable(updatedConfig) {
-    Object.assign(config, updatedConfig)
+function updateConfigVariable(key, value) {
+    config[key] = value
     saveConfigToFile()
 }
 
