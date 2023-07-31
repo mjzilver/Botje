@@ -1,5 +1,6 @@
 let bot
-const config = require("config.json")
+const { config } = require("systems/settings")
+
 // eslint-disable-next-line camelcase
 config.discord_api_key = config.discord_api_key_beta
 

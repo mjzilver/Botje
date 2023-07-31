@@ -1,5 +1,6 @@
 const { Client } = require("pg")
-const config = require("config.json")
+const { config } = require("./settings")
+
 const logger = require("systems/logger")
 
 class Database {

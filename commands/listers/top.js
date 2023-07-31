@@ -1,5 +1,6 @@
 const discord = require("discord.js")
-const config = require("config.json")
+const { config } = require("systems/settings")
+
 const database = require("systems/database.js")
 const Lister = require("./lister.js")
 const bot = require("systems/bot.js")

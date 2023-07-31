@@ -1,6 +1,7 @@
 const PNGImage = require("pngjs-image")
 const database = require("systems/database.js")
-const config = require("config.json")
+const { config } = require("systems/settings")
+
 const bot = require("systems/bot.js")
 
 module.exports = {

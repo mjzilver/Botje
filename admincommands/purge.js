@@ -1,4 +1,5 @@
-const config = require("config.json")
+const { config } = require("systems/settings")
+
 const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 
