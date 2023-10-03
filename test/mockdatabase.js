@@ -1,11 +1,11 @@
-let database = require("systems/database.js")
+const database = require("systems/database.js")
 
 class MockDatabase extends database {
     constructor() {
         super()
         this.mockData = {}
     }
-  
+
     // eslint-disable-next-line no-unused-vars
     query(selectSQL, parameters = [], callback) {
         // Implement mock query behavior
@@ -14,7 +14,7 @@ class MockDatabase extends database {
         }
         callback(result)
     }
-  
+
     async insert(selectSQL, parameters = [], callback = null) {
         // Implement mock insert behavior
         if (!this.mockData[selectSQL]) {

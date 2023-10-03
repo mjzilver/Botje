@@ -12,13 +12,13 @@ class Lister {
         const args = message.content.split(" ")
         const page = (args[2] ? args[2] - 1 : 0)
 
-        if (args.length == 1) {
+        if (args.length === 1) {
             this.total(message, page)
         } else if (mentioned) {
             this.mention(message, mentioned, page)
-        } else if (args[1] == "?") {
+        } else if (args[1] === "?") {
             this.perPerson(message, page)
-        } else if (args[1] == "%") {
+        } else if (args[1] === "%") {
             this.percentage(message, page)
         } else {
             bot.message.reply(message, "Incorrect format")

@@ -6,10 +6,10 @@ class Webhook {
     constructor() { }
 
     async fetch(channel) {
-        if (channel && channel.type == "GUILD_TEXT") {
+        if (channel && channel.type === "GUILD_TEXT") {
             const webhooks = await channel.fetchWebhooks()
             for (const [, webhook] of webhooks) {
-                if (webhook.name == projectPackage.name) {
+                if (webhook.name === projectPackage.name) {
                     logger.console("Found webhook")
                     return webhook
                 }

@@ -76,7 +76,8 @@ class Message {
             for (let i = 0; i < rows.length; i++) {
                 this.commandCalls[rows[i]["call_id"]] = rows[i]["reply_id"]
             }
-            this.scanForCommands()
+            if (config.scan_on_startup === true)
+                this.scanForCommands()
         })
     }
 
