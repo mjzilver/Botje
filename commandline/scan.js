@@ -8,7 +8,7 @@ module.exports = {
         const save = require("./save")
 
         for (const [channelId, channel] of bot.client.channels.cache.entries())
-            if (channel.type == "GUILD_TEXT")
+            if (channel.type === "GUILD_TEXT")
                 save.function([channelId, input])
     }
 }

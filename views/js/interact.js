@@ -4,7 +4,7 @@ function sendMessage() {
     let selectedUser = $("#userSelect").val()
     let textToSend = $("#textToSend").val()
 
-    if (textToSend != "") {
+    if (textToSend !== "") {
         $.post("/interact", {
             "channel": selectedChannel,
             "user": selectedUser,
@@ -18,7 +18,7 @@ function guildSelected() {
     let first = null
 
     $("#channelSelect > option").each(function () {
-        if ($(this).attr("guild") == selectedGuild) {
+        if ($(this).attr("guild") === selectedGuild) {
             $(this).show()
             if (!first)
                 first = $(this)

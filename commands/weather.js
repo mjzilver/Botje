@@ -25,7 +25,7 @@ module.exports = {
 
                 const result = JSON.parse(body)
 
-                if (result.cod == 200) {
+                if (result.cod === 200) {
                     const options = {
                         timeZone: "UTC"
                     }

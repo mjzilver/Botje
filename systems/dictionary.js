@@ -72,7 +72,7 @@ class Dictionary {
         for (const i in this.words) {
             let processedWord = this.words[i][0]
             processedWord = processedWord.textOnly()
-            if (processedWord.length == length && this.words[i][1] > 20) {
+            if (processedWord.length === length && this.words[i][1] > 20) {
                 result.push(processedWord)
             }
         }
@@ -85,7 +85,7 @@ class Dictionary {
         const max = (this.words.length < amount) ? this.words.length : amount
         for (let i = 0; i < max; i++) {
             nonSelectorsRegex += this.words[i][0]
-            if (i != max - 1)
+            if (i !== max - 1)
                 nonSelectorsRegex += "|"
         }
         return new RegExp(`\\b((${nonSelectorsRegex})\\s)\\b`, "gmi")

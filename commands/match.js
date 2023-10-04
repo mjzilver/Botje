@@ -7,7 +7,7 @@ module.exports = {
     "function": function match(message) {
         const words = message.content.split(" ")
 
-        if (words[0] == "match")
+        if (words[0] === "match")
             words.shift()
 
         const spellchecked = bot.spellcheck.checkSentence(words.join(" "))

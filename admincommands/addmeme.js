@@ -15,7 +15,7 @@ module.exports = async function addmeme(message) {
         url = getURL(message)
     }
 
-    if (args[0]?.indexOf("http") == 0)
+    if (args[0]?.indexOf("http") === 0)
         url = args.shift()
 
     const filename = args[0] ? `${args[0] }.png` : `${new Date().getTime() }.png`

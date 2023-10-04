@@ -9,7 +9,7 @@ module.exports = function disallow(message) {
     const filepath = "json/disallowed.json"
     const disallowed = JSON.parse(fs.readFileSync(filepath))
 
-    if (args[2] && args[2] == "remove") {
+    if (args[2] && args[2] === "remove") {
         delete disallowed[mention.id]
         logger.warn(`${mention.username} is now allowed to use the bot again`)
         bot.message.markComplete(message)

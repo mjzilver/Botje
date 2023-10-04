@@ -6,8 +6,8 @@ class Logic {
     constructor() { }
 
     levenshtein(a, b) {
-        if (a.length == 0) return b.length
-        if (b.length == 0) return a.length
+        if (a.length === 0) return b.length
+        if (b.length === 0) return a.length
 
         const matrix = []
 
@@ -18,7 +18,7 @@ class Logic {
 
         for (var i = 1; i <= b.length; i++) {
             for (var j = 1; j <= a.length; j++) {
-                if (b.charAt(i - 1) == a.charAt(j - 1)) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
                     matrix[i][j] = matrix[i - 1][j - 1]
                 } else {
                     matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, // substitution
@@ -36,7 +36,7 @@ class Logic {
     }
 
     findClosestMatchInList(word, wordList) {
-        if (word == 0) return ""
+        if (word === 0) return ""
 
         if (Array.isArray(wordList)) {
             const oldWordList = wordList
@@ -57,7 +57,7 @@ class Logic {
                 difference = currentdifference
                 closestMatch = wordlistword
                 chosenAmount = wordlistamount
-            } else if (currentdifference == difference) {
+            } else if (currentdifference === difference) {
                 if (wordlistamount < chosenAmount) {
                     difference = currentdifference
                     closestMatch = wordlistword

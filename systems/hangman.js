@@ -44,7 +44,7 @@ class hangman {
 
         let chosenword = ""
 
-        while (this.word == "") {
+        while (this.word === "") {
             chosenword = words.pickRandom()
             chosenword[0] = chosenword[0].textOnly()
             chosenword[0] = chosenword[0].replace(bot.dictionary.getNonSelectorsRegex(), "").trim()
@@ -70,7 +70,7 @@ class hangman {
 
         if (geussedContent) {
             if (geussedContent.length > 1) {
-                if (geussedContent == this.word) {
+                if (geussedContent === this.word) {
                     bot.message.send(message, `You guessed the word ${this.word} after ${this.tries} tries -- You have won!`)
                     this.hasEnded = true
                 } else {
@@ -83,7 +83,7 @@ class hangman {
                 } else {
                     if (this.word.includes(geussedContent)) {
                         for (let i = 0; i < this.word.length; i++) {
-                            if (this.word[i] == geussedContent) {
+                            if (this.word[i] === geussedContent) {
                                 this.visibleWord = this.visibleWord.replaceAt(i, geussedContent)
                             }
                         }
@@ -95,10 +95,10 @@ class hangman {
                 }
             }
 
-            if (this.tries == this.maxTries) {
+            if (this.tries === this.maxTries) {
                 bot.message.send(message, `Oh no! You have been hanged! The word was ${this.word}`)
                 this.hasEnded = true
-            } else if (this.visibleWord == this.word) {
+            } else if (this.visibleWord === this.word) {
                 bot.message.send(message, "You've won by guessing all the letters!")
                 this.hasEnded = true
             }

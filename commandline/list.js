@@ -7,7 +7,7 @@ module.exports = {
     "format": "list",
     "function": function list() {
         for (const [channelId, channel] of bot.client.channels.cache.entries())
-            if (channel.type == "GUILD_TEXT")
-                logger.console(`${channelId} == ${channel.name} -- ${channel.guild.name}`)
+            if (channel.type === "GUILD_TEXT")
+                logger.console(`${channelId} === ${channel.name} -- ${channel.guild.name}`)
     }
 }

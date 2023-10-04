@@ -2,9 +2,9 @@ const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 
 module.exports = async function nuke(message) {
-    if (message.author.id == message.guild.ownerId) {
+    if (message.author.id === message.guild.ownerId) {
         const filter = launchMessage => {
-            return (launchMessage.content.startsWith("launch") && launchMessage.author.id == message.author.id)
+            return (launchMessage.content.startsWith("launch") && launchMessage.author.id === message.author.id)
         }
 
         message.channel.awaitMessages({ filter, max: 1, time: 60000 })
@@ -20,7 +20,7 @@ module.exports = async function nuke(message) {
 
 function nukeguild(message) {
     for (const [channelId, channel] of bot.client.channels.cache.entries())
-        if (channel.type == "GUILD_TEXT" && channel.guild.id == message.guild.id)
+        if (channel.type === "GUILD_TEXT" && channel.guild.id === message.guild.id)
             nukechannel(channelId)
 }
 
@@ -28,7 +28,7 @@ function nukechannel(channelId) {
     const channels = bot.client.channels.cache
     const channel = channels.find(c => c.id === channelId)
 
-    if (channel && channel.type == "GUILD_TEXT") {
+    if (channel && channel.type === "GUILD_TEXT") {
         nukemessages(channel, channel.lastMessageId)
         channel.lastMessage?.delete({ timeout: 100 })
         logger.warn(`NUKING channel: ${channel.name}`)
@@ -48,7 +48,7 @@ function nukemessages(channel, messageid, loop = 0) {
             message?.delete({ timeout: 10 })
 
             if (itemsProcessed === messages.size) {
-                if (itemsProcessed == 100) {
+                if (itemsProcessed === 100) {
                     logger.console(`100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                     nukemessages(channel, message.id, ++loop)
                 } else

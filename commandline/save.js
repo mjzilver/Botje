@@ -14,7 +14,7 @@ module.exports = {
             const amount = (input[1]?.length !== 0 ? input[1] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
             const channel = channels.find(c => c.id === channelId)
 
-            if (channel && channel.type == "GUILD_TEXT")
+            if (channel && channel.type === "GUILD_TEXT")
                 catalog(channel, channel.lastMessageId, amount)
             else
                 logger.console("Channel not found")
@@ -34,7 +34,7 @@ function catalog(channel, messageid, amount, loop = 0) {
             database.storeMessage(message)
 
             if (itemsProcessed === messages.size) {
-                if (itemsProcessed == 100) {
+                if (itemsProcessed === 100) {
                     if ((amount - ((loop * 100) + itemsProcessed)) > 0) {
                         logger.console(`100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                         catalog(channel, message.id, amount, ++loop)

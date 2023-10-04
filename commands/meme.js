@@ -19,16 +19,16 @@ module.exports = {
             url = getURL(message)
         }
 
-        if (args[0]?.indexOf("http") == 0)
+        if (args[0]?.indexOf("http") === 0)
             url = args.shift()
 
         const topbottom = args.join(" ").split("|")
         const top = topbottom[0] ?? ""
         const bottom = topbottom[1] ?? ""
 
-        if (args[0] == "?" || !args[0]) {
+        if (args[0] === "?" || !args[0]) {
             let keyword = ""
-            if (args[0] == "?" && args[1])
+            if (args[0] === "?" && args[1])
                 keyword = args[1]
 
             const selectSQL = `SELECT message

@@ -9,7 +9,7 @@ module.exports = {
     "function": function speak(message) {
         const matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
 
-        if (matches && matches[1] != "") {
+        if (matches && matches[1] !== "") {
             findTopic(message, matches[1])
         } else {
             findByWord(message)
@@ -146,9 +146,9 @@ function findTopic(message, topic) {
 
         const picker = bot.logic.randomBetween(0, 2)
 
-        if (picker == 0)
+        if (picker === 0)
             bot.message.reply(message, `${first}`.normalizeSpaces())
-        else if (picker == 1)
+        else if (picker === 1)
             bot.message.reply(message, `${first} ${linkerwords.pickRandom()} ${second}`.normalizeSpaces())
         else
             bot.message.reply(message, `${first}, ${second} ${linkerwords.pickRandom()} ${third}`.normalizeSpaces())

@@ -66,7 +66,7 @@ class Command {
             const timePassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes()
 
             if (!bot.reply.process(message)) {
-                if ((this.messageCounter >= config.speakEvery || bot.logic.randomBetween(1, 20) == 1) && timePassed >= bot.logic.randomBetween(20, 60)) {
+                if ((this.messageCounter >= config.speakEvery || bot.logic.randomBetween(1, 20) === 1) && timePassed >= bot.logic.randomBetween(20, 60)) {
                     this.commands["speak"].function(message)
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
@@ -85,7 +85,7 @@ class Command {
                 const args = callMessage.content.removePrefix().normalizeSpaces().split(" ")
                 const command = args.shift().toLowerCase()
 
-                logger.debug(`Redoing this command == '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ""} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
+                logger.debug(`Redoing this command === '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ""} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)
 
                 if (command in this.commands) {
                     this.commands[command].function(callMessage)

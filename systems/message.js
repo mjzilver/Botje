@@ -39,7 +39,7 @@ class Message {
 
     findFromReply(replyMessage) {
         for (const [call, reply] of Object.entries(this.commandCalls)) {
-            if (reply == replyMessage.id) {
+            if (reply === replyMessage.id) {
                 return call
             }
         }

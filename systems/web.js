@@ -35,7 +35,7 @@ class WebServer {
                 let logs = []
                 if (req.query.level) {
                     for (let i = 0; i < results.file.length; i++)
-                        if (results.file[i].level == req.query.level)
+                        if (results.file[i].level === req.query.level)
                             logs.push(results.file[i])
                 } else
                     logs = results.file
@@ -52,7 +52,7 @@ class WebServer {
             GROUP BY user_id, user_name
             ORDER BY COUNT(message) DESC`
 
-            const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type == "GUILD_TEXT"))
+            const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type === "GUILD_TEXT"))
             const guilds = Object.fromEntries(bot.client.guilds.cache)
             const commands = (require("commandholders/commands.js"))
 
@@ -125,7 +125,7 @@ class WebServer {
 
                     database.insert(insertSQL, [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue], () => {
                         io.emit("pixelChanged", pixel)
-                        if (editPerPerson[socket.id] == undefined) {
+                        if (editPerPerson[socket.id] === undefined) {
                             editPerPerson[socket.id] = [new Date()]
                         } else {
                             editPerPerson[socket.id].push(new Date())

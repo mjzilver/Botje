@@ -11,7 +11,7 @@ module.exports = {
         const path = `backups/emotes/${message.guild.id}/`
         const files = fs.readdirSync(path)
 
-        if (args[0] == "?") {
+        if (args[0] === "?") {
             let result = ""
             for (let i = 0; i < files.length; i++) {
                 result += `${files[i]}, `

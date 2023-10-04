@@ -51,7 +51,7 @@ class Spellcheck {
     }
 
     findClosestWord(word) {
-        if (word == 0) return ""
+        if (word === 0) return ""
 
         word = word.toLowerCase()
 
@@ -66,7 +66,7 @@ class Spellcheck {
                     difference = currentdifference
                     closestMatch = wordlistword
                     chosenAmount = wordlistamount
-                } else if (currentdifference == difference) {
+                } else if (currentdifference === difference) {
                     if (wordlistamount < chosenAmount) {
                         difference = currentdifference
                         closestMatch = wordlistword

@@ -24,9 +24,9 @@ class WordLister extends Lister {
 
         if (mentioned && args[2]) {
             this.mention(message, mentioned, args[2].removeQuotes())
-        } else if (args[1] == "?" && args[2]) {
+        } else if (args[1] === "?" && args[2]) {
             this.perPerson(message, args[2].removeQuotes())
-        } else if (args[1] == "%" && args[2]) {
+        } else if (args[1] === "%" && args[2]) {
             this.percentage(message, args[2].removeQuotes())
         } else if (args[1]) {
             this.total(message, args[1].removeQuotes())
@@ -36,10 +36,10 @@ class WordLister extends Lister {
     }
 
     perPerson(message, word) {
-        const selectSQL = `SELECT user_id, user_name, count(message) as count
+        const selectSQL = `SELECT user_id, MAX(user_name) as user_name, count(message) as count
         FROM messages
         WHERE message LIKE $1 AND server_id = $2
-        GROUP BY user_id, user_name
+        GROUP BY user_id
         HAVING count(message) > 1
         ORDER BY count(message) DESC 
         LIMIT 10`
@@ -49,7 +49,7 @@ class WordLister extends Lister {
             for (let i = 0; (i < rows.length && i <= 10); i++)
                 result += `${rows[i]["user_name"]} has said ${word} ${rows[i]["count"]} times! \n`
 
-            if (result == "")
+            if (result === "")
                 return bot.message.send(message, `Nothing found for ${word} in ${message.guild.name} `)
 
             const top = new discord.MessageEmbed()
@@ -85,7 +85,7 @@ class WordLister extends Lister {
     }
 
     percentage(message, word) {
-        const selectSQL = `SELECT user_id, user_name, count(message) as count,
+        const selectSQL = `SELECT user_id, MAX(user_name) as user_name, count(message) as count,
                 (SElECT COUNT(m2.message) 
                 FROM messages AS m2
                 WHERE m2.user_id = messages.user_id
@@ -93,7 +93,7 @@ class WordLister extends Lister {
             FROM messages
             WHERE message LIKE $1
             AND server_id = $2
-            GROUP BY messages.user_id, messages.user_name, messages.server_id
+            GROUP BY messages.user_id, messages.server_id
             HAVING count(message) > 1
             ORDER BY count(message) DESC 
             LIMIT 10`
@@ -110,7 +110,7 @@ class WordLister extends Lister {
             for (let i = 0; i < resultArray.length; i++)
                 result += `${resultArray[i]["user_name"]} has said ${word} in ${resultArray[i]["percentage"]}% of their messages! \n`
 
-            if (result == "")
+            if (result === "")
                 return bot.message.send(message, `Nothing found for ${word} in ${message.guild.name} `)
 
             const top = new discord.MessageEmbed()
