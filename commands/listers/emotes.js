@@ -48,8 +48,8 @@ class EmotesLister extends Lister {
             WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
             AND server_id = $1 AND user_id = $2
             GROUP BY LOWER(message)
-            HAVING count > 1
-            ORDER BY count DESC 
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC 
             LIMIT 10`
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
@@ -67,12 +67,12 @@ class EmotesLister extends Lister {
     }
 
     perPerson(message, page) {
-        const selectSQL = `SELECT user_id, MAX(user_name), COUNT(*) as count
+        const selectSQL = `SELECT user_id, MAX(user_name) as user_name, COUNT(*) as count
             FROM messages
             WHERE message NOT LIKE '%<%' AND server_id = $1
             GROUP BY user_id
-            HAVING count > 1
-            ORDER BY count DESC`
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC`
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             let result = ""

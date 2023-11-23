@@ -96,7 +96,6 @@ class QualityLister extends Lister {
         })
     }
 
-
     calculateScore(message) {
         let score = 0
         for (let i = 0; i < message.length; i++)

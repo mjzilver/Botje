@@ -131,8 +131,9 @@ process.on("uncaughtException", function(error) {
     logger.error(`Uncaught error "${error.message}"\n === STACK === \n"${error.stack}"`)
 })
 
-// handle unhandled rejections
 process.on("unhandledRejection", function(error) {
+    if (bot.command.commandList.get())
+        bot.message.reply(bot.command.commandList.get(), "An error occured, this is probably your fault, do not @me!")
     logger.error(`Unhandled rejection "${error.message}"\n === STACK === \n"${error.stack}"`)
 })
 

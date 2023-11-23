@@ -12,19 +12,16 @@ module.exports = {
         args.shift()
         let url = ""
 
-        if (message.reference && message.reference.messageId) {
-            const repliedTo = await message.channel.messages.fetch(message.reference.messageId)
-            url = getURL(repliedTo)
-        } else {
+        if (message.reference && message.reference.messageId)
+            url = getURL(await message.channel.messages.fetch(message.reference.messageId))
+        else
             url = getURL(message)
-        }
+
 
         if (args[0]?.indexOf("http") === 0)
             url = args.shift()
 
-        const topbottom = args.join(" ").split("|")
-        const top = topbottom[0] ?? ""
-        const bottom = topbottom[1] ?? ""
+        const [top, bottom] = (args.join(" ").split("|") || []).slice(0, 2)
 
         if (args[0] === "?" || !args[0]) {
             let keyword = ""
@@ -66,8 +63,8 @@ async function processPicture(url, top, bottom, message) {
         const chosenFile = files[Math.floor(Math.random() * files.length)]
         url = `${path}/${chosenFile}`
     }
-    top = top.toUpperCase().trim().replaceFancyQuotes()
-    bottom = bottom.toUpperCase().trim().replaceFancyQuotes()
+    top = top ? top.toUpperCase().trim().replaceFancyQuotes() : ""
+    bottom = bottom ? bottom.toUpperCase().trim().replaceFancyQuotes() : ""
 
     Jimp.read(url, (err, image) => {
         Jimp.loadFont("assets/font.fnt").then(font => {

@@ -8,12 +8,10 @@ module.exports = async function addmeme(message) {
     args.shift()
     let url = ""
 
-    if (message.reference && message.reference.messageId) {
-        const repliedTo = await message.channel.messages.fetch(message.reference.messageId)
-        url = getURL(repliedTo)
-    } else {
+    if (message.reference && message.reference.messageId)
+        url = getURL(await message.channel.messages.fetch(message.reference.messageId))
+    else
         url = getURL(message)
-    }
 
     if (args[0]?.indexOf("http") === 0)
         url = args.shift()

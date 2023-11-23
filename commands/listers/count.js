@@ -3,7 +3,6 @@ const { config } = require("systems/settings")
 const database = require("systems/database.js")
 const Lister = require("./lister.js")
 const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
 
 module.exports = {
     "name": "count",
@@ -47,8 +46,6 @@ class CountLister extends Lister {
             let result = ""
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
                 result += `${rows[i]["user_name"]} has posted ${rows[i]["count"]} messages! \n`
-
-            logger.console(result)
 
             const top = new discord.MessageEmbed()
                 .setColor(config.color_hex)

@@ -63,7 +63,6 @@ class hangman {
         this.sendEmbed(message)
     }
 
-
     guess(message, geussedContent) {
         if (this.hasEnded)
             return bot.message.send(message, "This hangman game has ended...")
