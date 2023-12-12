@@ -31,7 +31,7 @@ class EmotesLister extends Lister {
         database.query(selectSQL, [message.guild.id], (rows) => {
             let result = ""
             for (let i = 0; i < rows.length; i++)
-                result += `${rows[i]["message"]} said ${rows[i]["count"]} times! \n`
+                result += `${rows[i]["message"]} was used ${rows[i]["count"]} times! \n`
 
             const top = new discord.MessageEmbed()
                 .setColor(config.color_hex)
@@ -69,7 +69,8 @@ class EmotesLister extends Lister {
     perPerson(message, page) {
         const selectSQL = `SELECT user_id, MAX(user_name) as user_name, COUNT(*) as count
             FROM messages
-            WHERE message NOT LIKE '%<%' AND server_id = $1
+            WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
+            AND server_id = $1
             GROUP BY user_id
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC`
@@ -77,7 +78,7 @@ class EmotesLister extends Lister {
         database.query(selectSQL, [message.guild.id], (rows) => {
             let result = ""
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
-                result += `${rows[i]["user_name"]} has posted ${rows[i]["count"]} messages! \n`
+                result += `${rows[i]["user_name"]} has posted ${rows[i]["count"]} emotes! \n`
 
             const top = new discord.MessageEmbed()
                 .setColor(config.color_hex)

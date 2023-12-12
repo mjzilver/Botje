@@ -117,7 +117,7 @@ class hangman {
     }
 
     sendEmbed(message) {
-        const attachment = new discord.MessageAttachment(`${__dirname}/assets/hangman/${this.tries}.png`, "hangman.png")
+        const attachment = new discord.MessageAttachment(`${__dirname}/../assets/hangman/${this.tries}.png`, "hangman.png")
 
         let showVisibleWord = ""
         for (let i = 0; i < this.visibleWord.length; i++)

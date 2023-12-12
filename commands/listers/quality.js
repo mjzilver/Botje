@@ -20,75 +20,81 @@ class QualityLister extends Lister {
     }
 
     mention(message, mentioned) {
-        const selectSQL = `SELECT user_id, user_name, message 
-        FROM messages 
-        WHERE server_id = $1 AND user_id = $2 `
-
-        const userdata = {
-            "points": 0,
-            "total": 0,
-            "quality": 0
-        }
+        const selectSQL = `
+            SELECT 
+                user_id,
+                (
+                    SELECT user_name
+                    FROM messages m2
+                    WHERE m2.user_id = m.user_id
+                    ORDER BY id DESC
+                    LIMIT 1
+                ) AS user_name,
+                COUNT(*) AS total_messages,
+                COUNT(DISTINCT message) AS unique_messages,
+                (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
+            FROM 
+                messages m
+            WHERE
+                server_id = $1
+                AND user_id = $2
+            GROUP BY 
+                user_id
+            HAVING 
+                COUNT(*) > 1000
+            ORDER BY 
+                percentage_unique DESC, user_id;
+        `
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
-            for (let i = 0; i < rows.length; i++) {
-                userdata["points"] += this.calculateScore(rows[i]["message"])
-                userdata["total"] += rows[i]["message"].length
+            if (rows.length === 0) {
+                return bot.message.send(message, `${mentioned.username} does not have enough qualifying messages.`)
             }
 
-            userdata["quality"] = Math.round(((userdata["points"] / userdata["total"]) * 100) / 2)
+            const userData = rows[0]
+            const userQuality = parseFloat(userData["percentage_unique"]).toFixed(2)
 
-            bot.message.send(message, `${mentioned.username}'s post quality is ${userdata["quality"]}%`)
+            bot.message.send(message, `${mentioned.username}'s post quality is ${userQuality}%`)
         })
     }
 
     perPerson(message, page = 0) {
-        const selectSQL = `SELECT user_id, user_name, message
-        FROM messages 
-        WHERE server_id = $1
-        ORDER BY user_id`
-
-        const userdata = {}
+        const selectSQL = `SELECT 
+            user_id,
+            (
+                SELECT user_name
+                FROM messages m2
+                WHERE m2.user_id = m.user_id
+                ORDER BY id DESC
+                LIMIT 1
+            ) AS user_name,
+            COUNT(*) AS total_messages,
+            COUNT(DISTINCT message) AS unique_messages,
+            (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
+        FROM 
+            messages m
+        WHERE
+            server_id = $1
+        GROUP BY 
+            user_id
+        HAVING 
+            COUNT(*) > 1000
+        ORDER BY 
+            percentage_unique DESC, user_id;`
 
         database.query(selectSQL, [message.guild.id], (rows) => {
-            for (let i = 0; i < rows.length; i++) {
-                const userName = rows[i]["user_name"]
-
-                if (!userdata[userName]) {
-                    userdata[userName] = {
-                        "points": 0,
-                        "total": 0,
-                        "quality": 0
-                    }
-                }
-
-                userdata[userName]["points"] += this.calculateScore(rows[i]["message"])
-                userdata[userName]["total"] += rows[i]["message"].length
-            }
-
-            const sorted = []
-            for (const user in userdata) {
-                // magical calculation
-                userdata[user]["quality"] = Math.round(((userdata[user]["points"] / userdata[user]["total"]) * 100) / 2)
-                sorted.push([user, userdata[user]["quality"]])
-            }
-
-            sorted.sort(function(a, b) {
-                return b[1] - a[1]
-            })
-
-            if (page > Math.ceil(sorted.length / 10))
-                return bot.message.send(message, `Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)} not found`)
+            if (page > Math.ceil(rows.length / 10))
+                return bot.message.send(message, `Page ${(page + 1)} of ${Math.ceil(rows.length / 10)} not found`)
 
             let result = ""
-            for (let i = page * 10; i < sorted.length && i <= (page * 10) + 9; i++)
-                result += `${sorted[i][0]}'s post quality is ${sorted[i][1]}% \n`
+            for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
+                result += `${rows[i]["user_name"]}'s post quality is ${parseFloat(rows[i]["percentage_unique"]).toFixed(2)}% \n`
 
             const top = new discord.MessageEmbed()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 quality posters in ${message.guild.name}`)
                 .setDescription(result)
-                .setFooter(`Page ${(page + 1)} of ${Math.ceil(sorted.length / 10)}`)
+                .setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
             bot.message.send(message, {
                 embeds: [top]
