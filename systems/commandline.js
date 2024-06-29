@@ -2,7 +2,7 @@ const logger = require("systems/logger.js")
 
 class commandline {
     constructor() {
-        this.commands = require("commandholders/clcommands.js")
+        this.commands = require("systems/commandLoader.js").clcommands
         const readline = require("readline")
 
         this.rl = readline.createInterface({

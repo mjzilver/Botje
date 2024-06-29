@@ -5,7 +5,7 @@ const logger = require("systems/logger.js")
 module.exports = {
     "name": "saveemotes",
     "description": "saves all emotes to /backups/emotes/guildid",
-    "format": "saveemotes?",
+    "format": "saveemotes",
     "function": function saveemotes() {
         logger.console("Emotes are being saved")
         const path = "backups/emotes"

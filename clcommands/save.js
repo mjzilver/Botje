@@ -18,6 +18,8 @@ module.exports = {
                 catalog(channel, channel.lastMessageId, amount)
             else
                 logger.console("Channel not found")
+        } else {
+            logger.console("No channel id given")
         }
     }
 }

@@ -5,9 +5,9 @@ const LimitedList = require("systems/types/limitedlist.js")
 
 class Command {
     constructor() {
-        this.commands = require("commandholders/commands.js")
-        this.admincommands = require("commandholders/admincommands.js")
-        this.dmcommands = require("commandholders/dmcommands.js")
+        this.commands = require("systems/commandLoader.js").commands
+        this.admincommands = require("systems/commandLoader.js").admincommands
+        this.dmcommands = require("systems/commandLoader.js").dmcommands
 
         // person as key -> time as value
         this.lastRequest = []

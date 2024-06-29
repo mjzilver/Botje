@@ -12,7 +12,7 @@ module.exports = {
         Format: \`()\` = optional argument, \`[]\` = required argument\n`
         const args = message.content.split(" ")
 
-        const commands = require("commandholders/commands.js")
+        const commands = require("systems/commandLoader.js").commands
         const pageAmount = Math.ceil(Object.entries(commands).length / 10)
         let pageNum = args[1] ? args[1] : 1
 
