@@ -9,7 +9,7 @@ module.exports = {
     "format": "help",
     "function": function help(message) {
         let helpMessage = "**Here is a list of all the commands *you* can use in private message (use b!help in a server to see server commands):  \n**"
-        const commands = require("commandholders/dmcommands.js")
+        const commands = require("systems/commandLoader.js").dmcommands
 
         for (const [, command] of Object.entries(commands)) {
             helpMessage += `\`${command.format}\`: ${command.description} \n`

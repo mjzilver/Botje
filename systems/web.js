@@ -54,7 +54,7 @@ class WebServer {
 
             const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type === "GUILD_TEXT"))
             const guilds = Object.fromEntries(bot.client.guilds.cache)
-            const commands = (require("commandholders/commands.js"))
+            const commands = (require("systems/commandLoader.js").commands)
 
             database.query(selectSQL, [], async(rows) => {
                 rows.unshift({ "user_id": "542721460033028117", "user_name": "Botje" })
