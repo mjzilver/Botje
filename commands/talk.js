@@ -26,6 +26,8 @@ module.exports = {
                     if (!chain[prevWord]) {
                         chain[prevWord] = [word]
                     } else {
+                        if (!Array.isArray(chain[prevWord]))
+                            chain[prevWord] = []
                         chain[prevWord].push(word)
                     }
                     prevWord = word
