@@ -22,6 +22,7 @@ function loadCommands(dirPath, commandObject) {
 const baseDir = `${__dirname }/../`
 
 loadCommands(path.join(baseDir, "commands"), commands)
+loadCommands(path.join(baseDir, "commands/listers"), commands)
 loadCommands(path.join(baseDir, "admincommands"), admincommands)
 loadCommands(path.join(baseDir, "clcommands"), clcommands)
 loadCommands(path.join(baseDir, "dmcommands"), dmcommands)

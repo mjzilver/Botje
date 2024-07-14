@@ -3,7 +3,7 @@ const database = require("systems/database.js")
 const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 
-class Eventlistener {
+class eventListener {
     constructor() {
         bot.client.on("shardError", function(error) {
             logger.error(`Shard error: ${error.message}`)
@@ -60,4 +60,4 @@ class Eventlistener {
     }
 }
 
-module.exports = new Eventlistener()
+module.exports = new eventListener()

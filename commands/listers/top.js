@@ -18,6 +18,10 @@ class TopLister extends Lister {
         super()
     }
 
+    total(message) {
+        this.perPerson(message)
+    }
+
     perPerson(message) {
         const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
         FROM messages

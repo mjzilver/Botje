@@ -1,6 +1,4 @@
-const { config } = require("./settings")
 const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
 
 class Logic {
     constructor() { }
@@ -68,73 +66,5 @@ class Logic {
         return closestMatch
     }
 }
-
-String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1).toLocaleLowerCase()
-}
-
-String.prototype.isImage = function() {
-    return this.match(new RegExp(/(?:http(s?):)*\.(jpe?g|gif|png)$/i, "i"))
-}
-
-String.prototype.isLink = function() {
-    return this.match(new RegExp(/(http(s?):|www).*?/, "gi"))
-}
-
-String.prototype.normalizeSpaces = function() {
-    return this.replace(new RegExp(/(^ +| +$|  +)/gi, "gi"), " ")
-}
-
-String.prototype.textOnly = function() {
-    return this.replace(new RegExp(/[^a-zA-Z ]/gi, "gi"), "")
-}
-
-String.prototype.chatCharsOnly = function() {
-    return this.replace(new RegExp(/[^a-zA-Z .,!?]/gi, "gi"), "")
-}
-
-String.prototype.removeQuotes = function() {
-    return this.replace(new RegExp(/"/gi, "gi"), "")
-}
-
-String.prototype.removePrefix = function() {
-    return this.replace(new RegExp(config.prefix, "i"), "")
-}
-
-String.prototype.replaceFancyQuotes = function() {
-    let str = this.valueOf()
-    str = str.replace(new RegExp(/(“|”|„)/gi, "gi"), "\"")
-    return str.replace(new RegExp(/(`|‘|’)/gi, "gi"), "'")
-}
-
-String.prototype.replaceAt = function(index, replacement) {
-    return this.substring(0, index) + replacement + this.substring(index + replacement.length)
-}
-
-Object.defineProperty(Array.prototype, "pickRandom", {
-    enumerable: false,
-    value: function() { return this[bot.logic.randomBetween(0, this.length - 1)] }
-})
-
-process.on("exit", function() {
-    logger.info("=== Bot shutting down, goodbye ===")
-})
-
-process.on("SIGINT", function() {
-    logger.info("=== Bot forced to shut down, goodbye ===")
-})
-
-process.on("uncaughtException", function(error) {
-    if (bot.command.commandList.get())
-        bot.message.reply(bot.command.commandList.get(), "An error occured, this is probably your fault!")
-
-    logger.error(`Uncaught error "${error.message}"\n === STACK === \n"${error.stack}"`)
-})
-
-process.on("unhandledRejection", function(error) {
-    if (bot.command.commandList.get())
-        bot.message.reply(bot.command.commandList.get(), "An error occured, this is probably your fault, do not @me!")
-    logger.error(`Unhandled rejection "${error.message}"\n === STACK === \n"${error.stack}"`)
-})
 
 module.exports = new Logic()

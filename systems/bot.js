@@ -50,12 +50,15 @@ class Bot {
 
     loadSystems() {
         this.message = require("systems/message.js")
-        this.eventlistener = require("systems/eventlistener.js")
+        this.eventListener = require("systems/eventListener.js")
         this.command = require("systems/command.js")
         this.logic = require("systems/logic.js")
         this.backup = require("systems/backup.js")
         this.reply = require("systems/reply.js")
+        this.processHandler = require("systems/processHandler.js")
+        this.stringUtils = require("systems/stringUtils.js")
         this.dictionary = require("systems/dictionary.js")
+
         this.disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
     }
 }

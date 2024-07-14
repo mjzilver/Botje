@@ -21,7 +21,7 @@ class Lister {
         } else if (args[1] === "%") {
             this.percentage(message, page)
         } else {
-            bot.message.reply(message, "Incorrect format")
+            bot.message.reply(message, "Incorrect format try ? % or mentioning an user")
         }
     }
 

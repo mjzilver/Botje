@@ -1,5 +1,6 @@
 const logger = require("systems/logger.js")
 const database = require("systems/database.js")
+const formatter = new Intl.NumberFormat("de-DE")
 
 module.exports = {
     name: "report",
@@ -17,7 +18,7 @@ module.exports = {
 
             database.query(sql, null, (rows) => {
                 logger.debug(`Database size: ${rows[0]["size"]}`)
-                logger.debug(`Message count: ${rows[0]["count"]}`)
+                logger.debug(`Message count: ${formatter.format(rows[0]["count"])}`)
             })
         } catch (error) {
             logger.debug(`Error: ${error.message}`)

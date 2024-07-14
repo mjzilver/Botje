@@ -16,10 +16,10 @@ beforeAll(() => {
 })
 
 describe("bot", () => {
-    test("should be fully loaded - and eventlistener and message systems are to be disabled", (done) => {
+    test("should be fully loaded - and eventListener and message systems are to be disabled", (done) => {
         bot.client.on("ready", () => {
             expect(bot).toBeDefined()
-            expect(bot.eventlistener).toBeUndefined()
+            expect(bot.eventListener).toBeUndefined()
             expect(bot.message).toBeUndefined()
             done()
         })
