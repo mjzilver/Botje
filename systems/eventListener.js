@@ -16,10 +16,10 @@ class eventListener {
         bot.client.on("messageCreate", message => {
             if (!(message.author.id in bot.disallowed)) {
                 if (message.channel.type === "DM") {
-                    bot.command.handleDM(message)
+                    bot.commandHandler.handleDM(message)
                 } else {
                     database.storeMessage(message)
-                    bot.command.handleCommand(message)
+                    bot.commandHandler.handleCommand(message)
                 }
             }
         })
@@ -37,7 +37,7 @@ class eventListener {
                     }
                     break
                 case config.redo_emoji:
-                    bot.command.redo(reaction.message)
+                    bot.commandHandler.redo(reaction.message)
                     break
                 default:
                     break

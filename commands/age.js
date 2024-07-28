@@ -17,3 +17,4 @@ module.exports = {
         bot.message.reply(message, `I have been in this server for ${years ? `${years} years, ` : ""}${days} days and ${hours} hours. My birthday is ${birthday}`)
     }
 }
+

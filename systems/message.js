@@ -55,7 +55,7 @@ class Message {
         const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, null, call.createdAt.getTime()])
-        bot.command.commandList.remove(call)
+        bot.commandHandler.commandList.remove(call)
     }
 
     addCommandCall(call, reply) {
@@ -64,7 +64,7 @@ class Message {
         const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, reply.id, reply.createdAt.getTime()])
-        bot.command.commandList.remove(call)
+        bot.commandHandler.commandList.remove(call)
     }
 
     getCommandCalls() {
@@ -95,8 +95,8 @@ class Message {
                             database.storeMessage(message)
                             if (message.content.match(new RegExp(config.prefix, "i"))) {
                                 if (!(message.id in this.commandCalls)) {
-                                    if (!bot.command.isUserBanned(message)) {
-                                        bot.command.handleCommand(message, true)
+                                    if (!bot.commandHandler.isUserBanned(message)) {
+                                        bot.commandHandler.handleCommand(message, true)
                                     }
                                 }
                             }

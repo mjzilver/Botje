@@ -34,7 +34,7 @@ class Bot {
             this.loadSystems()
             this.client.user.setPresence({
                 activities: [{
-                    name: `Running Version ${projectPackage.version}`
+                    name: `Version ${projectPackage.version}`
                 }]
             })
             logger.startup(`Logged in as: ${this.client.user.username} - ${projectPackage.version} - ${this.client.user.id}`)
@@ -51,15 +51,16 @@ class Bot {
     loadSystems() {
         this.message = require("systems/message.js")
         this.eventListener = require("systems/eventListener.js")
-        this.command = require("systems/command.js")
         this.logic = require("systems/logic.js")
         this.backup = require("systems/backup.js")
         this.reply = require("systems/reply.js")
         this.processHandler = require("systems/processHandler.js")
-        this.stringUtils = require("systems/stringUtils.js")
         this.dictionary = require("systems/dictionary.js")
-
         this.disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
+        this.commandHandler = require("./commandHandler")
+
+        this.database = require("systems/database.js")
+        this.logger = logger
     }
 }
 module.exports = new Bot()

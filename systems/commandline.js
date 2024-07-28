@@ -1,6 +1,6 @@
 const logger = require("systems/logger.js")
 
-class commandline {
+class commandLine {
     constructor() {
         this.commands = require("systems/commandLoader.js").clcommands
         const readline = require("readline")
@@ -23,4 +23,4 @@ class commandline {
     }
 }
 
-module.exports = new commandline()
+module.exports = new commandLine()

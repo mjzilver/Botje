@@ -91,7 +91,8 @@ views/images/image.png
 # dont include the meme and the meme_templates
 assets/meme.png
 assets/meme_templates/*
+assets/combined.png
+
+# dont include the package-lock.json
 package-lock.json
 
-scripts/
-assets/combined.png

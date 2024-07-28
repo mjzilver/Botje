@@ -3,7 +3,7 @@ const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 const LimitedList = require("systems/types/limitedlist.js")
 
-class Command {
+class CommandHandler {
     constructor() {
         this.commands = require("systems/commandLoader.js").commands
         this.admincommands = require("systems/commandLoader.js").admincommands
@@ -136,4 +136,4 @@ class Command {
     }
 }
 
-module.exports = new Command()
+module.exports = new CommandHandler()

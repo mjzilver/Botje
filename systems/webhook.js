@@ -26,7 +26,7 @@ class Webhook {
                 (member) => {
                     webhook.send({
                         content: text,
-                        username: member.user.nickname ? member.user.nickname : member.user.username,
+                        username: member.user.displayName ? member.user.displayName : member.user.username,
                         avatarURL: member.user.displayAvatarURL()
                     })
                 })

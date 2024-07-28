@@ -1,4 +1,5 @@
 const { config } = require("./settings")
+const bot = require("systems/bot.js")
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1).toLocaleLowerCase()
@@ -40,3 +41,8 @@ String.prototype.replaceFancyQuotes = function() {
 String.prototype.replaceAt = function(index, replacement) {
     return this.substring(0, index) + replacement + this.substring(index + replacement.length)
 }
+
+Object.defineProperty(Array.prototype, "pickRandom", {
+    enumerable: false,
+    value: function() { return this[bot.logic.randomBetween(0, this.length - 1)] }
+})
