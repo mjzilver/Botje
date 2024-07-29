@@ -2,7 +2,7 @@ const fs = require("fs")
 const database = require("systems/database.js")
 const logger = require("systems/logger.js")
 
-class Dictionary {
+module.exports = class Dictionary {
     constructor() {
         this.words = []
         this.wordsPath = "json/words.json"
@@ -91,5 +91,3 @@ class Dictionary {
         return new RegExp(`\\b((${nonSelectorsRegex})\\s)\\b`, "gmi")
     }
 }
-
-module.exports = new Dictionary()
