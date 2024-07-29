@@ -40,7 +40,7 @@ class ScoreLister extends Lister {
             userdata["quality"] = ((userdata["points"] / userdata["total"]) / 2)
             userdata["score"] = Math.round(userdata["total"] * userdata["quality"])
 
-            bot.message.send(message, `${mentioned.username}'s post score is ${userdata["score"]}`)
+            bot.messageHandler.send(message, `${mentioned.username}'s post score is ${userdata["score"]}`)
         })
     }
 
@@ -90,7 +90,7 @@ class ScoreLister extends Lister {
                 .setTitle(`Top 10 posters in ${message.guild.name}`)
                 .setDescription(result)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })

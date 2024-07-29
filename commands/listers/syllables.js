@@ -39,7 +39,7 @@ class syllableLister extends Lister {
             }
 
             userdata["average"] = Math.round(userdata["syllables"] / userdata["total"])
-            bot.message.send(message, `${mentioned.username} has an average of ${userdata["average"]} syllables per post`)
+            bot.messageHandler.send(message, `${mentioned.username} has an average of ${userdata["average"]} syllables per post`)
         })
     }
 
@@ -87,7 +87,7 @@ class syllableLister extends Lister {
                 .setTitle(`Top 10 most intellectual posters in ${message.guild.name}`)
                 .setDescription(result)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })

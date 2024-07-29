@@ -17,15 +17,15 @@ module.exports = {
                 result += `${files[i]}, `
             }
 
-            bot.message.reply(message, `Emotes backed up for this server: ${result}`)
+            bot.messageHandler.reply(message, `Emotes backed up for this server: ${result}`)
         } else if (args[0]) {
             const filename = `${args[0]}.png`
 
             if (fs.existsSync(path + filename)) {
-                bot.message.reply(message, { files: [path + filename] })
+                bot.messageHandler.reply(message, { files: [path + filename] })
             } else {
                 const closestFilename = bot.logic.findClosestMatchInList(filename, files)
-                bot.message.reply(message, { files: [path + closestFilename] })
+                bot.messageHandler.reply(message, { files: [path + closestFilename] })
             }
         }
     }

@@ -42,7 +42,7 @@ class TopLister extends Lister {
                 .setTitle(`Top 10 must used sentences in ${message.guild.name}`)
                 .setDescription(result)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })
@@ -69,7 +69,7 @@ class TopLister extends Lister {
                 .setTitle(`Top 10 must used sentences in ${message.guild.name} by ${mentioned.username}`)
                 .setDescription(result)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })

@@ -21,24 +21,24 @@ class Lister {
         } else if (args[1] === "%") {
             this.percentage(message, page)
         } else {
-            bot.message.reply(message, "Incorrect format try ? % or mentioning an user")
+            bot.messageHandler.reply(message, "Incorrect format try ? % or mentioning an user")
         }
     }
 
     total(message) {
-        bot.message.reply(message, "This command does not work without further commands")
+        bot.messageHandler.reply(message, "This command does not work without further commands")
     }
 
     mention(message) {
-        bot.message.reply(message, "This command does not work with @")
+        bot.messageHandler.reply(message, "This command does not work with @")
     }
 
     perPerson(message) {
-        bot.message.reply(message, "This command does not work with ?")
+        bot.messageHandler.reply(message, "This command does not work with ?")
     }
 
     percentage(message) {
-        bot.message.reply(message, "This command does not work with %")
+        bot.messageHandler.reply(message, "This command does not work with %")
     }
 }
 

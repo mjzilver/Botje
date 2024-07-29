@@ -1,10 +1,9 @@
 const { config } = require("./settings")
 const database = require("systems/database.js")
-const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 
-class eventListener {
-    constructor() {
+module.exports = class eventListener {
+    constructor(bot) {
         bot.client.on("shardError", function(error) {
             logger.error(`Shard error: ${error.message}`)
         })
@@ -59,5 +58,3 @@ class eventListener {
         })
     }
 }
-
-module.exports = new eventListener()

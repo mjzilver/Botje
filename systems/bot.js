@@ -3,6 +3,8 @@ const projectPackage = require("package.json")
 const { config } = require("./settings")
 const logger = require("systems/logger.js")
 const fs = require("fs")
+const MessageHandler = require("systems/messageHandler.js")
+const EventListener = require("systems/eventListener.js")
 
 class Bot {
     constructor() {
@@ -49,8 +51,9 @@ class Bot {
     }
 
     loadSystems() {
-        this.message = require("systems/message.js")
-        this.eventListener = require("systems/eventListener.js")
+        this.messageHandler = new MessageHandler(this)
+        this.eventListener = new EventListener(this)
+
         this.logic = require("systems/logic.js")
         this.backup = require("systems/backup.js")
         this.reply = require("systems/reply.js")

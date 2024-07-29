@@ -9,12 +9,12 @@ module.exports = async function nuke(message) {
 
         message.channel.awaitMessages({ filter, max: 1, time: 60000 })
             .then(() => {
-                bot.message.send(message, "Nuke launched. Blowout soon, fellow stalker.")
+                bot.messageHandler.send(message, "Nuke launched. Blowout soon, fellow stalker.")
                 nukeguild(message)
             })
-        bot.message.send(message, "Nuke armed to confirm launch type 'launch' to launch the nuke, this cannot be cancelled.")
+        bot.messageHandler.send(message, "Nuke armed to confirm launch type 'launch' to launch the nuke, this cannot be cancelled.")
     } else {
-        bot.message.send(message, "Only the server owner may send the nuke.")
+        bot.messageHandler.send(message, "Only the server owner may send the nuke.")
     }
 }
 

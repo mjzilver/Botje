@@ -57,7 +57,7 @@ async function processCombination(image1, image2, message) {
             combined.composite(image, 0, 0)
             combined.composite(image2, 0, 64)
             combined.write(outputPath, () => {
-                bot.message.reply(message, { files: [outputPath] })
+                bot.messageHandler.reply(message, { files: [outputPath] })
             })
         })
     })

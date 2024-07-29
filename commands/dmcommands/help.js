@@ -21,6 +21,6 @@ module.exports = {
             .setDescription(helpMessage)
             .setFooter(`Current Version: ${projectPackage.version}`)
 
-        return bot.message.send(message, { embeds: [help] })
+        return bot.messageHandler.send(message, { embeds: [help] })
     }
 }

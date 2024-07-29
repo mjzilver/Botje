@@ -50,7 +50,7 @@ module.exports = {
                     }
                 }
 
-                bot.message.send(message, sentence.capitalize())
+                bot.messageHandler.send(message, sentence.capitalize())
             }
         })
     }

@@ -1,10 +1,11 @@
 const { config } = require("./settings")
 const database = require("systems/database.js")
-const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 
-class Message {
-    constructor() {
+module.exports = class MessagerHandler {
+    constructor(bot) {
+        this.bot = bot
+
         this.commandCalls = {}
         this.getCommandCalls()
     }
@@ -55,7 +56,7 @@ class Message {
         const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, null, call.createdAt.getTime()])
-        bot.commandHandler.commandList.remove(call)
+        this.bot.commandHandler.commandList.remove(call)
     }
 
     addCommandCall(call, reply) {
@@ -64,7 +65,7 @@ class Message {
         const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, reply.id, reply.createdAt.getTime()])
-        bot.commandHandler.commandList.remove(call)
+        this.bot.commandHandler.commandList.remove(call)
     }
 
     getCommandCalls() {
@@ -85,7 +86,7 @@ class Message {
         logger.startup("Reading messages since startup")
         const yesterday = Date.now() - 24 * 60 * 60 * 1000
 
-        bot.client.channels.cache
+        this.bot.client.channels.cache
             .filter(channel => channel.type === "GUILD_TEXT" && channel.viewable)
             .forEach(channel => {
                 channel.messages.fetch({ limit: 100 }).then(messages => {
@@ -95,8 +96,8 @@ class Message {
                             database.storeMessage(message)
                             if (message.content.match(new RegExp(config.prefix, "i"))) {
                                 if (!(message.id in this.commandCalls)) {
-                                    if (!bot.commandHandler.isUserBanned(message)) {
-                                        bot.commandHandler.handleCommand(message, true)
+                                    if (!this.bot.commandHandler.isUserBanned(message)) {
+                                        this.bot.commandHandler.handleCommand(message, true)
                                     }
                                 }
                             }
@@ -105,5 +106,3 @@ class Message {
             })
     }
 }
-
-module.exports = new Message()

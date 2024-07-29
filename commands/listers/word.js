@@ -31,7 +31,7 @@ class WordLister extends Lister {
         } else if (args[1]) {
             this.total(message, args[1].removeQuotes())
         } else {
-            bot.message.send(message, `I have no idea what you want, format is as follows: '${module.exports.format}'`)
+            bot.messageHandler.send(message, `I have no idea what you want, format is as follows: '${module.exports.format}'`)
         }
     }
 
@@ -50,14 +50,14 @@ class WordLister extends Lister {
                 result += `${rows[i]["user_name"]} has said ${word} ${rows[i]["count"]} times! \n`
 
             if (result === "")
-                return bot.message.send(message, `Nothing found for ${word} in ${message.guild.name} `)
+                return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name} `)
 
             const top = new discord.MessageEmbed()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 users for the word ${word} in ${message.guild.name} `)
                 .setDescription(result)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })
@@ -69,7 +69,7 @@ class WordLister extends Lister {
         WHERE message LIKE $1 AND server_id = $2 `
 
         database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
-            bot.message.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
+            bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
         })
     }
 
@@ -80,7 +80,7 @@ class WordLister extends Lister {
         AND server_id = $2 AND user_id = $3 `
 
         database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id], (rows) => {
-            bot.message.send(message, `Ive found ${rows[0]["count"]} messages from ${mentioned.username} in this server that contain ${word}`)
+            bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages from ${mentioned.username} in this server that contain ${word}`)
         })
     }
 
@@ -111,14 +111,14 @@ class WordLister extends Lister {
                 result += `${resultArray[i]["user_name"]} has said ${word} in ${resultArray[i]["percentage"]}% of their messages! \n`
 
             if (result === "")
-                return bot.message.send(message, `Nothing found for ${word} in ${message.guild.name} `)
+                return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name} `)
 
             const top = new discord.MessageEmbed()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 users for the word ${word} in ${message.guild.name} `)
                 .setDescription(result)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })

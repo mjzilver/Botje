@@ -22,7 +22,7 @@ class CountLister extends Lister {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1"
 
         database.query(selectSQL, [message.guild.id], (rows) => {
-            bot.message.send(message, `Ive found ${rows[0]["count"]} messages in ${message.guild.name}`)
+            bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in ${message.guild.name}`)
         })
     }
 
@@ -30,7 +30,7 @@ class CountLister extends Lister {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1 AND user_id = $2"
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
-            bot.message.send(message, `Ive found ${rows[0]["count"]} messages by ${mentioned.username} in this server`)
+            bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages by ${mentioned.username} in this server`)
         })
     }
 
@@ -53,7 +53,7 @@ class CountLister extends Lister {
                 .setDescription(result)
                 .setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })
@@ -80,7 +80,7 @@ class CountLister extends Lister {
                 .setDescription(result)
                 .setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })

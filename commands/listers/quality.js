@@ -48,13 +48,13 @@ class QualityLister extends Lister {
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
             if (rows.length === 0) {
-                return bot.message.send(message, `${mentioned.username} does not have enough qualifying messages.`)
+                return bot.messageHandler.send(message, `${mentioned.username} does not have enough qualifying messages.`)
             }
 
             const userData = rows[0]
             const userQuality = parseFloat(userData["percentage_unique"]).toFixed(2)
 
-            bot.message.send(message, `${mentioned.username}'s post quality is ${userQuality}%`)
+            bot.messageHandler.send(message, `${mentioned.username}'s post quality is ${userQuality}%`)
         })
     }
 
@@ -84,7 +84,7 @@ class QualityLister extends Lister {
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             if (page > Math.ceil(rows.length / 10))
-                return bot.message.send(message, `Page ${(page + 1)} of ${Math.ceil(rows.length / 10)} not found`)
+                return bot.messageHandler.send(message, `Page ${(page + 1)} of ${Math.ceil(rows.length / 10)} not found`)
 
             let result = ""
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
@@ -96,7 +96,7 @@ class QualityLister extends Lister {
                 .setDescription(result)
                 .setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })

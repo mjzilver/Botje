@@ -30,7 +30,7 @@ module.exports = {
                     })
 
             image.writeImage("views/images/image.png", function() {
-                bot.message.reply(message, "Current image", {
+                bot.messageHandler.reply(message, "Current image", {
                     files: ["views/images/image.png"]
                 })
             })

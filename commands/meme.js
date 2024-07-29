@@ -46,7 +46,7 @@ module.exports = {
 
                     return processPicture(url ?? null, top, bottom, message)
                 }
-                bot.message.reply(message, "Can't find anything related, but this is your fault")
+                bot.messageHandler.reply(message, "Can't find anything related, but this is your fault")
             })
         } else if (top) {
             if (url.match(/\.(jpeg|jpg|gif|png)/gi))
@@ -81,7 +81,7 @@ async function processPicture(url, top, bottom, message) {
                 alignmentY: Jimp.VERTICAL_ALIGN_BOTTOM
             }, image.bitmap.width, image.bitmap.height * 0.1)
             image.write("assets/meme.png", () => {
-                bot.message.reply(message, {
+                bot.messageHandler.reply(message, {
                     files: ["assets/meme.png"]
                 })
             })

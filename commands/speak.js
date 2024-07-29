@@ -73,7 +73,7 @@ function findByWord(message) {
 
                     chosenMessage = chosenMessage.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), "")
                     logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
-                    bot.message.send(message, chosenMessage)
+                    bot.messageHandler.send(message, chosenMessage)
                 }
             })
         } else {
@@ -88,7 +88,7 @@ function findByWord(message) {
             database.query(selectSQL, [], (rows) => {
                 if (rows) {
                     logger.debug(`Sending message with '${words[0]}' in it`)
-                    bot.message.send(message, rows[0]["message"].normalizeSpaces())
+                    bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
                 }
             })
         }
@@ -112,7 +112,7 @@ function findRandom(message) {
 
     database.query(selectSQL, [], (rows) => {
         if (rows)
-            bot.message.send(message, rows[0]["message"].normalizeSpaces())
+            bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
     })
 }
 
@@ -147,10 +147,10 @@ function findTopic(message, topic) {
         const picker = bot.logic.randomBetween(0, 2)
 
         if (picker === 0)
-            bot.message.reply(message, `${first}`.normalizeSpaces())
+            bot.messageHandler.reply(message, `${first}`.normalizeSpaces())
         else if (picker === 1)
-            bot.message.reply(message, `${first} ${linkerwords.pickRandom()} ${second}`.normalizeSpaces())
+            bot.messageHandler.reply(message, `${first} ${linkerwords.pickRandom()} ${second}`.normalizeSpaces())
         else
-            bot.message.reply(message, `${first}, ${second} ${linkerwords.pickRandom()} ${third}`.normalizeSpaces())
+            bot.messageHandler.reply(message, `${first}, ${second} ${linkerwords.pickRandom()} ${third}`.normalizeSpaces())
     })
 }

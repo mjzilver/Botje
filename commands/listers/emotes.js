@@ -38,7 +38,7 @@ class EmotesLister extends Lister {
                 .setTitle(`Top 10 most used emotes in ${message.guild.name}`)
                 .setDescription(result)
 
-            bot.message.send(message, { embeds: [top] })
+            bot.messageHandler.send(message, { embeds: [top] })
         })
     }
 
@@ -62,7 +62,7 @@ class EmotesLister extends Lister {
                 .setTitle(`Top 10 most used emotes in ${message.guild.name} used by ${mentioned.username}`)
                 .setDescription(result)
 
-            bot.message.send(message, { embeds: [top] })
+            bot.messageHandler.send(message, { embeds: [top] })
         })
     }
 
@@ -86,13 +86,13 @@ class EmotesLister extends Lister {
                 .setDescription(result)
                 .setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
 
-            bot.message.send(message, {
+            bot.messageHandler.send(message, {
                 embeds: [top]
             })
         })
     }
 
     percentage(message) {
-        bot.message.reply(message, "This command does not work with %")
+        bot.messageHandler.reply(message, "This command does not work with %")
     }
 }

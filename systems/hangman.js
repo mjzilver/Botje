@@ -34,7 +34,7 @@ class hangman {
 
     start(message) {
         if (!this.hasEnded)
-            return bot.message.send(message, "A game of hangman is still ongoing")
+            return bot.messageHandler.send(message, "A game of hangman is still ongoing")
 
         this.word = ""
         this.visibleWord = ""
@@ -56,7 +56,7 @@ class hangman {
         for (let i = 0; i < this.word.length; i++)
             this.visibleWord += "―"
 
-        bot.message.send(message, "Starting new hangman game.")
+        bot.messageHandler.send(message, "Starting new hangman game.")
         logger.debug(`Starting new hangman game the word is ${this.word}`)
 
         this.hasEnded = false
@@ -65,20 +65,20 @@ class hangman {
 
     guess(message, geussedContent) {
         if (this.hasEnded)
-            return bot.message.send(message, "This hangman game has ended...")
+            return bot.messageHandler.send(message, "This hangman game has ended...")
 
         if (geussedContent) {
             if (geussedContent.length > 1) {
                 if (geussedContent === this.word) {
-                    bot.message.send(message, `You guessed the word ${this.word} after ${this.tries} tries -- You have won!`)
+                    bot.messageHandler.send(message, `You guessed the word ${this.word} after ${this.tries} tries -- You have won!`)
                     this.hasEnded = true
                 } else {
-                    bot.message.send(message, `Wrong! The word is not ${geussedContent}`)
+                    bot.messageHandler.send(message, `Wrong! The word is not ${geussedContent}`)
                     this.tries++
                 }
             } else {
                 if (this.alreadyGuessed.includes(geussedContent)) {
-                    bot.message.send(message, `${geussedContent} has already been guessed.`)
+                    bot.messageHandler.send(message, `${geussedContent} has already been guessed.`)
                 } else {
                     if (this.word.includes(geussedContent)) {
                         for (let i = 0; i < this.word.length; i++) {
@@ -87,7 +87,7 @@ class hangman {
                             }
                         }
                     } else {
-                        bot.message.send(message, `The word does not contain ${geussedContent}!`)
+                        bot.messageHandler.send(message, `The word does not contain ${geussedContent}!`)
                         this.alreadyGuessed.push(geussedContent)
                         this.tries++
                     }
@@ -95,16 +95,16 @@ class hangman {
             }
 
             if (this.tries === this.maxTries) {
-                bot.message.send(message, `Oh no! You have been hanged! The word was ${this.word}`)
+                bot.messageHandler.send(message, `Oh no! You have been hanged! The word was ${this.word}`)
                 this.hasEnded = true
             } else if (this.visibleWord === this.word) {
-                bot.message.send(message, "You've won by guessing all the letters!")
+                bot.messageHandler.send(message, "You've won by guessing all the letters!")
                 this.hasEnded = true
             }
 
             this.sendEmbed(message)
         } else {
-            bot.message.send(message, "Not a valid guess!")
+            bot.messageHandler.send(message, "Not a valid guess!")
         }
     }
 
@@ -141,7 +141,7 @@ class hangman {
         else
             hangmanEmbed.setFooter("Use b!hangman guess to guess")
 
-        bot.message.send(message, {
+        bot.messageHandler.send(message, {
             files: [attachment],
             embeds: [hangmanEmbed]
         })

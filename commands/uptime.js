@@ -12,6 +12,6 @@ module.exports = {
         const minutes = Math.floor((diff / 60000) % 60)
         const seconds = Math.floor((diff / 1000) % 60)
 
-        bot.message.send(message, `I have been online for ${days ? `${days} days, ` : ""}${hours ? `${hours} hours, ` : ""}${minutes} minutes and ${seconds} seconds`)
+        bot.messageHandler.send(message, `I have been online for ${days ? `${days} days, ` : ""}${hours ? `${hours} hours, ` : ""}${minutes} minutes and ${seconds} seconds`)
     }
 }

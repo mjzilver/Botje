@@ -15,7 +15,7 @@ class Command {
         this.aliases = []
 
         this.function = (message) => {
-            bot.message.send(message, "No function provided")
+            bot.messageHandler.send(message, "No function provided")
         }
 
         this.bot = bot

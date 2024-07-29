@@ -21,10 +21,10 @@ module.exports = {
             if (err) {
                 logger.error(err)
             } else if (!body.items[0]) {
-                bot.message.reply(message, `Nothing found for "${keyword}"`)
+                bot.messageHandler.reply(message, `Nothing found for "${keyword}"`)
             } else {
                 const video = body.items[0]
-                bot.message.reply(message, `https://www.youtube.com/watch?v=${video.id.videoId}`)
+                bot.messageHandler.reply(message, `https://www.youtube.com/watch?v=${video.id.videoId}`)
             }
         })
     }

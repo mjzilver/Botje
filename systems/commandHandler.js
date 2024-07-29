@@ -46,9 +46,9 @@ class CommandHandler {
         } else if (command in this.admincommands) {
             this.handleAdminCommand(command, message)
         } else if (!readback) {
-            bot.message.reply(message, `${command.capitalize()} is not a command, please try again.`)
+            bot.messageHandler.reply(message, `${command.capitalize()} is not a command, please try again.`)
         } else {
-            bot.message.markComplete(message)
+            bot.messageHandler.markComplete(message)
         }
     }
 
@@ -56,7 +56,7 @@ class CommandHandler {
         if (message.author.id === config.owner || message.member.permissions.has("ADMINISTRATOR")) {
             this.admincommands[command](message)
         } else {
-            bot.message.reply(message, `${command.capitalize()} is an admin command, and you are not allowed to use it.`)
+            bot.messageHandler.reply(message, `${command.capitalize()} is an admin command, and you are not allowed to use it.`)
         }
     }
 
@@ -80,7 +80,7 @@ class CommandHandler {
     }
 
     redo(message) {
-        message.channel.messages.fetch(bot.message.findFromReply(message))
+        message.channel.messages.fetch(bot.messageHandler.findFromReply(message))
             .then(callMessage => {
                 const args = callMessage.content.removePrefix().normalizeSpaces().split(" ")
                 const command = args.shift().toLowerCase()
@@ -115,7 +115,7 @@ class CommandHandler {
         if (elapsedTime < config.timeoutDuration * 1000) {
             const remainingTime = Math.ceil((config.timeoutDuration * 1000 - elapsedTime) / 1000)
             if (canSendMessage) {
-                bot.message.send(message, `Please wait ${remainingTime} second${remainingTime > 1 ? "s" : ""} before making another request.`)
+                bot.messageHandler.send(message, `Please wait ${remainingTime} second${remainingTime > 1 ? "s" : ""} before making another request.`)
             }
             return false // too soon, return false
         }
@@ -131,7 +131,7 @@ class CommandHandler {
             if (command in this.dmcommands)
                 this.dmcommands[command].function(message)
             else if (message.content.match(new RegExp(config.prefix, "i")))
-                bot.message.reply(message, "Use the command b!help for more information")
+                bot.messageHandler.reply(message, "Use the command b!help for more information")
         }
     }
 }

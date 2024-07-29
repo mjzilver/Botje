@@ -46,7 +46,7 @@ async function getRedditImage(message, last = "") {
         if (typeof (body) !== "undefined" && typeof (body.data) !== "undefined" && typeof (body.data.children) !== "undefined") {
             handleRedditImages(message, sub, body.data.children)
         } else
-            bot.message.send(message, "No images were found")
+            bot.messageHandler.send(message, "No images were found")
     })
 }
 
@@ -81,7 +81,7 @@ function handleRedditImages(message, sub, children) {
                 logger.debug(`Finding posts before post ${ children[children.length - 1].data.title}`)
                 getRedditImage(message, children[children.length - 1].data.name)
             } else
-                bot.message.send(message, "I have ran out of images to show you")
+                bot.messageHandler.send(message, "I have ran out of images to show you")
         }
     })
 }
@@ -96,11 +96,11 @@ function embedImage(message, post, sub) {
             .setImage(`${post.url}`)
             .setURL(`https://reddit.com${post.permalink}`)
             .setFooter(`From: reddit/r/${sub}`)
-        bot.message.send(message, { embeds: [image] })
+        bot.messageHandler.send(message, { embeds: [image] })
     } else if (post.url.match(/v\.redd\.it/gi)) {
         handleRedirect(message, post)
     } else if (post.url) {
-        bot.message.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
+        bot.messageHandler.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`)
     }
 }
 
@@ -148,7 +148,7 @@ function handleRedirect(message, post) {
 
         request(options, (err, res, body) => {
             const videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
-            bot.message.send(message, `${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
+            bot.messageHandler.send(message, `${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
         })
     })
 }

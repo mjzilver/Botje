@@ -14,7 +14,7 @@ module.exports = {
         const hours = Math.floor((diff / 3600000) % 24)
         const birthday = `${joined.getDate()} of ${joined.toLocaleString("default", { month: "long" })}`
 
-        bot.message.reply(message, `I have been in this server for ${years ? `${years} years, ` : ""}${days} days and ${hours} hours. My birthday is ${birthday}`)
+        bot.messageHandler.reply(message, `I have been in this server for ${years ? `${years} years, ` : ""}${days} days and ${hours} hours. My birthday is ${birthday}`)
     }
 }
 
