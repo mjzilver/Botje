@@ -1,6 +1,4 @@
-const bot = require("systems/bot.js")
-
-class Logic {
+module.exports =  class Logic {
     constructor() { }
 
     levenshtein(a, b) {
@@ -50,7 +48,7 @@ class Logic {
         let chosenAmount = 0
 
         for (const [wordlistword, wordlistamount] of Object.entries(wordList)) {
-            const currentdifference = bot.logic.levenshtein(word, wordlistword)
+            const currentdifference = this.levenshtein(word, wordlistword)
             if (currentdifference < difference) {
                 difference = currentdifference
                 closestMatch = wordlistword
@@ -66,5 +64,3 @@ class Logic {
         return closestMatch
     }
 }
-
-module.exports = new Logic()

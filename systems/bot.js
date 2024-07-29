@@ -5,6 +5,10 @@ const logger = require("systems/logger.js")
 const fs = require("fs")
 const MessageHandler = require("systems/messageHandler.js")
 const EventListener = require("systems/eventListener.js")
+const Logic = require("systems/logic.js")
+const BackupHandler = require("./backupHandler")
+const ReplyHandler = require("./reply")
+const CommandHandler = require("./commandHandler")
 
 class Bot {
     constructor() {
@@ -53,14 +57,14 @@ class Bot {
     loadSystems() {
         this.messageHandler = new MessageHandler(this)
         this.eventListener = new EventListener(this)
+        this.logic = new Logic()
+        this.backup = new BackupHandler()
+        this.replyHandler = new ReplyHandler(this)
+        this.commandHandler = new CommandHandler(this)
 
-        this.logic = require("systems/logic.js")
-        this.backup = require("systems/backup.js")
-        this.reply = require("systems/reply.js")
         this.processHandler = require("systems/processHandler.js")
         this.dictionary = require("systems/dictionary.js")
         this.disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
-        this.commandHandler = require("./commandHandler")
 
         this.database = require("systems/database.js")
         this.logger = logger

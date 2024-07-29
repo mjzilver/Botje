@@ -2,7 +2,7 @@ const fs = require("fs")
 const request = require("request")
 const logger = require("systems/logger.js")
 
-class Backup {
+module.exports = class BackupHandler {
     constructor() { }
 
     saveEmoji(emoji, filename = "") {
@@ -19,5 +19,3 @@ class Backup {
         }
     }
 }
-
-module.exports = new Backup()

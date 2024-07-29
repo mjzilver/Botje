@@ -1,9 +1,10 @@
-const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 
-class Reply {
-    constructor() {
+module.exports =  class ReplyHandler {
+    constructor(bot) {
         this.replyPatterns = require("json/reply.json")
+
+        this.bot = bot
 
         // replyPattern name as key -> time as value
         this.lastRequest = []
@@ -15,9 +16,9 @@ class Reply {
             if (message.content.match(new RegExp(reply["regex"], "gi")) && this.checkTime(reply)) {
                 logger.debug(`Replying to message '${message.content}' that matched ReplyPattern '${reply["name"]}'`)
                 if (reply["reply"])
-                    bot.messageHandler.reply(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ""))
+                    this.bot.messageHandler.reply(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ""))
                 else
-                    bot.messageHandler.send(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ""))
+                    this.bot.messageHandler.send(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ""))
 
                 match = true
             }
@@ -39,5 +40,3 @@ class Reply {
         return true
     }
 }
-
-module.exports = new Reply()
