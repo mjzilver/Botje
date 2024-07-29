@@ -66,7 +66,7 @@ module.exports = class CommandHandler {
             const currentTimestamp = new Date()
             const timePassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes()
 
-            if (!this.bot.reply.process(message)) {
+            if (!this.bot.replyHandler.process(message)) {
                 if ((this.messageCounter >= config.speakEvery || this.bot.logic.randomBetween(1, 20) === 1) && timePassed >= this.bot.logic.randomBetween(20, 60)) {
                     this.commands["speak"].function(message)
                     this.lastMessageSent = currentTimestamp
