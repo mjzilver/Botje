@@ -1,31 +1,49 @@
 const express = require("express")
 const router = express.Router()
 
-const database = require("systems/database.js")
 const bot = require("systems/bot.js")
 const webhook = require("systems/webhook.js")
 
+router.get("/channels/:guildId", (req, res) => {
+    const guildId = req.params.guildId
+
+    const channels = Array.from(bot.client.channels.cache.values())
+        .filter(channel => channel.type === "GUILD_TEXT" && channel.guild.id === guildId)
+        .map(channel => ({ id: channel.id, name: channel.name, guildId: channel.guild.id }))
+
+    res.json(channels.length > 0 ? channels : ["No channels found for this guild"])
+})
+
+router.get("/users/:channelId", (req, res) => {
+    const channelId = req.params.channelId
+
+    const channel = bot.client.channels.cache.get(channelId)
+
+    if (!channel) {
+        return res.status(404).send("Channel not found")
+    }
+
+    const users = Array.from(channel.members.values())
+        .map(member => ({
+            userId: member.id,
+            username: member.user.username,
+            channelId: channelId
+        }))
+
+    res.json(users)
+})
+
+
 router.get("/", (req, res) => {
-    const selectSQL = `SELECT user_id, user_name, COUNT(message)
-    FROM messages
-    GROUP BY user_id, user_name
-    ORDER BY COUNT(message) DESC`
-
-    const channels = Object.fromEntries(bot.client.channels.cache.filter(channel => channel.type === "GUILD_TEXT"))
     const guilds = Object.fromEntries(bot.client.guilds.cache)
-    const commands = (require("systems/commandLoader.js").commands)
 
-    database.query(selectSQL, [], async(rows) => {
-        rows.unshift({ "user_id": "542721460033028117", "user_name": "Botje" })
-
-        res.render("webhooks", {
-            "guilds": guilds,
-            "channels": channels,
-            "users": rows,
-            "commandNames": commands
-        })
+    res.render("webhooks", {
+        "guilds": guilds,
+        "channels": [],
+        "users": [],
     })
 })
+
 
 router.post("/", function(req) {
     webhook.sendMessage(req.body.channel, req.body.text, req.body.user)

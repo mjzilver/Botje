@@ -2,20 +2,21 @@ extends layout
 
 block content
     script(src="/js/webhooks.js")
+    link(rel="stylesheet" href="/css/webhooks.css" type="text/css")
 
-    div#webhooksForm
-        select.webhooks-select(name='dropDown' id='guildSelect' onchange="guildSelected()")
-            each val in guilds
-                option(value=val.id) #{val.name}
+    div#webhooks_form
+        select.webhooks_select(name='drop_down' id='guild_select')
+            each guild in guilds
+                option(value=guild.id) #{guild.name}
 
-        select.webhooks-select(name='dropDown' id='channelSelect')
-            each val in channels
-                option(guild=val.guild.id, value=val.id) #{val.name} 
+        select.webhooks_select(name='drop_down' id='channel_select')
+            option(value='') Select a channel
 
-        select.webhooks-select(name='dropDown' id='userSelect')
-            each val in users
-                option(value=val.user_id) #{val.user_name}
+        select.webhooks_select(name='drop_down' id='user_select')
+            option(value='') Select a user
 
-        input#textToSend.webhooks-text
+        input#text_to_send.webhooks_text
 
-        button#send.webhooks-button(onclick="sendMessage()") Use webhook
+        button#send_button.webhooks_button Use webhook
+
+        p#webhook_response

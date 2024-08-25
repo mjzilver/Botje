@@ -22,6 +22,9 @@ class Webhook {
     sendMessage(channelid, text, userid) {
         const channel = bot.client.channels.cache.get(channelid)
         this.fetch(channel).then((webhook) => {
+            // If the channel is not found, return
+            if (!channel) return
+
             channel.guild.members.fetch(userid).then(
                 (member) => {
                     webhook.send({

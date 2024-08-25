@@ -1,6 +1,7 @@
 const { config } = require("systems/settings.js")
 const logger = require("systems/logger.js")
 const featureFlags = require("./featureFlags")
+const { Server } = require("socket.io")
 
 class WebServer {
     constructor() {
@@ -12,8 +13,14 @@ class WebServer {
         app.use(express.json())
         app.use(express.urlencoded({ extended: true }))
 
+        app.use((req, res, next) => {
+            // pass feature flags to all views
+            res.locals.featureFlags = featureFlags
+            next()
+        })
+
         const server = require("http").createServer(app)
-        const io = require("socket.io").listen(server)
+        const io = new Server(server)
         global.io = io
 
         this.editPerPerson = []
@@ -21,10 +28,6 @@ class WebServer {
 
         if (featureFlags.enableTerminal) {
             app.use("/terminal", require("./routes/terminal"))
-        }
-
-        if (featureFlags.enableLog) {
-            app.use("/log", require("./routes/log"))
         }
 
         if (featureFlags.enableWebhooks) {

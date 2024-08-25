@@ -1,27 +1,25 @@
-head
-	title Botje Homepage
-	link(rel="icon" href="./images/robotcorgihead.png")
-	link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
-	link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css")
-	script(src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous")
-	script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous")
-	script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous")
-	script(src="/socket.io/socket.io.js")
-	link(rel="stylesheet" href="/css/custom.css" type="text/css")
+html
+	head
+		title Botje Homepage
+		link(rel="icon" href="./images/robotcorgihead.png")
+		link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css")
+		script(src="/socket.io/socket.io.js")
+		link(rel="stylesheet" href="/css/layout.css" type="text/css")
 
-body
-	nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
-		a.navbar-brand.icon(href="/")
-			img(src="./images/robotcorgihead.png" width="50" height="50" alt="")
-		ul.navbar-nav.mr-auto
-			li.nav-item
-				a.nav-link(href="/draw") Drawboard
-			li.nav-item
-				a.nav-link(href="/log") Log
+	body
+		nav.main-navbar
+			a.navbar-icon(href="/")
+				img(src="./images/robotcorgihead.png" width="50" height="50" alt="")
+			ul.nav-menu
+				if featureFlags.enableDraw
+					li.nav-item
+						a.nav-link(href="/draw") Drawboard
+				if featureFlags.enableTerminal
+					li.nav-item
+						a.nav-link(href="/terminal") Terminal
+				if featureFlags.enableWebhooks
+					li.nav-item
+						a.nav-link(href="/webhooks") Webhooks
 
-	.container-full
-		.row
-			.col-sm-1
-			.col-sm-10.content-col 
+		.main-content
 				block content
-			.col-sm-1

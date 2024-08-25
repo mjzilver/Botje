@@ -1,0 +1,27 @@
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.drawboard {
+    border: 3px groove darkslategray;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+
+    border-collapse: collapse;
+
+}
+
+.drawboard-header {
+    background-color: lightgray;
+    vertical-align: middle;
+    line-height: 10px;
+}
+
+.pixel {
+    padding: 0;
+    width: 0.25vw;
+    height: 0.25vw;
+}
