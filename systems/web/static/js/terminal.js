@@ -9,8 +9,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     socket.on("message", (data) => {
         const newMessage = document.createElement("li")
-        newMessage.textContent = `${data.timestamp} ${data.level}: ${data.message}`
-        newMessage.innerHTML = `<span class="timestamp">${data.timestamp}</span> <span class="level-${data.level}">${data.level}</span>: ${data.message}`
+
+        const timestampSpan = document.createElement("span")
+        timestampSpan.className = "timestamp"
+        timestampSpan.textContent = data.timestamp
+
+        const levelSpan = document.createElement("span")
+        levelSpan.className = `level-${data.level}`
+        levelSpan.textContent = data.level
+
+        const messageText = document.createTextNode(`: ${data.message}`)
+
+        // Append the elements in the correct order
+        newMessage.appendChild(timestampSpan)
+        newMessage.appendChild(document.createTextNode(" "))
+        newMessage.appendChild(levelSpan)
+        newMessage.appendChild(messageText)
+
+        // Append the new message to the terminal list
         terminalList.appendChild(newMessage)
 
         // Scroll the terminal to the bottom

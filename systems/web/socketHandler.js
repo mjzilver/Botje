@@ -51,7 +51,8 @@ class SocketHandler {
 
         // connect logger to terminal
         logger.add(new terminalLoggerTransport({
-            level: "console"
+            // minimum level to log
+            level: "repeat"
         }, socket))
 
         socket.on("command", (command) => {

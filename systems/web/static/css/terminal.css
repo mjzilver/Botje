@@ -61,3 +61,4 @@ html, body {
 .level-debug { color: blue; }
 .level-console { color: grey; }
 .level-startup { color: magenta; }
+.level-repeat { color: cyan; }
