@@ -11,15 +11,17 @@ class commandLine {
             terminal: false
         })
 
-        this.rl.on("line", (input) => {
-            const args = input.split(" ")
-            const command = args.shift().toLowerCase()
+        this.rl.on("line", this.handleCommand.bind(this))
+    }
 
-            if (command in this.commands)
-                this.commands[command].function(args)
-            else if (command.textOnly() !== "")
-                logger.console(`${command} is not a command`)
-        })
+    handleCommand(input) {
+        const args = input.split(" ")
+        const command = args.shift().toLowerCase()
+
+        if (command in this.commands)
+            this.commands[command].function(args)
+        else if (command.textOnly() !== "")
+            logger.console(`${command} is not a command`)
     }
 }
 

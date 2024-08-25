@@ -20,6 +20,26 @@ class WebServer {
         this.editPerPerson = []
         this.connectCounter = 0
 
+        app.get('/terminal', (req, res) => {
+            res.render("terminal", {
+                list: ["Welcome to bot terminal emulator"]
+            })
+        })
+
+        app.post('/terminal-message', (req, res) => {
+            const { message } = req.body;
+        
+            if (message) {
+                // handle the message
+                // add later
+
+                res.json({ success: true });
+            } else {
+                res.json({ success: false });
+            }
+        });
+        
+
         app.get("/log", function(req, res) {
             const options = {
                 limit: 10000,
