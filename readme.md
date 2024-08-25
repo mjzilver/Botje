@@ -22,7 +22,7 @@ However, please note that this bot is not intended for public use, and I cannot 
 - Pug - templating web-pages.
 - Winston - logging.
 - eslint - code style consistency.
-- Socketio - ebsocket communication.
+- Socketio - websocket communication.
 - Sqlite - used from feb 2019 - april 2023.
 
 # License
