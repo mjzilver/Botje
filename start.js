@@ -3,9 +3,16 @@ process.env.NODE_PATH = __dirname
 // https://nodejs.org/api/modules.html#modules_loading_from_the_global_folders
 require("module").Module._initPaths()
 
-require("systems/stringUtils.js")
+class Startup {
+    constructor() {
+        this.startupTime = new Date()
 
-// start up the 3 main systems
-require("systems/bot.js")
-require("systems/web.js")
-require("systems/commandLine.js")
+        this.stringUtils = require("systems/stringUtils")
+
+        this.bot = require("systems/bot")
+        this.webServer = require("systems/web/web")
+        this.commandLine = require("systems/commandline")
+    }
+}
+
+new Startup()

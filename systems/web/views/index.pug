@@ -1,0 +1,17 @@
+extends layout
+
+block content
+    <br/>
+    <div id="pageDiv" class="jumbotron">
+        <h3>Botje homepage</h3>
+        <ul>
+            if flags.enableDraw
+                <li><h5><a href='/draw'>Drawboard</a></h5></li>
+            if flags.enableLog
+                <li><h5><a href='/log'>Log</a></h5></li>
+            if flags.enableInteract
+                <li><h5><a href='/interact'>Interact</a></h5></li>
+            if flags.enableTerminal
+                <li><h5><a href='/terminal'>Terminal</a></h5></li>
+        </ul>
+    </div>

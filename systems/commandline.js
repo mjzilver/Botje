@@ -1,9 +1,9 @@
 const logger = require("systems/logger.js")
+const readline = require("readline")
 
 class commandLine {
     constructor() {
         this.commands = require("systems/commandLoader.js").clcommands
-        const readline = require("readline")
 
         this.rl = readline.createInterface({
             input: process.stdin,

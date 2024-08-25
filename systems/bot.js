@@ -51,7 +51,13 @@ class Bot {
     login() {
         if (!this.client.isReady()) {
             logger.startup("Attempting to log in")
-            this.client.login(config.discord_api_key)
+
+            if (process.argv.includes("--dev")) {
+                logger.startup("Logging in with dev key")
+                this.client.login(config.discord_api_key_dev)
+            } else {
+                this.client.login(config.discord_api_key)
+            }
         }
     }
 
@@ -61,7 +67,7 @@ class Bot {
         this.messageHandler = new MessageHandler(this)
         this.eventListener = new EventListener(this)
         this.logic = new Logic()
-        this.backup = new BackupHandler()
+        this.backupHandler = new BackupHandler()
         this.replyHandler = new ReplyHandler(this)
         this.commandHandler = new CommandHandler(this)
         this.dictionary = new Dictionary()

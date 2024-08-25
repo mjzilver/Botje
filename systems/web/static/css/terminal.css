@@ -1,0 +1,48 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Consolas;
+}
+
+.terminal {
+    background-color: #1e1e1e;
+    color: #fff;
+    width: 100%;
+    height: 100vh; 
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+.terminal-list {
+    list-style-type: none;
+    padding: 10px;
+    margin: 0;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden; 
+}
+
+.terminal-line {
+    margin: 5px 0;
+}
+
+.terminal-input {
+    width: calc(100% - 20px); 
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #fff;
+    background-color: #333;
+    outline: none;
+    box-sizing: border-box; 
+}
+
+/* Colors */
+.level-error { color: red; }
+.level-warn { color: yellow; }
+.level-info { color: green; }
+.level-debug { color: blue; }
+.level-console { color: grey; }
+.level-startup { color: magenta; }
