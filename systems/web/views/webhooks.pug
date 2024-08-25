@@ -1,0 +1,21 @@
+extends layout
+
+block content
+    script(src="/js/webhooks.js")
+
+    div#webhooksForm
+        select.webhooks-select(name='dropDown' id='guildSelect' onchange="guildSelected()")
+            each val in guilds
+                option(value=val.id) #{val.name}
+
+        select.webhooks-select(name='dropDown' id='channelSelect')
+            each val in channels
+                option(guild=val.guild.id, value=val.id) #{val.name} 
+
+        select.webhooks-select(name='dropDown' id='userSelect')
+            each val in users
+                option(value=val.user_id) #{val.user_name}
+
+        input#textToSend.webhooks-text
+
+        button#send.webhooks-button(onclick="sendMessage()") Use webhook

@@ -1,13 +1,13 @@
 extends layout
 
 block content
-    <script src="/js/log.js"></script>
+    script(src="/js/log.js")
 
-    <br/>
-    select(name='dropDown',class="custom-select", id='levelSelect')
+    br
+    select(name='dropDown' class="custom-select" id='levelSelect')
         each val in ['none','debug', 'info', 'warn', 'error', 'console', 'admin']
             option(onclick="selectLevel()")=val
-        
+
     table(class='table table-striped' id='log')
         thead(class='thead-dark')
             th(scope='col' class='level') Level

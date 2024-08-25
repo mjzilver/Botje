@@ -1,6 +1,6 @@
 module.exports = {
     enableTerminal: true,
     enableLog: true,
-    enableInteract: true,
+    enableWebhooks: true,
     enableDraw: true,
-};
+}

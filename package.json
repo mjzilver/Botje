@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "16.0.0",
+  "version": "16.0.1",
   "description": "Discordbot made for private use",
   "main": "start.js",
   "author": "Mick Jari",
@@ -23,7 +23,8 @@
   "scripts": {
     "start": "node start.js",
     "dev": "nodemon start.js --dev -e js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix"  
   },
   "nodemonConfig": {
     "ignore": [

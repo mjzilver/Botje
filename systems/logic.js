@@ -1,4 +1,4 @@
-module.exports =  class Logic {
+module.exports = class Logic {
     constructor() { }
 
     levenshtein(a, b) {

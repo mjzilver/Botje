@@ -1,10 +1,10 @@
-const express = require('express');
-const router = express.Router();
+const express = require("express")
+const router = express.Router()
 
 const database = require("systems/database.js")
 const { config } = require("systems/settings.js")
 
-router.get('/', (req, res) => {
+router.get("/", (req, res) => {
     const selectSQL = "SELECT * FROM colors ORDER BY y, x ASC"
 
     const pixels = new Array(config.image.size)
@@ -39,6 +39,6 @@ router.get('/', (req, res) => {
             pixels: pixels
         })
     })
-});
+})
 
-module.exports = router;
+module.exports = router

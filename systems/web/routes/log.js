@@ -1,9 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const express = require("express")
+const router = express.Router()
 
 const logger = require("systems/logger.js")
 
-router.get('/', (req, res) => {
+router.get("/", (req, res) => {
     const options = {
         limit: 10000,
         order: "desc",
@@ -27,6 +27,6 @@ router.get('/', (req, res) => {
             list: logs
         })
     })
-});
+})
 
-module.exports = router;
+module.exports = router

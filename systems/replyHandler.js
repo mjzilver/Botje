@@ -1,6 +1,6 @@
 const logger = require("systems/logger.js")
 
-module.exports =  class ReplyHandler {
+module.exports = class ReplyHandler {
     constructor(bot) {
         this.replyPatterns = require("json/reply.json")
 
