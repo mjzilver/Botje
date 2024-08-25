@@ -3,13 +3,11 @@
         "amd": true,
         "node": true,
         "es2021": true,
-        "jest/globals": true
+        "browser": true
     },
     "extends": "eslint:recommended",
     "overrides": [],
-    "plugins": [
-        "jest"
-    ],
+    "plugins": [],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"

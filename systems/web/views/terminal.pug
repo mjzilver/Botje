@@ -1,0 +1,18 @@
+html
+    head
+        title Botje Homepage
+        link(rel="icon" href="./images/robotcorgihead.png")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css")
+        script(src="/socket.io/socket.io.js")
+
+    body
+        block content
+            link(rel="stylesheet" href="/css/terminal.css" type="text/css")
+            script(src="/js/terminal.js")
+
+            div.terminal
+                ul.terminal-list#terminal-list
+                    each val in list.length ? list : []
+                        li.terminal-line= val
+                input.terminal-input(type="text" name="input" id="terminal-input")
+                button.terminal-button(onclick="home()") X

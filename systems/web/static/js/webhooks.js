@@ -5,7 +5,7 @@ function sendMessage() {
     let textToSend = $("#textToSend").val()
 
     if (textToSend !== "") {
-        $.post("/interact", {
+        $.post("/webhooks", {
             "channel": selectedChannel,
             "user": selectedUser,
             "text": textToSend

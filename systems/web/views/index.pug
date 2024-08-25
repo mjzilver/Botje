@@ -1,0 +1,15 @@
+extends layout
+
+block content
+    br
+    #pageDiv.jumbotron
+        h3 Botje homepage
+        ul
+            if flags.enableDraw
+                li: h5: a(href='/draw') Drawboard
+            if flags.enableLog
+                li: h5: a(href='/log') Log
+            if flags.enableWebhooks
+                li: h5: a(href='/webhooks') Webhooks
+            if flags.enableTerminal
+                li: h5: a(href='/terminal') Terminal

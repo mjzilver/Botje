@@ -45,16 +45,16 @@ module.exports = class eventListener {
         })
 
         bot.client.on("emojiCreate", emoji => {
-            bot.backup.saveEmoji(emoji)
+            bot.backupHandler.saveEmoji(emoji)
         })
 
         bot.client.on("emojiDelete", emoji => {
-            bot.backup.saveEmoji(emoji, "_deleted")
+            bot.backupHandler.saveEmoji(emoji, "_deleted")
         })
 
         bot.client.on("emojiUpdate", (oldEmoji, newEmoji) => {
-            bot.backup.saveEmoji(oldEmoji, "_old")
-            bot.backup.saveEmoji(newEmoji)
+            bot.backupHandler.saveEmoji(oldEmoji, "_old")
+            bot.backupHandler.saveEmoji(newEmoji)
         })
     }
 }

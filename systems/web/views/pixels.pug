@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    script(src="/js/pixels.js")
+    br/
+    table.drawboard
+        tr
+            th.drawboard-header(colspan='9000')
+                label(for="color") Color:
+                input#color(type="color" name="color" value="#f6b73c")
+                label(for="zoom") Zoom:
+                button(onclick="zoomIn()")
+                    span.octicon.octicon-plus
+                button(onclick="zoomOut()")
+                    span.octicon.octicon-dash
+                span#errorlabel
+                span Users drawing:
+                span#connectCounter
+        each pixelrow in pixels.length ? pixels : ['No Pixels']
+            tr
+                each pixel in pixelrow.length ? pixelrow : ['No Row']
+                    td.pixel(id=`${pixel.x}-${pixel.y}` style=`background-color: rgb(${pixel.red}, ${pixel.green}, ${pixel.blue}) !important;` onclick=`pixelClick(${pixel.x}, ${pixel.y})`)
