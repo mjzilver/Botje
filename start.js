@@ -10,7 +10,10 @@ class Startup {
         this.stringUtils = require("systems/stringUtils")
 
         this.bot = require("systems/bot")
-        this.webServer = require("systems/web/web")
+
+        if (process.argv.includes("--web")) {
+            this.webServer = require("systems/web/web")
+        }
         this.commandLine = require("systems/commandline")
     }
 }

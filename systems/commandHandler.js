@@ -1,6 +1,6 @@
 const { config } = require("./settings")
 const logger = require("systems/logger.js")
-const LimitedList = require("systems/types/limitedlist.js")
+const LimitedList = require("systems/types/limitedList.js")
 
 module.exports = class CommandHandler {
     constructor(bot) {

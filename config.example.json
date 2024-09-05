@@ -9,7 +9,8 @@
 	"timeoutDuration": 5,
 	"bot_avatar": "direct link to img",
 	"color_hex": "#bab3be",
-	"port": 100,
+	"port": 1500,
+	"dev-port": 1501,
 	"spamchecker": 1,
 	"image": {
 		"size": 150,

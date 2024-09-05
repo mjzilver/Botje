@@ -1,14 +1,6 @@
 const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 
-process.on("exit", function() {
-    logger.info("=== Bot shutting down, goodbye ===")
-})
-
-process.on("SIGINT", function() {
-    logger.info("=== Bot forced to shut down, goodbye ===")
-})
-
 process.on("uncaughtException", function(error) {
     if (bot.commandHandler.commandList.get())
         bot.messageHandler.reply(bot.commandHandler.commandList.get(), "An error occured, this is probably your fault!")

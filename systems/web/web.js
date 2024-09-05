@@ -25,6 +25,11 @@ class WebServer {
 
         this.editPerPerson = []
         this.connectCounter = 0
+        this.port = config.port
+
+        if (process.argv.includes("--dev")) {
+            this.port = config.devPort
+        }
 
         if (featureFlags.enableTerminal) {
             app.use("/terminal", require("./routes/terminal"))
@@ -44,8 +49,8 @@ class WebServer {
         const SocketHandler = require("./socketHandler")
         new SocketHandler(io)
 
-        server.listen(config.port, () => {
-            logger.startup(`Webserver running on port ${config.port}`)
+        server.listen(this.port, () => {
+            logger.startup(`Webserver running on port ${this.port}`)
         })
     }
 }
