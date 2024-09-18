@@ -71,9 +71,21 @@ class Bot {
         this.replyHandler = new ReplyHandler(this)
         this.commandHandler = new CommandHandler(this)
         this.dictionary = new Dictionary()
-
         this.processHandler = require("systems/processHandler.js")
-        this.disallowed = JSON.parse(fs.readFileSync("json/disallowed.json"))
+
+        const disallowedFilepath = "json/disallowed.json"
+        fs.readFile(disallowedFilepath, (err, data) => {
+            if (!err && data) {
+                this.disallowed = JSON.parse(data)
+            } else {
+                fs.writeFile(disallowedFilepath, "{}", (writeErr) => {
+                    if (writeErr) {
+                        logger.error("Error writing file:", writeErr)
+                    }
+                    this.disallowed = {}
+                })
+            }
+        })
 
         this.logger = logger
     }
