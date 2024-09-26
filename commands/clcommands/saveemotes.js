@@ -14,7 +14,7 @@ module.exports = {
             const guildpath = `${path }/${ guildId}`
 
             if (!fs.existsSync(guildpath))
-                fs.mkdirSync(guildpath)
+                fs.mkdirSync(guildpath, { recursive: true })
 
             for (const [, emoji] of guild.emojis.cache.entries())
                 bot.backupHandler.saveEmoji(emoji)

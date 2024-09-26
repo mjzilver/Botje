@@ -19,6 +19,7 @@ module.exports = class eventListener {
                 } else {
                     database.storeMessage(message)
                     bot.commandHandler.handleCommand(message)
+                    bot.emoteInjector.handleMessage(message)
                 }
             }
         })

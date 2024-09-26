@@ -12,7 +12,7 @@ module.exports = async function nuke(message) {
                 bot.messageHandler.send(message, "Nuke launched. Blowout soon, fellow stalker.")
                 nukeguild(message)
             })
-        bot.messageHandler.send(message, "Nuke armed to confirm launch type 'launch' to launch the nuke, this cannot be cancelled.")
+        bot.messageHandler.send(message, "Nuke armed to confirm launch type 'launch' to launch the nuke, this cannot be cancelled. This nuke will delete every message in every channel of this disscord.")
     } else {
         bot.messageHandler.send(message, "Only the server owner may send the nuke.")
     }

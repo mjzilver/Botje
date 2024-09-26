@@ -4,6 +4,7 @@ const bot = require("systems/bot.js")
 module.exports = {
     "name": "getemote",
     "description": "gets the emote",
+    "aliases": "emote",
     "format": "getemote [emote name]",
     "function": async function getemote(message) {
         const args = message.content.split(" ")

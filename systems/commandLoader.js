@@ -15,6 +15,12 @@ function loadCommands(dirPath, commandObject) {
             if (command.disabled !== true) {
                 commandObject[command.name] = command
             }
+
+            if (command.aliases !== undefined) {
+                for (const alias of command.aliases.split(",")) {
+                    commandObject[alias] = command
+                }
+            }
         }
     }
 }

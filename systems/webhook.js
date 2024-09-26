@@ -1,5 +1,4 @@
 const projectPackage = require("package.json")
-const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
 
 class Webhook {
@@ -19,8 +18,13 @@ class Webhook {
         }
     }
 
-    sendMessage(channelid, text, userid) {
+    sendMessage(channelid, text, userid, bot = null) {
+        if (bot === null) {
+            bot = require("systems/bot.js")
+        }
+
         const channel = bot.client.channels.cache.get(channelid)
+
         this.fetch(channel).then((webhook) => {
             // If the channel is not found, return
             if (!channel) return

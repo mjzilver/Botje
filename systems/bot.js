@@ -10,6 +10,7 @@ const BackupHandler = require("./backupHandler")
 const ReplyHandler = require("./replyHandler")
 const CommandHandler = require("./commandHandler")
 const Dictionary = require("./dictionary")
+const EmoteInjector = require("./emoteInjector")
 
 class Bot {
     constructor() {
@@ -71,6 +72,7 @@ class Bot {
         this.replyHandler = new ReplyHandler(this)
         this.commandHandler = new CommandHandler(this)
         this.dictionary = new Dictionary()
+        this.emoteInjector = new EmoteInjector(this)
         this.processHandler = require("systems/processHandler.js")
 
         const disallowedFilepath = "json/disallowed.json"
