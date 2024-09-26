@@ -1,12 +1,12 @@
 {
   "name": "botje",
-  "version": "16.1.0",
-  "description": "Discordbot made for private use",
+  "version": "16.1.1",
+  "description": "Discord bot made for private use",
   "main": "start.js",
   "author": "Mick Jari",
   "email": "4ilverj@gmail.com",
   "license": "AGPL 3.0",
-  "repository": "https://github.com/mjzilver/discordbot",
+  "repository": "https://github.com/mjzilver/botje",
   "private": true,
   "dependencies": {
     "discord.js": "^13.1.0",

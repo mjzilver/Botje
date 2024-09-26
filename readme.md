@@ -1,4 +1,4 @@
-# Discordbot aka Botje
+# Botje
 
 ### First created on Feb 6, 2019
 A discord bot made for myself and friends. This bot was built entirely for my own entertainment, and is not intended for public use.
