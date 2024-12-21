@@ -147,8 +147,16 @@ function handleRedirect(message, post) {
         }
 
         request(options, (err, res, body) => {
-            const videolink = body[0].data.children[0].data.secure_media.reddit_video.fallback_url
-            bot.messageHandler.send(message, `${post.title} \n${videolink} \n<https://reddit.com${post.permalink}>`)
+            if (err) {
+                return logger.error(err)
+            }
+
+            const videoLink = body?.[0]?.data?.children?.[0]?.data?.secure_media?.reddit_video?.fallback_url
+            if (videoLink) {
+                bot.messageHandler.send(message, `${post.title} \n${videoLink} \n<https://reddit.com${post.permalink}>`)
+            } else {
+                getRedditImage(message)
+            }
         })
     })
 }
