@@ -68,7 +68,7 @@ class Bot {
         this.messageHandler = new MessageHandler(this)
         this.eventListener = new EventListener(this)
         this.logic = new Logic()
-        this.backupHandler = new BackupHandler()
+        this.backupHandler = new BackupHandler(this)
         this.replyHandler = new ReplyHandler(this)
         this.commandHandler = new CommandHandler(this)
         this.dictionary = new Dictionary()

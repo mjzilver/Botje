@@ -15,6 +15,8 @@ class Database {
         this.client.connect().then(() => {
             this.initializeDatabase()
             logger.startup("Postgres Database loaded")
+        }).catch(e => {
+            logger.error(`Could not connect to database: ${e}`)
         })
     }
 
