@@ -12,7 +12,7 @@ module.exports = class BackupHandler {
     saveEmoji(emoji, filename = "") {
         const guildpath = `backups/emotes/${emoji.guild.id}`
         const emojilink = `https://cdn.discordapp.com/emojis/${emoji.id}.png`
-        const emojipath = `${guildpath}/${ emoji.name}${filename}.png`
+        const emojipath = `${guildpath}/${emoji.name}${filename}.png`
 
         if (!fs.existsSync(emojipath) || fs.statSync(emojipath).size < 10) {
             logger.console(`Saving ${emoji.name} at ${emojipath} from ${emojilink}`)
@@ -26,7 +26,9 @@ module.exports = class BackupHandler {
     exportDatabase() {
         const timeStamp = new Date().getTime()
         const dbBackupPath = `backups/database/backup-${timeStamp}.sql`
-        let fileContent = "BEGIN;\n"
+        let writeStream = fs.createWriteStream(dbBackupPath, { flags: 'a' })
+
+        writeStream.write("BEGIN;\n")
 
         const selectSQL = "SELECT * FROM messages;"
 
@@ -39,16 +41,16 @@ module.exports = class BackupHandler {
                 row.id, row.user_id, row.user_name, row.message,
                 row.channel_id, row.server_id, row.datetime)
 
-                fileContent += `${insertStatement }\n`
+                writeStream.write(`${insertStatement}\n`)
             }
-            fileContent += "COMMIT;\n"
+            
+            writeStream.write("COMMIT;\n")
+            writeStream.end(() => {
+                logger.console(`Database exported successfully to ${dbBackupPath}`)
+            })
 
-            fs.writeFile(dbBackupPath, fileContent, (writeErr) => {
-                if (writeErr) {
-                    logger.error("Failed to write database backup file:", writeErr)
-                } else {
-                    logger.console(`Database exported successfully to ${dbBackupPath}`)
-                }
+            writeStream.on("error", (writeErr) => {
+                logger.error("Failed to write database backup file:", writeErr)
             })
         })
     }
