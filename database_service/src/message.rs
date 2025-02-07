@@ -4,7 +4,7 @@ pub fn process_message(message: &str, words_cache: &[String]) -> Vec<String> {
     let re = Regex::new(r"(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http(.*)|speak)\b").unwrap();
     let filtered = re.replace_all(message, "").to_string();
 
-    let text_only = filtered.trim();
+    let text_only = filtered.trim().to_lowercase();
     let mut words: Vec<String> = text_only
         .split_whitespace()
         .map(String::from)

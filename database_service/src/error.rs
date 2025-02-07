@@ -1,9 +1,9 @@
 use serde::Serialize;
 use std::fmt;
 
-use tokio_postgres::Error as PgError;
-use tokio::io::Error as IoError;
 use serde_json::Error as SerdeJsonError;
+use tokio::io::Error as IoError;
+use tokio_postgres::Error as PgError;
 
 #[derive(Debug, Serialize)]
 pub struct Error {

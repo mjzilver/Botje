@@ -1,15 +1,29 @@
+use crate::commands::invalid_query::invalid_query;
+use crate::commands::speak_by_words::speak_by_words;
 use crate::error::Error;
 use crate::models::{CommonWords, SockMsg};
 use serde_json::json;
 use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::net::unix::OwnedWriteHalf;
 use tokio::net::UnixListener;
 use tokio::sync::RwLock;
 use tokio_postgres::Client;
-use crate::commands::speak_by_words::speak_by_words;
-use crate::commands::invalid_query::invalid_query;
 
 const SOCKET_PATH: &str = "/tmp/botje_service.sock";
+
+async fn send_response(writer: &mut OwnedWriteHalf, response: Result<serde_json::Value, Error>) {
+    let full_response = match response {
+        Ok(response) => response.to_string() + "\n",
+        Err(err) => json!({"error": err.to_string()}).to_string() + "\n",
+    };
+
+    if let Err(err) = writer.write_all(full_response.as_bytes()).await {
+        eprintln!("Failed to write to socket: {}", err);
+    } else {
+        println!("Sent: {}", full_response);
+    }
+}
 
 async fn handle_connection(
     socket: tokio::net::UnixStream,
@@ -39,22 +53,16 @@ async fn handle_connection(
                         println!("Received: {:?}", sock_msg);
 
                         match sock_msg.msg_type.as_str() {
-                            "speak_by_words" => match speak_by_words(&shared_client, &words_cache, sock_msg.args).await {
-                                Ok(data) => json!(data).to_string() + "\n",
-                                Err(err) => json!({"error": err.to_string()}).to_string() + "\n",
-                            },
-                            _ => invalid_query().await.unwrap()
+                            "speak_by_words" => {
+                                speak_by_words(&shared_client, &words_cache, sock_msg.args).await
+                            }
+                            _ => invalid_query().await,
                         }
                     }
-                    Err(_) => json!({"error": "Invalid JSON input"}).to_string() + "\n",
+                    Err(_) => Err(Error::new("Unable to parse SockMsg")),
                 };
 
-                if let Err(err) = writer.write_all(response.as_bytes()).await {
-                    eprintln!("Failed to write to socket: {}", err);
-                    break;
-                }
-
-                println!("Sent: {}", response);
+                send_response(&mut writer, response).await;
             }
             Err(err) => {
                 eprintln!("Error reading from socket: {}", err);

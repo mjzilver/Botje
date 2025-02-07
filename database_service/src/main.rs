@@ -10,8 +10,8 @@ mod utils;
 use crate::database::create_db_client;
 use crate::server::run_server;
 use crate::utils::load_or_generate_wordlist;
-use std::sync::Arc;
 use error::Error;
+use std::sync::Arc;
 use tokio::sync::RwLock;
 
 #[tokio::main]

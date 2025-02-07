@@ -1,22 +1,23 @@
-use std::{collections::HashSet, sync::Arc};
-
+use lazy_static::lazy_static;
+use rand::{rng, rngs::StdRng, seq::SliceRandom, SeedableRng};
 use serde_json::json;
+use std::sync::Arc;
 use strsim::levenshtein;
-use tokio::sync::RwLock;
+use tokio::sync::{Mutex, RwLock};
 use tokio_postgres::Client;
 
 use crate::{error::Error, message::process_message, models::CommonWords};
+
+lazy_static! {
+    static ref RNG: Mutex<StdRng> = Mutex::new(StdRng::from_rng(&mut rng()));
+}
 
 pub async fn speak_by_words(
     client: &Client,
     words_cache: &Arc<RwLock<CommonWords>>,
     msg_args: Option<String>,
 ) -> Result<serde_json::Value, Error> {
-    let query = "
-        SELECT message FROM messages
-        WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
-        AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-        AND LENGTH(message) < 150 AND LENGTH(message) > 10";
+    let query = "SELECT message FROM messages";
 
     let msg = match msg_args {
         Some(ref args) => args,
@@ -25,25 +26,40 @@ pub async fn speak_by_words(
 
     let msg_words = process_message(&msg, &words_cache.read().await.words);
 
-    let mut highest_amount = 0;
+    let mut highest_score = 0;
     let mut chosen_message: String = "".to_string();
-    let rows = client.query(query, &[]).await?;
+    let mut rows = client.query(query, &[]).await?;
+
+    let mut rng = RNG.lock().await;
+    rows.shuffle(&mut rng);
 
     let _: Vec<_> = rows
         .iter()
-        .map(|row| {
+        .filter(|row| {
             let row_msg: String = row.get("message");
+            !row_msg.contains("bot")
+                && !row_msg.contains("www")
+                && !row_msg.contains("http")
+                && row_msg.len() > 10
+                && row_msg.len() < 150
+        })
+        .map(|row| {
+            let mut row_msg: String = row.get("message");
+            row_msg = row_msg.to_lowercase();
             let row_words: Vec<&str> = row_msg.split_whitespace().collect();
 
-            let set1: HashSet<String> = row_words.iter().map(|s| s.to_lowercase()).collect();
-            let set2: HashSet<String> = msg_words.iter().map(|s| s.to_lowercase()).collect();
+            let mut score = 0;
 
-            let amount = set1.intersection(&set2).count();
+            for (j, word) in msg_words.iter().enumerate() {
+                if row_words.contains(&word.as_str()) {
+                    score += 30 - (j * j);
+                }
+            }
 
-            if amount > highest_amount {
+            if score > highest_score {
                 if levenshtein(&row_msg, &msg) > 15 {
                     chosen_message = row_msg;
-                    highest_amount = amount;
+                    highest_score = score;
                 }
             }
         })
