@@ -17,81 +17,26 @@ module.exports = {
     }
 }
 
-function findByWord(message) {
+async function findByWord(message) {
     const earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
 
     const words = message.content.removePrefix()
-        .replace(new RegExp(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http(.*)|speak)\b/gi), "")
-        .textOnly()
-        .replace(bot.dictionary.getNonSelectorsRegex(), "")
         .trim()
         .split(" ")
 
+    const messageContent = words.slice(1).join(" ")
+
     if (words && words.length >= 1 && words[0]) {
-        if (words.length > 1) {
-            words.sort(function(a, b) {
-                const al = a.match(/(?:[aeiouy]{1,2})/gi)
-                const bl = b.match(/(?:[aeiouy]{1,2})/gi)
-                return (bl ? bl.length : 0) - (al ? al.length : 0)
-            })
+
+        const result = await bot.rustSystem.sendQuery("speak_by_words", messageContent)
+
+        if (result.error) {
+            bot.messageHandler.reply(message, result.error)
+            return
         }
 
-        if (words.length > 1) {
-            const selectSQL = `SELECT message FROM messages
-                WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
-                AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-                AND LENGTH(message) < 150 AND LENGTH(message) > 10
-                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
-                ORDER BY RANDOM()`
-
-            database.query(selectSQL, [], (rows) => {
-                if (rows) {
-                    logger.debug(`Sending message with '${words.join(",")}' in it`)
-
-                    let highestAmount = 0
-                    let chosenMessage = ""
-
-                    const regexPatterns = words.map(w => new RegExp(w, "gmi"))
-
-                    for (let i = 0; i < rows.length; i++) {
-                        let amount = 0
-
-                        for (let j = 0; j < regexPatterns.length; j++) {
-                            if (rows[i]["message"].match(regexPatterns[j])) {
-                                amount += 30 - (j * j)
-                            }
-                        }
-
-                        if (amount > highestAmount) {
-                            if (bot.logic.levenshtein(rows[i]["message"], message.content) > 15) {
-                                chosenMessage = rows[i]["message"]
-                                highestAmount = amount
-                            }
-                        }
-                    }
-
-                    chosenMessage = chosenMessage.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), "")
-                    logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`)
-                    bot.messageHandler.send(message, chosenMessage)
-                }
-            })
-        } else {
-            const selectSQL = `SELECT message FROM messages
-                WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
-                AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-                AND message LIKE '%${words[0]}%' AND LENGTH(message) > 10
-                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
-                ORDER BY RANDOM()
-                LIMIT 1`
-
-            database.query(selectSQL, [], (rows) => {
-                if (rows) {
-                    logger.debug(`Sending message with '${words[0]}' in it`)
-                    bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
-                }
-            })
-        }
+        bot.messageHandler.reply(message, result)
     } else {
         findRandom(message)
     }
