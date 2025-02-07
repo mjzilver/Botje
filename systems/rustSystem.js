@@ -5,10 +5,13 @@ class RustSystem {
     constructor() {
         this.client = null;
         this.isConnected = false;
+        this.responseBuffer = "";
         this.connectToSocket();
     }
 
     connectToSocket() {
+        if (this.isConnected) return;
+
         this.client = net.createConnection("/tmp/botje_service.sock");
 
         this.client.on("connect", () => {
@@ -18,6 +21,16 @@ class RustSystem {
 
         this.client.on("error", (err) => {
             logger.error(`Error connecting to Rust socket: ${err.message}`);
+        });
+
+        this.client.on("end", () => {
+            this.isConnected = false;
+            logger.warn("Rust socket connection ended");
+        });
+    
+        this.client.on("close", (hadError) => {
+            this.isConnected = false;
+            logger.error("Rust socket connection closed unexpectedly");
         });
     }
 
@@ -33,26 +46,28 @@ class RustSystem {
             };
 
             logger.debug(`Sending message to Rust service: ${JSON.stringify(msg)}`);
-
             this.client.write(JSON.stringify(msg) + "\n");
 
-            let response = "";
+            const timeout = setTimeout(() => {
+                reject(new Error("No response from Rust service within timeout"));
+            }, 5000);
 
-            this.client.on("data", (chunk) => {
-                response += chunk.toString();
-            });
+            this.client.once("data", (chunk) => {
+                this.responseBuffer += chunk.toString();
 
-            this.client.on("end", () => {
                 try {
-                    const jsonResponse = JSON.parse(response.trim());
+                    const message = this.responseBuffer.trim();
+                    const jsonResponse = JSON.parse(message);
+
+                    logger.debug(`Processed response: ${JSON.stringify(jsonResponse)}`);
                     resolve(jsonResponse);
+
+                    this.responseBuffer = '';
+                    clearTimeout(timeout);
                 } catch (error) {
+                    logger.error("Failed to parse response: " + error.message);
                     reject(new Error("Invalid JSON response from Rust service"));
                 }
-            });
-
-            this.client.on("error", (err) => {
-                reject(new Error(`Error receiving data from Rust service: ${err.message}`));
             });
         });
     }

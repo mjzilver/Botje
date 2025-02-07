@@ -28,7 +28,6 @@ async function findByWord(message) {
     const messageContent = words.slice(1).join(" ")
 
     if (words && words.length >= 1 && words[0]) {
-
         const result = await bot.rustSystem.sendQuery("speak_by_words", messageContent)
 
         if (result.error) {
