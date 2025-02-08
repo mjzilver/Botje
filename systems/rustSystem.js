@@ -1,11 +1,13 @@
 const logger = require("systems/logger.js");
 const net = require("net");
+const { v4: uuidv4 } = require("uuid");
 
 class RustSystem {
     constructor() {
         this.client = null;
         this.isConnected = false;
         this.responseBuffer = "";
+        this.pendingRequests = new Map();
         this.connectToSocket();
     }
 
@@ -32,6 +34,30 @@ class RustSystem {
             this.isConnected = false;
             logger.error("Rust socket connection closed unexpectedly");
         });
+
+        this.client.on("data", (chunk) => {
+            this.responseBuffer += chunk.toString();
+
+            try {
+                const messages = this.responseBuffer.split("\n").filter(Boolean);
+                this.responseBuffer = "";
+
+                for (const message of messages) {
+                    const jsonResponse = JSON.parse(message);
+                    const requestId = jsonResponse.id;
+                    if (this.pendingRequests.has(requestId)) {
+                        const { resolve, _, timeout } = this.pendingRequests.get(requestId);
+                        logger.debug(`Processed response: ${JSON.stringify(jsonResponse)}`);
+
+                        clearTimeout(timeout)
+                        resolve(jsonResponse.response);
+                        this.pendingRequests.delete(requestId);
+                    }
+                }
+            } catch (error) {
+                logger.error("Failed to parse response: " + error.message);
+            }
+        });
     }
 
     sendQuery(msgType, args) {
@@ -40,7 +66,9 @@ class RustSystem {
                 this.connectToSocket();
             }
 
+            const requestId = uuidv4();
             const msg = {
+                id: requestId,
                 msg_type: msgType,
                 args: args
             };
@@ -50,25 +78,10 @@ class RustSystem {
 
             const timeout = setTimeout(() => {
                 reject(new Error("No response from Rust service within timeout"));
-            }, 5000);
+                this.pendingRequests.delete(requestId);
+            }, 15 * 1000);
 
-            this.client.once("data", (chunk) => {
-                this.responseBuffer += chunk.toString();
-
-                try {
-                    const message = this.responseBuffer.trim();
-                    const jsonResponse = JSON.parse(message);
-
-                    logger.debug(`Processed response: ${JSON.stringify(jsonResponse)}`);
-                    resolve(jsonResponse);
-
-                    this.responseBuffer = '';
-                    clearTimeout(timeout);
-                } catch (error) {
-                    logger.error("Failed to parse response: " + error.message);
-                    reject(new Error("Invalid JSON response from Rust service"));
-                }
-            });
+            this.pendingRequests.set(requestId, { resolve, reject, timeout });
         });
     }
 }

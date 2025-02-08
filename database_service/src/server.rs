@@ -12,10 +12,14 @@ use tokio_postgres::Client;
 
 const SOCKET_PATH: &str = "/tmp/botje_service.sock";
 
-async fn send_response(writer: &mut OwnedWriteHalf, response: Result<serde_json::Value, Error>) {
+async fn send_response(
+    writer: &mut OwnedWriteHalf, 
+    id: &str, 
+    response: Result<serde_json::Value, Error>
+) {
     let full_response = match response {
-        Ok(response) => response.to_string() + "\n",
-        Err(err) => json!({"error": err.to_string()}).to_string() + "\n",
+        Ok(response) => json!({ "id": id, "response": response }).to_string() + "\n",
+        Err(err) => json!({ "id": id, "error": err.to_string() }).to_string() + "\n",
     };
 
     if let Err(err) = writer.write_all(full_response.as_bytes()).await {
@@ -24,6 +28,7 @@ async fn send_response(writer: &mut OwnedWriteHalf, response: Result<serde_json:
         println!("Sent: {}", full_response);
     }
 }
+
 
 async fn handle_connection(
     socket: tokio::net::UnixStream,
@@ -48,8 +53,12 @@ async fn handle_connection(
                     continue;
                 }
 
+                let mut id: String = "Invalid ID".to_owned();
+
                 let response = match serde_json::from_str::<SockMsg>(input.trim()) {
                     Ok(sock_msg) => {
+                        id = sock_msg.id.clone();
+
                         println!("Received: {:?}", sock_msg);
 
                         match sock_msg.msg_type.as_str() {
@@ -62,7 +71,7 @@ async fn handle_connection(
                     Err(_) => Err(Error::new("Unable to parse SockMsg")),
                 };
 
-                send_response(&mut writer, response).await;
+                send_response(&mut writer, &id, response).await;
             }
             Err(err) => {
                 eprintln!("Error reading from socket: {}", err);

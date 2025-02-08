@@ -8,6 +8,7 @@ pub struct CommonWords {
 
 #[derive(Deserialize, Debug)]
 pub struct SockMsg {
+    pub id: String,
     pub msg_type: String,
     pub args: Option<String>,
 }
