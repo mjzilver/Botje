@@ -13,9 +13,9 @@ use tokio_postgres::Client;
 const SOCKET_PATH: &str = "/tmp/botje_service.sock";
 
 async fn send_response(
-    writer: &mut OwnedWriteHalf, 
-    id: &str, 
-    response: Result<serde_json::Value, Error>
+    writer: &mut OwnedWriteHalf,
+    id: &str,
+    response: Result<serde_json::Value, Error>,
 ) {
     let full_response = match response {
         Ok(response) => json!({ "id": id, "response": response }).to_string() + "\n",
@@ -28,7 +28,6 @@ async fn send_response(
         println!("Sent: {}", full_response);
     }
 }
-
 
 async fn handle_connection(
     socket: tokio::net::UnixStream,
