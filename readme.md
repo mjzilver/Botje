@@ -24,7 +24,3 @@ However, please note that this bot is not intended for public use, and I cannot 
 - eslint - code style consistency.
 - Socketio - websocket communication.
 - Sqlite - used from feb 2019 - april 2023.
-
-# License
-You are free to use, modify, and distribute the code for any purpose, as long as you comply with the terms of the AGPL. See the LICENSE file for more details.
-
