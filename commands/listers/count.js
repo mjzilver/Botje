@@ -35,12 +35,14 @@ class CountLister extends Lister {
     }
 
     perPerson(message, page) {
-        const selectSQL = `SELECT user_id, MAX(user_name) as user_name, COUNT(*) as count
-		FROM messages
-		WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1
-		GROUP BY user_id
-		HAVING COUNT(*) > 1
-		ORDER BY COUNT(*) DESC`
+        const selectSQL = `
+        SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count
+        FROM messages
+        WHERE server_id = $1
+        GROUP BY user_id
+        HAVING COUNT(*) > 1
+        ORDER BY COUNT(*) DESC
+        `;      
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             let result = ""
@@ -60,10 +62,10 @@ class CountLister extends Lister {
     }
 
     percentage(message, page) {
-        const selectSQL = `SELECT user_id, MAX(user_name) as user_name, COUNT(*) as count,
-			(SElECT COUNT(message) FROM messages WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1) as total
+        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count,
+			(SElECT COUNT(message) FROM messages WHERE  server_id = $1) as total
 			FROM messages
-			WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' AND server_id = $1
+			WHERE server_id = $1
 			GROUP BY user_id
 			HAVING COUNT(*) > 1
 			ORDER BY COUNT(*) DESC 

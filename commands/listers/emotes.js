@@ -67,7 +67,7 @@ class EmotesLister extends Lister {
     }
 
     perPerson(message, page) {
-        const selectSQL = `SELECT user_id, MAX(user_name) as user_name, COUNT(*) as count
+        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count
             FROM messages
             WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
             AND server_id = $1

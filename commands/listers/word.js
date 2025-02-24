@@ -23,22 +23,22 @@ class WordLister extends Lister {
         const mentioned = message.mentions.users.first()
 
         if (mentioned && args[2]) {
-            this.mention(message, mentioned, args[2].removeQuotes())
+            this.mention(message, mentioned, args[2].removeQuotes().toLowerCase())
         } else if (args[1] === "?" && args[2]) {
-            this.perPerson(message, args[2].removeQuotes())
+            this.perPerson(message, args[2].removeQuotes().toLowerCase())
         } else if (args[1] === "%" && args[2]) {
-            this.percentage(message, args[2].removeQuotes())
+            this.percentage(message, args[2].removeQuotes().toLowerCase())
         } else if (args[1]) {
-            this.total(message, args[1].removeQuotes())
+            this.total(message, args[1].removeQuotes().toLowerCase())
         } else {
             bot.messageHandler.send(message, `I have no idea what you want, format is as follows: '${module.exports.format}'`)
         }
     }
 
     perPerson(message, word) {
-        const selectSQL = `SELECT user_id, MAX(user_name) as user_name, count(message) as count
+        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, count(message) as count
         FROM messages
-        WHERE message LIKE $1 AND server_id = $2
+        WHERE LOWER(message) LIKE $1 AND server_id = $2
         GROUP BY user_id
         HAVING count(message) > 1
         ORDER BY count(message) DESC 
@@ -66,7 +66,7 @@ class WordLister extends Lister {
     total(message, word) {
         const selectSQL = `SELECT COUNT(*) as count
         FROM messages
-        WHERE message LIKE $1 AND server_id = $2 `
+        WHERE LOWER(message) LIKE $1 AND server_id = $2 `
 
         database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
             bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
@@ -76,7 +76,7 @@ class WordLister extends Lister {
     mention(message, mentioned, word) {
         const selectSQL = `SELECT COUNT(*) as count
         FROM messages
-        WHERE message LIKE $1 
+        WHERE LOWER(message) LIKE $1 
         AND server_id = $2 AND user_id = $3 `
 
         database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id], (rows) => {
@@ -85,13 +85,13 @@ class WordLister extends Lister {
     }
 
     percentage(message, word) {
-        const selectSQL = `SELECT user_id, MAX(user_name) as user_name, count(message) as count,
+        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, count(message) as count,
                 (SElECT COUNT(m2.message) 
                 FROM messages AS m2
                 WHERE m2.user_id = messages.user_id
                 AND m2.server_id = messages.server_id) as total
             FROM messages
-            WHERE message LIKE $1
+            WHERE LOWER(message) LIKE $1
             AND server_id = $2
             GROUP BY messages.user_id, messages.server_id
             HAVING count(message) > 1
