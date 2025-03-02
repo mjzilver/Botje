@@ -26,7 +26,7 @@ module.exports = class BackupHandler {
     exportDatabase() {
         const timeStamp = new Date().getTime()
         const dbBackupPath = `backups/database/backup-${timeStamp}.sql`
-        let writeStream = fs.createWriteStream(dbBackupPath, { flags: 'a' })
+        const writeStream = fs.createWriteStream(dbBackupPath, { flags: "a" })
 
         writeStream.write("BEGIN;\n")
 
@@ -43,7 +43,7 @@ module.exports = class BackupHandler {
 
                 writeStream.write(`${insertStatement}\n`)
             }
-            
+
             writeStream.write("COMMIT;\n")
             writeStream.end(() => {
                 logger.console(`Database exported successfully to ${dbBackupPath}`)

@@ -42,7 +42,7 @@ class CountLister extends Lister {
         GROUP BY user_id
         HAVING COUNT(*) > 1
         ORDER BY COUNT(*) DESC
-        `;      
+        `
 
         database.query(selectSQL, [message.guild.id], (rows) => {
             let result = ""

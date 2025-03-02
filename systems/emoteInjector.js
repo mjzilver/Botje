@@ -8,7 +8,7 @@ module.exports = class EmoteInjector {
     handleMessage(message) {
         if (message.author.bot) return
 
-        const matches = Array.from(message.content.matchAll(/(?<!<):([^:]+):(?!(?::\d+>))/g), m => m[1]);
+        const matches = Array.from(message.content.matchAll(/(?<!<):([^:]+):(?!(?::\d+>))/g), m => m[1])
         let correctedMessage = message.content
         let hasCorrections = false
 

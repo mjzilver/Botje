@@ -5,7 +5,7 @@ module.exports = {
     name: "checkdupes",
     description: "checks the database for duplicate entries, use -d yes for deletion",
     format: "checkdupes",
-    function: (input) => {
+    function: () => {
         try {
             const sql = `SELECT message, datetime, COUNT(message) AS count
                 FROM messages 
