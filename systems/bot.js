@@ -77,16 +77,15 @@ class Bot {
 
         const disallowedFilepath = "json/disallowed.json"
         fs.readFile(disallowedFilepath, (err, data) => {
-            if (!err && data) {
+            if (!err && data)
                 this.disallowed = JSON.parse(data)
-            } else {
+            else
                 fs.writeFile(disallowedFilepath, "{}", (writeErr) => {
-                    if (writeErr) {
+                    if (writeErr)
                         logger.error("Error writing file:", writeErr)
-                    }
+
                     this.disallowed = {}
                 })
-            }
         })
 
         this.logger = logger

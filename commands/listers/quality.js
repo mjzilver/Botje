@@ -47,9 +47,8 @@ class QualityLister extends Lister {
         `
 
         database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
-            if (rows.length === 0) {
+            if (rows.length === 0)
                 return bot.messageHandler.send(message, `${mentioned.username} does not have enough qualifying messages.`)
-            }
 
             const userData = rows[0]
             const userQuality = parseFloat(userData["percentage_unique"]).toFixed(2)

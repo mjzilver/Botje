@@ -39,13 +39,12 @@ async function getRedditImage(message, last = "") {
     }
 
     request(options, (err, res, body) => {
-        if (err) {
+        if (err)
             return logger.error(err)
-        }
 
-        if (typeof (body) !== "undefined" && typeof (body.data) !== "undefined" && typeof (body.data.children) !== "undefined") {
+        if (typeof (body) !== "undefined" && typeof (body.data) !== "undefined" && typeof (body.data.children) !== "undefined")
             handleRedditImages(message, sub, body.data.children)
-        } else
+        else
             bot.messageHandler.send(message, "No images were found")
     })
 }
@@ -69,19 +68,19 @@ function handleRedditImages(message, sub, children) {
             const post = filteredImages[chosen].data
 
             // if post is imgur check redirects if it is removed.png
-            if (post.url.match(/imgur\.com/gi)) {
+            if (post.url.match(/imgur\.com/gi))
                 handleImgur(message, post, sub)
-            } else {
+            else
                 embedImage(message, post, sub)
-            }
 
             insertPost(post, sub)
         } else {
             if (children.length >= 100) {
                 logger.debug(`Finding posts before post ${ children[children.length - 1].data.title}`)
                 getRedditImage(message, children[children.length - 1].data.name)
-            } else
+            } else {
                 bot.messageHandler.send(message, "I have ran out of images to show you")
+            }
         }
     })
 }
@@ -137,9 +136,8 @@ function handleRedirect(message, post) {
         logger.console(`Redirected to ${res.request.uri.href}`)
         let url = decodeURIComponent(res.request.uri.href)
 
-        if (res.request.uri.href.includes("over18")) {
+        if (res.request.uri.href.includes("over18"))
             url = url.substring(url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length)
-        }
 
         const options = {
             url: `${url }.json`,
@@ -147,16 +145,14 @@ function handleRedirect(message, post) {
         }
 
         request(options, (err, res, body) => {
-            if (err) {
+            if (err)
                 return logger.error(err)
-            }
 
             const videoLink = body?.[0]?.data?.children?.[0]?.data?.secure_media?.reddit_video?.fallback_url
-            if (videoLink) {
+            if (videoLink)
                 bot.messageHandler.send(message, `${post.title} \n${videoLink} \n<https://reddit.com${post.permalink}>`)
-            } else {
+            else
                 getRedditImage(message)
-            }
         })
     })
 }

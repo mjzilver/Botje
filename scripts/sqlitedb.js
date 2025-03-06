@@ -27,19 +27,18 @@ class Database {
     query(selectSQL, parameters = [], callback) {
         this.db.all(selectSQL, parameters, (err, rows) => {
             if (err)
-            {throw err}
+                throw err
             else
-            {callback(rows)}
+                callback(rows)
         })
     }
 
     storeMessage(message) {
-        if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i"))) {
+        if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")))
             message.guild.members.fetch(message.author.id).then(
                 () => {
                     this.insertMessage(message)
                 })
-        }
     }
 
     insertMessage(message) {

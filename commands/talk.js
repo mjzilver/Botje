@@ -41,14 +41,13 @@ module.exports = {
                 let previousWord = chain[""][bot.logic.randomBetween(0, chain[""].length - 1)]
                 sentence += previousWord
 
-                for (let i = 0; i < sentenceLength - 1; i++) {
+                for (let i = 0; i < sentenceLength - 1; i++)
                     if (chain[previousWord]) {
                         const currentWord = chain[previousWord][bot.logic.randomBetween(0, chain[previousWord].length - 1)]
 
                         sentence += ` ${ currentWord}`
                         previousWord = currentWord
                     }
-                }
 
                 bot.messageHandler.send(message, sentence.capitalize())
             }

@@ -48,9 +48,8 @@ class hangman {
             chosenword = words.pickRandom()
             chosenword[0] = chosenword[0].textOnly()
             chosenword[0] = chosenword[0].replace(bot.dictionary.getNonSelectorsRegex(), "").trim()
-            if (chosenword[1] > 10 && chosenword[0].length >= 5 && chosenword[0].length <= 20 && chosenword[0].match(/[a-z]+/i)) {
+            if (chosenword[1] > 10 && chosenword[0].length >= 5 && chosenword[0].length <= 20 && chosenword[0].match(/[a-z]+/i))
                 this.word = chosenword[0]
-            }
         }
 
         for (let i = 0; i < this.word.length; i++)
@@ -76,23 +75,19 @@ class hangman {
                     bot.messageHandler.send(message, `Wrong! The word is not ${geussedContent}`)
                     this.tries++
                 }
-            } else {
+            } else
                 if (this.alreadyGuessed.includes(geussedContent)) {
                     bot.messageHandler.send(message, `${geussedContent} has already been guessed.`)
-                } else {
+                } else
                     if (this.word.includes(geussedContent)) {
-                        for (let i = 0; i < this.word.length; i++) {
-                            if (this.word[i] === geussedContent) {
+                        for (let i = 0; i < this.word.length; i++)
+                            if (this.word[i] === geussedContent)
                                 this.visibleWord = this.visibleWord.replaceAt(i, geussedContent)
-                            }
-                        }
                     } else {
                         bot.messageHandler.send(message, `The word does not contain ${geussedContent}!`)
                         this.alreadyGuessed.push(geussedContent)
                         this.tries++
                     }
-                }
-            }
 
             if (this.tries === this.maxTries) {
                 bot.messageHandler.send(message, `Oh no! You have been hanged! The word was ${this.word}`)
@@ -109,11 +104,10 @@ class hangman {
     }
 
     help(message) {
-        if (this.hasEnded) {
+        if (this.hasEnded)
             this.start(message)
-        } else {
+        else
             this.sendEmbed(message)
-        }
     }
 
     sendEmbed(message) {

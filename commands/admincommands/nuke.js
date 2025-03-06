@@ -32,8 +32,9 @@ function nukechannel(channelId) {
         nukemessages(channel, channel.lastMessageId)
         channel.lastMessage?.delete({ timeout: 100 })
         logger.warn(`NUKING channel: ${channel.name}`)
-    } else
+    } else {
         logger.console("Channel not found")
+    }
 }
 
 function nukemessages(channel, messageid, loop = 0) {
@@ -47,13 +48,13 @@ function nukemessages(channel, messageid, loop = 0) {
             itemsProcessed++
             message?.delete({ timeout: 10 })
 
-            if (itemsProcessed === messages.size) {
+            if (itemsProcessed === messages.size)
                 if (itemsProcessed === 100) {
                     logger.console(`100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                     nukemessages(channel, message.id, ++loop)
-                } else
+                } else {
                     logger.warn(`End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
-            }
+                }
         }
     ))
 }

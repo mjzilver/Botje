@@ -11,9 +11,9 @@ class Startup {
 
         this.bot = require("systems/bot")
 
-        if (process.argv.includes("--web")) {
+        if (process.argv.includes("--web"))
             this.webServer = require("systems/web/web")
-        }
+
         this.commandLine = require("systems/commandline")
     }
 }

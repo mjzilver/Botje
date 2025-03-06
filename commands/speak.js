@@ -9,11 +9,10 @@ module.exports = {
     "function": function speak(message) {
         const matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
 
-        if (matches && matches[1] !== "") {
+        if (matches && matches[1] !== "")
             findTopic(message, matches[1])
-        } else {
+        else
             findByWord(message)
-        }
     }
 }
 
@@ -29,13 +28,12 @@ function findByWord(message) {
         .split(" ")
 
     if (words && words.length >= 1 && words[0]) {
-        if (words.length > 1) {
+        if (words.length > 1)
             words.sort(function(a, b) {
                 const al = a.match(/(?:[aeiouy]{1,2})/gi)
                 const bl = b.match(/(?:[aeiouy]{1,2})/gi)
                 return (bl ? bl.length : 0) - (al ? al.length : 0)
             })
-        }
 
         if (words.length > 1) {
             const selectSQL = `SELECT message FROM messages
@@ -57,18 +55,15 @@ function findByWord(message) {
                     for (let i = 0; i < rows.length; i++) {
                         let amount = 0
 
-                        for (let j = 0; j < regexPatterns.length; j++) {
-                            if (rows[i]["message"].match(regexPatterns[j])) {
+                        for (let j = 0; j < regexPatterns.length; j++)
+                            if (rows[i]["message"].match(regexPatterns[j]))
                                 amount += 30 - (j * j)
-                            }
-                        }
 
-                        if (amount > highestAmount) {
+                        if (amount > highestAmount)
                             if (bot.logic.levenshtein(rows[i]["message"], message.content) > 15) {
                                 chosenMessage = rows[i]["message"]
                                 highestAmount = amount
                             }
-                        }
                     }
 
                     chosenMessage = chosenMessage.replace(new RegExp(/(@.*)(?:\s|\b|$)/, "gi"), "")

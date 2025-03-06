@@ -35,16 +35,16 @@ function catalog(channel, messageid, amount, loop = 0) {
             itemsProcessed++
             database.storeMessage(message)
 
-            if (itemsProcessed === messages.size) {
-                if (itemsProcessed === 100) {
+            if (itemsProcessed === messages.size)
+                if (itemsProcessed === 100)
                     if ((amount - ((loop * 100) + itemsProcessed)) > 0) {
                         logger.console(`100 messages scanned continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
                         catalog(channel, message.id, amount, ++loop)
-                    } else
+                    } else {
                         logger.console(`Set amount reached ${((loop * 100) + itemsProcessed)} messages catalogged from ${channel.name} in ${channel.guild.name}`)
-                } else
+                    }
+                else
                     logger.console(`End reached ${((loop * 100) + itemsProcessed)} messages catalogged from ${channel.name} in ${channel.guild.name}`)
-            }
         }
     ))
 }

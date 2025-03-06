@@ -15,7 +15,7 @@
     "rules": {
         "keyword-spacing": ["error"],
         "indent": ["error", 4],
-        "quotes": ["error", "double"],
+        "quotes": ["error", "double"], 
         "semi": ["error", "never"],
         "no-unused-vars": ["warn"],
         "no-console": ["warn"],
@@ -36,6 +36,8 @@
         "padded-blocks": ["error", "never"],
         "prefer-const": "error",
         "prefer-template": "error",
-        "no-multiple-empty-lines": "error"
+        "no-multiple-empty-lines": ["error", { "max": 1 }],
+        "curly": ["error", "multi", "consistent"],
+        "brace-style": ["error", "1tbs"]
     }
 }

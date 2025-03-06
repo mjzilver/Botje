@@ -39,11 +39,9 @@ module.exports = class MessagerHandler {
     }
 
     findFromReply(replyMessage) {
-        for (const [call, reply] of Object.entries(this.commandCalls)) {
-            if (reply === replyMessage.id) {
+        for (const [call, reply] of Object.entries(this.commandCalls))
+            if (reply === replyMessage.id)
                 return call
-            }
-        }
     }
 
     delete(reply) {
@@ -74,9 +72,9 @@ module.exports = class MessagerHandler {
         ORDER BY timestamp DESC`
 
         database.query(selectSQL, [], (rows) => {
-            for (let i = 0; i < rows.length; i++) {
+            for (let i = 0; i < rows.length; i++)
                 this.commandCalls[rows[i]["call_id"]] = rows[i]["reply_id"]
-            }
+
             if (config.scan_on_startup === true)
                 this.scanForCommands()
         })
@@ -94,13 +92,10 @@ module.exports = class MessagerHandler {
                         .filter(message => message.createdTimestamp > yesterday)
                         .forEach(message => {
                             database.storeMessage(message)
-                            if (message.content.match(new RegExp(config.prefix, "i"))) {
-                                if (!(message.id in this.commandCalls)) {
-                                    if (!this.bot.commandHandler.isUserBanned(message)) {
+                            if (message.content.match(new RegExp(config.prefix, "i")))
+                                if (!(message.id in this.commandCalls))
+                                    if (!this.bot.commandHandler.isUserBanned(message))
                                         this.bot.commandHandler.handleCommand(message, true)
-                                    }
-                                }
-                            }
                         })
                 })
             })

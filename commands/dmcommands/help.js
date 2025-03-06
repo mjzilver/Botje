@@ -11,9 +11,8 @@ module.exports = {
         let helpMessage = "**Here is a list of all the commands *you* can use in private message (use b!help in a server to see server commands):  \n**"
         const commands = require("systems/commandLoader.js").dmcommands
 
-        for (const [, command] of Object.entries(commands)) {
+        for (const [, command] of Object.entries(commands))
             helpMessage += `\`${command.format}\`: ${command.description} \n`
-        }
 
         const help = new discord.MessageEmbed()
             .setColor(config.color_hex)

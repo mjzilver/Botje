@@ -105,11 +105,10 @@ class SocketHandler {
 
             database.insert(insertSQL, [pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue], () => {
                 this.io.emit("pixelChanged", pixel)
-                if (editPerPerson[socket.id] === undefined) {
+                if (editPerPerson[socket.id] === undefined)
                     editPerPerson[socket.id] = [new Date()]
-                } else {
+                else
                     editPerPerson[socket.id].push(new Date())
-                }
             })
         } else {
             logger.warn("User kicked for invalid emit")
@@ -120,9 +119,8 @@ class SocketHandler {
     handleDisconnect(socket) {
         this.io.emit("connectCounter", --this.connectCounter)
         const { editPerPerson } = this
-        if (editPerPerson && editPerPerson[socket.id]) {
+        if (editPerPerson && editPerPerson[socket.id])
             delete editPerPerson[socket.id]
-        }
     }
 
     spamChecker(id, editPerPerson) {

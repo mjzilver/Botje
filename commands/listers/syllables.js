@@ -76,7 +76,9 @@ class syllableLister extends Lister {
                 sorted.push([user, userdata[user]["average"]])
             }
 
-            sorted.sort(function(a, b) { return b[1] - a[1] })
+            sorted.sort(function(a, b) {
+                return b[1] - a[1]
+            })
 
             let result = ""
             for (let i = 0; (i < sorted.length && i <= 10); i++)

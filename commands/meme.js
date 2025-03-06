@@ -17,7 +17,6 @@ module.exports = {
         else
             url = getURL(message)
 
-
         if (args[0]?.indexOf("http") === 0)
             url = args.shift()
 

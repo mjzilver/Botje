@@ -33,9 +33,9 @@ class Database {
             if (err) {
                 logger.error(selectSQL)
                 logger.error(err.stack)
-            }
-            else
+            } else {
                 callback(result.rows)
+            }
         })
     }
 
@@ -52,13 +52,12 @@ class Database {
     }
 
     storeMessage(message) {
-        if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i"))) {
+        if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")))
             message.guild.members.fetch(message.author.id).then(() => {
                 this.insertMessage(message)
             }).catch(() => {
                 // person is not a member (has left the server)
             })
-        }
     }
 
     async insertMessage(message) {

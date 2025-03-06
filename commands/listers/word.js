@@ -22,17 +22,16 @@ class WordLister extends Lister {
         const args = message.content.match(/([^" ]+)|"([^"]+)"/gi)
         const mentioned = message.mentions.users.first()
 
-        if (mentioned && args[2]) {
+        if (mentioned && args[2])
             this.mention(message, mentioned, args[2].removeQuotes().toLowerCase())
-        } else if (args[1] === "?" && args[2]) {
+        else if (args[1] === "?" && args[2])
             this.perPerson(message, args[2].removeQuotes().toLowerCase())
-        } else if (args[1] === "%" && args[2]) {
+        else if (args[1] === "%" && args[2])
             this.percentage(message, args[2].removeQuotes().toLowerCase())
-        } else if (args[1]) {
+        else if (args[1])
             this.total(message, args[1].removeQuotes().toLowerCase())
-        } else {
+        else
             bot.messageHandler.send(message, `I have no idea what you want, format is as follows: '${module.exports.format}'`)
-        }
     }
 
     perPerson(message, word) {
@@ -105,7 +104,9 @@ class WordLister extends Lister {
                 const percentage = ((parseInt(rows[i]["count"]) / parseInt(rows[i]["total"])) * 100).toFixed(3)
                 resultArray.push({ "percentage": percentage, "user_name": rows[i]["user_name"] })
             }
-            resultArray.sort(function(a, b) { return b.percentage - a.percentage })
+            resultArray.sort(function(a, b) {
+                return b.percentage - a.percentage
+            })
 
             for (let i = 0; i < resultArray.length; i++)
                 result += `${resultArray[i]["user_name"]} has said ${word} in ${resultArray[i]["percentage"]}% of their messages! \n`

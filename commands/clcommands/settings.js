@@ -11,9 +11,8 @@ module.exports = {
 
         if (!setting || !value) {
             logger.console("Current settings:")
-            for (const [key, value] of Object.entries(config)) {
+            for (const [key, value] of Object.entries(config))
                 logger.console(`${key}: ${value}`)
-            }
         } else {
             updateConfigVariable(setting, value)
             logger.console(`Updated ${setting} to ${value}`)

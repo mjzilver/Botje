@@ -2,9 +2,8 @@ const bot = require("systems/bot.js")
 
 class Lister {
     constructor() {
-        if (this.constructor === Lister) {
+        if (this.constructor === Lister)
             throw new Error("Can't instantiate abstract class!")
-        }
     }
 
     process(message) {
@@ -12,17 +11,16 @@ class Lister {
         const args = message.content.split(" ")
         const page = (args[2] ? args[2] - 1 : 0)
 
-        if (args.length === 1) {
+        if (args.length === 1)
             this.total(message, page)
-        } else if (mentioned) {
+        else if (mentioned)
             this.mention(message, mentioned, page)
-        } else if (args[1] === "?") {
+        else if (args[1] === "?")
             this.perPerson(message, page)
-        } else if (args[1] === "%") {
+        else if (args[1] === "%")
             this.percentage(message, page)
-        } else {
+        else
             bot.messageHandler.reply(message, "Incorrect format try ? % or mentioning an user")
-        }
     }
 
     total(message) {

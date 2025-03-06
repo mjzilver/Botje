@@ -19,9 +19,8 @@ router.get("/users/:channelId", (req, res) => {
 
     const channel = bot.client.channels.cache.get(channelId)
 
-    if (!channel) {
+    if (!channel)
         return res.status(404).send("Channel not found")
-    }
 
     const users = Array.from(channel.members.values())
         .map(member => ({
@@ -33,7 +32,6 @@ router.get("/users/:channelId", (req, res) => {
     res.json(users)
 })
 
-
 router.get("/", (req, res) => {
     const guilds = Object.fromEntries(bot.client.guilds.cache)
 
@@ -43,7 +41,6 @@ router.get("/", (req, res) => {
         "users": [],
     })
 })
-
 
 router.post("/", function(req) {
     webhook.sendMessage(req.body.channel, req.body.text, req.body.user)

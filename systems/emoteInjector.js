@@ -33,9 +33,8 @@ module.exports = class EmoteInjector {
                     }
                 }
 
-                if (!found) {
+                if (!found)
                     continue
-                }
             }
         }
 

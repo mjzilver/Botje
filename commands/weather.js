@@ -15,8 +15,9 @@ module.exports = {
         if (args[1]) {
             args.shift()
             city = args.join(" ")
-        } else
+        } else {
             return bot.messageHandler.send(message, "You need to enter a city")
+        }
 
         request(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${config.weather_api_key}&units=metric&mode=JSON`,
             (err, res, body) => {

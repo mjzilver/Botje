@@ -43,17 +43,16 @@ module.exports = class Dictionary {
             for (let i = 0; i < rows.length; i++) {
                 const words = rows[i]["message"].split(/\s+/)
 
-                for (let j = 0; j < words.length; j++) {
+                for (let j = 0; j < words.length; j++)
                     if (!wordHolder[words[j]])
                         wordHolder[words[j]] = 1
                     else
                         wordHolder[words[j]]++
-                }
             }
 
-            for (const word in wordHolder) {
+            for (const word in wordHolder)
                 this.words.push([word, wordHolder[word]])
-            }
+
             this.words.sort(function(a, b) {
                 return b[1] - a[1]
             })
@@ -72,9 +71,8 @@ module.exports = class Dictionary {
         for (const i in this.words) {
             let processedWord = this.words[i][0]
             processedWord = processedWord.textOnly()
-            if (processedWord.length === length && this.words[i][1] > 20) {
+            if (processedWord.length === length && this.words[i][1] > 20)
                 result.push(processedWord)
-            }
         }
 
         return result

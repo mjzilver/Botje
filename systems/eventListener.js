@@ -13,7 +13,7 @@ module.exports = class eventListener {
         })
 
         bot.client.on("messageCreate", message => {
-            if (!(message.author.id in bot.disallowed)) {
+            if (!(message.author.id in bot.disallowed))
                 if (message.channel.type === "DM") {
                     bot.commandHandler.handleDM(message)
                 } else {
@@ -21,11 +21,10 @@ module.exports = class eventListener {
                     bot.commandHandler.handleCommand(message)
                     bot.emoteInjector.handleMessage(message)
                 }
-            }
         })
 
         bot.client.on("messageReactionAdd", (reaction) => {
-            if (reaction.message.author.equals(bot.client.user)) {
+            if (reaction.message.author.equals(bot.client.user))
                 switch (reaction.emoji.name) {
                 case config.positive_emoji:
                     // Handle positive emoji reaction
@@ -42,7 +41,6 @@ module.exports = class eventListener {
                 default:
                     break
                 }
-            }
         })
 
         bot.client.on("emojiCreate", emoji => {

@@ -6,15 +6,13 @@ module.exports = {
     "description": "clears the console without effecting the logs",
     "format": "clear",
     "function": async function clean() {
-        for (const [, channel] of bot.client.channels.cache.entries()) {
-            if (channel.type === "text") {
+        for (const [, channel] of bot.client.channels.cache.entries())
+            if (channel.type === "text")
                 channel.fetchWebhooks().then((webhooks) => {
                     webhooks.forEach((webhook) => {
                         logger.console(webhook)
                         webhook.delete()
                     })
                 })
-            }
-        }
     }
 }

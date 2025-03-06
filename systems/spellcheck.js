@@ -16,11 +16,10 @@ class Spellcheck {
         database.query(selectSQL, [], (rows) => {
             rows.forEach(row => {
                 row.message.split(" ").forEach(word => {
-                    if (!(word in this.wordList)) {
+                    if (!(word in this.wordList))
                         this.wordList[word] = 1
-                    } else {
+                    else
                         this.wordList[word] = this.wordList[word] + 1
-                    }
                 })
             })
         })
@@ -59,7 +58,7 @@ class Spellcheck {
         let difference = Number.MAX_VALUE
         let chosenAmount = 0
 
-        for (const [wordlistword, wordlistamount] of Object.entries(this.wordList)) {
+        for (const [wordlistword, wordlistamount] of Object.entries(this.wordList))
             if (wordlistamount >= 5) {
                 const currentdifference = bot.logic.levenshtein(word, wordlistword)
                 if (currentdifference < difference) {
@@ -74,7 +73,7 @@ class Spellcheck {
                     }
                 }
             }
-        }
+
         return closestMatch
     }
 }

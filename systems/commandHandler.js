@@ -27,9 +27,8 @@ module.exports = class CommandHandler {
             if (!isReadback)
                 this.commandList.push(message)
 
-            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, !isReadback)) {
+            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, !isReadback))
                 this.handleCommandType(command, args, isReadback, message)
-            }
         } else if (!message.author.bot) {
             this.handleNonCommandMessage(message)
         }
@@ -42,23 +41,21 @@ module.exports = class CommandHandler {
     }
 
     handleCommandType(command, args, readback, message) {
-        if (command in this.commands) {
+        if (command in this.commands)
             this.commands[command].function(message)
-        } else if (command in this.admincommands) {
+        else if (command in this.admincommands)
             this.handleAdminCommand(command, message)
-        } else if (!readback) {
+        else if (!readback)
             this.bot.messageHandler.reply(message, `${command.capitalize()} is not a command, please try again.`)
-        } else {
+        else
             this.bot.messageHandler.markComplete(message)
-        }
     }
 
     handleAdminCommand(command, message) {
-        if (message.author.id === config.owner || message.member.permissions.has("ADMINISTRATOR")) {
+        if (message.author.id === config.owner || message.member.permissions.has("ADMINISTRATOR"))
             this.admincommands[command](message)
-        } else {
+        else
             this.bot.messageHandler.reply(message, `${command.capitalize()} is an admin command, and you are not allowed to use it.`)
-        }
     }
 
     handleNonCommandMessage(message) {
@@ -66,7 +63,7 @@ module.exports = class CommandHandler {
             const currentTimestamp = new Date()
             const timePassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes()
 
-            if (!this.bot.replyHandler.process(message)) {
+            if (!this.bot.replyHandler.process(message))
                 if ((this.messageCounter >= config.speakEvery || this.bot.logic.randomBetween(1, 20) === 1) && timePassed >= this.bot.logic.randomBetween(20, 60)) {
                     this.commands["speak"].function(message)
                     this.lastMessageSent = currentTimestamp
@@ -75,7 +72,7 @@ module.exports = class CommandHandler {
                     if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false))
                         this.commands["speak"].function(message)
                 }
-            }
+
             this.messageCounter++
         }
     }
@@ -115,9 +112,9 @@ module.exports = class CommandHandler {
         const elapsedTime = currentTimestamp - this.lastRequest[message.author.username]
         if (elapsedTime < config.timeoutDuration * 1000) {
             const remainingTime = Math.ceil((config.timeoutDuration * 1000 - elapsedTime) / 1000)
-            if (canSendMessage) {
+            if (canSendMessage)
                 this.bot.messageHandler.send(message, `Please wait ${remainingTime} second${remainingTime > 1 ? "s" : ""} before making another request.`)
-            }
+
             return false // too soon, return false
         }
 

@@ -9,20 +9,16 @@ const clcommands = {}
 function loadCommands(dirPath, commandObject) {
     const files = fs.readdirSync(dirPath)
 
-    for (const file of files) {
+    for (const file of files)
         if (file.endsWith(".js")) {
             const command = require(path.join(dirPath, file))
-            if (command.disabled !== true) {
+            if (command.disabled !== true)
                 commandObject[command.name] = command
-            }
 
-            if (command.aliases !== undefined) {
-                for (const alias of command.aliases.split(",")) {
+            if (command.aliases !== undefined)
+                for (const alias of command.aliases.split(","))
                     commandObject[alias] = command
-                }
-            }
         }
-    }
 }
 
 const baseDir = `${__dirname }/../`

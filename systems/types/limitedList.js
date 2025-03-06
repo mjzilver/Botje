@@ -5,9 +5,9 @@ class LimitedList {
     }
 
     push(item) {
-        if (this.items.length >= this.limit) {
+        if (this.items.length >= this.limit)
             this.items.shift()
-        }
+
         this.items.push(item)
     }
 

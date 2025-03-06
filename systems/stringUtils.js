@@ -44,5 +44,7 @@ String.prototype.replaceAt = function(index, replacement) {
 
 Object.defineProperty(Array.prototype, "pickRandom", {
     enumerable: false,
-    value: function() { return this[bot.logic.randomBetween(0, this.length - 1)] }
+    value: function() {
+        return this[bot.logic.randomBetween(0, this.length - 1)]
+    }
 })

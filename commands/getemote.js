@@ -14,9 +14,8 @@ module.exports = {
 
         if (args[0] === "?") {
             let result = ""
-            for (let i = 0; i < files.length; i++) {
+            for (let i = 0; i < files.length; i++)
                 result += `${files[i]}, `
-            }
 
             bot.messageHandler.reply(message, `Emotes backed up for this server: ${result}`)
         } else if (args[0]) {

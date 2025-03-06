@@ -13,10 +13,9 @@ module.exports = {
                     sentence = sentence.join(" ")
                     sentence = sentence.toLowerCase()
 
-                    for (let i = 0; i < sentence.length; i++) {
+                    for (let i = 0; i < sentence.length; i++)
                         if (sentence.charAt(i) >= "a" && sentence.charAt(i) <= "z")
                             replyMessage.react(emojiValues[`letter_${ sentence.charAt(i)}`])
-                    }
 
                     message.delete({
                         timeout: 1000
@@ -28,13 +27,13 @@ module.exports = {
             sentence = sentence.join(" ")
             sentence = sentence.toLowerCase()
             let result = ""
-            if (sentence.length > 0) {
+            if (sentence.length > 0)
                 for (let i = 0; i < sentence.length; i++) {
                     if (sentence.charAt(i) >= "a" && sentence.charAt(i) <= "z")
                         result += emojiValues[`letter_${ sentence.charAt(i)}`]
                     result += " "
                 }
-            }
+
             bot.messageHandler.send(message, result)
         }
     }

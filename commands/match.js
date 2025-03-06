@@ -13,8 +13,7 @@ module.exports = {
 
         const spellchecked = bot.spellcheck.checkSentence(words.join(" "))
 
-        if (spellchecked.mistakes >= 1) {
+        if (spellchecked.mistakes >= 1)
             return bot.messageHandler.reply(message, `You made a mistake, it should be: \n"${spellchecked.result}"`)
-        }
     }
 }

@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
     const pixels = new Array(config.image.size)
     for (let i = 0; i < pixels.length; i++) {
         pixels[i] = new Array(config.image.size)
-        for (let j = 0; j < pixels[i].length; j++) {
+        for (let j = 0; j < pixels[i].length; j++)
             pixels[i][j] = {
                 y: i,
                 x: j,
@@ -18,14 +18,13 @@ router.get("/", (req, res) => {
                 green: 255,
                 blue: 255
             }
-        }
     }
 
     database.query(selectSQL, [], async(rows) => {
         for (let i = 0; i < rows.length; i++) {
             const element = rows[i]
 
-            if (element.x >= 0 && element.x < config.image.size && element.y >= 0 && element.y < config.image.size) {
+            if (element.x >= 0 && element.x < config.image.size && element.y >= 0 && element.y < config.image.size)
                 pixels[element.y][element.x] = {
                     y: element.y,
                     x: element.x,
@@ -33,7 +32,6 @@ router.get("/", (req, res) => {
                     green: element.green,
                     blue: element.blue
                 }
-            }
         }
         res.render("pixels", {
             pixels: pixels

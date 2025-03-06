@@ -27,21 +27,17 @@ class WebServer {
         this.connectCounter = 0
         this.port = config.port
 
-        if (process.argv.includes("--dev")) {
+        if (process.argv.includes("--dev"))
             this.port = config.devPort
-        }
 
-        if (featureFlags.enableTerminal) {
+        if (featureFlags.enableTerminal)
             app.use("/terminal", require("./routes/terminal"))
-        }
 
-        if (featureFlags.enableWebhooks) {
+        if (featureFlags.enableWebhooks)
             app.use("/webhooks", require("./routes/webhooks"))
-        }
 
-        if (featureFlags.enableDraw) {
+        if (featureFlags.enableDraw)
             app.use("/draw", require("./routes/draw"))
-        }
 
         // needs to be last
         app.use("/", require("./routes/index"))

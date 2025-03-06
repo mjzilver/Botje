@@ -98,9 +98,9 @@ class ScoreLister extends Lister {
 
     calculateScore(message) {
         let score = 0
-        for (let i = 0; i < message.length; i++) {
+        for (let i = 0; i < message.length; i++)
             score += letterValues[message.charAt(i)] === undefined ? 0 : letterValues[message.charAt(i)]
-        }
+
         return score
     }
 }
