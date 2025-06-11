@@ -65,7 +65,7 @@ async function processPicture(url, top, bottom, message) {
     top = top ? top.toUpperCase().trim().replaceFancyQuotes() : ""
     bottom = bottom ? bottom.toUpperCase().trim().replaceFancyQuotes() : ""
 
-    Jimp.read(url, (err, image) => {
+    Jimp.read(url, (_, image) => {
         Jimp.loadFont("assets/font.fnt").then(font => {
             image = image.resize(800, Jimp.AUTO)
 

@@ -16,7 +16,7 @@ class Database {
             this.initializeDatabase()
             logger.startup("Postgres Database loaded")
         }).catch(e => {
-            logger.error(`Could not connect to database: ${e}`)
+            logger.error(`Could not connect to database: ${e.message}`)
         })
     }
 
