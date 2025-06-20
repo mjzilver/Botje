@@ -1,5 +1,4 @@
 const request = require("request")
-const discord = require("discord.js")
 const { config } = require("systems/settings")
 const database = require("systems/database.js")
 const bot = require("systems/bot.js")
@@ -87,14 +86,17 @@ function handleRedditImages(message, sub, children) {
 
 function embedImage(message, post, sub) {
     if (post.url.isImage()) {
-        const image = new discord.MessageEmbed()
-            .setColor(`${config.color_hex}`)
-            .setTitle(`${post.title}`)
-            .addField("Updoots", `${post.score}`, true)
-            .addField("Posted by", `${post.author}`, true)
-            .setImage(`${post.url}`)
-            .setURL(`https://reddit.com${post.permalink}`)
-            .setFooter(`From: reddit/r/${sub}`)
+        const image = {
+            color: config.color_hex,
+            title: post.title,
+            fields: [
+                { name: "Updoots", value: `${post.score}`, inline: true },
+                { name: "Posted by", value: `${post.author}`, inline: true }
+            ],
+            image: { url: post.url },
+            url: `https://reddit.com${post.permalink}`,
+            footer: { text: `From: reddit/r/${sub}` }
+        }
         bot.messageHandler.send(message, { embeds: [image] })
     } else if (post.url.match(/v\.redd\.it/gi)) {
         handleRedirect(message, post)

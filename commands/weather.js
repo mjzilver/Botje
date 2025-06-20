@@ -37,15 +37,17 @@ module.exports = {
                         .setColor(config.color_hex)
                         .setTitle(`Weather in ${result.name} ${result.sys.country}`)
                         .setThumbnail(`https://openweathermap.org/img/wn/${result.weather[0].icon}@2x.png`)
-                        .addField("Current Weather", result.weather[0].description.capitalize())
-                        .addField("Temperature", `${result.main.temp}°C`, true)
-                        .addField("Feels like", `${result.main.feels_like}°C`, true)
-                        .addField("Humidity", `${result.main.humidity}%`, true)
-                        .addField("Wind", `${result.wind.speed}m/s`, true)
-                        .addField("Clouds", `${result.clouds.all}%`, true)
-                        .addField("Pressure", `${result.main.pressure}hPa`, true)
-                        .addField("Sunrise", sunrise, true)
-                        .addField("Sunset", sunset, true)
+                        .addFields(
+                            { name: "Current Weather", value: result.weather[0].description.capitalize() },
+                            { name: "Temperature", value: `${result.main.temp}°C`, inline: true },
+                            { name: "Feels like", value: `${result.main.feels_like}°C`, inline: true },
+                            { name: "Humidity", value: `${result.main.humidity}%`, inline: true },
+                            { name: "Wind", value: `${result.wind.speed}m/s`, inline: true },
+                            { name: "Clouds", value: `${result.clouds.all}%`, inline: true },
+                            { name: "Pressure", value: `${result.main.pressure}hPa`, inline: true },
+                            { name: "Sunrise", value: sunrise, inline: true },
+                            { name: "Sunset", value: sunset, inline: true }
+                        )
 
                     bot.messageHandler.send(message, { embeds: [weatherEmbed] })
                 } else {

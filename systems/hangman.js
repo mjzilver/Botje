@@ -121,13 +121,17 @@ class hangman {
             .setColor(config.color_hex)
             .setTitle(`Hangman -- ${this.tries}/${this.maxTries} tries`)
             .setImage("attachment://hangman.png")
-            .addField("Word", showVisibleWord, false)
+            .addFields(
+                { name: "Word", value: showVisibleWord, inline: false }
+            )
 
         if (this.alreadyGuessed.length > 0) {
             let alreadyGuessedString = ""
             for (let i = 0; i < this.alreadyGuessed.length; i++)
                 alreadyGuessedString += `${this.alreadyGuessed[i].toUpperCase() } `
-            hangmanEmbed.addField("Already guessed letters", alreadyGuessedString, false)
+            hangmanEmbed.addFields(
+                { name: "Already guessed letters", value: alreadyGuessedString, inline: false }
+            )
         }
 
         if (this.hasEnded)
