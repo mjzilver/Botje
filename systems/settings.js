@@ -27,10 +27,8 @@ function updateConfigVariable(key, value) {
     saveConfigToFile()
 }
 
-// Load the config from the file when the module is required.
 loadConfigFromFile()
 
-// Export the functions and config object so other classes can access them.
 module.exports = {
     config,
     updateConfigVariable,

@@ -4,8 +4,6 @@ const logger = require("systems/logger.js")
 const options = {
     limit: 5,
     order: "desc",
-    from: new Date(Date.now() - 24 * 60 * 60 * 1000), // last 24 hours
-    until: new Date(),
     level: "error",
 }
 
