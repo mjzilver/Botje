@@ -3,7 +3,7 @@ const database = require("systems/database.js")
 
 module.exports = {
     name: "checkdupes",
-    description: "checks the database for duplicate entries, use -d yes for deletion",
+    description: "checks the database for duplicate entries",
     format: "checkdupes",
     function: () => {
         try {

@@ -12,11 +12,17 @@ const loggerLevels = {
     startup: 6
 }
 
-Winston.loggers.add("logger", {
+Winston.addColors({
+    console: "grey",
+    deletion: "yellow",
+    startup: "magenta",
+    repeat: "cyan",
+})
+
+const logger = Winston.createLogger({
     levels: loggerLevels,
     transports: [
-        new (Winston.transports.Console)({
-            colorize: true,
+        new Winston.transports.Console({
             level: "startup",
             format: combine(
                 timestamp({ format: "DD-MM-YYYY HH:mm:ss" }),
@@ -24,8 +30,7 @@ Winston.loggers.add("logger", {
                 printf(output => `${output.timestamp} ${output.level}: ${output.message}`)
             )
         }),
-        new (Winston.transports.File)({
-            name: "file",
+        new Winston.transports.File({
             filename: "bot.log",
             level: "warn",
             format: combine(
@@ -36,11 +41,41 @@ Winston.loggers.add("logger", {
     ]
 })
 
-Winston.addColors({
-    console: "grey",
-    deletion: "yellow",
-    startup: "magenta",
-    repeat: "cyan",
-})
+logger.printColumns = function(arrays, headers = [], loggerFn = logger.console) {
+    if (!arrays.length) return
+    const rowCount = arrays[0].length
+    const colWidths = arrays.map(col => Math.max(...col.map(val => String(val).length)))
 
-module.exports = Winston.loggers.get("logger")
+    if (headers) {
+        const headerLine = headers.map((val, i) =>
+            String(val).padEnd(colWidths[i])
+        ).join(" | ")
+        loggerFn(headerLine)
+        loggerFn(colWidths.map(w => "=".repeat(w)).join(" | "))
+    }
+
+    for (let row = 0; row < rowCount; row++) {
+        const line = arrays.map((col, i) =>
+            String(col[row]).padEnd(colWidths[i])
+        ).join(" | ")
+        loggerFn(line)
+    }
+}
+
+logger.printRows = function(rows, loggerFn = logger.console) {
+    if (!rows.length) return
+    const colCount = rows[0].length
+    const colWidths = Array.from({ length: colCount }, (_, i) =>
+        Math.max(...rows.map(row => String(row[i]).length))
+    )
+
+    for (const row of rows) {
+        const line = row.map((val, i) =>
+            String(val).padEnd(colWidths[i])
+        ).join(" | ")
+
+        loggerFn(line)
+    }
+}
+
+module.exports = logger

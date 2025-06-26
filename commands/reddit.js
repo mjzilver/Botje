@@ -16,7 +16,7 @@ const defaultOptions = {
 
 module.exports = {
     "name": "reddit",
-    "description": "gets a random link from the given subreddit use top|hot|new to sort and the timeframe (only for top)",
+    "description": "gets a random link from the given subreddit",
     "format": "reddit [subreddit] (top|hot|new) (hour|day|week|month|year|all)",
     "function": getRedditImage
 }

@@ -6,7 +6,7 @@ const bot = require("systems/bot.js")
 
 module.exports = {
     "name": "word",
-    "description": "shows how many times a word has been said in the current channel, ? per user or from mentioned user",
+    "description": "shows how many times a word has been said in the current channel or by a mentioned user",
     "format": "word (@user | ?) [word]",
     "function": (message) => {
         new WordLister().process(message)

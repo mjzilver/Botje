@@ -6,7 +6,7 @@ const bot = require("systems/bot.js")
 module.exports = {
     "name": "meme",
     "description": "turn an image into a meme, include picture by uploading, replying or URL",
-    "format": "meme (link to image) (top text) - (bottom text)",
+    "format": "meme (link to image) (top text) | (bottom text)",
     "function": async function meme(message) {
         const args = message.content.split(" ")
         args.shift()

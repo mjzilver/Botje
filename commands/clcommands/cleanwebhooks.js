@@ -3,7 +3,7 @@ const logger = require("systems/logger.js")
 
 module.exports = {
     "name": "cleanwebhooks",
-    "description": "clears the console without effecting the logs",
+    "description": "removes all webhooks from all text channels",
     "format": "clear",
     "function": async function clean() {
         for (const [, channel] of bot.client.channels.cache.entries())
