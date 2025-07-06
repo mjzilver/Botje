@@ -1,5 +1,6 @@
 const fs = require("fs")
 const bot = require("systems/bot.js")
+const { findClosestMatchInList } = require("systems/utils.js")
 
 module.exports = {
     "name": "getemote",
@@ -24,7 +25,7 @@ module.exports = {
             if (fs.existsSync(path + filename)) {
                 bot.messageHandler.reply(message, { files: [path + filename] })
             } else {
-                const closestFilename = bot.logic.findClosestMatchInList(filename, files)
+                const closestFilename = findClosestMatchInList(filename, files)
                 bot.messageHandler.reply(message, { files: [path + closestFilename] })
             }
         }

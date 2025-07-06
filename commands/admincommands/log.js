@@ -24,14 +24,18 @@ module.exports = async function log(message) {
             return
         }
 
-        const logMessages = logs.map(log => {
-            const timestamp = new Date(log.timestamp).toLocaleString("nl-NL")
-            return `${timestamp} level: ${log.level} ${log.message}`
-        }).join("\n")
-
         bot.messageHandler.send(
             message,
-            `Last ${logs.length} error logs in the last 24 hours:\n${logMessages}`
+            `Found ${logs.length} error logs in the last 24 hours. Fetching details...`
         )
+        logs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+            .map(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString("nl-NL")
+
+                bot.messageHandler.send(
+                    message,
+                    `Log at ${timestamp} level: ${log.level} ${log.message}`
+                )
+            })
     })
 }

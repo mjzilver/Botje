@@ -1,5 +1,6 @@
 const database = require("systems/database.js")
 const bot = require("systems/bot.js")
+const { randomBetween } = require("systems/utils.js")
 
 module.exports = {
     "name": "talk",
@@ -35,15 +36,15 @@ module.exports = {
             }
 
             let sentence = ""
-            const sentenceLength = bot.logic.randomBetween(8, 15)
+            const sentenceLength = randomBetween(8, 15)
 
             if (chain[""]) {
-                let previousWord = chain[""][bot.logic.randomBetween(0, chain[""].length - 1)]
+                let previousWord = chain[""][randomBetween(0, chain[""].length - 1)]
                 sentence += previousWord
 
                 for (let i = 0; i < sentenceLength - 1; i++)
                     if (chain[previousWord]) {
-                        const currentWord = chain[previousWord][bot.logic.randomBetween(0, chain[previousWord].length - 1)]
+                        const currentWord = chain[previousWord][randomBetween(0, chain[previousWord].length - 1)]
 
                         sentence += ` ${ currentWord}`
                         previousWord = currentWord

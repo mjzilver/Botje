@@ -1,4 +1,5 @@
 const bot = require("systems/bot.js")
+const { formatUptime } = require("systems/utils.js")
 
 module.exports = {
     "name": "uptime",
@@ -7,11 +8,8 @@ module.exports = {
     "function": function uptime(message) {
         const now = new Date()
         const diff = now - bot.client.readyTimestamp
-        const days = Math.floor(diff / 86400000)
-        const hours = Math.floor((diff / 3600000) % 24)
-        const minutes = Math.floor((diff / 60000) % 60)
-        const seconds = Math.floor((diff / 1000) % 60)
+        const formattedUptime = formatUptime(diff)
 
-        bot.messageHandler.send(message, `I have been online for ${days ? `${days} days, ` : ""}${hours ? `${hours} hours, ` : ""}${minutes} minutes and ${seconds} seconds`)
+        bot.messageHandler.send(message, `I have been online for **${formattedUptime}** since my last restart.`)
     }
 }

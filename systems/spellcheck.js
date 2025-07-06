@@ -1,5 +1,5 @@
 const database = require("systems/database.js")
-const bot = require("systems/bot.js")
+const { levenshtein } = require("systems/utils.js")
 
 class Spellcheck {
     constructor() {
@@ -60,7 +60,7 @@ class Spellcheck {
 
         for (const [wordlistword, wordlistamount] of Object.entries(this.wordList))
             if (wordlistamount >= 5) {
-                const currentdifference = bot.logic.levenshtein(word, wordlistword)
+                const currentdifference = levenshtein(word, wordlistword)
                 if (currentdifference < difference) {
                     difference = currentdifference
                     closestMatch = wordlistword

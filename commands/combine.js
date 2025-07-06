@@ -1,6 +1,7 @@
 const fs = require("fs")
 const bot = require("systems/bot.js")
 const Jimp = require("jimp")
+const { findClosestMatchInList } = require("systems/utils.js")
 
 module.exports = {
     "name": "combine",
@@ -30,8 +31,8 @@ module.exports = {
                 image2 = `${args[1].match(emoteParser)[1] }.png`
 
             if (!files.includes(image1) || !files.includes(image2)) {
-                image1 = bot.logic.findClosestMatchInList(args[0], files)
-                image2 = bot.logic.findClosestMatchInList(args[1], files)
+                image1 = findClosestMatchInList(args[0], files)
+                image2 = findClosestMatchInList(args[1], files)
                 return processCombination(image1, image2, message)
             }
             return processCombination(image1, image2, message)

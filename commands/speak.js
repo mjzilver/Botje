@@ -1,6 +1,7 @@
 const database = require("systems/database.js")
 const bot = require("systems/bot.js")
 const logger = require("systems/logger.js")
+const { randomBetween, levenshtein } = require("systems/utils.js")
 
 module.exports = {
     "name": "speak",
@@ -60,7 +61,7 @@ function findByWord(message) {
                                 amount += 30 - (j * j)
 
                         if (amount > highestAmount)
-                            if (bot.logic.levenshtein(rows[i]["message"], message.content) > 15) {
+                            if (levenshtein(rows[i]["message"], message.content) > 15) {
                                 chosenMessage = rows[i]["message"]
                                 highestAmount = amount
                             }
@@ -139,7 +140,7 @@ function findTopic(message, topic) {
 
         const linkerwords = ["and", "or", "but", "also"]
 
-        const picker = bot.logic.randomBetween(0, 2)
+        const picker = randomBetween(0, 2)
 
         if (picker === 0)
             bot.messageHandler.reply(message, `${first}`.normalizeSpaces())

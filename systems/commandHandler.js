@@ -1,6 +1,7 @@
 const { config } = require("./settings")
 const logger = require("systems/logger.js")
 const LimitedList = require("systems/types/limitedList.js")
+const { randomBetween } = require("systems/utils.js")
 
 module.exports = class CommandHandler {
     constructor(bot) {
@@ -64,7 +65,7 @@ module.exports = class CommandHandler {
             const timePassed = new Date(currentTimestamp.getTime() - this.lastMessageSent.getTime()).getMinutes()
 
             if (!this.bot.replyHandler.process(message))
-                if ((this.messageCounter >= config.speakEvery || this.bot.logic.randomBetween(1, 20) === 1) && timePassed >= this.bot.logic.randomBetween(20, 60)) {
+                if ((this.messageCounter >= config.speakEvery || randomBetween(1, 20) === 1) && timePassed >= randomBetween(20, 60)) {
                     this.commands["speak"].function(message)
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
