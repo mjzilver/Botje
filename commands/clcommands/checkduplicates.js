@@ -6,6 +6,7 @@ module.exports = {
     description: "checks the database for duplicate entries",
     format: "checkdupes",
     function: () => {
+        logger.info("Checking for duplicate entries in the database...")
         try {
             const sql = `SELECT message, datetime, COUNT(message) AS count
                 FROM messages 
@@ -14,14 +15,14 @@ module.exports = {
                 ORDER BY COUNT(message) DESC;`
 
             database.query(sql, null, (rows) => {
-                logger.debug(`Found ${rows.length} duplicates`)
+                logger.console(`Found ${rows.length} duplicates`)
 
                 rows.forEach((row) => {
-                    logger.debug(`Duplicate: ${row.message} (${row.datetime}) - ${row.count} times`)
+                    logger.console(`Duplicate: ${row.message} (${row.datetime}) - ${row.count} times`)
                 })
             })
         } catch (error) {
-            logger.debug(`Error: ${error.message}`)
+            logger.error(`Error: ${error.message}`)
         }
     }
 }

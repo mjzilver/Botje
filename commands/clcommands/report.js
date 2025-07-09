@@ -39,10 +39,10 @@ module.exports = {
                     ["Message Count", formatter.format(rows[0]["count"])]
                 )
 
-                logger.printRows(printRows, logger.debug)
+                logger.printRows(printRows, logger.console)
             })
         } catch (error) {
-            logger.debug(`Error: ${error.message}`)
+            logger.error(`Error: ${error.message}`)
         }
     }
 }

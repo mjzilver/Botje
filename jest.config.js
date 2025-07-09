@@ -8,6 +8,11 @@ module.exports = {
         "/node_modules/",
         "<rootDir>/__tests__/mocks/"
     ],
+    collectCoverageFrom: [
+        "systems/**/*.js",
+        "!systems/web/**/*.js",
+        "!**/*.test.js",
+    ],
     moduleNameMapper: {
         "^systems/(.*)$": path.join(__dirname, "systems/$1"),
     },
