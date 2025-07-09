@@ -1,7 +1,7 @@
 const fs = require("fs")
 const request = require("request")
-const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
+const bot = require("../../systems/bot")
+const logger = require("../../systems/logger")
 
 module.exports = async function addmeme(message) {
     const args = message.content.split(" ")

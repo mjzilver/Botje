@@ -1,15 +1,15 @@
 const { config } = require("./settings")
-const logger = require("systems/logger.js")
-const LimitedList = require("systems/types/limitedList.js")
-const { randomBetween } = require("systems/utils.js")
+const logger = require("./logger")
+const LimitedList = require("./types/limitedList")
+const { randomBetween } = require("./utils")
 
 module.exports = class CommandHandler {
     constructor(bot) {
         this.bot = bot
 
-        this.commands = require("systems/commandLoader.js").commands
-        this.admincommands = require("systems/commandLoader.js").admincommands
-        this.dmcommands = require("systems/commandLoader.js").dmcommands
+        this.commands = require("./commandLoader").commands
+        this.admincommands = require("./commandLoader").admincommands
+        this.dmcommands = require("./commandLoader").dmcommands
 
         // person as key -> time as value
         this.lastRequest = []

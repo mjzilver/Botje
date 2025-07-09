@@ -1,5 +1,5 @@
-const { config } = require("systems/settings.js")
-const logger = require("systems/logger.js")
+const { config } = require("../settings")
+const logger = require("../logger")
 const featureFlags = require("./featureFlags")
 const { Server } = require("socket.io")
 

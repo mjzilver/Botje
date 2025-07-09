@@ -1,7 +1,7 @@
 /* eslint-disable */
-const sqlitedb = require("scripts/sqlitedb.js")
-const postgresdb = require("systems/database.js")
-const logger = require("systems/logger")
+const sqlitedb = require("./sqlitedb")
+const postgresdb = require("../systems/database")
+const logger = require("../systems/logger")
 
 const selectSQL = "SELECT * FROM messages order by id DESC"
 sqlitedb.db.all(selectSQL, [], (err, rows) => {

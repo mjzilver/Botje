@@ -1,7 +1,7 @@
-const { config } = require("systems/settings")
 const request = require("request")
-const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
+const { config } = require("../systems/settings")
+const bot = require("../systems/bot.js")
+const logger = require("../systems/logger.js")
 
 module.exports = {
     "name": "youtube",

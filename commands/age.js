@@ -1,4 +1,4 @@
-const bot = require("systems/bot.js")
+const bot = require("../systems/bot")
 
 module.exports = {
     "name": "age",

@@ -1,8 +1,8 @@
-const logger = require("systems/logger.js")
+const logger = require("./logger")
 
 module.exports = class ReplyHandler {
     constructor(bot) {
-        this.replyPatterns = require("json/reply.json")
+        this.replyPatterns = require("../json/reply.json")
 
         this.bot = bot
 

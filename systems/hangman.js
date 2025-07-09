@@ -1,7 +1,7 @@
 const discord = require("discord.js")
 const { config } = require("./settings")
-const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
+const bot = require("./bot")
+const logger = require("./logger")
 
 class hangman {
     constructor() {
@@ -40,7 +40,7 @@ class hangman {
         this.visibleWord = ""
         this.tries = 0
         this.alreadyGuessed = []
-        const words = require("json/words.json")
+        const words = require("../json/words.json")
 
         let chosenword = ""
 
@@ -135,9 +135,9 @@ class hangman {
         }
 
         if (this.hasEnded)
-            hangmanEmbed.setFooter("Use b!hangman start to start a new game!")
+            hangmanEmbed.setFooter({ text:"Use b!hangman start to start a new game!" })
         else
-            hangmanEmbed.setFooter("Use b!hangman guess to guess")
+            hangmanEmbed.setFooter({ text:"Use b!hangman guess to guess" })
 
         bot.messageHandler.send(message, {
             files: [attachment],

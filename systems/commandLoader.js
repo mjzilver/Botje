@@ -1,6 +1,6 @@
 const fs = require("fs")
 const path = require("path")
-const logger = require("systems/logger")
+const logger = require("./logger")
 
 const commands = {}
 const admincommands = {}

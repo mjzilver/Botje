@@ -1,6 +1,6 @@
 const fs = require("fs")
 const configFilePath = "./config.json"
-const logger = require("systems/logger.js")
+const logger = require("./logger")
 
 let config = {}
 

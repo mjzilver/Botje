@@ -1,5 +1,5 @@
-const bot = require("systems/bot.js")
-const { randomBetween } = require("systems/utils.js")
+const bot = require("../systems/bot")
+const { randomBetween } = require("../systems/utils")
 
 module.exports = {
     "name": "roll",

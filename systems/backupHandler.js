@@ -1,7 +1,7 @@
 const fs = require("fs")
 const request = require("request")
-const logger = require("systems/logger.js")
-const database = require("systems/database.js")
+const logger = require("./logger")
+const database = require("./database")
 const format = require("pg-format")
 
 module.exports = class BackupHandler {

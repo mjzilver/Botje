@@ -1,7 +1,7 @@
 const Jimp = require("jimp")
 const fs = require("fs")
-const database = require("systems/database.js")
-const bot = require("systems/bot.js")
+const database = require("../systems/database")
+const bot = require("../systems/bot")
 
 module.exports = {
     "name": "meme",

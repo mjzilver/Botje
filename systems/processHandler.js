@@ -1,5 +1,5 @@
-const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
+const bot = require("./bot")
+const logger = require("./logger")
 
 process.on("uncaughtException", (error) => {
     if (bot.commandHandler.commandList.get())

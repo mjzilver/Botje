@@ -1,8 +1,8 @@
 const express = require("express")
 const router = express.Router()
 
-const bot = require("systems/bot.js")
-const webhook = require("systems/webhook.js")
+const bot = require("../../../systems/bot.js")
+const webhook = require("../../../systems/webhook.js")
 
 router.get("/channels/:guildId", (req, res) => {
     const guildId = req.params.guildId

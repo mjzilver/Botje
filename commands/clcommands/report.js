@@ -1,8 +1,9 @@
-const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
-const database = require("systems/database.js")
+const bot = require("../../systems/bot")
+const logger = require("../../systems/logger")
+const database = require("../../systems/database")
 const formatter = new Intl.NumberFormat("en-GB")
-const { formatUptime } = require("systems/utils.js")
+const { formatUptime } = require("../../systems/utils")
+const os = require("os")
 
 module.exports = {
     name: "report",
@@ -16,8 +17,13 @@ module.exports = {
             const diff = now - bot.client.readyTimestamp
             const formattedUptime = formatUptime(diff)
 
+            const ipAddress = Object.values(os.networkInterfaces())
+                .flat()
+                .find(alias => alias.family === "IPv4" && !alias.internal)?.address || "Not found"
+
             const printRows = [
                 ["Process ID", process.pid],
+                ["IP address", ipAddress],
                 ["Node.js Version", process.version],
                 ["Memory: rss", `${Math.round(rss / 1024 / 1024 * 100) / 100} MB`],
                 ["Memory: heapUsed", `${Math.round(heapUsed / 1024 / 1024 * 100) / 100} MB`],

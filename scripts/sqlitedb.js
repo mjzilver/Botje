@@ -1,5 +1,5 @@
 const config = require("config.json")
-const logger = require("systems/logger")
+const logger = require("../systems/logger")
 
 class Database {
     constructor() {

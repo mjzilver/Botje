@@ -1,7 +1,7 @@
 const fs = require("fs")
-const bot = require("systems/bot.js")
+const bot = require("../systems/bot")
 const Jimp = require("jimp")
-const { findClosestMatchInList } = require("systems/utils.js")
+const { findClosestMatchInList } = require("../systems/utils")
 
 module.exports = {
     "name": "combine",

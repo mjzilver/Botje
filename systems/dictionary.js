@@ -1,6 +1,6 @@
 const fs = require("fs")
-const database = require("systems/database.js")
-const logger = require("systems/logger.js")
+const database = require("./database")
+const logger = require("./logger")
 
 module.exports = class Dictionary {
     constructor() {

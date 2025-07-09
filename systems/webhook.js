@@ -1,5 +1,5 @@
-const projectPackage = require("package.json")
-const logger = require("systems/logger.js")
+const projectPackage = require("../package.json")
+const logger = require("./logger")
 
 class Webhook {
     constructor() { }
@@ -20,7 +20,7 @@ class Webhook {
 
     sendMessage(channelid, text, userid, bot = null) {
         if (bot === null)
-            bot = require("systems/bot.js")
+            bot = require("./bot")
 
         const channel = bot.client.channels.cache.get(channelid)
 

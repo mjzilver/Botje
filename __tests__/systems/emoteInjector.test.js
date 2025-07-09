@@ -1,19 +1,19 @@
-jest.mock("systems/database")
-jest.mock("systems/logger")
-jest.mock("systems/settings")
-jest.mock("systems/bot")
-jest.mock("systems/webhook")
+jest.mock("../../systems/database")
+jest.mock("../../systems/logger")
+jest.mock("../../systems/settings")
+jest.mock("../../systems/bot")
+jest.mock("../../systems/webhook")
 jest.mock("messageMocks")
 jest.mock("guildMocks")
 jest.mock("emojiMocks")
 
-const bot = require("systems/bot")
-const webhook = require("systems/webhook")
+const bot = require("../../systems/bot")
+const webhook = require("../../systems/webhook")
 const { createCallMock } = require("messageMocks")
 const { createGuildMock } = require("guildMocks")
 const { createEmojiMock } = require("emojiMocks")
 
-const EmoteInjector = require("systems/emoteInjector")
+const EmoteInjector = require("../../systems/emoteInjector")
 
 const mockGuildCache = (...guilds) => {
     bot.client.guilds = {

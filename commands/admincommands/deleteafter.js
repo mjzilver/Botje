@@ -1,4 +1,4 @@
-const logger = require("systems/logger.js")
+const logger = require("../../systems/logger")
 
 module.exports = async function deletafter(message) {
     const refenceId = message.reference?.messageId

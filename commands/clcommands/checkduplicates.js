@@ -1,5 +1,5 @@
-const logger = require("systems/logger.js")
-const database = require("systems/database.js")
+const logger = require("../../systems/logger")
+const database = require("../../systems/database")
 
 module.exports = {
     name: "checkdupes",

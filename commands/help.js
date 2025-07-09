@@ -1,7 +1,7 @@
 const discord = require("discord.js")
-const projectPackage = require("package.json")
-const { config } = require("systems/settings")
-const bot = require("systems/bot.js")
+const projectPackage = require("../package.json")
+const { config } = require("../systems/settings")
+const bot = require("../systems/bot")
 
 module.exports = {
     "name": "help",
@@ -12,7 +12,7 @@ module.exports = {
         Format: \`()\` = optional argument, \`[]\` = required argument\n`
         const args = message.content.split(" ")
 
-        const commands = require("systems/commandLoader.js").commands
+        const commands = require("../systems/commandLoader").commands
         const pageAmount = Math.ceil(Object.entries(commands).length / 10)
         let pageNum = args[1] ? args[1] : 1
 
@@ -32,7 +32,7 @@ module.exports = {
             .setColor(config.color_hex)
             .setTitle(":robot: Current commands: :robot:")
             .setDescription(helpMessage)
-            .setFooter(`Page ${pageNum}/${pageAmount} \nCurrent Version: ${projectPackage.version}`)
+            .setFooter({ text: `Page ${pageNum}/${pageAmount} \nCurrent Version: ${projectPackage.version}` })
 
         return bot.messageHandler.send(message, { embeds: [help] })
     }

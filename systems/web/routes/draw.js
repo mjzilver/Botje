@@ -1,8 +1,8 @@
 const express = require("express")
 const router = express.Router()
 
-const database = require("systems/database.js")
-const { config } = require("systems/settings.js")
+const database = require("../../../systems/database.js")
+const { config } = require("../../../systems/settings.js")
 
 router.get("/", (req, res) => {
     const selectSQL = "SELECT * FROM colors ORDER BY y, x ASC"

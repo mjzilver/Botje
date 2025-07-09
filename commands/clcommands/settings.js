@@ -1,5 +1,5 @@
-const { config, updateConfigVariable } = require("systems/settings")
-const logger = require("systems/logger.js")
+const { config, updateConfigVariable } = require("../../systems/settings")
+const logger = require("../../systems/logger")
 
 module.exports = {
     "name": "settings",

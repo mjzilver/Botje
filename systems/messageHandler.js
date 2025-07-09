@@ -1,6 +1,6 @@
 const { config } = require("./settings")
-const database = require("systems/database.js")
-const logger = require("systems/logger.js")
+const database = require("./database")
+const logger = require("./logger")
 
 module.exports = class MessageHandler {
     constructor(bot) {

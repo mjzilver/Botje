@@ -1,4 +1,4 @@
-const webhook = require("systems/webhook.js")
+const webhook = require("./webhook")
 
 module.exports = class EmoteInjector {
     constructor(bot) {

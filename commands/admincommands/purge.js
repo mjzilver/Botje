@@ -1,6 +1,6 @@
-const { config } = require("systems/settings")
-const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
+const { config } = require("../../systems/settings")
+const bot = require("../../systems/bot")
+const logger = require("../../systems/logger")
 
 module.exports = async function purge(message) {
     message.channel.messages.fetch()

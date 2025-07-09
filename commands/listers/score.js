@@ -1,9 +1,9 @@
-const letterValues = require("json/letter_values.json")
+const letterValues = require("../../json/letter_values.json")
 const discord = require("discord.js")
-const { config } = require("systems/settings")
-const database = require("systems/database.js")
+const { config } = require("../../systems/settings")
+const database = require("../../systems/database")
 const Lister = require("./lister.js")
-const bot = require("systems/bot.js")
+const bot = require("../../systems/bot")
 
 module.exports = {
     "name": "score",

@@ -1,8 +1,8 @@
 const request = require("request")
 const discord = require("discord.js")
-const { config } = require("systems/settings")
-const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
+const { config } = require("../systems/settings")
+const bot = require("../systems/bot")
+const logger = require("../systems/logger")
 
 module.exports = {
     "name": "weather",

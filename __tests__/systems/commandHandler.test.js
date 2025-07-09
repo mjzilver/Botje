@@ -1,16 +1,16 @@
-jest.mock("systems/database")
-jest.mock("systems/logger")
-jest.mock("systems/settings")
-jest.mock("systems/commandLoader")
-jest.mock("systems/bot")
+jest.mock("../../systems/database")
+jest.mock("../../systems/logger")
+jest.mock("../../systems/settings")
+jest.mock("../../systems/commandLoader")
+jest.mock("../../systems/bot")
 jest.mock("messageMocks")
 
-const { config } = require("systems/settings")
-const bot = require("systems/bot")
+const { config } = require("../../systems/settings")
+const bot = require("../../systems/bot")
 const { createCallMock } = require("messageMocks")
-require("systems/stringUtils") // Side effect import
+require("../../systems/stringUtils") // Side effect import
 
-const CommandHandler = require("systems/commandHandler")
+const CommandHandler = require("../../systems/commandHandler")
 
 describe("CommandHandler", () => {
     let handler

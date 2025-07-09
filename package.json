@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "16.2.2",
+  "version": "16.2.3",
   "description": "Discord bot made for private use",
   "main": "start.js",
   "author": "Mick Jari",
@@ -21,6 +21,7 @@
   },
   "scripts": {
     "start": "node start.js",
+    "start-web": "node start.js --web",
     "dev": "nodemon start.js -e js",
     "test": "jest",
     "test-cov": "jest --coverage",

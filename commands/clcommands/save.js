@@ -1,6 +1,6 @@
-const database = require("systems/database.js")
-const bot = require("systems/bot.js")
-const logger = require("systems/logger.js")
+const database = require("../../systems/database")
+const bot = require("../../systems/bot")
+const logger = require("../../systems/logger")
 
 module.exports = {
     "name": "save",

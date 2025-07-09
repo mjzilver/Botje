@@ -1,11 +1,11 @@
-const logger = require("systems/logger.js")
+const logger = require("../../systems/logger")
 
 module.exports = {
     "name": "commands",
     "description": "shows description and format for all chat commands",
     "format": "commands",
     "function": function commands() {
-        const commands = require("systems/commandLoader.js").commands
+        const commands = require("../../systems/commandLoader").commands
 
         logger.printColumns([
             Object.values(commands).map(cmd => cmd.name),

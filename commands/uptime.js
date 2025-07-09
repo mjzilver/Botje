@@ -1,5 +1,5 @@
-const bot = require("systems/bot.js")
-const { formatUptime } = require("systems/utils.js")
+const bot = require("../systems/bot")
+const { formatUptime } = require("../systems/utils")
 
 module.exports = {
     "name": "uptime",

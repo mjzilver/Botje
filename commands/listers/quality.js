@@ -1,9 +1,9 @@
-const letterValues = require("json/letter_values.json")
+const letterValues = require("../../json/letter_values.json")
 const discord = require("discord.js")
-const { config } = require("systems/settings")
-const database = require("systems/database.js")
+const { config } = require("../../systems/settings")
+const database = require("../../systems/database")
 const Lister = require("./lister.js")
-const bot = require("systems/bot.js")
+const bot = require("../../systems/bot")
 
 module.exports = {
     "name": "quality",
@@ -93,7 +93,7 @@ class QualityLister extends Lister {
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 quality posters in ${message.guild.name}`)
                 .setDescription(result)
-                .setFooter(`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}`)
+                .setFooter({ text:`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}` })
 
             bot.messageHandler.send(message, {
                 embeds: [top]

@@ -1,10 +1,10 @@
 const discord = require("discord.js")
-const projectPackage = require("package.json")
+const projectPackage = require("../package.json")
 const { config } = require("./settings")
-const logger = require("systems/logger.js")
+const logger = require("./logger")
 const fs = require("fs")
-const MessageHandler = require("systems/messageHandler.js")
-const EventListener = require("systems/eventListener.js")
+const MessageHandler = require("./messageHandler")
+const EventListener = require("./eventListener")
 const BackupHandler = require("./backupHandler")
 const ReplyHandler = require("./replyHandler")
 const CommandHandler = require("./commandHandler")
@@ -62,7 +62,7 @@ class Bot {
     }
 
     loadSystems() {
-        this.database = require("systems/database.js")
+        this.database = require("./database")
 
         this.messageHandler = new MessageHandler(this)
         this.eventListener = new EventListener(this)
@@ -71,7 +71,7 @@ class Bot {
         this.commandHandler = new CommandHandler(this)
         this.dictionary = new Dictionary()
         this.emoteInjector = new EmoteInjector(this)
-        this.processHandler = require("systems/processHandler.js")
+        this.processHandler = require("./processHandler")
 
         this.loadDisallowed()
 

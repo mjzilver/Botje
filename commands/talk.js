@@ -1,6 +1,6 @@
-const database = require("systems/database.js")
-const bot = require("systems/bot.js")
-const { randomBetween } = require("systems/utils.js")
+const database = require("../systems/database")
+const bot = require("../systems/bot")
+const { randomBetween } = require("../systems/utils")
 
 module.exports = {
     "name": "talk",
