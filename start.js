@@ -1,16 +1,8 @@
-class Startup {
-    constructor() {
-        this.startupTime = new Date()
+require("./systems/stringUtils")
 
-        this.stringUtils = require("./systems/stringUtils")
+require("./systems/bot")
 
-        this.bot = require("./systems/bot")
+if (process.argv.includes("--web"))
+    require("./systems/web/web")
 
-        if (process.argv.includes("--web"))
-            this.webServer = require("./systems/web/web")
-
-        this.commandLine = require("./systems/commandline")
-    }
-}
-
-new Startup()
+require("./systems/commandline")

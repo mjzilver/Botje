@@ -1,4 +1,5 @@
 const bot = require("../systems/bot")
+const { pickRandomItem } = require("../systems/utils")
 
 module.exports = {
     "name": "choose",
@@ -13,6 +14,6 @@ module.exports = {
         if (items.length < 2)
             return bot.messageHandler.reply(message, `Please provide at least two options \nUse format \`${this.format}\``)
 
-        return bot.messageHandler.reply(message, `${presets.pickRandom()} \`${items.pickRandom().trim()}\``)
+        return bot.messageHandler.reply(message, `${pickRandomItem(presets)} \`${pickRandomItem(presets).trim()}\``)
     }
 }

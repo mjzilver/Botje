@@ -1,7 +1,7 @@
 const bot = require("../systems/bot")
 const database = require("../systems/database")
 const logger = require("../systems/logger")
-const { randomBetween, levenshtein } = require("../systems/utils")
+const { randomBetween, levenshtein, pickRandomItem } = require("../systems/utils")
 
 module.exports = {
     "name": "speak",
@@ -134,9 +134,19 @@ function findTopic(message, topic) {
 
         logger.debug(`Picked terms related to '${topic}', first '${first}', second '${second}', third '${third}'`)
 
-        first = first.substring(first.indexOf(topic.toLowerCase()))
-        second = second.substring(second.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), "")
-        third = third.substring(third.indexOf(topic.toLowerCase()) + topic.length).replace(new RegExp(regStr, "gi"), "")
+        function extractTopicPhrase(message, topic, regStr, removeTopic = false) {
+            const topicLower = topic.toLowerCase()
+            const idx = message.indexOf(topicLower)
+            if (idx === -1) return message
+            const result = removeTopic
+                ? message.substring(idx + topicLower.length)
+                : message.substring(idx)
+            return result.replace(new RegExp(regStr, "gi"), "").trim()
+        }
+
+        first = extractTopicPhrase(first, topic, "", false)
+        second = extractTopicPhrase(second, topic, regStr, true)
+        third = extractTopicPhrase(third, topic, regStr, true)
 
         const linkerwords = ["and", "or", "but", "also"]
 
@@ -145,8 +155,8 @@ function findTopic(message, topic) {
         if (picker === 0)
             bot.messageHandler.reply(message, `${first}`.normalizeSpaces())
         else if (picker === 1)
-            bot.messageHandler.reply(message, `${first} ${linkerwords.pickRandom()} ${second}`.normalizeSpaces())
+            bot.messageHandler.reply(message, `${first} ${pickRandomItem(linkerwords)} ${second}`.normalizeSpaces())
         else
-            bot.messageHandler.reply(message, `${first}, ${second} ${linkerwords.pickRandom()} ${third}`.normalizeSpaces())
+            bot.messageHandler.reply(message, `${first}, ${second} ${pickRandomItem(linkerwords)} ${third}`.normalizeSpaces())
     })
 }

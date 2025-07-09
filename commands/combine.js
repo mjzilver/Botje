@@ -3,7 +3,7 @@ const fs = require("fs")
 const Jimp = require("jimp")
 
 const bot = require("../systems/bot")
-const { findClosestMatchInList } = require("../systems/utils")
+const { findClosestMatchInList, pickRandomItem } = require("../systems/utils")
 
 module.exports = {
     "name": "combine",
@@ -18,9 +18,9 @@ module.exports = {
         const emoteParser = /:(.+?)(~.*)?:[0-9]*/
 
         if (!args[0])
-            args[0] = files.pickRandom()
+            args[0] = pickRandomItem(files)
         if (!args[1])
-            args[1] = files.pickRandom()
+            args[1] = pickRandomItem(files)
 
         let image1 = `${args[0] }.png`
         let image2 = `${args[1] }.png`

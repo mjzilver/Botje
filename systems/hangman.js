@@ -3,6 +3,7 @@ const discord = require("discord.js")
 const bot = require("./bot")
 const logger = require("./logger")
 const { config } = require("./settings")
+const { pickRandomItem } = require("./utils")
 
 class hangman {
     constructor() {
@@ -46,7 +47,7 @@ class hangman {
         let chosenword = ""
 
         while (this.word === "") {
-            chosenword = words.pickRandom()
+            chosenword = pickRandomItem(words)
             chosenword[0] = chosenword[0].textOnly()
             chosenword[0] = chosenword[0].replace(bot.dictionary.getNonSelectorsRegex(), "").trim()
             if (chosenword[1] > 10 && chosenword[0].length >= 5 && chosenword[0].length <= 20 && chosenword[0].match(/[a-z]+/i))

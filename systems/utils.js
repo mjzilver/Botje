@@ -21,10 +21,6 @@ function levenshtein(a, b) {
     return matrix[b.length][a.length]
 }
 
-function randomBetween(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
 function findClosestMatchInList(word, wordList) {
     if (word === 0) return ""
 
@@ -66,16 +62,20 @@ function formatUptime(ms) {
     return `${days ? `${days} days, ` : ""}${hours ? `${hours} hours, ` : ""}${minutes ? `${minutes} minutes and ` : ""}${seconds} seconds`
 }
 
-Object.defineProperty(Array.prototype, "pickRandom", {
-    enumerable: false,
-    value: () => {
-        return this[randomBetween(0, this.length - 1)]
-    }
-})
+function randomBetween(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function pickRandomItem(array) {
+    if (!Array.isArray(array) || array.length === 0)
+        throw new Error("Array must be non-empty to pick a random item")
+    return array[randomBetween(0, array.length - 1)]
+}
 
 module.exports = {
     levenshtein,
     randomBetween,
+    pickRandomItem,
     findClosestMatchInList,
     formatUptime
 }

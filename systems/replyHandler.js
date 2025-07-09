@@ -1,4 +1,5 @@
 const logger = require("./logger")
+const { pickRandomItem } = require("./utils")
 
 module.exports = class ReplyHandler {
     constructor(bot) {
@@ -16,9 +17,9 @@ module.exports = class ReplyHandler {
             if (message.content.match(new RegExp(reply["regex"], "gi")) && this.checkTime(reply)) {
                 logger.debug(`Replying to message '${message.content}' that matched ReplyPattern '${reply["name"]}'`)
                 if (reply["reply"])
-                    this.bot.messageHandler.reply(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ""))
+                    this.bot.messageHandler.reply(message, pickRandomItem(reply["replies"]) + (reply["mention"] ? `, ${message.author.username}` : ""))
                 else
-                    this.bot.messageHandler.send(message, reply["replies"].pickRandom() + (reply["mention"] ? `, ${message.author.username}` : ""))
+                    this.bot.messageHandler.send(message, pickRandomItem(reply["replies"]) + (reply["mention"] ? `, ${message.author.username}` : ""))
 
                 match = true
             }
