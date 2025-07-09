@@ -1,5 +1,5 @@
-const { config } = require("./settings")
 const logger = require("./logger")
+const { config } = require("./settings")
 const LimitedList = require("./types/limitedList")
 const { randomBetween } = require("./utils")
 

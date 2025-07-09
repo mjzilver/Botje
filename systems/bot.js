@@ -1,15 +1,17 @@
-const discord = require("discord.js")
-const projectPackage = require("../package.json")
-const { config } = require("./settings")
-const logger = require("./logger")
 const fs = require("fs")
-const MessageHandler = require("./messageHandler")
-const EventListener = require("./eventListener")
+
+const discord = require("discord.js")
+
+const logger = require("./logger")
+const projectPackage = require("../package.json")
 const BackupHandler = require("./backupHandler")
-const ReplyHandler = require("./replyHandler")
 const CommandHandler = require("./commandHandler")
 const Dictionary = require("./dictionary")
 const EmoteInjector = require("./emoteInjector")
+const EventListener = require("./eventListener")
+const MessageHandler = require("./messageHandler")
+const ReplyHandler = require("./replyHandler")
+const { config } = require("./settings")
 
 class Bot {
     constructor() {

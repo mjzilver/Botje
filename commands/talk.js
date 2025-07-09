@@ -1,5 +1,5 @@
-const database = require("../systems/database")
 const bot = require("../systems/bot")
+const database = require("../systems/database")
 const { randomBetween } = require("../systems/utils")
 
 module.exports = {

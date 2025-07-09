@@ -1,6 +1,7 @@
 const { Client } = require("pg")
-const { config } = require("./settings")
+
 const logger = require("./logger")
+const { config } = require("./settings")
 
 class Database {
     constructor() {

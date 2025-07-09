@@ -1,4 +1,5 @@
 const fs = require("fs")
+
 const configFilePath = "./config.json"
 const logger = require("./logger")
 

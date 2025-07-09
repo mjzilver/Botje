@@ -6,7 +6,7 @@
         "browser": true
     },
     "extends": "eslint:recommended",
-    "plugins": ["jest"],
+    "plugins": ["jest", "import"],
     "overrides": [
         {
             "files": [
@@ -52,6 +52,19 @@
         "prefer-template": "error",
         "no-multiple-empty-lines": ["error", { "max": 1 }],
         "curly": ["error", "multi", "consistent"],
-        "brace-style": ["error", "1tbs"]
+        "brace-style": ["error", "1tbs"],
+        "import/order": ["error", {
+        "groups": [
+            "builtin",
+            "external",
+            "internal",
+            ["parent", "sibling", "index"] 
+        ],
+        "newlines-between": "always",
+        "alphabetize": {
+            "order": "asc",
+            "caseInsensitive": true
+        }
+        }]
     }
 }

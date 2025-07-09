@@ -4,13 +4,13 @@ jest.mock("../../systems/settings")
 jest.mock("../../systems/bot")
 jest.mock("messageMocks")
 
-const database = require("../../systems/database")
-const { config } = require("../../systems/settings")
-const bot = require("../../systems/bot")
-const logger = require("../../systems/logger")
 const { createCallMock, createReplyMock } = require("messageMocks")
 
+const bot = require("../../systems/bot")
+const database = require("../../systems/database")
+const logger = require("../../systems/logger")
 const MessageHandler = require("../../systems/messageHandler")
+const { config } = require("../../systems/settings")
 
 describe("MessageHandler", () => {
     let handler

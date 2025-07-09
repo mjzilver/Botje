@@ -1,6 +1,8 @@
 const fs = require("fs")
-const bot = require("../systems/bot")
+
 const Jimp = require("jimp")
+
+const bot = require("../systems/bot")
 const { findClosestMatchInList } = require("../systems/utils")
 
 module.exports = {

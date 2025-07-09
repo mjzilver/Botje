@@ -1,7 +1,8 @@
-const { config } = require("../settings")
-const logger = require("../logger")
-const featureFlags = require("./featureFlags")
 const { Server } = require("socket.io")
+
+const logger = require("../logger")
+const { config } = require("../settings")
+const featureFlags = require("./featureFlags")
 
 class WebServer {
     constructor() {

@@ -1,5 +1,6 @@
-const logger = require("./logger")
 const readline = require("readline")
+
+const logger = require("./logger")
 
 class commandLine {
     constructor() {

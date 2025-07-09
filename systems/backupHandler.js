@@ -1,8 +1,10 @@
 const fs = require("fs")
-const request = require("request")
-const logger = require("./logger")
-const database = require("./database")
+
 const format = require("pg-format")
+const request = require("request")
+
+const database = require("./database")
+const logger = require("./logger")
 
 module.exports = class BackupHandler {
     constructor(bot) {

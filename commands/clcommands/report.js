@@ -1,9 +1,10 @@
+const os = require("os")
+
 const bot = require("../../systems/bot")
-const logger = require("../../systems/logger")
 const database = require("../../systems/database")
+const logger = require("../../systems/logger")
 const formatter = new Intl.NumberFormat("en-GB")
 const { formatUptime } = require("../../systems/utils")
-const os = require("os")
 
 module.exports = {
     name: "report",

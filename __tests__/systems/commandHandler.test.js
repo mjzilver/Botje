@@ -5,12 +5,12 @@ jest.mock("../../systems/commandLoader")
 jest.mock("../../systems/bot")
 jest.mock("messageMocks")
 
-const { config } = require("../../systems/settings")
-const bot = require("../../systems/bot")
 const { createCallMock } = require("messageMocks")
-require("../../systems/stringUtils") // Side effect import
 
+const bot = require("../../systems/bot")
 const CommandHandler = require("../../systems/commandHandler")
+const { config } = require("../../systems/settings")
+require("../../systems/stringUtils") // side-effects needed for command handler
 
 describe("CommandHandler", () => {
     let handler

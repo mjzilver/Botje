@@ -1,8 +1,9 @@
-const { config } = require("../settings")
+const { Transport } = require("winston")
+
+const CommandLine = require("../commandline")
 const database = require("../database")
 const logger = require("../logger")
-const { Transport } = require("winston")
-const CommandLine = require("../commandline")
+const { config } = require("../settings")
 
 class terminalLoggerTransport extends Transport {
     constructor(options, socket) {

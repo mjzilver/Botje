@@ -1,8 +1,9 @@
 const discord = require("discord.js")
-const { config } = require("../../systems/settings")
-const database = require("../../systems/database")
+
 const Lister = require("./lister.js")
 const bot = require("../../systems/bot")
+const database = require("../../systems/database")
+const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "count",

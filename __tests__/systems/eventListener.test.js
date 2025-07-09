@@ -3,12 +3,12 @@ jest.mock("../../systems/database.js")
 jest.mock("../../systems/bot.js")
 
 const EventEmitter = require("events")
-const database = require("../../systems/database.js")
+
 const bot = require("../../systems/bot.js")
+const database = require("../../systems/database.js")
+const EventListener = require("../../systems/eventListener.js")
 const logger = require("../../systems/logger.js")
 const { config } = require("../../systems/settings")
-
-const EventListener = require("../../systems/eventListener.js")
 
 describe("EventListener", () => {
     let client

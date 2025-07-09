@@ -1,6 +1,6 @@
-const { config } = require("./settings")
 const database = require("./database")
 const logger = require("./logger")
+const { config } = require("./settings")
 
 module.exports = class eventListener {
     constructor(bot) {

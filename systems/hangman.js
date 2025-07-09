@@ -1,7 +1,8 @@
 const discord = require("discord.js")
-const { config } = require("./settings")
+
 const bot = require("./bot")
 const logger = require("./logger")
+const { config } = require("./settings")
 
 class hangman {
     constructor() {
