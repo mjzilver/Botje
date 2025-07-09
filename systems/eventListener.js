@@ -4,11 +4,11 @@ const logger = require("systems/logger.js")
 
 module.exports = class eventListener {
     constructor(bot) {
-        bot.client.on("shardError", function(error) {
+        bot.client.on("shardError", function (error) {
             logger.error(`Shard error: ${error.message}`)
         })
 
-        bot.client.on("error", function(error) {
+        bot.client.on("error", function (error) {
             logger.error(`Client error: ${error.message}`)
         })
 

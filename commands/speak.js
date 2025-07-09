@@ -30,7 +30,7 @@ function findByWord(message) {
 
     if (words && words.length >= 1 && words[0]) {
         if (words.length > 1)
-            words.sort(function(a, b) {
+            words.sort(function (a, b) {
                 const al = a.match(/(?:[aeiouy]{1,2})/gi)
                 const bl = b.match(/(?:[aeiouy]{1,2})/gi)
                 return (bl ? bl.length : 0) - (al ? al.length : 0)

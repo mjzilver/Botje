@@ -76,7 +76,7 @@ class syllableLister extends Lister {
                 sorted.push([user, userdata[user]["average"]])
             }
 
-            sorted.sort(function(a, b) {
+            sorted.sort(function (a, b) {
                 return b[1] - a[1]
             })
 

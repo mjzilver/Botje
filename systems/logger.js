@@ -41,7 +41,7 @@ const logger = Winston.createLogger({
     ]
 })
 
-logger.printColumns = function(arrays, headers = [], loggerFn = logger.console) {
+logger.printColumns = function (arrays, headers = [], loggerFn = logger.console) {
     if (!arrays.length) return
     const rowCount = arrays[0].length
     const colWidths = arrays.map(col => Math.max(...col.map(val => String(val).length)))
@@ -62,7 +62,7 @@ logger.printColumns = function(arrays, headers = [], loggerFn = logger.console) 
     }
 }
 
-logger.printRows = function(rows, loggerFn = logger.console) {
+logger.printRows = function (rows, loggerFn = logger.console) {
     if (!rows.length) return
     const colCount = rows[0].length
     const colWidths = Array.from({ length: colCount }, (_, i) =>

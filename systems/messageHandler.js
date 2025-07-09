@@ -2,10 +2,11 @@ const { config } = require("./settings")
 const database = require("systems/database.js")
 const logger = require("systems/logger.js")
 
-module.exports = class MessagerHandler {
+module.exports = class MessageHandler {
     constructor(bot) {
         this.bot = bot
 
+        // Key = call.id, Value = reply.id
         this.commandCalls = {}
         this.getCommandCalls()
     }
@@ -42,12 +43,6 @@ module.exports = class MessagerHandler {
         for (const [call, reply] of Object.entries(this.commandCalls))
             if (reply === replyMessage.id)
                 return call
-    }
-
-    delete(reply) {
-        logger.console(this.commandCalls[reply.id])
-        reply.channel.messages.fetch(this.commandCalls[reply.id]).then(() => { })
-        reply.delete({ timeout: 5000 })
     }
 
     markComplete(call) {

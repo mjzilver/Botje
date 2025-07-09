@@ -53,12 +53,12 @@ module.exports = class Dictionary {
             for (const word in wordHolder)
                 this.words.push([word, wordHolder[word]])
 
-            this.words.sort(function(a, b) {
+            this.words.sort(function (a, b) {
                 return b[1] - a[1]
             })
             const shortList = this.words.slice(0, 200)
 
-            fs.writeFile(this.wordsPath, JSON.stringify(shortList), function(err) {
+            fs.writeFile(this.wordsPath, JSON.stringify(shortList), function (err) {
                 if (err)
                     logger.error(err)
             })

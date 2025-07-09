@@ -21,7 +21,7 @@ module.exports = async function addmeme(message) {
     if (url) {
         const path = "assets/meme_templates"
 
-        request(url).pipe(fs.createWriteStream(`${path}/${filename}`)).on("finish", function() {
+        request(url).pipe(fs.createWriteStream(`${path}/${filename}`)).on("finish", function () {
             bot.messageHandler.reply(message, `Added meme to the meme templates as ${filename}`)
             logger.warn(`Added meme to the meme templates as ${filename}`)
         })

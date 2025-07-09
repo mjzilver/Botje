@@ -41,7 +41,7 @@ async function getRedditImage(message, last = "") {
         if (err)
             return logger.error(err)
 
-        if (typeof (body) !== "undefined" && typeof (body.data) !== "undefined" && typeof (body.data.children) !== "undefined")
+        if (body?.data?.children)
             handleRedditImages(message, sub, body.data.children)
         else
             bot.messageHandler.send(message, "No images were found")

@@ -73,6 +73,12 @@ class Bot {
         this.emoteInjector = new EmoteInjector(this)
         this.processHandler = require("systems/processHandler.js")
 
+        this.loadDisallowed()
+
+        this.logger = logger
+    }
+
+    loadDisallowed() {
         const disallowedFilepath = "json/disallowed.json"
         fs.readFile(disallowedFilepath, (err, data) => {
             if (!err && data)
@@ -85,8 +91,6 @@ class Bot {
                     this.disallowed = {}
                 })
         })
-
-        this.logger = logger
     }
 }
 module.exports = new Bot()

@@ -1,5 +1,6 @@
 const fs = require("fs")
 const path = require("path")
+const logger = require("systems/logger")
 
 const commands = {}
 const admincommands = {}
@@ -28,6 +29,11 @@ loadCommands(path.join(baseDir, "commands/listers"), commands)
 loadCommands(path.join(baseDir, "commands/admincommands"), admincommands)
 loadCommands(path.join(baseDir, "commands/clcommands"), clcommands)
 loadCommands(path.join(baseDir, "commands/dmcommands"), dmcommands)
+
+logger.startup(`[CommandLoader] Loaded ${Object.keys(commands).length} commands`)
+logger.startup(`[CommandLoader] Loaded ${Object.keys(admincommands).length} admin commands`)
+logger.startup(`[CommandLoader] Loaded ${Object.keys(clcommands).length} clcommands`)
+logger.startup(`[CommandLoader] Loaded ${Object.keys(dmcommands).length} dmcommands`)
 
 module.exports = {
     "admincommands": admincommands,

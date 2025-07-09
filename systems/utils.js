@@ -68,7 +68,7 @@ function formatUptime(ms) {
 
 Object.defineProperty(Array.prototype, "pickRandom", {
     enumerable: false,
-    value: function() {
+    value: function () {
         return this[randomBetween(0, this.length - 1)]
     }
 })

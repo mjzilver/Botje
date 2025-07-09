@@ -75,7 +75,7 @@ class SocketHandler {
     handleConnection(socket) {
         this.io.emit("connectCounter", ++this.connectCounter)
 
-        socket.on("pixelChange", async(pixel) => {
+        socket.on("pixelChange", async (pixel) => {
             await this.handlePixelChange(socket, pixel)
         })
 
