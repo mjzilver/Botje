@@ -6,7 +6,7 @@ module.exports = {
     "description": "erases the log",
     "format": "erase",
     "function": function erase() {
-        fs.truncate("bot.log", 0, function (err) {
+        fs.truncate("bot.log", 0, (err) => {
             if (err)
                 logger.error(err)
             logger.warn(" === Log was cleared before this === ")

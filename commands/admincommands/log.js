@@ -8,7 +8,7 @@ const options = {
 }
 
 module.exports = async function log(message) {
-    logger.query(options, async function (err, results) {
+    logger.query(options, async (err, results) => {
         if (err) {
             logger.warn(`Error in log query: ${err}`)
             return

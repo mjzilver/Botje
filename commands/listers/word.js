@@ -104,7 +104,7 @@ class WordLister extends Lister {
                 const percentage = ((parseInt(rows[i]["count"]) / parseInt(rows[i]["total"])) * 100).toFixed(3)
                 resultArray.push({ "percentage": percentage, "user_name": rows[i]["user_name"] })
             }
-            resultArray.sort(function (a, b) {
+            resultArray.sort((a, b) => {
                 return b.percentage - a.percentage
             })
 

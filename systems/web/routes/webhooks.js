@@ -42,7 +42,7 @@ router.get("/", (req, res) => {
     })
 })
 
-router.post("/", function (req) {
+router.post("/", (req) => {
     webhook.sendMessage(req.body.channel, req.body.text, req.body.user)
 })
 

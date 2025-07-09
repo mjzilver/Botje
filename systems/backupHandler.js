@@ -17,7 +17,7 @@ module.exports = class BackupHandler {
         if (!fs.existsSync(emojipath) || fs.statSync(emojipath).size < 10) {
             logger.console(`Saving ${emoji.name} at ${emojipath} from ${emojilink}`)
 
-            request(emojilink).pipe(fs.createWriteStream(emojipath, { flags: "w" })).on("error", function (err) {
+            request(emojilink).pipe(fs.createWriteStream(emojipath, { flags: "w" })).on("error", (err) => {
                 logger.error(`Failed to save emoji "${emoji.name}" for guild "${emoji.guild.id}" at path "${emojipath}":`, err)
             })
         }

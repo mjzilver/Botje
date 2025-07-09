@@ -13,7 +13,7 @@ function pixelClick(x, y) {
     })
 }
 
-socket.on("pixelChanged", function (pixel) {
+socket.on("pixelChanged", (pixel) => {
     const pixelElement = document.getElementById(`${pixel.x}-${pixel.y}`)
     pixelElement.style.backgroundColor = `rgb(${pixel.red}, ${pixel.green}, ${pixel.blue})`
 })
@@ -38,7 +38,7 @@ function zoomOut() {
     styleTags.forEach(tag => tag.remove())
 }
 
-socket.on("connectCounter", function (connectCounter) {
+socket.on("connectCounter", (connectCounter) => {
     document.getElementById("connectCounter").textContent = connectCounter
 })
 

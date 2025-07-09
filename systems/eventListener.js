@@ -4,11 +4,11 @@ const logger = require("systems/logger.js")
 
 module.exports = class eventListener {
     constructor(bot) {
-        bot.client.on("shardError", function (error) {
+        bot.client.on("shardError", (error) => {
             logger.error(`Shard error: ${error.message}`)
         })
 
-        bot.client.on("error", function (error) {
+        bot.client.on("error", (error) => {
             logger.error(`Client error: ${error.message}`)
         })
 
@@ -27,7 +27,6 @@ module.exports = class eventListener {
             if (reaction.message.author.equals(bot.client.user))
                 switch (reaction.emoji.name) {
                 case config.positive_emoji:
-                    // Handle positive emoji reaction
                     break
                 case config.negative_emoji:
                     if (reaction.count >= 3 && reaction.count > reaction.message.reactions.resolve(config.positive_emoji)?.count) {

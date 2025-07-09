@@ -22,7 +22,7 @@ module.exports = function disallow(message) {
         return bot.messageHandler.send(message, "You need to @ someone to disallow them")
     }
 
-    fs.writeFile(filepath, JSON.stringify(disallowed), function (err) {
+    fs.writeFile(filepath, JSON.stringify(disallowed), (err) => {
         if (err)
             logger.error(err)
     })
