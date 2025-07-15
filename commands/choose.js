@@ -14,6 +14,6 @@ module.exports = {
         if (items.length < 2)
             return bot.messageHandler.reply(message, `Please provide at least two options \nUse format \`${this.format}\``)
 
-        return bot.messageHandler.reply(message, `${pickRandomItem(presets)} \`${pickRandomItem(presets).trim()}\``)
+        return bot.messageHandler.reply(message, `${pickRandomItem(presets)} \`${pickRandomItem(items).trim()}\``)
     }
 }
