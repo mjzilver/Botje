@@ -39,6 +39,13 @@ module.exports = class MessageHandler {
         this.markComplete(call)
     }
 
+    edit(replyObj, newContent) {
+        if (!replyObj) return
+        return replyObj.edit(newContent).catch(err => {
+            logger.error("Failed to edit message:", err)
+        })
+    }
+
     findFromReply(replyMessage) {
         for (const [call, reply] of Object.entries(this.commandCalls))
             if (reply === replyMessage.id)
