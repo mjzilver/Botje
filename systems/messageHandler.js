@@ -40,9 +40,13 @@ module.exports = class MessageHandler {
     }
 
     edit(replyObj, newContent) {
-        if (!replyObj) return
-        return replyObj.edit(newContent).catch(err => {
-            logger.error("Failed to edit message:", err)
+        return new Promise((resolve, reject) => {
+            if (!replyObj)
+                return reject(new Error("No reply object"))
+
+            replyObj.edit(newContent)
+                .then(resolve)
+                .catch(err => reject(err))
         })
     }
 

@@ -13,6 +13,9 @@ module.exports = {
         logger.info(`Sending prompt to LLM: "${prompt}"`)
         const discordMsg = await bot.messageHandler.reply(message, "Thinking...")
 
+        const controller = new AbortController()
+        const signal = controller.signal
+
         try {
             const response = await fetch(config.llm.api, {
                 method: "POST",
@@ -21,21 +24,19 @@ module.exports = {
                     model: "dolphin-llama3",
                     prompt: prompt,
                     stream: true
-                })
+                }),
+                signal: signal
             })
 
             const reader = response.body.getReader()
             const decoder = new TextDecoder("utf-8")
             let firstChunk = true
             let accumulated = ""
-            let finished = false
 
-            while (!finished) {
+            while (true) {
                 const { done, value } = await reader.read()
-                if (done) {
-                    finished = done
+                if (done)
                     break
-                }
 
                 const chunk = decoder.decode(value, { stream: true }).trim()
                 if (!chunk) continue
@@ -50,11 +51,17 @@ module.exports = {
 
                         if (json.response) {
                             accumulated += json.response
-                            if (firstChunk) {
-                                await bot.messageHandler.edit(discordMsg, json.response)
-                                firstChunk = false
-                            } else {
-                                await bot.messageHandler.edit(discordMsg, accumulated)
+                            try {
+                                if (firstChunk) {
+                                    await bot.messageHandler.edit(discordMsg, json.response)
+                                    firstChunk = false
+                                } else {
+                                    await bot.messageHandler.edit(discordMsg, accumulated)
+                                }
+                            } catch (err) {
+                                logger.error("Message edit failed, aborting stream:", err)
+                                controller.abort()
+                                break
                             }
                         }
                     } catch (err) {
@@ -64,8 +71,12 @@ module.exports = {
 
             await discordMsg.react("🤖")
         } catch (err) {
-            logger.error("Failed to contact LLM:", err)
-            await bot.messageHandler.edit(discordMsg, "Error contacting LLM.")
+            if (err.name === "AbortError") {
+                logger.info("Stream aborted.")
+            } else {
+                logger.error("Failed to contact LLM:", err)
+                await bot.messageHandler.edit(discordMsg, "Error contacting LLM.")
+            }
         }
     }
 }
