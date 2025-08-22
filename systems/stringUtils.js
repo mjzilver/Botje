@@ -32,6 +32,14 @@ String.prototype.removePrefix = function () {
     return this.replace(new RegExp(config.prefix, "i"), "")
 }
 
+String.prototype.removeCommand = function () { 
+    return this.replace(new RegExp(`^${config.prefix}[a-zA-Z]+\\s*`, "i"), "") 
+}
+
+String.prototype.removeCommands = function () { 
+    return this.replace(new RegExp(`${config.prefix}[a-zA-Z]+\\s*`, "i"), "") 
+}
+
 String.prototype.replaceFancyQuotes = function () {
     return this.replace(/[“”„]/g, "\"")
         .replace(/[‘’‚‛]/g, "'")
