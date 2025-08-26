@@ -6,23 +6,22 @@ async function buildChain(message) {
     const username = message.author.bot ? "bot" : "user"
     let chain = `${username}: ${message.content.removeCommand()}`
 
-    if (message.reference && message.reference.messageId) {
+    if (message.reference && message.reference.messageId)
         try {
             const prev = await message.channel.messages.fetch(message.reference.messageId)
             chain = `${await buildChain(prev)}\n${chain}`
         } catch (err) {
-            console.warn("Could not fetch referenced message:", err)
+            logger.warn("Could not fetch referenced message:", err)
         }
-    }
 
     return chain
 }
-const bannedPhrases = ["bot:", "user:", "dolphin:", "[user]:", "[bot]:"];
+const bannedPhrases = ["bot:", "user:", "dolphin:", "[user]:", "[bot]:"]
 function filterBotReply(filtered) {
-    for (const phrase of bannedPhrases) {
+    for (const phrase of bannedPhrases)
         filtered = filtered.replace(new RegExp(phrase, "gi"), "").trim()
-    }
-    return filtered || "thinking...";
+
+    return filtered || "thinking..."
 }
 
 module.exports = {
@@ -30,22 +29,22 @@ module.exports = {
     "description": "asks via an LLM",
     "format": "ask (text)",
     "function": async function ask(message) {
-        let userQuestion;
-        let promptTemplate;
+        let userQuestion
+        let promptTemplate
 
         if (message.reference?.messageId) {
-            userQuestion = await buildChain(message);
-            promptTemplate = config.llm.conversation_prompt;
+            userQuestion = await buildChain(message)
+            promptTemplate = config.llm.conversation_prompt
         } else {
-            userQuestion = message.content.removeCommand();
-            promptTemplate = config.llm.base_prompt;
+            userQuestion = message.content.removeCommand()
+            promptTemplate = config.llm.base_prompt
         }
 
-        const prompt = promptTemplate.replace("{userQuestion}", userQuestion);
+        const prompt = promptTemplate.replace("{userQuestion}", userQuestion)
 
-        const discordMsg = await bot.messageHandler.reply(message, "Thinking...");
-        const controller = new AbortController();
-        const signal = controller.signal;
+        const discordMsg = await bot.messageHandler.reply(message, "Thinking...")
+        const controller = new AbortController()
+        const signal = controller.signal
 
         try {
             const response = await fetch(config.llm.api, {
@@ -81,16 +80,16 @@ module.exports = {
                         }
 
                         if (json.response) {
-                            accumulated += json.response;
-                            const filtered = filterBotReply(firstChunk ? json.response : accumulated);
+                            accumulated += json.response
+                            const filtered = filterBotReply(firstChunk ? json.response : accumulated)
 
                             try {
-                                await bot.messageHandler.edit(discordMsg, filtered);
-                                firstChunk = false;
+                                await bot.messageHandler.edit(discordMsg, filtered)
+                                firstChunk = false
                             } catch (err) {
-                                logger.error("Message edit failed, aborting stream:", err);
-                                controller.abort();
-                                break;
+                                logger.error("Message edit failed, aborting stream:", err)
+                                controller.abort()
+                                break
                             }
                         }
                     } catch (err) {

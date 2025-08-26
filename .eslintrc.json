@@ -52,19 +52,20 @@
         "prefer-template": "error",
         "no-multiple-empty-lines": ["error", { "max": 1 }],
         "curly": ["error", "multi", "consistent"],
+        "no-constant-condition": "off",
         "brace-style": ["error", "1tbs"],
         "import/order": ["error", {
-        "groups": [
-            "builtin",
-            "external",
-            "internal",
-            ["parent", "sibling", "index"] 
-        ],
-        "newlines-between": "always",
-        "alphabetize": {
-            "order": "asc",
-            "caseInsensitive": true
-        }
+            "groups": [
+                "builtin",
+                "external",
+                "internal",
+                ["parent", "sibling", "index"] 
+            ],
+            "newlines-between": "always",
+            "alphabetize": {
+                "order": "asc",
+                "caseInsensitive": true
+            }
         }]
     }
 }
