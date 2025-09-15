@@ -17,7 +17,7 @@ module.exports = {
         if (!fs.existsSync(resultsDir))
             fs.mkdirSync(resultsDir, { recursive: true })
 
-        exec(`npx jest --json --outputFile=${resultsFile}`, (error) => {
+        exec(`npx jest --json --outputFile=${resultsFile}`, error => {
             if (error) {
                 logger.error(`Error running tests: ${error.message}`)
                 return

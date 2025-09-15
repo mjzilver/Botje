@@ -14,10 +14,10 @@ module.exports = {
                 HAVING COUNT(message) >= 2 
                 ORDER BY COUNT(message) DESC;`
 
-            database.query(sql, null, (rows) => {
+            database.query(sql, null, rows => {
                 logger.console(`Found ${rows.length} duplicates`)
 
-                rows.forEach((row) => {
+                rows.forEach(row => {
                     logger.console(`Duplicate: ${row.message} (${row.datetime}) - ${row.count} times`)
                 })
             })

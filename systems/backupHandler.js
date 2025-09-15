@@ -19,7 +19,7 @@ module.exports = class BackupHandler {
         if (!fs.existsSync(emojipath) || fs.statSync(emojipath).size < 10) {
             logger.console(`Saving ${emoji.name} at ${emojipath} from ${emojilink}`)
 
-            request(emojilink).pipe(fs.createWriteStream(emojipath, { flags: "w" })).on("error", (err) => {
+            request(emojilink).pipe(fs.createWriteStream(emojipath, { flags: "w" })).on("error", err => {
                 logger.error(`Failed to save emoji "${emoji.name}" for guild "${emoji.guild.id}" at path "${emojipath}":`, err)
             })
         }
@@ -34,7 +34,7 @@ module.exports = class BackupHandler {
 
         const selectSQL = "SELECT * FROM messages;"
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [], rows => {
             for (const row of rows) {
                 const insertStatement = format(`INSERT INTO messages 
                     (id, user_id, user_name, message, channel_id, server_id, datetime) 
@@ -51,7 +51,7 @@ module.exports = class BackupHandler {
                 logger.console(`Database exported successfully to ${dbBackupPath}`)
             })
 
-            writeStream.on("error", (writeErr) => {
+            writeStream.on("error", writeErr => {
                 logger.error("Failed to write database backup file:", writeErr)
             })
         })

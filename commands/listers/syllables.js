@@ -9,7 +9,7 @@ module.exports = {
     "name": "syllables",
     "description": "shows the top 10 users with the most syllables",
     "format": "syllables (@user)",
-    "function": (message) => {
+    "function": message => {
         new syllableLister().process(message)
     }
 }
@@ -30,7 +30,7 @@ class syllableLister extends Lister {
             "average": 0
         }
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
             for (let i = 0; i < rows.length; i++) {
                 const syllables = this.calculateSyllables(rows[i]["message"])
                 if (syllables >= 1) {
@@ -52,7 +52,7 @@ class syllableLister extends Lister {
 
         const userdata = {}
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             for (let i = 0; i < rows.length; i++) {
                 const userName = rows[i]["user_name"]
 

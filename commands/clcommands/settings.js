@@ -5,7 +5,7 @@ module.exports = {
     "name": "settings",
     "description": "changes the bot's settings",
     "format": "settings <setting> <value>",
-    "function": (input) => {
+    "function": input => {
         const setting = input[0]
         const value = input[1]
 

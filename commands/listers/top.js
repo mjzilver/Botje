@@ -9,7 +9,7 @@ module.exports = {
     "name": "top",
     "description": "shows the top 10 emotes in the current channel or mentioned user",
     "format": "top (@user)",
-    "function": (message) => {
+    "function": message => {
         new TopLister().process(message)
     }
 }
@@ -32,7 +32,7 @@ class TopLister extends Lister {
         ORDER BY COUNT(*) DESC 
         LIMIT 10`
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             let result = ""
             for (let i = 0;
                 (i < rows.length && i <= 10); i++)
@@ -59,7 +59,7 @@ class TopLister extends Lister {
         ORDER BY COUNT(*) DESC 
         LIMIT 10`
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
             let result = ""
             for (let i = 0;
                 (i < rows.length && i <= 10); i++)

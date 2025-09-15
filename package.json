@@ -1,6 +1,6 @@
 {
   "name": "botje",
-  "version": "16.2.11",
+  "version": "16.2.12",
   "description": "Discord bot made for private use",
   "main": "start.js",
   "author": "Mick Jari",

@@ -40,7 +40,7 @@ module.exports = class Dictionary {
 
         const wordHolder = {}
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [], rows => {
             for (let i = 0; i < rows.length; i++) {
                 const words = rows[i]["message"].split(/\s+/)
 
@@ -59,7 +59,7 @@ module.exports = class Dictionary {
             })
             const shortList = this.words.slice(0, 200)
 
-            fs.writeFile(this.wordsPath, JSON.stringify(shortList), (err) => {
+            fs.writeFile(this.wordsPath, JSON.stringify(shortList), err => {
                 if (err)
                     logger.error(err)
             })

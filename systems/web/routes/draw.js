@@ -20,7 +20,7 @@ router.get("/", (req, res) => {
             }
     }
 
-    database.query(selectSQL, [], async (rows) => {
+    database.query(selectSQL, [], async rows => {
         for (let i = 0; i < rows.length; i++) {
             const element = rows[i]
 

@@ -10,7 +10,7 @@ module.exports = {
     "name": "quality",
     "description": "shows the top 10 quality posers in the current channel or mentioned user",
     "format": "quality (@user)",
-    "function": (message) => {
+    "function": message => {
         new QualityLister().process(message)
     }
 }
@@ -47,7 +47,7 @@ class QualityLister extends Lister {
                 percentage_unique DESC, user_id;
         `
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
             if (rows.length === 0)
                 return bot.messageHandler.send(message, `${mentioned.username} does not have enough qualifying messages.`)
 
@@ -82,7 +82,7 @@ class QualityLister extends Lister {
         ORDER BY 
             percentage_unique DESC, user_id;`
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             if (page > Math.ceil(rows.length / 10))
                 return bot.messageHandler.send(message, `Page ${(page + 1)} of ${Math.ceil(rows.length / 10)} not found`)
 

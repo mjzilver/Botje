@@ -44,7 +44,7 @@ function nukemessages(channel, messageid, loop = 0) {
         limit: 100,
         before: messageid
     }).then(messages => messages.forEach(
-        (message) => {
+        message => {
             itemsProcessed++
             message?.delete({ timeout: 10 })
 

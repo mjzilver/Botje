@@ -9,7 +9,7 @@ module.exports = {
     "name": "count",
     "description": "counts messages in the current channel or from the mentioned user",
     "format": "count (@user  ? | %)",
-    "function": (message) => {
+    "function": message => {
         new CountLister().process(message)
     }
 }
@@ -22,7 +22,7 @@ class CountLister extends Lister {
     total(message) {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1"
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in ${message.guild.name}`)
         })
     }
@@ -30,7 +30,7 @@ class CountLister extends Lister {
     mention(message, mentioned) {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1 AND user_id = $2"
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
             bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages by ${mentioned.username} in this server`)
         })
     }
@@ -45,7 +45,7 @@ class CountLister extends Lister {
         ORDER BY COUNT(*) DESC
         `
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             let result = ""
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
                 result += `${rows[i]["user_name"]} has posted ${rows[i]["count"]} messages! \n`
@@ -72,7 +72,7 @@ class CountLister extends Lister {
 			ORDER BY COUNT(*) DESC 
 			LIMIT 10`
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             let result = ""
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
                 result += `${rows[i]["user_name"]} has posted ${Math.round((parseInt(rows[i]["count"]) / parseInt(rows[i]["total"])) * 100)}% of all messages! \n`

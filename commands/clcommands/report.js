@@ -35,7 +35,7 @@ module.exports = {
             const sql = `SELECT pg_size_pretty(pg_database_size('botdb')) AS size, 
             COUNT(messages.id) as count FROM messages`
 
-            database.query(sql, null, (rows) => {
+            database.query(sql, null, rows => {
                 if (rows.length === 0) {
                     logger.error("No data found in the database.")
                     return

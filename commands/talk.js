@@ -16,7 +16,7 @@ module.exports = {
         if (mention)
             selectSQL += `AND user_id = ${mention.id}`
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [], rows => {
             for (let i = 0; i < rows.length; i++) {
                 const words = rows[i]["message"].split(" ")
                 let prevWord = ""

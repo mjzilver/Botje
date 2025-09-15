@@ -53,7 +53,7 @@ function handleRedditImages(message, sub, children) {
     const selectSQL = "SELECT * FROM images WHERE sub = $1"
     const foundImages = {}
 
-    database.query(selectSQL, [sub], (rows) => {
+    database.query(selectSQL, [sub], rows => {
         for (let i = 0; i < rows.length; i++)
             foundImages[rows[i].link] = true
 

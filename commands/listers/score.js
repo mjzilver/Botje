@@ -10,7 +10,7 @@ module.exports = {
     "name": "score",
     "description": "shows the top scoring posters in the channel or mentioned user",
     "format": "score (@user)",
-    "function": (message) => {
+    "function": message => {
         new ScoreLister().process(message)
     }
 }
@@ -32,7 +32,7 @@ class ScoreLister extends Lister {
             "score": 0
         }
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
             for (let i = 0; i < rows.length; i++) {
                 userdata["points"] += this.calculateScore(rows[i]["message"])
                 userdata["total"] += rows[i]["message"].length
@@ -53,7 +53,7 @@ class ScoreLister extends Lister {
 
         const userdata = {}
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             for (let i = 0; i < rows.length; i++) {
                 const userName = rows[i]["user_name"]
 

@@ -38,7 +38,7 @@ module.exports = {
                 ORDER BY RANDOM()
                 LIMIT 1`
 
-            database.query(selectSQL, [`%${keyword}%`], (rows) => {
+            database.query(selectSQL, [`%${keyword}%`], rows => {
                 if (rows && rows[0]) {
                     const content = rows[0]["message"]
                     const middle = content.lastIndexOf(" ", content.length / 2)

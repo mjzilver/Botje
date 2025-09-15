@@ -32,13 +32,13 @@ class SocketHandler {
         this.editPerPerson = []
         this.connectCounter = 0
 
-        this.io.on("connection", (socket) => {
+        this.io.on("connection", socket => {
             this.handleConnection(socket)
         })
 
         const terminalNamespace = io.of("/terminal")
 
-        terminalNamespace.on("connection", (socket) => {
+        terminalNamespace.on("connection", socket => {
             this.handleTerminalConnection(socket)
         })
     }
@@ -56,7 +56,7 @@ class SocketHandler {
             level: "repeat"
         }, socket))
 
-        socket.on("command", (command) => {
+        socket.on("command", command => {
             // send back the command to the client
             socket.emit("message", {
                 level: "console",
@@ -76,7 +76,7 @@ class SocketHandler {
     handleConnection(socket) {
         this.io.emit("connectCounter", ++this.connectCounter)
 
-        socket.on("pixelChange", async (pixel) => {
+        socket.on("pixelChange", async pixel => {
             await this.handlePixelChange(socket, pixel)
         })
 
@@ -130,7 +130,7 @@ class SocketHandler {
                 delete editPerPerson[id]
                 return true
             }
-            const recentEdits = editPerPerson[id].filter((timestamp) => {
+            const recentEdits = editPerPerson[id].filter(timestamp => {
                 const currentTime = new Date()
                 const timePassed = currentTime.getTime() - timestamp.getTime()
                 return timePassed < 200

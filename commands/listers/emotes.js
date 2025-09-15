@@ -9,7 +9,7 @@ module.exports = {
     "name": "emotes",
     "description": "shows the top 10 emotes in the current channel or from the mentioned user",
     "format": "emotes (@user)",
-    "function": (message) => {
+    "function": message => {
         new EmotesLister().process(message)
     }
 }
@@ -29,7 +29,7 @@ class EmotesLister extends Lister {
             ORDER BY COUNT(*)  DESC 
             LIMIT 10`
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             let result = ""
             for (let i = 0; i < rows.length; i++)
                 result += `${rows[i]["message"]} was used ${rows[i]["count"]} times! \n`
@@ -53,7 +53,7 @@ class EmotesLister extends Lister {
             ORDER BY COUNT(*) DESC 
             LIMIT 10`
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], (rows) => {
+        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
             let result = ""
             for (let i = 0; i < rows.length; i++)
                 result += `${rows[i]["message"]} said ${rows[i]["count"]} times! \n`
@@ -76,7 +76,7 @@ class EmotesLister extends Lister {
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC`
 
-        database.query(selectSQL, [message.guild.id], (rows) => {
+        database.query(selectSQL, [message.guild.id], rows => {
             let result = ""
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
                 result += `${rows[i]["user_name"]} has posted ${rows[i]["count"]} emotes! \n`

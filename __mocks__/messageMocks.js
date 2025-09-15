@@ -5,7 +5,7 @@ const createCallMock = (overrides = {}) => ({
         id: "mock-user-id",
         username: "mock-user",
         bot: false,
-        equals: jest.fn((user) => user.id === "mock-user-id")
+        equals: jest.fn(user => user.id === "mock-user-id")
     },
     channel: {
         name: "mock-channel",

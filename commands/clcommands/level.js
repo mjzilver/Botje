@@ -4,7 +4,7 @@ module.exports = {
     name: "level",
     description: "sets logging level",
     format: "level <level>",
-    function: (input) => {
+    function: input => {
         if (input[0] && logger.levels[input[0]]) {
             logger.transports[0].level = input[0]
             logger.console(`Logging level set to ${logger.transports[0].level}`)

@@ -27,7 +27,7 @@ function findClosestMatchInList(word, wordList) {
     if (Array.isArray(wordList)) {
         const oldWordList = wordList
         wordList = {}
-        oldWordList.forEach((item) => {
+        oldWordList.forEach(item => {
             wordList[item] = 1
         })
     }

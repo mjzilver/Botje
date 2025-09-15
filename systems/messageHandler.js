@@ -14,7 +14,7 @@ module.exports = class MessageHandler {
     send(call, content) {
         if (content) {
             const promise = call.channel.send(content)
-            promise.then((reply) => {
+            promise.then(reply => {
                 this.addCommandCall(call, reply)
                 reply.react(config.positive_emoji)
                 reply.react(config.negative_emoji)
@@ -28,7 +28,7 @@ module.exports = class MessageHandler {
     reply(call, content) {
         if (content) {
             const promise = call.reply(content)
-            promise.then((reply) => {
+            promise.then(reply => {
                 this.addCommandCall(call, reply)
                 reply.react(config.positive_emoji)
                 reply.react(config.negative_emoji)
@@ -77,7 +77,7 @@ module.exports = class MessageHandler {
         WHERE timestamp > ${new Date() - 24 * 60 * 60 * 1000}
         ORDER BY timestamp DESC`
 
-        database.query(selectSQL, [], (rows) => {
+        database.query(selectSQL, [], rows => {
             for (let i = 0; i < rows.length; i++)
                 this.commandCalls[rows[i]["call_id"]] = rows[i]["reply_id"]
 

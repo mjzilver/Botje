@@ -9,7 +9,7 @@ module.exports = {
     "name": "word",
     "description": "shows how many times a word has been said in the current channel or by a mentioned user",
     "format": "word (@user | ?) [word]",
-    "function": (message) => {
+    "function": message => {
         new WordLister().process(message)
     }
 }
@@ -44,7 +44,7 @@ class WordLister extends Lister {
         ORDER BY count(message) DESC 
         LIMIT 10`
 
-        database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
+        database.query(selectSQL, [`%${word}%`, message.guild.id], rows => {
             let result = ""
             for (let i = 0; (i < rows.length && i <= 10); i++)
                 result += `${rows[i]["user_name"]} has said ${word} ${rows[i]["count"]} times! \n`
@@ -68,7 +68,7 @@ class WordLister extends Lister {
         FROM messages
         WHERE LOWER(message) LIKE $1 AND server_id = $2 `
 
-        database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
+        database.query(selectSQL, [`%${word}%`, message.guild.id], rows => {
             bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
         })
     }
@@ -79,7 +79,7 @@ class WordLister extends Lister {
         WHERE LOWER(message) LIKE $1 
         AND server_id = $2 AND user_id = $3 `
 
-        database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id], (rows) => {
+        database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id], rows => {
             bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages from ${mentioned.username} in this server that contain ${word}`)
         })
     }
@@ -98,7 +98,7 @@ class WordLister extends Lister {
             ORDER BY count(message) DESC 
             LIMIT 10`
 
-        database.query(selectSQL, [`%${word}%`, message.guild.id], (rows) => {
+        database.query(selectSQL, [`%${word}%`, message.guild.id], rows => {
             let result = ""
             const resultArray = []
             for (let i = 0; (i < rows.length && i <= 10); i++) {

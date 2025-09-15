@@ -44,7 +44,7 @@ function findByWord(message) {
                 AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
                 ORDER BY RANDOM()`
 
-            database.query(selectSQL, [], (rows) => {
+            database.query(selectSQL, [], rows => {
                 if (rows) {
                     logger.debug(`Sending message with '${words.join(",")}' in it`)
 
@@ -81,7 +81,7 @@ function findByWord(message) {
                 ORDER BY RANDOM()
                 LIMIT 1`
 
-            database.query(selectSQL, [], (rows) => {
+            database.query(selectSQL, [], rows => {
                 if (rows) {
                     logger.debug(`Sending message with '${words[0]}' in it`)
                     bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
@@ -106,7 +106,7 @@ function findRandom(message) {
         ORDER BY RANDOM()
         LIMIT 1`
 
-    database.query(selectSQL, [], (rows) => {
+    database.query(selectSQL, [], rows => {
         if (rows)
             bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
     })
@@ -119,7 +119,7 @@ function findTopic(message, topic) {
         AND message NOT LIKE '%<%' AND LENGTH(message) > 10
         ORDER BY random() `
 
-    database.query(selectSQL, [], (rows) => {
+    database.query(selectSQL, [], rows => {
         if (rows.length < 3) {
             logger.debug("Not enough info about topic -- redirecting to the regular method")
             message.content = message.content.replace(/(about|think|of)/ig, "")

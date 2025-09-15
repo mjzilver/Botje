@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Connect to WebSocket on the /terminal path
     const socket = io("/terminal")
 
-    socket.on("message", (data) => {
+    socket.on("message", data => {
         const newMessage = document.createElement("li")
 
         const timestampSpan = document.createElement("span")
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
         terminalList.scrollTop = terminalList.scrollHeight
     })
 
-    inputField.addEventListener("keypress", (e) => {
+    inputField.addEventListener("keypress", e => {
         if (e.key === "Enter") {
             e.preventDefault()
             const message = inputField.value.trim()

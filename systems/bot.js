@@ -86,7 +86,7 @@ class Bot {
             if (!err && data)
                 this.disallowed = JSON.parse(data)
             else
-                fs.writeFile(disallowedFilepath, "{}", (writeErr) => {
+                fs.writeFile(disallowedFilepath, "{}", writeErr => {
                     if (writeErr)
                         logger.error("Error writing file:", writeErr)
 

@@ -8,7 +8,7 @@ module.exports = async function deletafter(message) {
                 limit: 100,
                 before: message.id
             }).then(messages => messages.forEach(
-                (fetchedMessage) => {
+                fetchedMessage => {
                     if (refenceId < fetchedMessage.id)
                         fetchedMessage.delete({ timeout: 10 })
                 }
