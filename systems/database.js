@@ -61,6 +61,15 @@ class Database {
             })
     }
 
+    async updateMessage(message) {
+        this.client.query("UPDATE messages SET message = $1 WHERE id = $2::bigint",
+            [message.cleanContent, message.id])
+            .catch((err) => {
+                logger.error(`Failed to update: ${message.content} posted by ${message.author.username}`)
+                logger.error(err.stack)
+            })
+    }
+
     async insertMessage(message) {
         this.client.query("INSERT INTO messages (id, user_id, user_name, message, channel_id, server_id, datetime) VALUES ($1::bigint, $2::bigint, $3, $4, $5::bigint, $6::bigint, $7::bigint) ON CONFLICT (id) DO NOTHING",
             [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])

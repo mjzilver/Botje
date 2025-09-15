@@ -23,6 +23,14 @@ module.exports = class eventListener {
                 }
         })
 
+        bot.client.on("messageUpdate", (_, newMessage) => {
+            if (!(newMessage.author.id in bot.disallowed))
+                if (newMessage.channel.type !== "DM") {
+                    database.updateMessage(newMessage)
+                    bot.emoteInjector.handleMessage(newMessage)
+                }
+        })
+
         bot.client.on("messageReactionAdd", (reaction) => {
             if (reaction.message.author.equals(bot.client.user))
                 switch (reaction.emoji.name) {
