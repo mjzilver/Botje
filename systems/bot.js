@@ -54,9 +54,9 @@ class Bot {
         if (!this.client.isReady()) {
             logger.startup("Attempting to log in")
 
-            if (process.argv.includes("--dev")) {
-                logger.startup("Logging in with dev key")
-                this.client.login(config.discord_api_key_dev)
+            if (process.argv.includes("--beta")) {
+                logger.startup("Logging in with beta key")
+                this.client.login(config.discord_api_key_beta)
             } else {
                 this.client.login(config.discord_api_key)
             }

@@ -1,7 +1,7 @@
 {
 	"prefix": "^(b! ?)",
 	"discord_api_key": "discord bot api key",
-	"discord_api_key_dev": "discord dev bot api key",
+	"discord_api_key_beta": "discord dev bot api key",
 	"weather_api_key": "openweathermap api key",
 	"youtube_api_key": "youtube api key",
 	"owner": "owner discord UUID",
