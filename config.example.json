@@ -27,6 +27,7 @@
 		"port": 5432
 	},
 	"llm": {
+		"model": "model",
     	"api": "api goes here",
     	"base_prompt": "You are a discord user, A discord user asks you \"{userQuestion}\". Answer the question clearly and concise.",
 		"conversation": "You are a discord user, reply to this conversaion: \"{userQuestion}\". Answer the last question clearly and concise."

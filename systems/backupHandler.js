@@ -35,18 +35,29 @@ module.exports = class BackupHandler {
         const selectSQL = "SELECT * FROM messages;"
 
         database.query(selectSQL, [], rows => {
-            for (const row of rows) {
-                const insertStatement = format(`INSERT INTO messages 
-                    (id, user_id, user_name, message, channel_id, server_id, datetime) 
-                    VALUES (%L, %L, %L, %L, %L, %L, %L) 
-                    ON CONFLICT (id) DO NOTHING;`,
-                row.id, row.user_id, row.user_name, row.message,
-                row.channel_id, row.server_id, row.datetime)
-
-                writeStream.write(`${insertStatement}\n`)
+            if (rows.length === 0) {
+                writeStream.write("COMMIT;\n")
+                writeStream.end(() => {
+                    logger.console(`Database exported successfully to ${dbBackupPath}`)
+                })
+                return
             }
 
+            const values = rows.map(row => {
+                return format("(%L, %L, %L, %L, %L, %L, %L)",
+                    row.id, row.user_id, row.user_name, row.message,
+                    row.channel_id, row.server_id, row.datetime)
+            }).join(",\n")
+
+            const insertStatement = `INSERT INTO messages
+            (id, user_id, user_name, message, channel_id, server_id, datetime)
+            VALUES
+            ${values}
+            ON CONFLICT (id) DO NOTHING;`
+
+            writeStream.write(`${insertStatement}\n`)
             writeStream.write("COMMIT;\n")
+
             writeStream.end(() => {
                 logger.console(`Database exported successfully to ${dbBackupPath}`)
             })

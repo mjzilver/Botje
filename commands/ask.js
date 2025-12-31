@@ -51,7 +51,7 @@ module.exports = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    model: "dolphin-llama3",
+                    model: config.llm.model,
                     prompt: prompt,
                     stream: true
                 }),
