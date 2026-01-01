@@ -45,6 +45,10 @@ String.prototype.replaceFancyQuotes = function () {
         .replace(/[‘’‚‛]/g, "'")
 }
 
+String.prototype.sanitizeFilename = function () {
+    return this.replace(/[/:*?"<>|\\]/g, "_")
+}
+
 String.prototype.replaceAt = function (index, replacement) {
     return this.substring(0, index) + replacement + this.substring(index + replacement.length)
 }
