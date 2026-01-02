@@ -8,7 +8,7 @@ const logger = require("../../systems/logger")
 
 function getUsbMounts() {
     const output = execSync(
-        "lsblk -o MOUNTPOINT,RM | awk '$2==1 && $1!=\"\" {print $1}'",
+        "findmnt -rn -o TARGET | grep '^/media/'",
         { encoding: "utf8" }
     )
 
@@ -29,11 +29,11 @@ function isValidDirectory(dir) {
 
 module.exports = {
     name: "backup",
-    description: "Backs up everything to a USB drive",
+    description: "Backs up everything to a drive",
     format: "backup <destination>",
     function: async function backup(input) {
         if (!input[0]) {
-            logger.console("Available USB mount points:")
+            logger.console("Available mount points:")
             getUsbMounts().forEach(m => logger.console(`- ${m}`))
             return
         }
