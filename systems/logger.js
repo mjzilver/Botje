@@ -32,7 +32,7 @@ const logger = Winston.createLogger({
         }),
         new Winston.transports.File({
             filename: "bot.log",
-            level: "warn",
+            level: "debug",
             format: combine(
                 timestamp(),
                 json()

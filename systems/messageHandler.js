@@ -57,7 +57,8 @@ module.exports = class MessageHandler {
     }
 
     markComplete(call) {
-        const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
+        const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) 
+        VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, null, call.createdAt.getTime()])
         this.bot.commandHandler.commandList.remove(call)
@@ -66,7 +67,8 @@ module.exports = class MessageHandler {
     addCommandCall(call, reply) {
         this.commandCalls[call.id] = reply.id
 
-        const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) VALUES ($1::bigint, $2::bigint, $3::bigint) 
+        const insertSQL = `INSERT INTO command_calls (call_id, reply_id, timestamp) 
+        VALUES ($1::bigint, $2::bigint, $3::bigint) 
         ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`
         database.insert(insertSQL, [call.id, reply.id, reply.createdAt.getTime()])
         this.bot.commandHandler.commandList.remove(call)

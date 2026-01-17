@@ -107,7 +107,7 @@ module.exports = class CommandHandler {
 
         if (!(message.author.username in this.lastRequest)) {
             this.lastRequest[message.author.username] = currentTimestamp
-            return true // no previous request found, return true
+            return true // no previous request found
         }
 
         const elapsedTime = currentTimestamp - this.lastRequest[message.author.username]
@@ -116,11 +116,11 @@ module.exports = class CommandHandler {
             if (canSendMessage)
                 this.bot.messageHandler.send(message, `Please wait ${remainingTime} second${remainingTime > 1 ? "s" : ""} before making another request.`)
 
-            return false // too soon, return false
+            return false // too soon
         }
 
         this.lastRequest[message.author.username] = currentTimestamp
-        return true // enough time has elapsed, return true
+        return true // enough time has elapsed
     }
 
     handleDM(message) {

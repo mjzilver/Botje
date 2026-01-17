@@ -1,11 +1,11 @@
-const { Client } = require("pg")
+const { Pool } = require("pg")
 
 const logger = require("./logger")
 const { config } = require("./settings")
 
 class Database {
     constructor() {
-        this.client = new Client({
+        this.pool = new Pool({
             user: config.db.user,
             host: config.db.host,
             database: config.db.database,
@@ -13,26 +13,36 @@ class Database {
             port: config.db.port,
         })
 
-        this.client.connect().then(() => {
-            this.initializeDatabase()
-            logger.startup("Postgres Database loaded")
-        }).catch(e => {
-            logger.error(`Could not connect to database: ${e}`)
-        })
+        this.pool.connect()
+            .then(client => {
+                this.initializeDatabase()
+                logger.startup("Postgres Database loaded")
+                client.release()
+            })
+            .catch(e => {
+                logger.error(`Could not connect to database: ${e}`)
+            })
     }
 
     async initializeDatabase() {
-        await this.client.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)")
-        await this.client.query(`CREATE TABLE IF NOT EXISTS messages 
-            (id bigint, user_id bigint, user_name text, message text, datetime bigint, channel_id bigint, server_id bigint, PRIMARY KEY(id))`)
-        await this.client.query("CREATE TABLE IF NOT EXISTS colors (x integer, y integer, red integer, green integer, blue integer, PRIMARY KEY(x,y))")
-        await this.client.query("CREATE TABLE IF NOT EXISTS command_calls (call_id bigint, reply_id bigint NULL, timestamp bigint, PRIMARY KEY(call_id))")
+        await this.pool.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)")
+        await this.pool.query(`CREATE TABLE IF NOT EXISTS messages 
+      (id bigint, user_id bigint, user_name text, message text, datetime bigint, channel_id bigint, server_id bigint, PRIMARY KEY(id))`)
+        await this.pool.query("CREATE TABLE IF NOT EXISTS colors (x integer, y integer, red integer, green integer, blue integer, PRIMARY KEY(x,y))")
+        await this.pool.query("CREATE TABLE IF NOT EXISTS command_calls (call_id bigint, reply_id bigint NULL, timestamp bigint, PRIMARY KEY(call_id))")
     }
 
-    query(selectSQL, parameters = [], callback) {
-        this.client.query(selectSQL, parameters, (err, result) => {
+    query(selectQuery, parameters = [], callback) {
+        const startTime = performance.now()
+
+        this.pool.query(selectQuery, parameters, (err, result) => {
+            const endTime = performance.now()
+            const duration = endTime - startTime
+
+            logger.debug(`Query executed in ${duration.toFixed(2)} ms\nSQL: ${selectQuery}`)
+
             if (err) {
-                logger.error(selectSQL)
+                logger.error(selectQuery)
                 logger.error(err.stack)
             } else {
                 callback(result.rows)
@@ -40,14 +50,20 @@ class Database {
         })
     }
 
-    async insert(selectSQL, parameters = [], callback = null) {
-        this.client.query(selectSQL, parameters, err => {
+    async insert(insertQuery, parameters = [], callback = null) {
+        const startTime = performance.now()
+
+        this.pool.query(insertQuery, parameters, err => {
+            const endTime = performance.now()
+            const duration = endTime - startTime
+
+            logger.debug(`Query executed in ${duration.toFixed(2)} ms\nSQL: ${insertQuery}`)
+
             if (err) {
                 logger.error(err.stack)
-                logger.error(selectSQL)
+                logger.error(insertQuery)
             } else {
-                if (callback)
-                    callback()
+                if (callback) callback()
             }
         })
     }
@@ -62,7 +78,7 @@ class Database {
     }
 
     async updateMessage(message) {
-        this.client.query("UPDATE messages SET message = $1 WHERE id = $2::bigint",
+        this.pool.query("UPDATE messages SET message = $1 WHERE id = $2::bigint",
             [message.cleanContent, message.id])
             .catch(err => {
                 logger.error(`Failed to update: ${message.content} posted by ${message.author.username}`)
@@ -71,7 +87,7 @@ class Database {
     }
 
     async insertMessage(message) {
-        this.client.query("INSERT INTO messages (id, user_id, user_name, message, channel_id, server_id, datetime) VALUES ($1::bigint, $2::bigint, $3, $4, $5::bigint, $6::bigint, $7::bigint) ON CONFLICT (id) DO NOTHING",
+        this.pool.query("INSERT INTO messages (id, user_id, user_name, message, channel_id, server_id, datetime) VALUES ($1::bigint, $2::bigint, $3, $4, $5::bigint, $6::bigint, $7::bigint) ON CONFLICT (id) DO NOTHING",
             [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
             .catch(err => {
                 logger.error(`Failed to insert: ${message.content} posted by ${message.author.username}`)
