@@ -32,6 +32,9 @@ module.exports = {
                 ["Uptime", formattedUptime]
             ]
 
+            if (process.argv.includes("--web"))
+                printRows.push(["Web Interface", "Enabled"])
+
             const sql = `SELECT pg_size_pretty(pg_database_size('botdb')) AS size, 
             COUNT(messages.id) as count FROM messages`
 
@@ -45,6 +48,8 @@ module.exports = {
                     ["Database Size", rows[0]["size"]],
                     ["Message Count", formatter.format(rows[0]["count"])]
                 )
+
+                printRows.sort((a, b) => a[0].localeCompare(b[0]))
 
                 logger.printRows(printRows, logger.console)
             })

@@ -25,8 +25,8 @@ class EmotesLister extends Lister {
             WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
             AND server_id = $1
             GROUP BY LOWER(message)
-            HAVING COUNT(*)  > 1
-            ORDER BY COUNT(*)  DESC 
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC 
             LIMIT 10`
 
         database.query(selectSQL, [message.guild.id], rows => {

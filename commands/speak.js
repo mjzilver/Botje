@@ -41,8 +41,7 @@ function findByWord(message) {
                 WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
                 AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
                 AND LENGTH(message) < 150 AND LENGTH(message) > 10
-                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
-                ORDER BY RANDOM()`
+                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}`
 
             database.query(selectSQL, [], rows => {
                 if (rows) {
@@ -77,11 +76,9 @@ function findByWord(message) {
                 WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
                 AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
                 AND message LIKE '%${words[0]}%' AND LENGTH(message) > 10
-                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}
-                ORDER BY RANDOM()
-                LIMIT 1`
+                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()} `
 
-            database.query(selectSQL, [], rows => {
+            database.queryRandomMessage(selectSQL, [], rows => {
                 if (rows) {
                     logger.debug(`Sending message with '${words[0]}' in it`)
                     bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
@@ -102,11 +99,9 @@ function findRandom(message) {
     const selectSQL = `SELECT message FROM messages
         WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
         AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-        AND datetime < ${earliest.getTime()} AND LENGTH(message) > 10
-        ORDER BY RANDOM()
-        LIMIT 1`
+        AND datetime < ${earliest.getTime()} AND LENGTH(message) > 10 `
 
-    database.query(selectSQL, [], rows => {
+    database.queryRandomMessage(selectSQL, [], rows => {
         if (rows)
             bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
     })
@@ -116,8 +111,7 @@ function findTopic(message, topic) {
     const selectSQL = `SELECT LOWER(message) as message
         FROM messages
         WHERE message LIKE '%${topic} is%' OR message LIKE '%${topic} are%' 
-        AND message NOT LIKE '%<%' AND LENGTH(message) > 10
-        ORDER BY random() `
+        AND message NOT LIKE '%<%' AND LENGTH(message) > 10`
 
     database.query(selectSQL, [], rows => {
         if (rows.length < 3) {

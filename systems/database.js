@@ -27,7 +27,7 @@ class Database {
     async initializeDatabase() {
         await this.pool.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)")
         await this.pool.query(`CREATE TABLE IF NOT EXISTS messages 
-      (id bigint, user_id bigint, user_name text, message text, datetime bigint, channel_id bigint, server_id bigint, PRIMARY KEY(id))`)
+        (id bigint, user_id bigint, user_name text, message text, datetime bigint, channel_id bigint, server_id bigint, PRIMARY KEY(id))`)
         await this.pool.query("CREATE TABLE IF NOT EXISTS colors (x integer, y integer, red integer, green integer, blue integer, PRIMARY KEY(x,y))")
         await this.pool.query("CREATE TABLE IF NOT EXISTS command_calls (call_id bigint, reply_id bigint NULL, timestamp bigint, PRIMARY KEY(call_id))")
     }
@@ -48,6 +48,28 @@ class Database {
                 callback(result.rows)
             }
         })
+    }
+
+    async getCount(selectQuery, parameters = []) {
+        return new Promise(resolve => {
+            const countQuery = `SELECT COUNT(*) AS count FROM (${selectQuery}) AS sub`
+
+            this.query(countQuery, parameters, rows => {
+                resolve(parseInt(rows[0].count, 10))
+            })
+        })
+    }
+
+    async queryRandomMessage(selectQuery, parameters = [], callback) {
+        const count = await this.getCount(selectQuery, parameters)
+
+        if (count === 0)
+            return callback([])
+
+        const offset = Math.floor(Math.random() * count)
+        const queryWithOffset = `${selectQuery} LIMIT 1 OFFSET $${parameters.length + 1}`
+
+        this.query(queryWithOffset, [...parameters, offset], callback)
     }
 
     async insert(insertQuery, parameters = [], callback = null) {
