@@ -17,22 +17,23 @@ class Bot {
     constructor() {
         this.client = new discord.Client({
             intents: [
-                "DIRECT_MESSAGES",
-                "DIRECT_MESSAGE_TYPING",
-                "GUILDS",
-                "GUILD_MEMBERS",
-                "GUILD_BANS",
-                "GUILD_EMOJIS_AND_STICKERS",
-                "GUILD_INTEGRATIONS",
-                "GUILD_WEBHOOKS",
-                "GUILD_INVITES",
-                "GUILD_VOICE_STATES",
-                "GUILD_PRESENCES",
-                "GUILD_MESSAGES",
-                "GUILD_MESSAGE_REACTIONS",
-                "GUILD_MESSAGE_TYPING",
+                discord.GatewayIntentBits.DirectMessages,
+                discord.GatewayIntentBits.DirectMessageTyping,
+                discord.GatewayIntentBits.Guilds,
+                discord.GatewayIntentBits.GuildMembers,
+                discord.GatewayIntentBits.GuildModeration,
+                discord.GatewayIntentBits.GuildExpressions,
+                discord.GatewayIntentBits.GuildIntegrations,
+                discord.GatewayIntentBits.GuildWebhooks,
+                discord.GatewayIntentBits.GuildInvites,
+                discord.GatewayIntentBits.GuildVoiceStates,
+                discord.GatewayIntentBits.GuildPresences,
+                discord.GatewayIntentBits.GuildMessages,
+                discord.GatewayIntentBits.GuildMessageReactions,
+                discord.GatewayIntentBits.GuildMessageTyping,
+                discord.GatewayIntentBits.MessageContent,
             ],
-            partials: ["CHANNEL"],
+            partials: [discord.Partials.Channel],
             autoReconnect: true
         })
 

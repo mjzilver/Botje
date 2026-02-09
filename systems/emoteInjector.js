@@ -5,7 +5,7 @@ module.exports = class EmoteInjector {
         this.bot = bot
     }
 
-    handleMessage(message) {
+    async handleMessage(message) {
         if (message.author.bot) return
 
         const matches = Array.from(new Set(
@@ -35,8 +35,9 @@ module.exports = class EmoteInjector {
         }
 
         if (hasCorrections) {
-            webhook.sendMessage(message.channel.id, correctedMessage, message.author.id, this.bot)
-            message.delete()
+            const success = await webhook.sendMessage(message.channel.id, correctedMessage, message.author.id)
+            if (success)
+                message.delete()
         }
     }
 }

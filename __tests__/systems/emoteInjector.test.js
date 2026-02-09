@@ -58,7 +58,7 @@ describe("EmoteInjector", () => {
         expect(message.delete).not.toHaveBeenCalled()
     })
 
-    test("replaces missing emoji with one found in another guild", () => {
+    test("replaces missing emoji with one found in another guild", async () => {
         const emoji = createEmojiMock({ name: "smile", id: "emoji789" })
 
         const message = createCallMock({ content: "I love :smile:" })
@@ -74,19 +74,19 @@ describe("EmoteInjector", () => {
         })
 
         mockGuildCache(message.guild, otherGuild)
+        webhook.sendMessage.mockResolvedValue(true)
 
-        injector.handleMessage(message)
+        await injector.handleMessage(message)
 
         expect(webhook.sendMessage).toHaveBeenCalledWith(
             message.channel.id,
             "I love <:smile:emoji789>",
-            message.author.id,
-            expect.any(Object)
+            message.author.id
         )
         expect(message.delete).toHaveBeenCalled()
     })
 
-    test("handles multiple missing emojis correctly", () => {
+    test("handles multiple missing emojis correctly", async () => {
         const emojiA = createEmojiMock({ name: "a", id: "id1" })
         const emojiB = createEmojiMock({ name: "b", id: "id2" })
 
@@ -107,19 +107,19 @@ describe("EmoteInjector", () => {
         })
 
         mockGuildCache(message.guild, otherGuild)
+        webhook.sendMessage.mockResolvedValue(true)
 
-        injector.handleMessage(message)
+        await injector.handleMessage(message)
 
         expect(webhook.sendMessage).toHaveBeenCalledWith(
             message.channel.id,
             "hello <:a:id1> and <:b:id2>",
-            message.author.id,
-            expect.any(Object)
+            message.author.id
         )
         expect(message.delete).toHaveBeenCalled()
     })
 
-    test("ignores emoji syntax that's already proper (e.g., <:name:id>)", () => {
+    test("ignores emoji syntax that's already proper (e.g., <:name:id>)", async () => {
         const message = createCallMock({ content: "proper <:smile:12345> and :missing:" })
         const existingEmoji = createEmojiMock({ name: "smile", id: "12345" })
 
@@ -139,14 +139,14 @@ describe("EmoteInjector", () => {
         })
 
         mockGuildCache(message.guild, otherGuild)
+        webhook.sendMessage.mockResolvedValue(true)
 
-        injector.handleMessage(message)
+        await injector.handleMessage(message)
 
         expect(webhook.sendMessage).toHaveBeenCalledWith(
             message.channel.id,
             "proper <:smile:12345> and <:missing:999>",
-            message.author.id,
-            expect.any(Object)
+            message.author.id
         )
         expect(message.delete).toHaveBeenCalled()
     })
@@ -172,7 +172,7 @@ describe("EmoteInjector", () => {
         expect(message.delete).not.toHaveBeenCalled()
     })
 
-    test("handles duplicate emoji names only once", () => {
+    test("handles duplicate emoji names only once", async () => {
         const emoji = createEmojiMock({ name: "cat", id: "id3" })
 
         const message = createCallMock({ content: ":cat: :cat:" })
@@ -188,14 +188,14 @@ describe("EmoteInjector", () => {
         })
 
         mockGuildCache(message.guild, otherGuild)
+        webhook.sendMessage.mockResolvedValue(true)
 
-        injector.handleMessage(message)
+        await injector.handleMessage(message)
 
         expect(webhook.sendMessage).toHaveBeenCalledWith(
             message.channel.id,
             "<:cat:id3> <:cat:id3>",
-            message.author.id,
-            bot
+            message.author.id
         )
         expect(message.delete).toHaveBeenCalled()
     })

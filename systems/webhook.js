@@ -1,11 +1,12 @@
 const projectPackage = require("../package.json")
+const bot = require("./bot")
 const logger = require("./logger")
 
 class Webhook {
     constructor() { }
 
     async fetch(channel) {
-        if (channel && channel.type === "GUILD_TEXT") {
+        if (channel && channel.isTextBased() && channel.guild) {
             const webhooks = await channel.fetchWebhooks()
             for (const [, webhook] of webhooks)
                 if (webhook.name === projectPackage.name) {
@@ -14,29 +15,30 @@ class Webhook {
                 }
 
             logger.console("making new webhook")
-            return await channel.createWebhook(projectPackage.name)
+            return await channel.createWebhook({ name: projectPackage.name })
         }
+        return null
     }
 
-    sendMessage(channelid, text, userid, bot = null) {
-        if (bot === null)
-            bot = require("./bot")
-
+    async sendMessage(channelid, text, userid) {
         const channel = bot.client.channels.cache.get(channelid)
+        if (!channel) return false
 
-        this.fetch(channel).then(webhook => {
-            // If the channel is not found, return
-            if (!channel) return
+        try {
+            const webhook = await this.fetch(channel)
+            if (!webhook) return false
 
-            channel.guild.members.fetch(userid).then(
-                member => {
-                    webhook.send({
-                        content: text,
-                        username: member.user.displayName ? member.user.displayName : member.user.username,
-                        avatarURL: member.user.displayAvatarURL()
-                    })
-                })
-        })
+            const member = await channel.guild.members.fetch(userid)
+            await webhook.send({
+                content: text,
+                username: member.user.displayName ? member.user.displayName : member.user.username,
+                avatarURL: member.user.displayAvatarURL()
+            })
+            return true
+        } catch (error) {
+            logger.error(`Failed to send webhook message: ${error.message}`)
+            return false
+        }
     }
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 const path = require("path")
 const cardData = require("../json/card_data.json")
 
@@ -20,10 +21,8 @@ for (const card of cardData) {
     }
 
     const filepath = path.join(__dirname, "../assets/tarot", filename)
-    
-    const fs = require("fs")
-    if (!fs.existsSync(filepath)) {
-        console.log(`Missing file for card: ${card.name} expected at ${filename}`)
-    }
 
+    const fs = require("fs")
+    if (!fs.existsSync(filepath))
+        console.log(`Missing file for card: ${card.name} expected at ${filename}`)
 }
