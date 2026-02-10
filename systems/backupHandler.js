@@ -1,8 +1,9 @@
 const fs = require("fs")
 const path = require("path")
+const { pipeline } = require("stream/promises")
 
 const format = require("pg-format")
-const request = require("request")
+const axios = require("axios")
 
 const database = require("./database")
 const logger = require("./logger")
@@ -48,14 +49,10 @@ module.exports = class BackupHandler {
 
             logger.console(`Saving ${emoji.name} at ${emojiPath} from ${emojiLink}`)
 
-            const writeStream = fs.createWriteStream(emojiPath, { flags: "w" })
-
-            writeStream.on("finish", () => resolve(emojiPath))
-            writeStream.on("error", reject)
-
-            request(emojiLink)
-                .on("error", reject)
-                .pipe(writeStream)
+            axios.get(emojiLink, { responseType: "stream" })
+                .then(response => pipeline(response.data, fs.createWriteStream(emojiPath, { flags: "w" })))
+                .then(() => resolve(emojiPath))
+                .catch(reject)
         })
     }
 

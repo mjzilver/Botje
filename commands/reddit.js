@@ -1,4 +1,4 @@
-const request = require("request")
+const axios = require("axios")
 
 const bot = require("../systems/bot")
 const database = require("../systems/database")
@@ -9,11 +9,10 @@ const botHeader = {
     "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1" // This is required by reddit
 }
 
-const defaultOptions = {
-    json: true,
-    followAllRedirects: true,
-    headers: botHeader
-}
+const axiosInstance = axios.create({
+    headers: botHeader,
+    maxRedirects: 10
+})
 
 module.exports = {
     "name": "reddit",
@@ -33,20 +32,19 @@ async function getRedditImage(message, last = "") {
     if (["hour", "day", "week", "month", "year", "all"].includes(args[3]))
         time = args[3]
 
-    const options = {
-        url: `https://www.reddit.com/r/${sub}/${sort}.json?sort=${sort}&t=${time}&limit=100&after=${last}`,
-        ...defaultOptions
-    }
+    const url = `https://www.reddit.com/r/${sub}/${sort}.json?sort=${sort}&t=${time}&limit=100&after=${last}`
 
-    request(options, (err, res, body) => {
-        if (err)
-            return logger.error(err)
+    try {
+        const response = await axiosInstance.get(url)
+        const body = response.data
 
         if (body?.data?.children)
             handleRedditImages(message, sub, body.data.children)
         else
             bot.messageHandler.send(message, "No images were found")
-    })
+    } catch (err) {
+        logger.error(err)
+    }
 }
 
 function handleRedditImages(message, sub, children) {

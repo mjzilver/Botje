@@ -9,7 +9,8 @@
   "repository": "https://github.com/mjzilver/botje",
   "private": true,
   "dependencies": {
-    "discord.js": "^14.16.3",
+    "axios": "^1.13.5",
+    "discord.js": "^14.25.1",
     "jimp": "^0.22.12",
     "pg": "^8.12.0",
     "pg-format": "^1.0.4",
