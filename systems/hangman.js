@@ -113,13 +113,13 @@ class hangman {
     }
 
     sendEmbed(message) {
-        const attachment = new discord.MessageAttachment(`${__dirname}/../assets/hangman/${this.tries}.png`, "hangman.png")
+        const attachment = new discord.AttachmentBuilder(`${__dirname}/../assets/hangman/${this.tries}.png`, { name: "hangman.png" })
 
         let showVisibleWord = ""
         for (let i = 0; i < this.visibleWord.length; i++)
             showVisibleWord += `${this.visibleWord[i].toUpperCase() } `
 
-        const hangmanEmbed = new discord.MessageEmbed()
+        const hangmanEmbed = new discord.EmbedBuilder()
             .setColor(config.color_hex)
             .setTitle(`Hangman -- ${this.tries}/${this.maxTries} tries`)
             .setImage("attachment://hangman.png")

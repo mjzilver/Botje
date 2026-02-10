@@ -1,3 +1,4 @@
+const discord = require("discord.js")
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
 const logger = require("../../systems/logger")
@@ -14,7 +15,7 @@ module.exports = {
             const amount = (input[1]?.length !== 0 ? input[1] : 1000000) // if no set amount 1 million is set as the max OR the end is reached
             const channel = channels.find(c => c.id === channelId)
 
-            if (channel && channel.type === "GUILD_TEXT")
+            if (channel && channel.type === discord.ChannelType.GuildText)
                 catalog(channel, channel.lastMessageId, amount)
             else
                 logger.console("Channel not found")

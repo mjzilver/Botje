@@ -52,7 +52,7 @@ class WordLister extends Lister {
             if (result === "")
                 return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name} `)
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 users for the word ${word} in ${message.guild.name} `)
                 .setDescription(result)
@@ -115,7 +115,7 @@ class WordLister extends Lister {
             if (result === "")
                 return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name} `)
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 users for the word ${word} in ${message.guild.name} `)
                 .setDescription(result)

@@ -42,8 +42,8 @@ module.exports = {
 
         const buffer = await image.getBufferAsync(Jimp.MIME_PNG)
 
-        const attachment = new discord.MessageAttachment(buffer, `${card.name_short}.png`)
-        const tarotEmbed = new discord.MessageEmbed()
+        const attachment = new discord.AttachmentBuilder(buffer, { name: `${card.name_short}.png` })
+        const tarotEmbed = new discord.EmbedBuilder()
             .setColor(config.color_hex)
             .setTitle(`Your card is: ${card.name} ${isReversed ? "(Reversed)" : ""}`)
             .setImage(`attachment://${card.name_short}.png`)

@@ -10,12 +10,12 @@ module.exports = async function deletafter(message) {
             }).then(messages => messages.forEach(
                 fetchedMessage => {
                     if (refenceId < fetchedMessage.id)
-                        fetchedMessage.delete({ timeout: 10 })
+                        setTimeout(() => fetchedMessage.delete().catch(() => {}), 10)
                 }
             ))
 
         logger.warn(`Deleting up to 100 messages after "${message.content}"`)
-        message.delete({ timeout: 5000 })
+        setTimeout(() => message.delete().catch(() => {}), 5000)
     } else {
         message.reply("You need to reply to a manage to delete after the replied to message")
     }

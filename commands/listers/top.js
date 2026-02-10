@@ -38,7 +38,7 @@ class TopLister extends Lister {
                 (i < rows.length && i <= 10); i++)
                 result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 must used sentences in ${message.guild.name}`)
                 .setDescription(result)
@@ -65,7 +65,7 @@ class TopLister extends Lister {
                 (i < rows.length && i <= 10); i++)
                 result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 must used sentences in ${message.guild.name} by ${mentioned.username}`)
                 .setDescription(result)

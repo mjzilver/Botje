@@ -86,7 +86,7 @@ class ScoreLister extends Lister {
             for (let i = 0; (i < sorted.length && i <= 10); i++)
                 result += `${sorted[i][0]}'s post score is ${sorted[i][1]} \n`
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 posters in ${message.guild.name}`)
                 .setDescription(result)

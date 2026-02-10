@@ -1,3 +1,4 @@
+const discord = require("discord.js")
 const bot = require("../../systems/bot")
 const logger = require("../../systems/logger")
 
@@ -8,7 +9,7 @@ module.exports = {
     "function": function list() {
         const channels = []
         for (const [channelId, channel] of bot.client.channels.cache.entries())
-            if (channel.type === "GUILD_TEXT")
+            if (channel.type === discord.ChannelType.GuildText)
                 channels.push({ channelId, channel })
 
         channels.sort((a, b) => {

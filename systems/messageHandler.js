@@ -1,3 +1,4 @@
+const discord = require("discord.js")
 const database = require("./database")
 const logger = require("./logger")
 const { config } = require("./settings")
@@ -93,7 +94,7 @@ module.exports = class MessageHandler {
         const yesterday = Date.now() - 24 * 60 * 60 * 1000
 
         this.bot.client.channels.cache
-            .filter(channel => channel.type === "GUILD_TEXT" && channel.viewable)
+            .filter(channel => channel.type === discord.ChannelType.GuildText && channel.viewable)
             .forEach(channel => {
                 channel.messages.fetch({ limit: 100 }).then(messages => {
                     messages

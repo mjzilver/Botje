@@ -1,3 +1,4 @@
+const discord = require("discord.js")
 const express = require("express")
 const router = express.Router()
 
@@ -8,7 +9,7 @@ router.get("/channels/:guildId", (req, res) => {
     const guildId = req.params.guildId
 
     const channels = Array.from(bot.client.channels.cache.values())
-        .filter(channel => channel.type === "GUILD_TEXT" && channel.guild.id === guildId)
+        .filter(channel => channel.type === discord.ChannelType.GuildText && channel.guild.id === guildId)
         .map(channel => ({ id: channel.id, name: channel.name, guildId: channel.guild.id }))
 
     res.json(channels.length > 0 ? channels : ["No channels found for this guild"])

@@ -1,3 +1,4 @@
+const discord = require("discord.js")
 const emojiValues = require("../json/emoji.json")
 const bot = require("../systems/bot")
 
@@ -6,7 +7,7 @@ module.exports = {
     "description": "turns your message into emojis",
     "format": "emoji [string]",
     "function": function emoji(message) {
-        if (message.type === "REPLY") {
+        if (message.type === discord.MessageType.Reply) {
             message.channel.messages.fetch(message.reference.messageId)
                 .then(replyMessage => {
                     let sentence = message.content.split(" ").slice(1)
@@ -17,9 +18,7 @@ module.exports = {
                         if (sentence.charAt(i) >= "a" && sentence.charAt(i) <= "z")
                             replyMessage.react(emojiValues[`letter_${ sentence.charAt(i)}`])
 
-                    message.delete({
-                        timeout: 1000
-                    })
+                    setTimeout(() => message.delete().catch(() => {}), 1000)
                 })
         } else {
             let sentence = message.content.split(" ").slice(1)

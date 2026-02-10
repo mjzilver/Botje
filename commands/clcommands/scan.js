@@ -1,3 +1,4 @@
+const discord = require("discord.js")
 const bot = require("../../systems/bot")
 
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
         const save = require("./save")
 
         for (const [channelId, channel] of bot.client.channels.cache.entries())
-            if (channel.type === "GUILD_TEXT")
+            if (channel.type === discord.ChannelType.GuildText)
                 save.function([channelId, input])
     }
 }

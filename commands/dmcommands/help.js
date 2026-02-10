@@ -15,7 +15,7 @@ module.exports = {
         for (const [, command] of Object.entries(commands))
             helpMessage += `\`${command.format}\`: ${command.description} \n`
 
-        const help = new discord.MessageEmbed()
+        const help = new discord.EmbedBuilder()
             .setColor(config.color_hex)
             .setTitle(":robot: Current DirectMessage commands: :robot:")
             .setDescription(helpMessage)

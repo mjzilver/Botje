@@ -34,7 +34,7 @@ class EmotesLister extends Lister {
             for (let i = 0; i < rows.length; i++)
                 result += `${rows[i]["message"]} was used ${rows[i]["count"]} times! \n`
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 most used emotes in ${message.guild.name}`)
                 .setDescription(result)
@@ -58,7 +58,7 @@ class EmotesLister extends Lister {
             for (let i = 0; i < rows.length; i++)
                 result += `${rows[i]["message"]} said ${rows[i]["count"]} times! \n`
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 most used emotes in ${message.guild.name} used by ${mentioned.username}`)
                 .setDescription(result)
@@ -81,7 +81,7 @@ class EmotesLister extends Lister {
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
                 result += `${rows[i]["user_name"]} has posted ${rows[i]["count"]} emotes! \n`
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 posters in ${message.guild.name}`)
                 .setDescription(result)

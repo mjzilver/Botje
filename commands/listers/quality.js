@@ -90,7 +90,7 @@ class QualityLister extends Lister {
             for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
                 result += `${rows[i]["user_name"]}'s post quality is ${parseFloat(rows[i]["percentage_unique"]).toFixed(2)}% \n`
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 quality posters in ${message.guild.name}`)
                 .setDescription(result)

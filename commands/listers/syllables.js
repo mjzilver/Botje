@@ -85,7 +85,7 @@ class syllableLister extends Lister {
             for (let i = 0; (i < sorted.length && i <= 10); i++)
                 result += `${sorted[i][0]} has an average of ${sorted[i][1]} syllables per post \n`
 
-            const top = new discord.MessageEmbed()
+            const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
                 .setTitle(`Top 10 most intellectual posters in ${message.guild.name}`)
                 .setDescription(result)

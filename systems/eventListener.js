@@ -1,3 +1,4 @@
+const discord = require("discord.js")
 const database = require("./database")
 const logger = require("./logger")
 const { config } = require("./settings")
@@ -14,7 +15,7 @@ module.exports = class eventListener {
 
         bot.client.on("messageCreate", message => {
             if (!(message.author.id in bot.disallowed))
-                if (message.channel.type === "DM") {
+                if (message.channel.type === discord.ChannelType.DM) {
                     bot.commandHandler.handleDM(message)
                 } else {
                     database.storeMessage(message)
@@ -38,7 +39,7 @@ module.exports = class eventListener {
                     break
                 case config.negative_emoji:
                     if (reaction.count >= 3 && reaction.count > reaction.message.reactions.resolve(config.positive_emoji)?.count) {
-                        reaction.message.delete({ timeout: 5000 })
+                        setTimeout(() => reaction.message.delete().catch(() => {}), 5000)
                         logger.warn(`Post gets deleted due to downvotes - ${reaction.message.content}`)
                     }
                     break

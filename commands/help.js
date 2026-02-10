@@ -29,7 +29,7 @@ module.exports = {
                 helpMessage += `\`${command.format}\`: ${command.description} \n`
         }
 
-        const help = new discord.MessageEmbed()
+        const help = new discord.EmbedBuilder()
             .setColor(config.color_hex)
             .setTitle(":robot: Current commands: :robot:")
             .setDescription(helpMessage)

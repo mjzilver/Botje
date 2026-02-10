@@ -1,3 +1,4 @@
+const discord = require("discord.js")
 const bot = require("../../systems/bot")
 const logger = require("../../systems/logger")
 
@@ -20,7 +21,7 @@ module.exports = async function nuke(message) {
 
 function nukeguild(message) {
     for (const [channelId, channel] of bot.client.channels.cache.entries())
-        if (channel.type === "GUILD_TEXT" && channel.guild.id === message.guild.id)
+        if (channel.type === discord.ChannelType.GuildText && channel.guild.id === message.guild.id)
             nukechannel(channelId)
 }
 
@@ -28,7 +29,7 @@ function nukechannel(channelId) {
     const channels = bot.client.channels.cache
     const channel = channels.find(c => c.id === channelId)
 
-    if (channel && channel.type === "GUILD_TEXT") {
+    if (channel && channel.type === discord.ChannelType.GuildText) {
         nukemessages(channel, channel.lastMessageId)
         channel.lastMessage?.delete({ timeout: 100 })
         logger.warn(`NUKING channel: ${channel.name}`)

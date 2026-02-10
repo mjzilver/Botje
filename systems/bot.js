@@ -33,8 +33,7 @@ class Bot {
                 discord.GatewayIntentBits.GuildMessageTyping,
                 discord.GatewayIntentBits.MessageContent,
             ],
-            partials: [discord.Partials.Channel],
-            autoReconnect: true
+            partials: [discord.Partials.Channel]
         })
 
         this.login()
