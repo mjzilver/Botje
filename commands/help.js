@@ -1,7 +1,7 @@
 const discord = require("discord.js")
 
 const projectPackage = require("../package.json")
-const { newPaginatedEmbed, createPages } = require("../systems/pagination")
+const { sendPaginatedEmbed, createPages } = require("../systems/pagination")
 const { config } = require("../systems/settings")
 
 module.exports = {
@@ -28,6 +28,6 @@ module.exports = {
             return embed
         })
 
-        return newPaginatedEmbed(message, pages)
+        return sendPaginatedEmbed(message, pages)
     }
 }

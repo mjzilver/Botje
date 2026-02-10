@@ -4,7 +4,7 @@ const Lister = require("./lister.js")
 const letterValues = require("../../json/letter_values.json")
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
-const { newPaginatedEmbed, createPages } = require("../../systems/pagination")
+const { sendPaginatedEmbed, createPages } = require("../../systems/pagination")
 const { config } = require("../../systems/settings")
 
 module.exports = {
@@ -95,7 +95,7 @@ class ScoreLister extends Lister {
                     .setFooter({ text: `Page ${pageNum}/${totalPages}` })
             })
 
-            newPaginatedEmbed(message, pages)
+            sendPaginatedEmbed(message, pages)
         })
     }
 

@@ -9,7 +9,7 @@ const logger = require("./logger")
  * @param {Number} timeout - Time in milliseconds before buttons expire (default: 5 minutes)
  * @returns {Promise<discord.Message>}
  */
-async function newPaginatedEmbed(message, pages, timeout = 300000) {
+async function sendPaginatedEmbed(message, pages, timeout = 300000) {
     if (!pages || pages.length === 0)
         throw new Error("Pages array cannot be empty")
 
@@ -19,7 +19,6 @@ async function newPaginatedEmbed(message, pages, timeout = 300000) {
 
         if (typeof page === "object" && (page.embeds || page.content || page.files))
             content = page
-
         else
             content = { embeds: Array.isArray(page) ? page : [page] }
 
@@ -115,6 +114,6 @@ function createPages(items, itemsPerPage, formatPage) {
 }
 
 module.exports = {
-    newPaginatedEmbed,
+    sendPaginatedEmbed: sendPaginatedEmbed,
     createPages
 }
