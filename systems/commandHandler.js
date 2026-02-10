@@ -1,3 +1,4 @@
+const { PermissionFlagsBits } = require("discord.js")
 const logger = require("./logger")
 const { config } = require("./settings")
 const LimitedList = require("./types/limitedList")
@@ -28,7 +29,7 @@ module.exports = class CommandHandler {
             if (!isReadback)
                 this.commandList.push(message)
 
-            if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, !isReadback))
+            if (message.member.permissions.has(PermissionFlagsBits.Administrator) || this.isUserAllowed(message, !isReadback))
                 this.handleCommandType(command, args, isReadback, message)
         } else if (!message.author.bot) {
             this.handleNonCommandMessage(message)
@@ -53,7 +54,7 @@ module.exports = class CommandHandler {
     }
 
     handleAdminCommand(command, message) {
-        if (message.author.id === config.owner || message.member.permissions.has("ADMINISTRATOR"))
+        if (message.author.id === config.owner || message.member.permissions.has(PermissionFlagsBits.Administrator))
             this.admincommands[command](message)
         else
             this.bot.messageHandler.reply(message, `${command.capitalize()} is an admin command, and you are not allowed to use it.`)
@@ -70,7 +71,7 @@ module.exports = class CommandHandler {
                     this.lastMessageSent = currentTimestamp
                     this.messageCounter = 0
                 } else if (message.content.match(new RegExp(/\bbot(je)?\b/, "gi"))) {
-                    if (message.member.permissions.has("ADMINISTRATOR") || this.isUserAllowed(message, false))
+                    if (message.member.permissions.has(PermissionFlagsBits.Administrator) || this.isUserAllowed(message, false))
                         this.commands["speak"].function(message)
                 }
 
