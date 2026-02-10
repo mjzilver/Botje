@@ -8,8 +8,16 @@ const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "count",
-    "description": "counts messages in the server, by user, or shows leaderboard/percentages",
+    "description": "counts messages in the server",
     "format": "count | count @user | count top | count percent",
+    "subcommands": [
+        { name: "total", description: "Show total message count" },
+        { name: "top", description: "Show top message posters" },
+        { name: "percent", description: "Show percentage breakdown by user" },
+        { name: "user", description: "Show message count for a specific user", options: [
+            { type: "user", name: "user", description: "The user to check", required: true }
+        ] }
+    ],
     "function": message => {
         new CountLister().process(message)
     }

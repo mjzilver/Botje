@@ -68,38 +68,42 @@ class hangman {
         if (this.hasEnded)
             return bot.messageHandler.send(message, "This hangman game has ended...")
 
+        let content = ""
+
         if (geussedContent) {
             if (geussedContent.length > 1) {
                 if (geussedContent === this.word) {
-                    bot.messageHandler.send(message, `You guessed the word ${this.word} after ${this.tries} tries -- You have won!`)
+                    content = `You guessed the word ${this.word} after ${this.tries} tries -- You have won!`
                     this.hasEnded = true
                 } else {
-                    bot.messageHandler.send(message, `Wrong! The word is not ${geussedContent}`)
+                    content = `Wrong! The word is not ${geussedContent}`
                     this.tries++
                 }
             } else
                 if (this.alreadyGuessed.includes(geussedContent)) {
-                    bot.messageHandler.send(message, `${geussedContent} has already been guessed.`)
+                    content = `${geussedContent} has already been guessed.`
                 } else
                     if (this.word.includes(geussedContent)) {
                         for (let i = 0; i < this.word.length; i++)
                             if (this.word[i] === geussedContent)
                                 this.visibleWord = this.visibleWord.replaceAt(i, geussedContent)
+
+                        content = `Good guess! The word contains ${geussedContent}`
                     } else {
-                        bot.messageHandler.send(message, `The word does not contain ${geussedContent}!`)
+                        content = `The word does not contain ${geussedContent}!`
                         this.alreadyGuessed.push(geussedContent)
                         this.tries++
                     }
 
             if (this.tries === this.maxTries) {
-                bot.messageHandler.send(message, `Oh no! You have been hanged! The word was ${this.word}`)
+                content = `Oh no! You have been hanged! The word was ${this.word}`
                 this.hasEnded = true
             } else if (this.visibleWord === this.word) {
-                bot.messageHandler.send(message, "You've won by guessing all the letters!")
+                content = "You've won by guessing all the letters!"
                 this.hasEnded = true
             }
 
-            this.sendEmbed(message)
+            this.sendEmbed(message, content)
         } else {
             bot.messageHandler.send(message, "Not a valid guess!")
         }
@@ -112,7 +116,7 @@ class hangman {
             this.sendEmbed(message)
     }
 
-    sendEmbed(message) {
+    sendEmbed(message, content = "") {
         const attachment = new discord.AttachmentBuilder(`${__dirname}/../assets/hangman/${this.tries}.png`, { name: "hangman.png" })
 
         let showVisibleWord = ""
@@ -122,6 +126,7 @@ class hangman {
         const hangmanEmbed = new discord.EmbedBuilder()
             .setColor(config.color_hex)
             .setTitle(`Hangman -- ${this.tries}/${this.maxTries} tries`)
+            .setDescription(content)
             .setImage("attachment://hangman.png")
             .addFields(
                 { name: "Word", value: showVisibleWord, inline: false }

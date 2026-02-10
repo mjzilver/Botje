@@ -9,6 +9,10 @@ module.exports = {
     "name": "combine",
     "description": "combines two emotes into one",
     "format": "combine [emote name] [emote name]",
+    "options": [
+        { type: "string", name: "emote1", description: "The first emote to combine", required: false },
+        { type: "string", name: "emote2", description: "The second emote to combine", required: false }
+    ],
     "function": async function combine(message) {
         const args = message.content.split(" ")
         args.shift()

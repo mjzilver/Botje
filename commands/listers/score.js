@@ -9,8 +9,14 @@ const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "score",
-    "description": "shows the top scoring posters in the channel or mentioned user",
+    "description": "shows the top scoring posters in the server",
     "format": "score (@user)",
+    "subcommands": [
+        { name: "top", description: "Show top scoring posters" },
+        { name: "user", description: "Show score for a specific user", options: [
+            { type: "user", name: "user", description: "The user to check", required: true }
+        ] }
+    ],
     "function": message => {
         new ScoreLister().process(message)
     }

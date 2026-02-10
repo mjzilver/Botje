@@ -14,6 +14,11 @@ module.exports = class eventListener {
             logger.error(`Client error: ${error.message}`)
         })
 
+        bot.client.on("interactionCreate", interaction => {
+            console.log(`Interaction received: ${interaction.commandName}`)
+            bot.slashCommandRegistry.handleInteraction(interaction)
+        })
+
         bot.client.on("messageCreate", message => {
             if (!(message.author.id in bot.disallowed))
                 if (message.channel.type === discord.ChannelType.DM) {

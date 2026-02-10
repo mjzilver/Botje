@@ -18,6 +18,22 @@ module.exports = {
     "name": "reddit",
     "description": "gets a random link from the given subreddit",
     "format": "reddit [subreddit] (top|hot|new) (hour|day|week|month|year|all)",
+    "options": [
+        { type: "string", name: "subreddit", description: "The subreddit name", required: true },
+        { type: "string", name: "sort", description: "Sort method", required: false, choices: [
+            { name: "Hot", value: "hot" },
+            { name: "Top", value: "top" },
+            { name: "New", value: "new" }
+        ] },
+        { type: "string", name: "time", description: "Time period for top posts", required: false, choices: [
+            { name: "Hour", value: "hour" },
+            { name: "Day", value: "day" },
+            { name: "Week", value: "week" },
+            { name: "Month", value: "month" },
+            { name: "Year", value: "year" },
+            { name: "All Time", value: "all" }
+        ] }
+    ],
     "function": getRedditImage
 }
 
@@ -86,7 +102,7 @@ function handleRedditImages(message, sub, children) {
 function embedImage(message, post, sub) {
     if (post.url.isImage()) {
         const image = {
-            color: config.color_hex,
+            color: parseInt(config.color_hex.replace('#', ''), 16),
             title: post.title,
             fields: [
                 { name: "Updoots", value: `${post.score}`, inline: true },

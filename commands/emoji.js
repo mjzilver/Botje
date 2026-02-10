@@ -7,6 +7,9 @@ module.exports = {
     "name": "emoji",
     "description": "turns your message into emojis",
     "format": "emoji [string]",
+    "options": [
+        { type: "string", name: "text", description: "The text to convert into emojis", required: true }
+    ],
     "function": function emoji(message) {
         if (message.type === discord.MessageType.Reply) {
             message.channel.messages.fetch(message.reference.messageId)

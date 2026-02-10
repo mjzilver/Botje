@@ -3,8 +3,12 @@ const { randomBetween } = require("../systems/utils")
 
 module.exports = {
     "name": "roll",
-    "description": "gets you roll a number",
+    "description": "rolls a random number",
     "format": "roll",
+    "options": [
+        { type: "integer", name: "max", description: "Maximum value (default: current timestamp)", required: false },
+        { type: "integer", name: "min", description: "Minimum value (default: 0)", required: false }
+    ],
     "function": function roll(message) {
         const args = message.content.split(" ")
 

@@ -7,6 +7,9 @@ module.exports = {
     "name": "speak",
     "description": "makes the bot speak via recycled messages",
     "format": "speak (sentence)",
+    "options": [
+        { type: "string", name: "sentence", description: "The sentence to base the response on", required: false }
+    ],
     "function": function speak(message) {
         const matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
 

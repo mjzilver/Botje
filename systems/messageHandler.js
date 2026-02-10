@@ -7,38 +7,43 @@ const { config } = require("./settings")
 module.exports = class MessageHandler {
     constructor(bot) {
         this.bot = bot
-
-        // Key = call.id, Value = reply.id
         this.commandCalls = {}
         this.getCommandCalls()
     }
 
-    send(call, content) {
-        if (content) {
-            const promise = call.channel.send(content)
-            promise.then(reply => {
-                this.addCommandCall(call, reply)
+    _sendMessage(call, content, useReply) {
+        if (!content) {
+            logger.error(`Content empty could not send, call: "${call}"`)
+            this.markComplete(call)
+            return
+        }
+
+        let promise
+
+        if (call.isSlashCommand && call.interaction)
+            promise = call.interaction.replied
+                ? call.interaction.followUp(content)
+                : call.interaction.reply(content)
+        else
+            promise = useReply ? call.reply(content) : call.channel.send(content)
+
+        promise.then(reply => {
+            this.addCommandCall(call, reply)
+            if (reply.react) {
                 reply.react(config.positive_emoji)
                 reply.react(config.negative_emoji)
-            })
-            return promise
-        }
-        logger.error(`Content empty could not send, call: "${call}"`)
-        this.markComplete(call)
+            }
+        })
+
+        return promise
+    }
+
+    send(call, content) {
+        return this._sendMessage(call, content, false)
     }
 
     reply(call, content) {
-        if (content) {
-            const promise = call.reply(content)
-            promise.then(reply => {
-                this.addCommandCall(call, reply)
-                reply.react(config.positive_emoji)
-                reply.react(config.negative_emoji)
-            })
-            return promise
-        }
-        logger.error(`Content empty could not send, call: "${call}"`)
-        this.markComplete(call)
+        return this._sendMessage(call, content, true)
     }
 
     edit(replyObj, newContent) {

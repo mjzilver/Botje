@@ -9,6 +9,9 @@ module.exports = {
     "name": "weather",
     "description": "shows the current weather and weather info from the mentioned city",
     "format": "weather [city]",
+    "options": [
+        { type: "string", name: "city", description: "The city name", required: true }
+    ],
     "function": async function weather(message) {
         let city = "Leiden" // default city to avoid errors
         const args = message.content.split(" ")

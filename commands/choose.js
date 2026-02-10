@@ -5,6 +5,9 @@ module.exports = {
     "name": "choose",
     "description": "chooses one of the options given",
     "format": "choose [option] | [option2]",
+    "options": [
+        { type: "string", name: "choices", description: "Options separated by | (e.g., pizza | pasta | salad)", required: true }
+    ],
     "function": async function choose(message) {
         const filtered = message.content.removePrefix().replace(/choose /g, "")
         const items = filtered.split("|")

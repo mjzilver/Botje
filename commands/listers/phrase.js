@@ -8,9 +8,24 @@ const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "phrase",
-    "description": "shows how many times a word/phrase has been used in the server, by a user, or shows leaderboard/percentages. Use quotes for multi-word phrases.",
+    "description": "shows how many times a word/phrase has been used in the server",
     "format": "phrase hello | phrase \"hello world\" | phrase @user hello | phrase top hello | phrase percent hello",
     "aliases": "word",
+    "subcommands": [
+        { name: "total", description: "Show total usage of a phrase", options: [
+            { type: "string", name: "phrase", description: "The word or phrase to search for", required: true }
+        ] },
+        { name: "top", description: "Show who uses a phrase the most", options: [
+            { type: "string", name: "phrase", description: "The word or phrase to search for", required: true }
+        ] },
+        { name: "percent", description: "Show percentage breakdown of phrase usage", options: [
+            { type: "string", name: "phrase", description: "The word or phrase to search for", required: true }
+        ] },
+        { name: "user", description: "Show phrase usage for a specific user", options: [
+            { type: "user", name: "user", description: "The user to check", required: true },
+            { type: "string", name: "phrase", description: "The word or phrase to search for", required: true }
+        ] }
+    ],
     "function": message => {
         new PhraseLister().process(message)
     }

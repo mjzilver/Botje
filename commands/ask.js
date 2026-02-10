@@ -28,6 +28,9 @@ module.exports = {
     "name": "ask",
     "description": "asks via an LLM",
     "format": "ask (text)",
+    "options": [
+        { type: "string", name: "question", description: "Your question", required: true }
+    ],
     "function": async function ask(message) {
         let userQuestion
         let promptTemplate

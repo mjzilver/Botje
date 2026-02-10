@@ -9,8 +9,14 @@ const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "quality",
-    "description": "shows post quality (uniqueness) for a user or leaderboard",
+    "description": "shows post quality (uniqueness)",
     "format": "quality @user | quality top",
+    "subcommands": [
+        { name: "top", description: "Show users with highest quality posts" },
+        { name: "user", description: "Show quality for a specific user", options: [
+            { type: "user", name: "user", description: "The user to check", required: true }
+        ] }
+    ],
     "function": message => {
         new QualityLister().process(message)
     }

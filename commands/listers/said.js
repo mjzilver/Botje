@@ -7,9 +7,15 @@ const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "said",
-    "description": "shows the most repeated phrases in the server or by a mentioned user",
+    "description": "shows the most repeated phrases in the server",
     "alias": "aliases",
     "format": "said | said @user",
+    "subcommands": [
+        { name: "total", description: "Show most repeated phrases in server" },
+        { name: "user", description: "Show most repeated phrases for a specific user", options: [
+            { type: "user", name: "user", description: "The user to check", required: true }
+        ] }
+    ],
     "function": message => {
         new SaidLister().process(message)
     }

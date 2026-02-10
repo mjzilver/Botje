@@ -8,6 +8,9 @@ module.exports = {
     "name": "youtube",
     "description": "searches for a youtube video",
     "format": "youtube [keyword]",
+    "options": [
+        { type: "string", name: "keyword", description: "Search term", required: true }
+    ],
     "function": async function youtube(message) {
         const keyword = message.content.replace(/youtube /g, "")
 

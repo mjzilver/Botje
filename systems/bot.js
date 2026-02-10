@@ -12,6 +12,7 @@ const EventListener = require("./eventListener")
 const MessageHandler = require("./messageHandler")
 const ReplyHandler = require("./replyHandler")
 const { config } = require("./settings")
+const SlashCommandRegistry = require("./slashCommandHandler")
 
 class Bot {
     constructor() {
@@ -39,8 +40,8 @@ class Bot {
         this.login()
         setInterval(this.login.bind(this), 5 * 60 * 1000)
 
-        this.client.on("clientReady", () => {
-            this.loadSystems()
+        this.client.once("clientReady", async () => {
+            await this.loadSystems()
             this.client.user.setPresence({
                 activities: [{
                     name: `Version ${projectPackage.version}`
@@ -63,7 +64,7 @@ class Bot {
         }
     }
 
-    loadSystems() {
+    async loadSystems() {
         this.database = require("./database")
 
         this.messageHandler = new MessageHandler(this)
@@ -73,11 +74,18 @@ class Bot {
         this.commandHandler = new CommandHandler(this)
         this.dictionary = new Dictionary()
         this.emoteInjector = new EmoteInjector(this)
+        this.slashCommandRegistry = new SlashCommandRegistry(this)
         this.processHandler = require("./processHandler")
 
         this.loadDisallowed()
+        await this.registerSlashCommands()
 
         this.logger = logger
+    }
+
+    async registerSlashCommands() {
+        const { commands } = require("./commandLoader")
+        await this.slashCommandRegistry.registerCommands(commands)
     }
 
     loadDisallowed() {

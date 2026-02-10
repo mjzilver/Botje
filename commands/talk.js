@@ -6,6 +6,9 @@ module.exports = {
     "name": "talk",
     "description": "makes the bot talk via predictive text or as if it were the mentioned user",
     "format": "talk (@user)",
+    "options": [
+        { type: "user", name: "user", description: "The user to mimic (optional)", required: false }
+    ],
     "function": function talk(message) {
         const mention = message.mentions ? message.mentions.users.first() : null
         const chain = {}

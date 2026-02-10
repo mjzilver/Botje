@@ -8,8 +8,14 @@ const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "syllables",
-    "description": "shows the top 10 users with the most syllables",
+    "description": "shows the top users with the most syllables in their posts",
     "format": "syllables (@user)",
+    "subcommands": [
+        { name: "top", description: "Show top users by syllable count" },
+        { name: "user", description: "Show syllable stats for a specific user", options: [
+            { type: "user", name: "user", description: "The user to check", required: true }
+        ] }
+    ],
     "function": message => {
         new syllableLister().process(message)
     }

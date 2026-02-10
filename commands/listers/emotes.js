@@ -8,8 +8,15 @@ const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "emotes",
-    "description": "shows top emotes in server, by user, or user leaderboard",
+    "description": "shows top emotes in server",
     "format": "emotes | emotes @user | emotes top",
+    "subcommands": [
+        { name: "top", description: "Show top 10 most used emotes" },
+        { name: "percent", description: "Show emote usage by person" },
+        { name: "user", description: "Show top emotes for a specific user", options: [
+            { type: "user", name: "user", description: "The user to check", required: true }
+        ] }
+    ],
     "function": message => {
         new EmotesLister().process(message)
     }
