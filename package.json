@@ -10,37 +10,24 @@
   "private": true,
   "dependencies": {
     "discord.js": "^14.16.3",
-    "express": "^4.16.4",
     "jimp": "^0.22.12",
     "pg": "^8.12.0",
     "pg-format": "^1.0.4",
-    "pug": "^3.0.2",
-    "request": "^2.81.0",
-    "socket.io": "^4.7.5",
     "winston": "^3.2.1"
   },
   "scripts": {
     "start": "node start.js",
-    "start-web": "node start.js --web",
     "dev": "nodemon start.js -e js",
     "beta": "nodemon start.js --beta -e js",
-    "test": "jest",
-    "test-cov": "jest --coverage",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
   },
   "nodemonConfig": {
-    "ignore": [
-      "start.js",
-      "views\\**"
-    ],
     "signal": "SIGINT"
   },
   "devDependencies": {
     "eslint": "^8.39.0",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jest": "^29.0.1",
-    "eslint-plugin-json-files": "^2.1.0",
-    "jest": "^30.0.4"
+    "eslint-plugin-json-files": "^2.1.0"
   }
 }

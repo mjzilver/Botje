@@ -6,21 +6,7 @@
         "browser": true
     },
     "extends": "eslint:recommended",
-    "plugins": ["jest", "import"],
-    "overrides": [
-        {
-            "files": [
-                "**/__tests__/**/*.js", 
-                "**/*.test.js",
-                "**/__mocks__/**/*.js",
-                "__mocks__/**/*.js" 
-            ],
-            "env": {
-                "jest": true
-            },
-            "extends": ["plugin:jest/recommended"]
-        }
-    ],
+    "plugins": ["import"],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"

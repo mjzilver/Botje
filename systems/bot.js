@@ -39,7 +39,7 @@ class Bot {
         this.login()
         setInterval(this.login.bind(this), 5 * 60 * 1000)
 
-        this.client.on("ready", () => {
+        this.client.on("clientReady", () => {
             this.loadSystems()
             this.client.user.setPresence({
                 activities: [{

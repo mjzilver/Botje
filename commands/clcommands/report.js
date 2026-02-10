@@ -32,9 +32,6 @@ module.exports = {
                 ["Uptime", formattedUptime]
             ]
 
-            if (process.argv.includes("--web"))
-                printRows.push(["Web Interface", "Enabled"])
-
             const sql = `SELECT pg_size_pretty(pg_database_size('botdb')) AS size, 
             COUNT(messages.id) as count FROM messages`
 

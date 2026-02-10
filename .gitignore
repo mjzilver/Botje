@@ -14,10 +14,6 @@ package-lock.json
 # Log files
 bot.log
 
-# Test files
-test_results/
-coverage/
-
 # Configuration files
 config.json
 
