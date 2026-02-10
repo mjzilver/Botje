@@ -66,14 +66,8 @@ module.exports = class SlashCommandRegistry {
                     if (opt.required) option.setRequired(true)
                     return option
                 })
-            else if (opt.type === "number")
-                builder.addNumberOption(option => {
-                    option
-                        .setName(opt.name)
-                        .setDescription(opt.description || "No description")
-                    if (opt.required) option.setRequired(true)
-                    return option
-                })
+            else
+                logger.warn(`[SlashCommands] Unsupported option type "${opt.type}" for option "${opt.name}" in command "${builder.name}"`)
     }
 
     interactionToMessage(interaction, commandName) {
@@ -104,7 +98,6 @@ module.exports = class SlashCommandRegistry {
         const options = interaction.options
         const args = []
 
-        // Handle subcommands
         const subcommand = options.getSubcommand(false)
         if (subcommand)
             args.push(subcommand)
@@ -118,9 +111,10 @@ module.exports = class SlashCommandRegistry {
                 args.push(`<@${user.id}>`)
                 pseudoMessage.mentions.users.set(user.id, user)
             } else if (option.type === discord.ApplicationCommandOptionType.String
-                       || option.type === discord.ApplicationCommandOptionType.Integer
-                       || option.type === discord.ApplicationCommandOptionType.Number) {
+                       || option.type === discord.ApplicationCommandOptionType.Integer) {
                 args.push(option.value)
+            } else {
+                logger.warn(`[SlashCommands] Unsupported option type "${option.type}" in command "${commandName}"`)
             }
 
         if (args.length > 0) {

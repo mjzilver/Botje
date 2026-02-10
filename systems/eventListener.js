@@ -15,7 +15,6 @@ module.exports = class eventListener {
         })
 
         bot.client.on("interactionCreate", interaction => {
-            console.log(`Interaction received: ${interaction.commandName}`)
             bot.slashCommandRegistry.handleInteraction(interaction)
         })
 

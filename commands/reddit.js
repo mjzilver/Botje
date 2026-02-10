@@ -102,7 +102,7 @@ function handleRedditImages(message, sub, children) {
 function embedImage(message, post, sub) {
     if (post.url.isImage()) {
         const image = {
-            color: parseInt(config.color_hex.replace('#', ''), 16),
+            color: parseInt(config.color_hex.replace("#", ""), 16),
             title: post.title,
             fields: [
                 { name: "Updoots", value: `${post.score}`, inline: true },
