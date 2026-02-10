@@ -1,4 +1,5 @@
 const discord = require("discord.js")
+
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
 const logger = require("../../systems/logger")

@@ -1,5 +1,5 @@
-const discord = require("discord.js")
 const axios = require("axios")
+const discord = require("discord.js")
 
 const bot = require("../systems/bot")
 const logger = require("../systems/logger")

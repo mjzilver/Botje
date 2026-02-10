@@ -3,12 +3,13 @@ const discord = require("discord.js")
 const Lister = require("./lister.js")
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
+const { newPaginatedEmbed, createPages } = require("../../systems/pagination")
 const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "count",
-    "description": "counts messages in the current channel or from the mentioned user",
-    "format": "count (@user  ? | %)",
+    "description": "counts messages in the server, by user, or shows leaderboard/percentages",
+    "format": "count | count @user | count top | count percent",
     "function": message => {
         new CountLister().process(message)
     }
@@ -35,57 +36,54 @@ class CountLister extends Lister {
         })
     }
 
-    perPerson(message, page) {
-        const selectSQL = `
-        SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count
-        FROM messages
-        WHERE server_id = $1
-        GROUP BY user_id
-        HAVING COUNT(*) > 1
-        ORDER BY COUNT(*) DESC
-        `
+    perPerson(message) {
+        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count
+            FROM messages
+            WHERE server_id = $1
+            GROUP BY user_id
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC `
 
         database.query(selectSQL, [message.guild.id], rows => {
-            let result = ""
-            for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
-                result += `${rows[i]["user_name"]} has posted ${rows[i]["count"]} messages! \n`
+            const pages = createPages(rows, 10, (pageRows, pageNum, totalPages) => {
+                let result = ""
+                for (const row of pageRows)
+                    result += `${row["user_name"]} has posted ${row["count"]} messages! \n`
 
-            const top = new discord.EmbedBuilder()
-                .setColor(config.color_hex)
-                .setTitle(`Top 10 posters in ${message.guild.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}` })
-
-            bot.messageHandler.send(message, {
-                embeds: [top]
+                return new discord.EmbedBuilder()
+                    .setColor(config.color_hex)
+                    .setTitle(`Top 10 posters in ${message.guild.name}`)
+                    .setDescription(result)
+                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
             })
+
+            newPaginatedEmbed(message, pages)
         })
     }
 
-    percentage(message, page) {
+    percentage(message) {
         const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count,
 			(SElECT COUNT(message) FROM messages WHERE  server_id = $1) as total
 			FROM messages
 			WHERE server_id = $1
 			GROUP BY user_id
 			HAVING COUNT(*) > 1
-			ORDER BY COUNT(*) DESC 
-			LIMIT 10`
+			ORDER BY COUNT(*) DESC`
 
         database.query(selectSQL, [message.guild.id], rows => {
-            let result = ""
-            for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
-                result += `${rows[i]["user_name"]} has posted ${Math.round((parseInt(rows[i]["count"]) / parseInt(rows[i]["total"])) * 100)}% of all messages! \n`
+            const pages = createPages(rows, 10, (pageRows, pageNum, totalPages) => {
+                let result = ""
+                for (const row of pageRows)
+                    result += `${row["user_name"]} has posted ${Math.round((parseInt(row["count"]) / parseInt(row["total"])) * 100)}% of all messages! \n`
 
-            const top = new discord.EmbedBuilder()
-                .setColor(config.color_hex)
-                .setTitle(`Top 10 posters in ${message.guild.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}` })
-
-            bot.messageHandler.send(message, {
-                embeds: [top]
+                return new discord.EmbedBuilder()
+                    .setColor(config.color_hex)
+                    .setTitle(`Top 10 posters in ${message.guild.name}`)
+                    .setDescription(result)
+                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
             })
+
+            newPaginatedEmbed(message, pages)
         })
     }
 }

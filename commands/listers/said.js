@@ -6,15 +6,16 @@ const database = require("../../systems/database")
 const { config } = require("../../systems/settings")
 
 module.exports = {
-    "name": "top",
-    "description": "shows the top 10 emotes in the current channel or mentioned user",
-    "format": "top (@user)",
+    "name": "said",
+    "description": "shows the most repeated phrases in the server or by a mentioned user",
+    "alias": "aliases",
+    "format": "said | said @user",
     "function": message => {
-        new TopLister().process(message)
+        new SaidLister().process(message)
     }
 }
 
-class TopLister extends Lister {
+class SaidLister extends Lister {
     constructor() {
         super()
     }
@@ -25,12 +26,12 @@ class TopLister extends Lister {
 
     perPerson(message) {
         const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-        FROM messages
-        WHERE message NOT LIKE '%<%' AND server_id = $1
-        GROUP BY LOWER(message)
-        HAVING COUNT(*) > 1
-        ORDER BY COUNT(*) DESC 
-        LIMIT 10`
+            FROM messages
+            WHERE message NOT LIKE '%<%' AND server_id = $1
+            GROUP BY LOWER(message)
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC 
+            LIMIT 10`
 
         database.query(selectSQL, [message.guild.id], rows => {
             let result = ""
@@ -40,7 +41,7 @@ class TopLister extends Lister {
 
             const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
-                .setTitle(`Top 10 must used sentences in ${message.guild.name}`)
+                .setTitle(`Top 10 most used phrases in ${message.guild.name}`)
                 .setDescription(result)
 
             bot.messageHandler.send(message, {
@@ -51,13 +52,13 @@ class TopLister extends Lister {
 
     mention(message, mentioned) {
         const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-        FROM messages
-        WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' 
-        AND server_id = $1 AND user_id = $2
-        GROUP BY LOWER(message)
-        HAVING COUNT(*) > 1
-        ORDER BY COUNT(*) DESC 
-        LIMIT 10`
+            FROM messages
+            WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' 
+            AND server_id = $1 AND user_id = $2
+            GROUP BY LOWER(message)
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC 
+            LIMIT 10`
 
         database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
             let result = ""
@@ -67,7 +68,7 @@ class TopLister extends Lister {
 
             const top = new discord.EmbedBuilder()
                 .setColor(config.color_hex)
-                .setTitle(`Top 10 must used sentences in ${message.guild.name} by ${mentioned.username}`)
+                .setTitle(`Top 10 most used phrases in ${message.guild.name} by ${mentioned.username}`)
                 .setDescription(result)
 
             bot.messageHandler.send(message, {

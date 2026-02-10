@@ -4,12 +4,13 @@ const Lister = require("./lister.js")
 const letterValues = require("../../json/letter_values.json")
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
+const { newPaginatedEmbed, createPages } = require("../../systems/pagination")
 const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "quality",
-    "description": "shows the top 10 quality posers in the current channel or mentioned user",
-    "format": "quality (@user)",
+    "description": "shows post quality (uniqueness) for a user or leaderboard",
+    "format": "quality @user | quality top",
     "function": message => {
         new QualityLister().process(message)
     }
@@ -58,7 +59,7 @@ class QualityLister extends Lister {
         })
     }
 
-    perPerson(message, page = 0) {
+    perPerson(message) {
         const selectSQL = `SELECT 
             user_id,
             (
@@ -83,22 +84,19 @@ class QualityLister extends Lister {
             percentage_unique DESC, user_id;`
 
         database.query(selectSQL, [message.guild.id], rows => {
-            if (page > Math.ceil(rows.length / 10))
-                return bot.messageHandler.send(message, `Page ${(page + 1)} of ${Math.ceil(rows.length / 10)} not found`)
+            const pages = createPages(rows, 10, (pageRows, pageNum, totalPages) => {
+                let result = ""
+                for (const row of pageRows)
+                    result += `${row["user_name"]}'s post quality is ${parseFloat(row["percentage_unique"]).toFixed(2)}% \n`
 
-            let result = ""
-            for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
-                result += `${rows[i]["user_name"]}'s post quality is ${parseFloat(rows[i]["percentage_unique"]).toFixed(2)}% \n`
-
-            const top = new discord.EmbedBuilder()
-                .setColor(config.color_hex)
-                .setTitle(`Top 10 quality posters in ${message.guild.name}`)
-                .setDescription(result)
-                .setFooter({ text:`Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}` })
-
-            bot.messageHandler.send(message, {
-                embeds: [top]
+                return new discord.EmbedBuilder()
+                    .setColor(config.color_hex)
+                    .setTitle(`Top 10 quality posters in ${message.guild.name}`)
+                    .setDescription(result)
+                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
             })
+
+            newPaginatedEmbed(message, pages)
         })
     }
 

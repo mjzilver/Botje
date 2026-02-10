@@ -1,40 +1,33 @@
 const discord = require("discord.js")
 
 const projectPackage = require("../package.json")
-const bot = require("../systems/bot")
+const { newPaginatedEmbed, createPages } = require("../systems/pagination")
 const { config } = require("../systems/settings")
 
 module.exports = {
     "name": "help",
     "description": "sends this helpful message",
     "format": "help",
-    "function": function help(message) {
-        let helpMessage = `**Here is a list of all the commands *you* can use: **
-        Format: \`()\` = optional argument, \`[]\` = required argument\n`
-        const args = message.content.split(" ")
-
+    "function": async function help(message) {
         const commands = require("../systems/commandLoader").commands
-        const pageAmount = Math.ceil(Object.entries(commands).length / 10)
-        let pageNum = args[1] ? args[1] : 1
+        const commandList = Object.entries(commands).map(([, command]) => command)
 
-        if (pageNum > pageAmount)
-            pageNum = pageAmount
+        const pages = createPages(commandList, 10, (pageCommands, pageNum, totalPages) => {
+            let helpMessage = `**Here is a list of all the commands *you* can use: **
+        Format: \`()\` = optional argument, \`[]\` = required argument\n`
 
-        const start = (pageNum - 1) * 10
-        let count = 0
-
-        for (const [, command] of Object.entries(commands)) {
-            count++
-            if (count >= start && count <= start + 10)
+            for (const command of pageCommands)
                 helpMessage += `\`${command.format}\`: ${command.description} \n`
-        }
 
-        const help = new discord.EmbedBuilder()
-            .setColor(config.color_hex)
-            .setTitle(":robot: Current commands: :robot:")
-            .setDescription(helpMessage)
-            .setFooter({ text: `Page ${pageNum}/${pageAmount} \nCurrent Version: ${projectPackage.version}` })
+            const embed = new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(":robot: Current commands: :robot:")
+                .setDescription(helpMessage)
+                .setFooter({ text: `Page ${pageNum}/${totalPages} \nCurrent Version: ${projectPackage.version}` })
 
-        return bot.messageHandler.send(message, { embeds: [help] })
+            return embed
+        })
+
+        return newPaginatedEmbed(message, pages)
     }
 }

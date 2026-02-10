@@ -2,8 +2,8 @@ const fs = require("fs")
 const path = require("path")
 const { pipeline } = require("stream/promises")
 
-const format = require("pg-format")
 const axios = require("axios")
+const format = require("pg-format")
 
 const database = require("./database")
 const logger = require("./logger")

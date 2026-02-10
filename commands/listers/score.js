@@ -4,6 +4,7 @@ const Lister = require("./lister.js")
 const letterValues = require("../../json/letter_values.json")
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
+const { newPaginatedEmbed, createPages } = require("../../systems/pagination")
 const { config } = require("../../systems/settings")
 
 module.exports = {
@@ -22,8 +23,8 @@ class ScoreLister extends Lister {
 
     mention(message, mentioned) {
         const selectSQL = `SELECT user_id, user_name, message
-        FROM messages 
-        WHERE server_id = $1 AND user_id = $2 `
+            FROM messages 
+            WHERE server_id = $1 AND user_id = $2 `
 
         const userdata = {
             "points": 0,
@@ -47,9 +48,9 @@ class ScoreLister extends Lister {
 
     perPerson(message) {
         const selectSQL = `SELECT user_id, user_name, message
-        FROM messages 
-        WHERE server_id = $1
-        ORDER BY user_id`
+            FROM messages 
+            WHERE server_id = $1
+            ORDER BY user_id`
 
         const userdata = {}
 
@@ -82,18 +83,19 @@ class ScoreLister extends Lister {
                 return b[1] - a[1]
             })
 
-            let result = ""
-            for (let i = 0; (i < sorted.length && i <= 10); i++)
-                result += `${sorted[i][0]}'s post score is ${sorted[i][1]} \n`
+            const pages = createPages(sorted, 10, (pageRows, pageNum, totalPages) => {
+                let result = ""
+                for (const row of pageRows)
+                    result += `${row[0]}'s post score is ${row[1]} \n`
 
-            const top = new discord.EmbedBuilder()
-                .setColor(config.color_hex)
-                .setTitle(`Top 10 posters in ${message.guild.name}`)
-                .setDescription(result)
-
-            bot.messageHandler.send(message, {
-                embeds: [top]
+                return new discord.EmbedBuilder()
+                    .setColor(config.color_hex)
+                    .setTitle(`Top posters by score in ${message.guild.name}`)
+                    .setDescription(result)
+                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
             })
+
+            newPaginatedEmbed(message, pages)
         })
     }
 

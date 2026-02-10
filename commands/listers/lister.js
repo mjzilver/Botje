@@ -6,21 +6,44 @@ class Lister {
             throw new Error("Can't instantiate abstract class!")
     }
 
-    process(message) {
-        const mentioned = message.mentions.users.first()
-        const args = message.content.split(" ")
-        const page = (args[2] ? args[2] - 1 : 0)
+    parseArgs(message, options = {}) {
+        const { preserveQuotes = false } = options
 
-        if (args.length === 1)
-            this.total(message, page)
-        else if (mentioned)
-            this.mention(message, mentioned, page)
-        else if (args[1] === "?")
-            this.perPerson(message, page)
-        else if (args[1] === "%")
-            this.percentage(message, page)
+        const rawArgs = preserveQuotes
+            ? message.content.match(/([^" ]+)|"([^"]+)"/gi)
+            : message.content.split(" ")
+
+        const args = rawArgs.slice(1)
+        const mention = message.mentions.users.first()
+
+        const hasLeaderboard = args.some(a =>
+            a && ["leaderboard", "top", "?"].includes(a.toLowerCase()))
+        const hasPercent = args.some(a =>
+            a && ["percent", "percentage", "%"].includes(a.toLowerCase()))
+
+        const filteredArgs = args.filter(a =>
+            a && !["leaderboard", "top", "percent", "percentage", "?", "%"].includes(a.toLowerCase())
+            && !a.startsWith("<@"))
+
+        return {
+            mention,
+            leaderboard: hasLeaderboard,
+            percent: hasPercent,
+            args: filteredArgs
+        }
+    }
+
+    process(message) {
+        const { mention, leaderboard, percent } = this.parseArgs(message)
+
+        if (mention)
+            this.mention(message, mention)
+        else if (leaderboard)
+            this.perPerson(message)
+        else if (percent)
+            this.percentage(message)
         else
-            bot.messageHandler.reply(message, "Incorrect format try ? % or mentioning an user")
+            this.total(message)
     }
 
     total(message) {

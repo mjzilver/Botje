@@ -3,12 +3,13 @@ const discord = require("discord.js")
 const Lister = require("./lister.js")
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
+const { newPaginatedEmbed, createPages } = require("../../systems/pagination")
 const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "emotes",
-    "description": "shows the top 10 emotes in the current channel or from the mentioned user",
-    "format": "emotes (@user)",
+    "description": "shows top emotes in server, by user, or user leaderboard",
+    "format": "emotes | emotes @user | emotes top",
     "function": message => {
         new EmotesLister().process(message)
     }
@@ -67,7 +68,7 @@ class EmotesLister extends Lister {
         })
     }
 
-    perPerson(message, page) {
+    perPerson(message) {
         const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count
             FROM messages
             WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
@@ -77,19 +78,19 @@ class EmotesLister extends Lister {
             ORDER BY COUNT(*) DESC`
 
         database.query(selectSQL, [message.guild.id], rows => {
-            let result = ""
-            for (let i = page * 10; i < rows.length && i <= (page * 10) + 9; i++)
-                result += `${rows[i]["user_name"]} has posted ${rows[i]["count"]} emotes! \n`
+            const pages = createPages(rows, 10, (pageRows, pageNum, totalPages) => {
+                let result = ""
+                for (const row of pageRows)
+                    result += `${row["user_name"]} has posted ${row["count"]} emotes! \n`
 
-            const top = new discord.EmbedBuilder()
-                .setColor(config.color_hex)
-                .setTitle(`Top 10 posters in ${message.guild.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${(page + 1)} of ${Math.ceil(rows.length / 10)}` })
-
-            bot.messageHandler.send(message, {
-                embeds: [top]
+                return new discord.EmbedBuilder()
+                    .setColor(config.color_hex)
+                    .setTitle(`Top 10 posters in ${message.guild.name}`)
+                    .setDescription(result)
+                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
             })
+
+            newPaginatedEmbed(message, pages)
         })
     }
 

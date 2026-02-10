@@ -105,57 +105,47 @@ function embedImage(message, post, sub) {
 }
 
 function handleImgur(message, post, sub) {
-    const options = {
-        url: post.url,
-        ...defaultOptions
-    }
-
-    request(options, (err, res) => {
-        if (err)
-            throw err
-
-        if (res.request.uri.href.includes("removed.png")) {
-            logger.debug("Found removed.png, finding new image")
-            getRedditImage(message)
-        } else {
-            post.url = res.request.uri.href
-            embedImage(message, post, sub)
-        }
-    })
+    axiosInstance.get(post.url)
+        .then(res => {
+            if (res.request.res.responseUrl.includes("removed.png")) {
+                logger.debug("Found removed.png, finding new image")
+                getRedditImage(message)
+            } else {
+                post.url = res.request.res.responseUrl
+                embedImage(message, post, sub)
+            }
+        })
+        .catch(err => {
+            logger.error(err)
+        })
 }
 
 function handleRedirect(message, post) {
-    const options = {
-        url: post.url,
-        ...defaultOptions
-    }
+    axiosInstance.get(post.url)
+        .then(async res => {
+            const redirectUrl = res.request.res.responseUrl
+            logger.console(`Redirected to ${redirectUrl}`)
+            let url = decodeURIComponent(redirectUrl)
 
-    request(options, (err, res) => {
-        if (err)
-            throw err
+            if (redirectUrl.includes("over18"))
+                url = url.substring(url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length)
 
-        logger.console(`Redirected to ${res.request.uri.href}`)
-        let url = decodeURIComponent(res.request.uri.href)
+            try {
+                const response = await axiosInstance.get(`${url}.json`)
+                const body = response.data
 
-        if (res.request.uri.href.includes("over18"))
-            url = url.substring(url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length)
-
-        const options = {
-            url: `${url }.json`,
-            ...defaultOptions
-        }
-
-        request(options, (err, res, body) => {
-            if (err)
-                return logger.error(err)
-
-            const videoLink = body?.[0]?.data?.children?.[0]?.data?.secure_media?.reddit_video?.fallback_url
-            if (videoLink)
-                bot.messageHandler.send(message, `${post.title} \n${videoLink} \n<https://reddit.com${post.permalink}>`)
-            else
-                getRedditImage(message)
+                const videoLink = body?.[0]?.data?.children?.[0]?.data?.secure_media?.reddit_video?.fallback_url
+                if (videoLink)
+                    bot.messageHandler.send(message, `${post.title} \n${videoLink} \n<https://reddit.com${post.permalink}>`)
+                else
+                    getRedditImage(message)
+            } catch (err) {
+                logger.error(err)
+            }
         })
-    })
+        .catch(err => {
+            logger.error(err)
+        })
 }
 
 function insertPost(post, sub) {
