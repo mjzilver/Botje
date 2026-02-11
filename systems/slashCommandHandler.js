@@ -170,14 +170,7 @@ module.exports = class SlashCommandRegistry {
         if (!commandDef)
             return interaction.reply({ content: "Unknown command", ephemeral: true })
 
-        try {
-            const pseudoMessage = this.interactionToMessage(interaction, commandDef.command.name)
-            await commandDef.command.function(pseudoMessage)
-        } catch (err) {
-            logger.error(`[SlashCommands] Error executing /${interaction.commandName}: ${err.message}`)
-
-            if (!interaction.replied && !interaction.deferred)
-                await interaction.reply({ content: "An error occurred executing this command", ephemeral: true })
-        }
+        const pseudoMessage = this.interactionToMessage(interaction, commandDef.command.name)
+        await commandDef.command.function(pseudoMessage)
     }
 }

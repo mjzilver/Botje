@@ -75,7 +75,6 @@ class Bot {
         this.dictionary = new Dictionary()
         this.emoteInjector = new EmoteInjector(this)
         this.slashCommandRegistry = new SlashCommandRegistry(this)
-        this.processHandler = require("./processHandler")
 
         this.loadDisallowed()
         await this.registerSlashCommands()
