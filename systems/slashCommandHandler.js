@@ -70,6 +70,7 @@ module.exports = class SlashCommandRegistry {
                 logger.warn(`[SlashCommands] Unsupported option type "${opt.type}" for option "${opt.name}" in command "${builder.name}"`)
     }
 
+    // Creates a pseudo-message object from the interaction to allow reuse of existing command functions
     interactionToMessage(interaction, commandName) {
         const pseudoMessage = {
             id: interaction.id,

@@ -3,12 +3,6 @@ const discord = require("discord.js")
 const bot = require("./bot")
 const logger = require("./logger")
 
-/**
- * @param {discord.Message} message - The original message object
- * @param {Array<discord.EmbedBuilder|Object>} pages - Array of embeds or content objects to paginate
- * @param {Number} timeout - Time in milliseconds before buttons expire (default: 5 minutes)
- * @returns {Promise<discord.Message>}
- */
 async function sendPaginatedEmbed(message, pages, timeout = 300000) {
     if (!pages || pages.length === 0)
         throw new Error("Pages array cannot be empty")
@@ -93,12 +87,6 @@ async function sendPaginatedEmbed(message, pages, timeout = 300000) {
     return sentMessage
 }
 
-/**
- * @param {Array} items
- * @param {Number} itemsPerPage
- * @param {Function} formatPage
- * @returns {Array}
- */
 function createPages(items, itemsPerPage, formatPage) {
     const pages = []
     const totalPages = Math.ceil(items.length / itemsPerPage)
