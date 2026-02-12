@@ -2,6 +2,7 @@ const discord = require("discord.js")
 
 const bot = require("../../systems/bot")
 const logger = require("../../systems/logger")
+const MessageIterator = require("../../systems/messageIterator")
 
 module.exports = async function nuke(message) {
     if (message.author.id === message.guild.ownerId) {
@@ -20,43 +21,29 @@ module.exports = async function nuke(message) {
     }
 }
 
-function nukeguild(message) {
-    for (const [channelId, channel] of bot.client.channels.cache.entries())
-        if (channel.type === discord.ChannelType.GuildText && channel.guild.id === message.guild.id)
-            nukechannel(channelId)
-}
-
-function nukechannel(channelId) {
-    const channels = bot.client.channels.cache
-    const channel = channels.find(c => c.id === channelId)
-
-    if (channel && channel.type === discord.ChannelType.GuildText) {
-        nukemessages(channel, channel.lastMessageId)
-        channel.lastMessage?.delete({ timeout: 100 })
-        logger.warn(`NUKING channel: ${channel.name}`)
-    } else {
-        logger.console("Channel not found")
+async function nukeguild(message) {
+    for (const [channelId, channel] of bot.client.channels.cache.entries()) {
+        if (channel.type === discord.ChannelType.GuildText && channel.guild.id === message.guild.id) {
+            await nukechannel(channel)
+        }
     }
 }
 
-function nukemessages(channel, messageid, loop = 0) {
-    let itemsProcessed = 0
+async function nukechannel(channel) {
+    if (channel && channel.type === discord.ChannelType.GuildText) {
+        logger.warn(`NUKING channel: ${channel.name}`)
+        
+        const iterator = new MessageIterator({
+            onMessage: async (msg) => {
+                await msg.delete({ timeout: 10 })
+            },
+            onComplete: (stats) => {
+                logger.warn(`${stats.totalProcessed} messages nuked from ${channel.name} in ${channel.guild.name}`)
+            }
+        })
 
-    channel.messages.fetch({
-        limit: 100,
-        before: messageid
-    }).then(messages => messages.forEach(
-        message => {
-            itemsProcessed++
-            message?.delete({ timeout: 10 })
-
-            if (itemsProcessed === messages.size)
-                if (itemsProcessed === 100) {
-                    logger.console(`100 messages scanned to nuke continuing - total ${((loop * 100) + itemsProcessed)} messages from ${channel.name} in ${channel.guild.name}`)
-                    nukemessages(channel, message.id, ++loop)
-                } else {
-                    logger.warn(`End reached ${((loop * 100) + itemsProcessed)} messages scanned to nuke from ${channel.name} in ${channel.guild.name}`)
-                }
-        }
-    ))
+        await iterator.iterate(channel)
+    } else {
+        logger.console("Channel not found")
+    }
 }
