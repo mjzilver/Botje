@@ -11,6 +11,6 @@ process.on("uncaughtException", error => {
 process.on("unhandledRejection", error => {
     if (bot.commandHandler?.commandList?.get())
         bot.messageHandler.reply(bot.commandHandler.commandList.get(), "An error occured, this is probably your fault, do not @me!")
-    
+
     logger.error(error)
 })

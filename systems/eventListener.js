@@ -15,7 +15,7 @@ module.exports = class eventListener {
         })
 
         bot.client.on("interactionCreate", interaction => {
-            bot.slashCommandRegistry.handleInteraction(interaction)
+            bot.SlashHandler.handleInteraction(interaction)
         })
 
         bot.client.on("messageCreate", message => {

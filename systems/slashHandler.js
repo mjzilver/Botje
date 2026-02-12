@@ -3,7 +3,7 @@ const discord = require("discord.js")
 
 const logger = require("./logger")
 
-module.exports = class SlashCommandRegistry {
+module.exports = class Slashhandler {
     constructor(bot) {
         this.bot = bot
         this.slashCommands = []

@@ -28,9 +28,10 @@
 	},
 	"llm": {
 		"model": "model",
-    	"api": "api goes here",
-    	"base_prompt": "You are a discord user, A discord user asks you \"{userQuestion}\". Answer the question clearly and concise.",
-		"conversation": "You are a discord user, reply to this conversaion: \"{userQuestion}\". Answer the last question clearly and concise."
-  	},
+		"api": "api goes here",
+		"base_prompt": "You are a discord user, A discord user asks you \"{userQuestion}\". Answer the question clearly and concise.",
+		"conversation": "You are a discord user, reply to this conversaion: \"{userQuestion}\". Answer the last question clearly and concise.",
+		"tarot_prompt": "User asked: {userQuestion}\nTarot card pulled: {cardName} ({orientation})\nCard meanings: \"{meaning}\"\n\nInterpret the meaning that fits their query like a fortune teller, use tarot-appropriate mystical language. Keep it brief: maximum one paragraph, maximum 5 sentences. Be enigmatic yet insightful."
+	},
 	"scan_on_startup": "1"
 }

@@ -12,7 +12,7 @@ const EventListener = require("./eventListener")
 const MessageHandler = require("./messageHandler")
 const ReplyHandler = require("./replyHandler")
 const { config } = require("./settings")
-const SlashCommandRegistry = require("./slashCommandHandler")
+const SlashHandler = require("./slashHandler")
 
 class Bot {
     constructor() {
@@ -74,7 +74,7 @@ class Bot {
         this.commandHandler = new CommandHandler(this)
         this.dictionary = new Dictionary()
         this.emoteInjector = new EmoteInjector(this)
-        this.slashCommandRegistry = new SlashCommandRegistry(this)
+        this.SlashHandler = new SlashHandler(this)
 
         this.loadDisallowed()
         await this.registerSlashCommands()
@@ -84,7 +84,7 @@ class Bot {
 
     async registerSlashCommands() {
         const { commands } = require("./commandLoader")
-        await this.slashCommandRegistry.registerCommands(commands)
+        await this.SlashHandler.registerCommands(commands)
     }
 
     loadDisallowed() {
