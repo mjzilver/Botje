@@ -22,7 +22,7 @@ module.exports = {
                         if (sentence.charAt(i) >= "a" && sentence.charAt(i) <= "z")
                             bot.messageHandler.react(replyMessage, emojiValues[`letter_${ sentence.charAt(i)}`])
 
-                    setTimeout(() => message.delete().catch(() => {}), 1000)
+                    setTimeout(() => bot.messageHandler.delete(message), 1000)
                 })
         } else {
             let sentence = message.content.split(" ").slice(1)

@@ -1,5 +1,6 @@
 const logger = require("../../systems/logger")
 const MessageIterator = require("../../systems/messageIterator")
+const bot = require("../../systems/bot")
 
 module.exports = async function deleteafter(message) {
     const referenceId = message.reference?.messageId
@@ -9,7 +10,7 @@ module.exports = async function deleteafter(message) {
                 limit: 100,
                 onMessage: async (fetchedMessage) => {
                     if (referenceId < fetchedMessage.id) {
-                        setTimeout(() => fetchedMessage.delete().catch(() => {}), 10)
+                        setTimeout(() => bot.messageHandler.delete(fetchedMessage), 10)
                     }
                 },
                 logProgress: false
@@ -19,7 +20,7 @@ module.exports = async function deleteafter(message) {
         }
 
         logger.warn(`Deleting up to 100 messages after "${message.content}"`)
-        setTimeout(() => message.delete().catch(() => {}), 5000)
+        setTimeout(() => bot.messageHandler.delete(message), 5000)
     } else {
         message.reply("You need to reply to a message to delete after the replied-to message")
     }

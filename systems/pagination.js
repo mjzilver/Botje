@@ -79,9 +79,9 @@ async function sendPaginatedEmbed(message, pages, timeout = 300000) {
     })
 
     collector.on("end", () => {
-        sentMessage.edit({
+        bot.messageHandler.edit(sentMessage, {
             components: [getButtons(true)]
-        }).catch(err => logger.debug("Could not disable pagination buttons:", err.message))
+        }).catch(() => {})
     })
 
     return sentMessage

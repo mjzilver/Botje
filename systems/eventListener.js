@@ -44,7 +44,7 @@ module.exports = class eventListener {
                     break
                 case config.negative_emoji:
                     if (reaction.count >= 3 && reaction.count > reaction.message.reactions.resolve(config.positive_emoji)?.count) {
-                        setTimeout(() => reaction.message.delete().catch(() => {}), 5000)
+                        setTimeout(() => bot.messageHandler.delete(reaction.message), 5000)
                         logger.warn(`Post gets deleted due to downvotes - ${reaction.message.content}`)
                     }
                     break
