@@ -81,11 +81,10 @@ logger.printRows = (rows, loggerFn = logger.console) => {
 // override logger.error to print stack
 const originalError = logger.error
 logger.error = (message, ...args) => {
-    if (message instanceof Error) {
+    if (message instanceof Error)
         originalError(message.stack || message.toString(), ...args)
-    } else {
+    else
         originalError(message, ...args)
-    }
 }
 
 module.exports = logger

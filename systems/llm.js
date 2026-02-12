@@ -55,12 +55,8 @@ async function streamToMessage(message, prompt, filterFn = null) {
                             await message.edit(toDisplay)
                             firstChunk = false
                         } catch (err) {
-                            // Message was deleted or can't be edited, abort everything
-                            if (err.code === 10008 || err.message?.includes("Unknown")) {
-                                logger.info("Message no longer exists, aborting stream")
-                            } else {
-                                logger.error("Message edit failed, aborting stream:", err)
-                            }
+                            logger.error("Message edit failed, aborting stream:", err)
+
                             controller.abort()
                             shouldAbort = true
                             break
