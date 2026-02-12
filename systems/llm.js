@@ -55,7 +55,7 @@ async function streamToMessage(message, prompt, filterFn = null) {
                             await message.edit(toDisplay)
                             firstChunk = false
                         } catch (err) {
-                            logger.error("Message edit failed, aborting stream:", err)
+                            logger.debug(`Message edit failed (likely deleted), aborting stream: ${err.message}`)
 
                             controller.abort()
                             shouldAbort = true

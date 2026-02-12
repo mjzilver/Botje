@@ -20,7 +20,7 @@ module.exports = {
 
                     for (let i = 0; i < sentence.length; i++)
                         if (sentence.charAt(i) >= "a" && sentence.charAt(i) <= "z")
-                            replyMessage.react(emojiValues[`letter_${ sentence.charAt(i)}`])
+                            bot.messageHandler.react(replyMessage, emojiValues[`letter_${ sentence.charAt(i)}`])
 
                     setTimeout(() => message.delete().catch(() => {}), 1000)
                 })

@@ -37,7 +37,7 @@ module.exports = class EmoteInjector {
         if (hasCorrections) {
             const success = await webhook.sendMessage(message.channel.id, correctedMessage, message.author.id)
             if (success)
-                message.delete()
+                this.bot.messageHandler.delete(message)
         }
     }
 }

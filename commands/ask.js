@@ -50,7 +50,7 @@ module.exports = {
 
         try {
             await llm.streamToMessage(discordMsg, prompt, filterBotReply)
-            await discordMsg.react("🤖")
+            await bot.messageHandler.react(discordMsg, "🤖")
         } catch (err) {
             await bot.messageHandler.edit(discordMsg, "Error contacting LLM.")
         }

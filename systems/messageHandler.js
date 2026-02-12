@@ -25,15 +25,18 @@ module.exports = class MessageHandler {
                 ? call.interaction.followUp(content)
                 : call.interaction.reply(content)
         else
-            promise = useReply ? call.reply(content) : call.channel.send(content)
+            promise = useReply ? call.reply(content).catch(err => {
+                logger.error("Failed to reply to message (likely deleted):", err.message)
+                throw err
+            }) : call.channel.send(content)
 
         promise.then(reply => {
             this.addCommandCall(call, reply)
             if (reply.react) {
-                reply.react(config.positive_emoji)
-                reply.react(config.negative_emoji)
+                this.react(reply, config.positive_emoji)
+                this.react(reply, config.negative_emoji)
             }
-        })
+        }).catch(() => {})
 
         return promise
     }
@@ -46,6 +49,12 @@ module.exports = class MessageHandler {
         return this._sendMessage(call, content, true)
     }
 
+    react(message, emoji) {
+        return message.react(emoji).catch(err => {
+            logger.debug(`Failed to react to message (likely deleted): ${err.message}`)
+        })
+    }
+
     edit(replyObj, newContent) {
         return new Promise((resolve, reject) => {
             if (!replyObj)
@@ -53,7 +62,16 @@ module.exports = class MessageHandler {
 
             replyObj.edit(newContent)
                 .then(resolve)
-                .catch(err => reject(err))
+                .catch(err => {
+                    logger.debug(`Failed to edit message (likely deleted): ${err.message}`)
+                    reject(err)
+                })
+        })
+    }
+
+    delete(message) {
+        return message.delete().catch(err => {
+            logger.debug(`Failed to delete message (likely already deleted): ${err.message}`)
         })
     }
 

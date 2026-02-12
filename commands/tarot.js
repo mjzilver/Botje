@@ -71,7 +71,7 @@ module.exports = {
 
             try {
                 await llm.streamToMessage(interpretMsg, prompt)
-                await interpretMsg.react("🔮")
+                await bot.messageHandler.react(interpretMsg, "🔮")
             } catch (err) {
                 logger.error("Failed to get tarot interpretation:", err)
                 await bot.messageHandler.edit(interpretMsg, "You are mentally blocking the spirits from revealing your fortune. Try asking again while being more open to the mystical energies of the universe.")

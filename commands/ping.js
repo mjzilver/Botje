@@ -6,7 +6,7 @@ module.exports = {
     "format": "ping",
     "function": async function ping(message) {
         bot.messageHandler.send(message, "Ping?").then(m => {
-            m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms.`)
+            bot.messageHandler.edit(m, `Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms.`)
         })
     }
 }

@@ -90,7 +90,7 @@ module.exports = class CommandHandler {
 
                 if (command in this.commands) {
                     this.commands[command].function(callMessage)
-                    message.delete()
+                    this.bot.messageHandler.delete(message)
                 }
             })
     }
