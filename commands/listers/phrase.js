@@ -129,7 +129,7 @@ class PhraseLister extends Lister {
             const pages = createPages(sortedRows, 10, (pageRows, pageNum, totalPages) => {
                 let result = ""
                 for (const row of pageRows)
-                    result += `${row.user_name} has said ${word} in ${row.percentage}% of their messages! \n`
+                    result += `${row.userName} has said ${word} in ${row.percentage}% of their messages! \n`
 
                 return new discord.EmbedBuilder()
                     .setColor(config.color_hex)
