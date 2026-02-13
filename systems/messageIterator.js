@@ -6,7 +6,7 @@ class MessageIterator {
         this.onComplete = options.onComplete || null
         this.limit = options.limit || Infinity
         this.logProgress = options.logProgress !== false
-        
+
         this.stats = {
             totalProcessed: 0
         }
@@ -15,9 +15,9 @@ class MessageIterator {
     async iterate(channel, startMessageId = null) {
         const messageId = startMessageId || channel.lastMessageId
         if (!messageId) {
-            if (this.logProgress) {
+            if (this.logProgress)
                 logger.console(`No messages found in ${channel.name}`)
-            }
+
             this.onComplete?.(this.stats)
             return
         }
@@ -28,9 +28,9 @@ class MessageIterator {
     async fetchBatch(channel, messageId) {
         const remaining = this.limit - this.stats.totalProcessed
         if (remaining <= 0) {
-            if (this.logProgress) {
+            if (this.logProgress)
                 logger.console(`Limit reached: ${this.stats.totalProcessed} messages processed from ${channel.name}`)
-            }
+
             this.onComplete?.(this.stats)
             return
         }
@@ -44,9 +44,9 @@ class MessageIterator {
             })
 
             if (messages.size === 0) {
-                if (this.logProgress) {
+                if (this.logProgress)
                     logger.console(`End reached: ${this.stats.totalProcessed} messages processed from ${channel.name}`)
-                }
+
                 this.onComplete?.(this.stats)
                 return
             }
@@ -59,17 +59,16 @@ class MessageIterator {
             }
 
             // Log progress
-            if (this.logProgress && messages.size === 100) {
-                logger.console(`${this.stats.totalProcessed} messages processed from ${channel.name} in ${channel.guild?.name || 'DM'}`)
-            }
+            if (this.logProgress && messages.size === 100)
+                logger.console(`${this.stats.totalProcessed} messages processed from ${channel.name} in ${channel.guild?.name || "DM"}`)
 
             // Continue if we fetched a full batch and haven't reached the limit
             if (messages.size === 100 && this.stats.totalProcessed < this.limit) {
                 await this.fetchBatch(channel, lastMessageId)
             } else {
-                if (this.logProgress) {
+                if (this.logProgress)
                     logger.console(`End reached: ${this.stats.totalProcessed} messages processed from ${channel.name}`)
-                }
+
                 this.onComplete?.(this.stats)
             }
         } catch (error) {

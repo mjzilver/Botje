@@ -22,22 +22,20 @@ module.exports = async function nuke(message) {
 }
 
 async function nukeguild(message) {
-    for (const [channelId, channel] of bot.client.channels.cache.entries()) {
-        if (channel.type === discord.ChannelType.GuildText && channel.guild.id === message.guild.id) {
+    for (const [, channel] of bot.client.channels.cache.entries())
+        if (channel.type === discord.ChannelType.GuildText && channel.guild.id === message.guild.id)
             await nukechannel(channel)
-        }
-    }
 }
 
 async function nukechannel(channel) {
     if (channel && channel.type === discord.ChannelType.GuildText) {
         logger.warn(`NUKING channel: ${channel.name}`)
-        
+
         const iterator = new MessageIterator({
-            onMessage: async (msg) => {
+            onMessage: async msg => {
                 await msg.delete({ timeout: 10 })
             },
-            onComplete: (stats) => {
+            onComplete: stats => {
                 logger.warn(`${stats.totalProcessed} messages nuked from ${channel.name} in ${channel.guild.name}`)
             }
         })

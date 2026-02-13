@@ -1,7 +1,6 @@
 const discord = require("discord.js")
 
 const bot = require("./bot")
-const logger = require("./logger")
 
 async function sendPaginatedEmbed(message, pages, timeout = 300000) {
     if (!pages || pages.length === 0)

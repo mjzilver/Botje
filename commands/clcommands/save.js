@@ -20,10 +20,10 @@ module.exports = {
             if (channel && channel.type === discord.ChannelType.GuildText) {
                 const iterator = new MessageIterator({
                     limit: amount,
-                    onMessage: async (message) => {
+                    onMessage: async message => {
                         database.storeMessage(message)
                     },
-                    onComplete: (stats) => {
+                    onComplete: stats => {
                         logger.console(`${stats.totalProcessed} messages catalogued from ${channel.name} in ${channel.guild.name}`)
                     }
                 })

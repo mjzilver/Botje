@@ -1,6 +1,6 @@
+const bot = require("../../systems/bot")
 const logger = require("../../systems/logger")
 const MessageIterator = require("../../systems/messageIterator")
-const bot = require("../../systems/bot")
 
 module.exports = async function deleteafter(message) {
     const referenceId = message.reference?.messageId
@@ -8,10 +8,9 @@ module.exports = async function deleteafter(message) {
         if (message.reference.messageId) {
             const iterator = new MessageIterator({
                 limit: 100,
-                onMessage: async (fetchedMessage) => {
-                    if (referenceId < fetchedMessage.id) {
+                onMessage: async fetchedMessage => {
+                    if (referenceId < fetchedMessage.id)
                         setTimeout(() => bot.messageHandler.delete(fetchedMessage), 10)
-                    }
                 },
                 logProgress: false
             })
