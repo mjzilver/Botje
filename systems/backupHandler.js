@@ -7,6 +7,8 @@ const format = require("pg-format")
 
 const database = require("./database")
 const logger = require("./logger")
+const { spawn } = require("child_process")
+const { config } = require("./settings")
 
 module.exports = class BackupHandler {
     constructor(bot) {
@@ -71,7 +73,6 @@ module.exports = class BackupHandler {
         })
     }
 
-    // TODO: use pg_dump
     async backupDatabase(destination = null) {
         return new Promise((resolve, reject) => {
             const timeStamp = Date.now()
@@ -85,56 +86,33 @@ module.exports = class BackupHandler {
 
             const dbBackupPath = path.join(basePath, `backup-${timeStamp}.sql`)
             const writeStream = fs.createWriteStream(dbBackupPath, { flags: "w" })
+            writeStream.on("error", (err) => reject(err))
 
-            writeStream.on("error", reject)
+            const connStr = `postgresql://${encodeURIComponent(config.db.user)}:${encodeURIComponent(config.db.password)}@${config.db.host}:${config.db.port}/${encodeURIComponent(config.db.database)}`
 
-            writeStream.write("BEGIN;\n")
+            const dump = spawn("pg_dump", ["--format=p", "--no-owner", "--no-acl", connStr])
 
-            const selectSQL = "SELECT * FROM messages;"
+            dump.on("error", (err) => {
+                writeStream.destroy()
+                reject(err)
+            })
 
-            ;(async () => {
-                try {
-                    const rows = await database.query(selectSQL, [])
+            dump.stderr.on("data", (chunk) => {
+                logger.error(`pg_dump stderr: ${chunk.toString()}`)
+            })
 
-                    if (!rows || rows.length === 0) {
-                        writeStream.write("COMMIT;\n")
-                        return writeStream.end(() => {
-                            logger.console(`Database exported successfully to ${dbBackupPath}`)
-                            resolve(dbBackupPath)
-                        })
-                    }
+            dump.stdout.pipe(writeStream)
 
-                    const values = rows.map(row =>
-                        format(
-                            "(%L, %L, %L, %L, %L, %L, %L)",
-                            row.id,
-                            row.user_id,
-                            row.message,
-                            row.channel_id,
-                            row.server_id,
-                            row.datetime
-                        )
-                    ).join(",\n")
-
-                    const insertStatement = `
-                    INSERT INTO messages
-                    (id, user_id, message, channel_id, server_id, datetime)
-                    VALUES
-                    ${values}
-                    ON CONFLICT (id) DO NOTHING;
-                    `
-
-                    writeStream.write(insertStatement)
-                    writeStream.write("\nCOMMIT;\n")
-
-                    writeStream.end(() => {
-                        logger.console(`Database exported successfully to ${dbBackupPath}`)
-                        resolve(dbBackupPath)
-                    })
-                } catch (err) {
-                    reject(err)
+            dump.on("close", (code) => {
+                if (code !== 0) {
+                    return reject(new Error(`pg_dump exited with code ${code}`))
                 }
-            })()
+
+                writeStream.end(() => {
+                    logger.console(`Database exported successfully to ${dbBackupPath}`)
+                    resolve(dbBackupPath)
+                })
+            })
         })
     }
 }
