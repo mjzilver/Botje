@@ -38,6 +38,8 @@ module.exports = class eventListener {
         })
 
         bot.client.on("messageReactionAdd", reaction => {
+            database.insertReaction(reaction)
+
             if (reaction.message.author.equals(bot.client.user))
                 switch (reaction.emoji.name) {
                 case config.positive_emoji:

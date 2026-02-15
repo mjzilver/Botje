@@ -13,108 +13,215 @@ class Database {
             port: config.db.port,
         })
 
-        this.pool.connect()
-            .then(client => {
-                this.initializeDatabase()
-                logger.startup("Postgres Database loaded")
-                client.release()
-            })
-            .catch(e => {
-                logger.error(`Could not connect to database: ${e}`)
-            })
+        this.initialize()
+    }
+
+    async initialize() {
+        try {
+            await this.initializeDatabase()
+            logger.startup("Postgres Database loaded")
+        } catch (e) {
+            logger.error(`Could not initialize database: ${e}`)
+        }
     }
 
     async initializeDatabase() {
-        await this.pool.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)")
-        await this.pool.query(`CREATE TABLE IF NOT EXISTS messages 
-        (id bigint, user_id bigint, user_name text, message text, datetime bigint, channel_id bigint, server_id bigint, PRIMARY KEY(id))`)
-        await this.pool.query("CREATE TABLE IF NOT EXISTS colors (x integer, y integer, red integer, green integer, blue integer, PRIMARY KEY(x,y))")
-        await this.pool.query("CREATE TABLE IF NOT EXISTS command_calls (call_id bigint, reply_id bigint NULL, timestamp bigint, PRIMARY KEY(call_id))")
+        await this.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)")
+
+        await this.query(`
+            CREATE TABLE IF NOT EXISTS messages (
+                id bigint PRIMARY KEY,
+                user_id bigint,
+                message text,
+                datetime bigint,
+                channel_id bigint,
+                server_id bigint,
+                reply_to bigint NULL
+            )
+        `)
+
+        await this.query(`
+            CREATE TABLE IF NOT EXISTS command_calls (
+                call_id bigint PRIMARY KEY,
+                reply_id bigint NULL,
+                timestamp bigint
+            )
+        `)
+
+        await this.query(`
+            CREATE TABLE IF NOT EXISTS reactions (
+                message_id bigint,
+                user_id bigint,
+                emoji text,
+                timestamp bigint,
+                PRIMARY KEY(message_id, user_id, emoji)
+            )
+        `)
+
+        await this.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                user_id bigint PRIMARY KEY
+            )
+        `)
+
+        await this.query(`
+            CREATE TABLE IF NOT EXISTS usernames (
+                user_id bigint,
+                server_id bigint,
+                user_name text,
+                timestamp bigint,
+                PRIMARY KEY(user_id, server_id, user_name)
+            )
+        `)
     }
 
-    query(selectQuery, parameters = [], callback) {
-        const startTime = performance.now()
+    async query(sql, params = []) {
+        try {
+            const result = await this.pool.query(sql, params)
+            return result.rows
+        } catch (err) {
+            logger.error(`SQL Error:\n${sql}\n${err}`)
+            throw err
+        }
+    }
 
-        this.pool.query(selectQuery, parameters, (err, result) => {
-            const endTime = performance.now()
-            const duration = endTime - startTime
+    async getCurrentUsername(userId, serverId) {
+        const rows = await this.query(
+            `SELECT user_name FROM usernames
+             WHERE user_id = $1 AND server_id = $2
+             ORDER BY timestamp DESC
+             LIMIT 1`,
+            [userId, serverId]
+        )
 
-            logger.debug(`Query executed in ${duration.toFixed(2)} ms\nSQL: ${selectQuery}`)
-
-            if (err) {
-                logger.error(selectQuery)
-                logger.error(err.stack)
-            } else {
-                callback(result.rows)
-            }
-        })
+        return rows.length ? rows[0].user_name : null
     }
 
     async getCount(selectQuery, parameters = []) {
-        return new Promise(resolve => {
-            const countQuery = `SELECT COUNT(*) AS count FROM (${selectQuery}) AS sub`
-
-            this.query(countQuery, parameters, rows => {
-                resolve(parseInt(rows[0].count, 10))
-            })
-        })
+        const countQuery = `SELECT COUNT(*) AS count FROM (${selectQuery}) AS sub`
+        const rows = await this.query(countQuery, parameters)
+        return parseInt(rows[0].count, 10)
     }
 
-    async queryRandomMessage(selectQuery, parameters = [], callback) {
+    async queryRandomMessage(selectQuery, parameters = []) {
         const count = await this.getCount(selectQuery, parameters)
-
-        if (count === 0)
-            return callback([])
+        if (count === 0) return []
 
         const offset = Math.floor(Math.random() * count)
         const queryWithOffset = `${selectQuery} LIMIT 1 OFFSET $${parameters.length + 1}`
 
-        this.query(queryWithOffset, [...parameters, offset], callback)
+        return await this.query(queryWithOffset, [...parameters, offset])
     }
 
-    async insert(insertQuery, parameters = [], callback = null) {
-        const startTime = performance.now()
-
-        this.pool.query(insertQuery, parameters, err => {
-            const endTime = performance.now()
-            const duration = endTime - startTime
-
-            logger.debug(`Query executed in ${duration.toFixed(2)} ms\nSQL: ${insertQuery}`)
-
-            if (err) {
-                logger.error(err.stack)
-                logger.error(insertQuery)
-            } else {
-                if (callback) callback()
-            }
-        })
+    async insert(sql, params = []) {
+        await this.query(sql, params)
     }
 
-    storeMessage(message) {
-        if (message.cleanContent !== "" && message.guild && !message.author.bot && !message.content.match(new RegExp(config.prefix, "i")))
-            message.guild.members.fetch(message.author.id).then(() => {
-                this.insertMessage(message)
-            }).catch(() => {
-                // person is not a member (has left the server)
-            })
+    async ensureUserExists(user, serverId, displayName = null) {
+        await this.query(
+            "INSERT INTO users (user_id) VALUES ($1::bigint) ON CONFLICT DO NOTHING",
+            [user.id]
+        )
+
+        if (serverId && displayName)
+            await this.query(
+                `INSERT INTO usernames (user_id, server_id, user_name, timestamp)
+                 VALUES ($1::bigint, $2::bigint, $3, $4::bigint)
+                 ON CONFLICT DO NOTHING`,
+                [user.id, serverId, displayName, Date.now()]
+            )
+    }
+
+    async storeMessage(message) {
+        if (
+            message.cleanContent === ""
+            || !message.guild
+            || message.author.bot
+            || message.content.match(new RegExp(config.prefix, "i"))
+        ) return
+
+        try {
+            const member = await message.guild.members.fetch(message.author.id)
+
+            await this.ensureUserExists(
+                message.author,
+                message.guild.id,
+                member.displayName
+            )
+
+            await this.insertMessage(message)
+        } catch {
+            logger.info(`Failed to store message: ${message.content} (likely left server) Author: ${message.author.tag}`)
+        }
     }
 
     async updateMessage(message) {
-        this.pool.query("UPDATE messages SET message = $1 WHERE id = $2::bigint",
-            [message.cleanContent, message.id])
-            .catch(err => {
-                logger.error(`Failed to update: ${message.content} posted by ${message.author.username}`)
-                logger.error(err.stack)
-            })
+        try {
+            await this.query(
+                "UPDATE messages SET message = $1 WHERE id = $2::bigint",
+                [message.cleanContent, message.id]
+            )
+        } catch {
+            logger.error(`Failed to update: ${message.content}`)
+        }
+    }
+
+    async insertReaction(reaction) {
+        let users = reaction.users.cache
+
+        if (users.size === 0)
+            try {
+                users = await reaction.users.fetch()
+            } catch {
+                logger.error("Failed to fetch users for reaction")
+                return
+            }
+
+        for (const user of users.values())
+            try {
+                await this.query(
+                    `INSERT INTO reactions (message_id, user_id, emoji, timestamp)
+                     VALUES ($1::bigint, $2::bigint, $3, $4::bigint)
+                     ON CONFLICT DO NOTHING`,
+                    [reaction.message.id, user.id, reaction.emoji.name, Date.now()]
+                )
+            } catch {
+                logger.error("Failed to store reaction")
+            }
     }
 
     async insertMessage(message) {
-        this.pool.query("INSERT INTO messages (id, user_id, user_name, message, channel_id, server_id, datetime) VALUES ($1::bigint, $2::bigint, $3, $4, $5::bigint, $6::bigint, $7::bigint) ON CONFLICT (id) DO NOTHING",
-            [message.id, message.author.id, message.author.username, message.cleanContent, message.channel.id, message.guild.id, message.createdAt.getTime()])
-            .catch(err => {
-                logger.error(`Failed to insert: ${message.content} posted by ${message.author.username}`)
-                logger.error(err.stack)
-            })
+        let replyTo = null
+
+        if (message.reference)
+            try {
+                const repliedMessage = await message.channel.messages.fetch(
+                    message.reference.messageId
+                )
+                replyTo = repliedMessage?.id ?? null
+            } catch {
+                logger.error("Failed to fetch replied message")
+            }
+
+        await this.query(
+            `INSERT INTO messages
+            (id, user_id, message, channel_id, server_id, datetime, reply_to)
+            VALUES ($1::bigint, $2::bigint, $3, $4::bigint, $5::bigint, $6::bigint, $7::bigint)
+            ON CONFLICT (id) DO UPDATE SET reply_to = EXCLUDED.reply_to`,
+            [
+                message.id,
+                message.author.id,
+                message.cleanContent,
+                message.channel.id,
+                message.guild.id,
+                message.createdAt.getTime(),
+                replyTo
+            ]
+        )
+
+        if (message.reactions.cache.size > 0)
+            for (const reaction of message.reactions.cache.values())
+                await this.insertReaction(reaction)
     }
 }
 

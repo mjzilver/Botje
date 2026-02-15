@@ -13,6 +13,7 @@ const MessageHandler = require("./messageHandler")
 const ReplyHandler = require("./replyHandler")
 const { config } = require("./settings")
 const SlashHandler = require("./slashHandler")
+const UserHandler = require("./userHandler")
 
 class Bot {
     constructor() {
@@ -75,6 +76,7 @@ class Bot {
         this.dictionary = new Dictionary()
         this.emoteInjector = new EmoteInjector(this)
         this.SlashHandler = new SlashHandler(this)
+        this.userHandler = new UserHandler(this)
 
         this.loadDisallowed()
         await this.registerSlashCommands()

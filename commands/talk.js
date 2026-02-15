@@ -9,7 +9,7 @@ module.exports = {
     "options": [
         { type: "user", name: "user", description: "The user to mimic (optional)", required: false }
     ],
-    "function": function talk(message) {
+    "function": async function talk(message) {
         const mention = message.mentions ? message.mentions.users.first() : null
         const chain = {}
 
@@ -19,42 +19,41 @@ module.exports = {
         if (mention)
             selectSQL += `AND user_id = ${mention.id}`
 
-        database.query(selectSQL, [], rows => {
-            for (let i = 0; i < rows.length; i++) {
-                const words = rows[i]["message"].split(" ")
-                let prevWord = ""
+        const rows = await database.query(selectSQL, [])
+        for (let i = 0; i < rows.length; i++) {
+            const words = rows[i]["message"].split(" ")
+            let prevWord = ""
 
-                for (let j = 0; j < words.length; j++) {
-                    const word = words[j].toLowerCase()
+            for (let j = 0; j < words.length; j++) {
+                const word = words[j].toLowerCase()
 
-                    if (!chain[prevWord]) {
-                        chain[prevWord] = [word]
-                    } else {
-                        if (!Array.isArray(chain[prevWord]))
-                            chain[prevWord] = []
-                        chain[prevWord].push(word)
-                    }
-                    prevWord = word
+                if (!chain[prevWord]) {
+                    chain[prevWord] = [word]
+                } else {
+                    if (!Array.isArray(chain[prevWord]))
+                        chain[prevWord] = []
+                    chain[prevWord].push(word)
                 }
+                prevWord = word
             }
+        }
 
-            let sentence = ""
-            const sentenceLength = randomBetween(8, 15)
+        let sentence = ""
+        const sentenceLength = randomBetween(8, 15)
 
-            if (chain[""]) {
-                let previousWord = chain[""][randomBetween(0, chain[""].length - 1)]
-                sentence += previousWord
+        if (chain[""]) {
+            let previousWord = chain[""][randomBetween(0, chain[""].length - 1)]
+            sentence += previousWord
 
-                for (let i = 0; i < sentenceLength - 1; i++)
-                    if (chain[previousWord]) {
-                        const currentWord = chain[previousWord][randomBetween(0, chain[previousWord].length - 1)]
+            for (let i = 0; i < sentenceLength - 1; i++)
+                if (chain[previousWord]) {
+                    const currentWord = chain[previousWord][randomBetween(0, chain[previousWord].length - 1)]
 
-                        sentence += ` ${ currentWord}`
-                        previousWord = currentWord
-                    }
+                    sentence += ` ${ currentWord}`
+                    previousWord = currentWord
+                }
 
-                bot.messageHandler.send(message, sentence.capitalize())
-            }
-        })
+            bot.messageHandler.send(message, sentence.capitalize())
+        }
     }
 }

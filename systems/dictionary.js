@@ -33,14 +33,15 @@ module.exports = class Dictionary {
         })
     }
 
-    generateWordsFile() {
+    async generateWordsFile() {
         const selectSQL = `SELECT LOWER(message) as message
         FROM messages
         WHERE message NOT LIKE '%<%' AND message NOT LIKE ''`
 
         const wordHolder = {}
 
-        database.query(selectSQL, [], rows => {
+        try {
+            const rows = await database.query(selectSQL, [])
             for (let i = 0; i < rows.length; i++) {
                 const words = rows[i]["message"].split(/\s+/)
 
@@ -63,7 +64,9 @@ module.exports = class Dictionary {
                 if (err)
                     logger.error(err)
             })
-        })
+        } catch (err) {
+            logger.error(err)
+        }
     }
 
     getWordsByLength(length) {

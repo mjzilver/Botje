@@ -27,17 +27,10 @@ class QualityLister extends Lister {
         super()
     }
 
-    mention(message, mentioned) {
+    async mention(message, mentioned) {
         const selectSQL = `
             SELECT 
                 user_id,
-                (
-                    SELECT user_name
-                    FROM messages m2
-                    WHERE m2.user_id = m.user_id
-                    ORDER BY id DESC
-                    LIMIT 1
-                ) AS user_name,
                 COUNT(*) AS total_messages,
                 COUNT(DISTINCT message) AS unique_messages,
                 (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
@@ -54,27 +47,22 @@ class QualityLister extends Lister {
                 percentage_unique DESC, user_id;
         `
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
-            if (rows.length === 0)
-                return bot.messageHandler.send(message, `${mentioned.username} does not have enough qualifying messages.`)
+        const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
+        if (rows.length === 0) {
+            const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+            return bot.messageHandler.send(message, `\`${userName}\` does not have enough qualifying messages.`)
+        }
 
-            const userData = rows[0]
-            const userQuality = parseFloat(userData["percentage_unique"]).toFixed(2)
+        const userData = rows[0]
+        const userQuality = parseFloat(userData["percentage_unique"]).toFixed(2)
 
-            bot.messageHandler.send(message, `${mentioned.username}'s post quality is ${userQuality}%`)
-        })
+        const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+        bot.messageHandler.send(message, `\`${userName}\`'s post quality is ${userQuality}%`)
     }
 
-    perPerson(message) {
+    async perPerson(message) {
         const selectSQL = `SELECT 
             user_id,
-            (
-                SELECT user_name
-                FROM messages m2
-                WHERE m2.user_id = m.user_id
-                ORDER BY id DESC
-                LIMIT 1
-            ) AS user_name,
             COUNT(*) AS total_messages,
             COUNT(DISTINCT message) AS unique_messages,
             (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
@@ -89,21 +77,23 @@ class QualityLister extends Lister {
         ORDER BY 
             percentage_unique DESC, user_id;`
 
-        database.query(selectSQL, [message.guild.id], rows => {
-            const pages = createPages(rows, 10, (pageRows, pageNum, totalPages) => {
-                let result = ""
-                for (const row of pageRows)
-                    result += `${row["user_name"]}'s post quality is ${parseFloat(row["percentage_unique"]).toFixed(2)}% \n`
+        const rows = await database.query(selectSQL, [message.guild.id])
 
-                return new discord.EmbedBuilder()
-                    .setColor(config.color_hex)
-                    .setTitle(`Top 10 quality posters in ${message.guild.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
-            })
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows) {
+                const userName = await bot.userHandler.getDisplayName(row["user_id"], message.guild.id)
+                result += `\`${userName}\`'s post quality is ${parseFloat(row["percentage_unique"]).toFixed(2)}% \n`
+            }
 
-            sendPaginatedEmbed(message, pages)
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top 10 quality posters in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
         })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     calculateScore(message) {

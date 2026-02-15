@@ -63,11 +63,13 @@ async function getRedditImage(message, last = "") {
     }
 }
 
-function handleRedditImages(message, sub, children) {
+async function handleRedditImages(message, sub, children) {
     const selectSQL = "SELECT * FROM images WHERE sub = $1"
     const foundImages = {}
 
-    database.query(selectSQL, [sub], rows => {
+    try {
+        const rows = await database.query(selectSQL, [sub])
+
         for (let i = 0; i < rows.length; i++)
             foundImages[rows[i].link] = true
 
@@ -96,7 +98,9 @@ function handleRedditImages(message, sub, children) {
                 bot.messageHandler.send(message, "I have ran out of images to show you")
             }
         }
-    })
+    } catch (err) {
+        logger.error(err)
+    }
 }
 
 function embedImage(message, post, sub) {
@@ -164,9 +168,12 @@ function handleRedirect(message, post) {
         })
 }
 
-function insertPost(post, sub) {
+async function insertPost(post, sub) {
     const insertSQL = "INSERT INTO images (link, sub) VALUES ($1, $2) ON CONFLICT (link) DO UPDATE SET sub = EXCLUDED.sub;"
-    database.insert(insertSQL, [post.url, sub], () => {
+    try {
+        await database.insert(insertSQL, [post.url, sub])
         logger.debug(`inserted: ${post.url} - ${sub}`)
-    })
+    } catch (err) {
+        logger.error(err)
+    }
 }

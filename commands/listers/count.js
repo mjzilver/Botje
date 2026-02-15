@@ -28,70 +28,67 @@ class CountLister extends Lister {
         super()
     }
 
-    total(message) {
+    async total(message) {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1"
-
-        database.query(selectSQL, [message.guild.id], rows => {
-            bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in ${message.guild.name}`)
-        })
+        const rows = await database.query(selectSQL, [message.guild.id])
+        bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in ${message.guild.name}`)
     }
 
-    mention(message, mentioned) {
+    async mention(message, mentioned) {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1 AND user_id = $2"
-
-        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
-            bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages by ${mentioned.username} in this server`)
-        })
+        const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
+        const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+        bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages by \`${userName}\` in this server`)
     }
 
-    perPerson(message) {
-        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count
+    async perPerson(message) {
+        const selectSQL = `SELECT user_id, server_id, COUNT(*) as count
             FROM messages
             WHERE server_id = $1
-            GROUP BY user_id
+            GROUP BY user_id, server_id
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC `
+        const rows = await database.query(selectSQL, [message.guild.id])
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows) {
+                const userName = await bot.userHandler.getDisplayName(row["user_id"], row["server_id"])
+                result += `\`${userName}\` has posted ${row["count"]} messages! \n`
+            }
 
-        database.query(selectSQL, [message.guild.id], rows => {
-            const pages = createPages(rows, 10, (pageRows, pageNum, totalPages) => {
-                let result = ""
-                for (const row of pageRows)
-                    result += `${row["user_name"]} has posted ${row["count"]} messages! \n`
-
-                return new discord.EmbedBuilder()
-                    .setColor(config.color_hex)
-                    .setTitle(`Top 10 posters in ${message.guild.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
-            })
-
-            sendPaginatedEmbed(message, pages)
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top 10 posters in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
         })
+
+        sendPaginatedEmbed(message, pages)
     }
 
-    percentage(message) {
-        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, COUNT(*) as count,
-			(SElECT COUNT(message) FROM messages WHERE  server_id = $1) as total
+    async percentage(message) {
+        const selectSQL = `SELECT user_id, server_id, COUNT(*) as count,
+			(SElECT COUNT(message) FROM messages WHERE server_id = $1) as total
 			FROM messages
 			WHERE server_id = $1
-			GROUP BY user_id
+			GROUP BY user_id, server_id
 			HAVING COUNT(*) > 1
 			ORDER BY COUNT(*) DESC`
+        const rows = await database.query(selectSQL, [message.guild.id])
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows) {
+                const userName = await bot.userHandler.getDisplayName(row["user_id"], row["server_id"])
+                result += `\`${userName}\` has posted ${Math.round((parseInt(row["count"]) / parseInt(row["total"])) * 100)}% of all messages! \n`
+            }
 
-        database.query(selectSQL, [message.guild.id], rows => {
-            const pages = createPages(rows, 10, (pageRows, pageNum, totalPages) => {
-                let result = ""
-                for (const row of pageRows)
-                    result += `${row["user_name"]} has posted ${Math.round((parseInt(row["count"]) / parseInt(row["total"])) * 100)}% of all messages! \n`
-
-                return new discord.EmbedBuilder()
-                    .setColor(config.color_hex)
-                    .setTitle(`Top 10 posters in ${message.guild.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
-            })
-
-            sendPaginatedEmbed(message, pages)
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top 10 posters in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
         })
+
+        sendPaginatedEmbed(message, pages)
     }
 }

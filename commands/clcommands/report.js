@@ -10,7 +10,7 @@ module.exports = {
     name: "report",
     description: "reports information about bot's process",
     format: "report",
-    function: () => {
+    function: async () => {
         try {
             const { rss, heapUsed, heapTotal } = process.memoryUsage()
 
@@ -35,21 +35,20 @@ module.exports = {
             const sql = `SELECT pg_size_pretty(pg_database_size('botdb')) AS size, 
             COUNT(messages.id) as count FROM messages`
 
-            database.query(sql, null, rows => {
-                if (rows.length === 0) {
-                    logger.error("No data found in the database.")
-                    return
-                }
+            const rows = await database.query(sql, [])
+            if (rows.length === 0) {
+                logger.error("No data found in the database.")
+                return
+            }
 
-                printRows.push(
-                    ["Database Size", rows[0]["size"]],
-                    ["Message Count", formatter.format(rows[0]["count"])]
-                )
+            printRows.push(
+                ["Database Size", rows[0]["size"]],
+                ["Message Count", formatter.format(rows[0]["count"])]
+            )
 
-                printRows.sort((a, b) => a[0].localeCompare(b[0]))
+            printRows.sort((a, b) => a[0].localeCompare(b[0]))
 
-                logger.printRows(printRows, logger.console)
-            })
+            logger.printRows(printRows, logger.console)
         } catch (error) {
             logger.error(`Error: ${error.message}`)
         }

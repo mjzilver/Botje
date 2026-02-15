@@ -99,18 +99,21 @@ module.exports = class MessageHandler {
         this.bot.commandHandler.commandList.remove(call)
     }
 
-    getCommandCalls() {
+    async getCommandCalls() {
         const selectSQL = `SELECT call_id, reply_id, timestamp FROM command_calls 
         WHERE timestamp > ${new Date() - 24 * 60 * 60 * 1000}
         ORDER BY timestamp DESC`
 
-        database.query(selectSQL, [], rows => {
+        try {
+            const rows = await database.query(selectSQL, [])
             for (let i = 0; i < rows.length; i++)
                 this.commandCalls[rows[i]["call_id"]] = rows[i]["reply_id"]
 
             if (config.scan_on_startup === true)
                 this.scanForCommands()
-        })
+        } catch (err) {
+            logger.error(err)
+        }
     }
 
     scanForCommands() {

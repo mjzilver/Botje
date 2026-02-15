@@ -12,7 +12,7 @@ module.exports = {
         const commands = require("../systems/commandLoader").commands
         const commandList = Object.entries(commands).map(([, command]) => command)
 
-        const pages = createPages(commandList, 10, (pageCommands, pageNum, totalPages) => {
+        const pages = await createPages(commandList, 10, (pageCommands, pageNum, totalPages) => {
             let helpMessage = `**Here is a list of all the commands *you* can use: **
         Format: \`()\` = optional argument, \`[]\` = required argument\n`
 

@@ -54,57 +54,57 @@ class PhraseLister extends Lister {
             this.total(message, word)
     }
 
-    perPerson(message, word) {
-        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, count(message) as count
+    async perPerson(message, word) {
+        const selectSQL = `SELECT user_id, server_id, count(message) as count
             FROM messages
             WHERE LOWER(message) LIKE $1 AND server_id = $2
-            GROUP BY user_id
+            GROUP BY user_id, server_id
             HAVING count(message) > 1
             ORDER BY count(message) DESC`
 
-        database.query(selectSQL, [`%${word}%`, message.guild.id], rows => {
-            if (!rows || rows.length === 0)
-                return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name}`)
+        const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id])
+        if (!rows || rows.length === 0)
+            return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name}`)
 
-            const pages = createPages(rows, 10, (pageRows, pageNum, totalPages) => {
-                let result = ""
-                for (const row of pageRows)
-                    result += `${row["user_name"]} has said ${word} ${row["count"]} times! \n`
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows) {
+                const userName = await bot.userHandler.getDisplayName(row["user_id"], row["server_id"])
+                result += `\`${userName}\` has said ${word} ${row["count"]} times! \n`
+            }
 
-                return new discord.EmbedBuilder()
-                    .setColor(config.color_hex)
-                    .setTitle(`Top users for "${word}" in ${message.guild.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
-            })
-
-            sendPaginatedEmbed(message, pages)
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top users for "${word}" in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
         })
+
+        sendPaginatedEmbed(message, pages)
     }
 
-    total(message, word) {
+    async total(message, word) {
         const selectSQL = `SELECT COUNT(*) as count
             FROM messages
             WHERE LOWER(message) LIKE $1 AND server_id = $2 `
 
-        database.query(selectSQL, [`%${word}%`, message.guild.id], rows => {
-            bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
-        })
+        const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id])
+        bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
     }
 
-    mention(message, mentioned, word) {
+    async mention(message, mentioned, word) {
         const selectSQL = `SELECT COUNT(*) as count
             FROM messages
             WHERE LOWER(message) LIKE $1 
             AND server_id = $2 AND user_id = $3 `
 
-        database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id], rows => {
-            bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages from ${mentioned.username} in this server that contain ${word}`)
-        })
+        const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id])
+        const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+        bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages from \`${userName}\` in this server that contain ${word}`)
     }
 
-    percentage(message, word) {
-        const selectSQL = `SELECT user_id, MODE() WITHIN GROUP (ORDER BY user_name) AS user_name, count(message) as count,
+    async percentage(message, word) {
+        const selectSQL = `SELECT user_id, server_id, count(message) as count,
                 (SElECT COUNT(m2.message) 
                 FROM messages AS m2
                 WHERE m2.user_id = messages.user_id
@@ -116,30 +116,29 @@ class PhraseLister extends Lister {
             HAVING count(message) > 1
             ORDER BY count(message) DESC`
 
-        database.query(selectSQL, [`%${word}%`, message.guild.id], rows => {
-            if (!rows || rows.length === 0)
-                return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name}`)
+        const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id])
+        if (!rows || rows.length === 0)
+            return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name}`)
 
-            // Sort by percentage
-            const sortedRows = rows.map(row => ({
-                userName: row["user_name"],
-                percentage: ((parseInt(row["count"]) / parseInt(row["total"])) * 100).toFixed(3)
-            })).sort((a, b) => b.percentage - a.percentage)
+        // Sort by percentage
+        const sortedRows = rows.map(async row => ({
+            userName: await bot.userHandler.getDisplayName(row["user_id"], row["server_id"]),
+            percentage: ((parseInt(row["count"]) / parseInt(row["total"])) * 100).toFixed(3)
+        })).sort((a, b) => b.percentage - a.percentage)
 
-            const pages = createPages(sortedRows, 10, (pageRows, pageNum, totalPages) => {
-                let result = ""
-                for (const row of pageRows)
-                    result += `${row.userName} has said ${word} in ${row.percentage}% of their messages! \n`
+        const pages = await createPages(sortedRows, 10, (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows)
+                result += `\`${row.userName}\` has said ${word} in ${row.percentage}% of their messages! \n`
 
-                return new discord.EmbedBuilder()
-                    .setColor(config.color_hex)
-                    .setTitle(`Top users by percentage for "${word}" in ${message.guild.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
-            })
-
-            sendPaginatedEmbed(message, pages)
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top users by percentage for "${word}" in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
         })
+
+        sendPaginatedEmbed(message, pages)
     }
 }
 

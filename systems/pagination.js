@@ -86,7 +86,7 @@ async function sendPaginatedEmbed(message, pages, timeout = 300000) {
     return sentMessage
 }
 
-function createPages(items, itemsPerPage, formatPage) {
+async function createPages(items, itemsPerPage, formatPage) {
     const pages = []
     const totalPages = Math.ceil(items.length / itemsPerPage)
 
@@ -94,7 +94,7 @@ function createPages(items, itemsPerPage, formatPage) {
         const start = i * itemsPerPage
         const end = start + itemsPerPage
         const pageItems = items.slice(start, end)
-        pages.push(formatPage(pageItems, i + 1, totalPages))
+        pages.push(await formatPage(pageItems, i + 1, totalPages))
     }
 
     return pages

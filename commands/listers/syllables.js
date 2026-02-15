@@ -26,8 +26,8 @@ class syllableLister extends Lister {
         super()
     }
 
-    mention(message, mentioned) {
-        const selectSQL = `SELECT user_id, user_name, message
+    async mention(message, mentioned) {
+        const selectSQL = `SELECT user_id, message
             FROM messages 
             WHERE server_id = $1 AND user_id = $2 `
 
@@ -37,71 +37,70 @@ class syllableLister extends Lister {
             "average": 0
         }
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
-            for (let i = 0; i < rows.length; i++) {
-                const syllables = this.calculateSyllables(rows[i]["message"])
-                if (syllables >= 1) {
-                    userdata["syllables"] += syllables
-                    userdata["total"] += 1
-                }
+        const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
+        for (let i = 0; i < rows.length; i++) {
+            const syllables = this.calculateSyllables(rows[i]["message"])
+            if (syllables >= 1) {
+                userdata["syllables"] += syllables
+                userdata["total"] += 1
             }
+        }
 
-            userdata["average"] = Math.round(userdata["syllables"] / userdata["total"])
-            bot.messageHandler.send(message, `${mentioned.username} has an average of ${userdata["average"]} syllables per post`)
-        })
+        userdata["average"] = Math.round(userdata["syllables"] / userdata["total"])
+        const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+        bot.messageHandler.send(message, `\`${userName}\` has an average of ${userdata["average"]} syllables per post`)
     }
 
-    perPerson(message) {
-        const selectSQL = `SELECT user_id, user_name, message
+    async perPerson(message) {
+        const selectSQL = `SELECT user_id, message
             FROM messages 
             WHERE server_id = $1
             ORDER BY user_id`
 
         const userdata = {}
 
-        database.query(selectSQL, [message.guild.id], rows => {
-            for (let i = 0; i < rows.length; i++) {
-                const userName = rows[i]["user_name"]
+        const rows = await database.query(selectSQL, [message.guild.id])
+        for (let i = 0; i < rows.length; i++) {
+            const userName = await bot.userHandler.getDisplayName(rows[i]["user_id"], message.guild.id)
 
-                if (!userdata[userName])
-                    userdata[userName] = {
-                        "syllables": 0,
-                        "total": 0,
-                        "average": 0
-                    }
-
-                const syllables = this.calculateSyllables(rows[i]["message"])
-                if (syllables >= 1) {
-                    userdata[userName]["syllables"] += syllables
-                    userdata[userName]["total"] += 1
+            if (!userdata[userName])
+                userdata[userName] = {
+                    "syllables": 0,
+                    "total": 0,
+                    "average": 0
                 }
+
+            const syllables = this.calculateSyllables(rows[i]["message"])
+            if (syllables >= 1) {
+                userdata[userName]["syllables"] += syllables
+                userdata[userName]["total"] += 1
             }
+        }
 
-            const sorted = []
-            for (const user in userdata) {
-                // magical calculation
-                userdata[user]["average"] = Math.round(userdata[user]["syllables"] / userdata[user]["total"])
-                sorted.push([user, userdata[user]["average"]])
-            }
+        const sorted = []
+        for (const user in userdata) {
+            // magical calculation
+            userdata[user]["average"] = Math.round(userdata[user]["syllables"] / userdata[user]["total"])
+            sorted.push([user, userdata[user]["average"]])
+        }
 
-            sorted.sort((a, b) => {
-                return b[1] - a[1]
-            })
-
-            const pages = createPages(sorted, 10, (pageRows, pageNum, totalPages) => {
-                let result = ""
-                for (const row of pageRows)
-                    result += `${row[0]} has an average of ${row[1]} syllables per post \n`
-
-                return new discord.EmbedBuilder()
-                    .setColor(config.color_hex)
-                    .setTitle(`Top most intellectual posters in ${message.guild.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
-            })
-
-            sendPaginatedEmbed(message, pages)
+        sorted.sort((a, b) => {
+            return b[1] - a[1]
         })
+
+        const pages = await createPages(sorted, 10, (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows)
+                result += `\`${row[0]}\` has an average of ${row[1]} syllables per post \n`
+
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top most intellectual posters in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
+        })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     calculateSyllables(message) {

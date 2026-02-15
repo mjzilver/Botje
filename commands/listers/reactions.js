@@ -7,80 +7,80 @@ const { sendPaginatedEmbed, createPages } = require("../../systems/pagination")
 const { config } = require("../../systems/settings")
 
 module.exports = {
-    "name": "emotes",
-    "description": "shows top emotes in server",
-    "format": "emotes | emotes @user | emotes top",
+    "name": "reactions",
+    "description": "shows top reactions in server",
+    "format": "reactions | reactions @user | reactions top",
     "subcommands": [
-        { name: "top", description: "Show top 10 most used emotes" },
-        { name: "percent", description: "Show emote usage by person" },
-        { name: "user", description: "Show top emotes for a specific user", options: [
+        { name: "total", description: "Show total usage of reactions" },
+        { name: "top", description: "Show top 10 most used reactions" },
+        { name: "user", description: "Show top reactions by a specific user", options: [
             { type: "user", name: "user", description: "The user to check", required: true }
         ] }
     ],
     "function": message => {
-        new EmotesLister().process(message)
+        new ReactionsLister().process(message)
     }
 }
 
-class EmotesLister extends Lister {
+class ReactionsLister extends Lister {
     constructor() {
         super()
     }
 
     async total(message) {
-        const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-            FROM messages
-            WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
-            AND server_id = $1
-            GROUP BY LOWER(message)
+        const selectSQL = `SELECT r.emoji as emoji, COUNT(*) as count
+            FROM reactions r
+            JOIN messages m ON r.message_id = m.id
+            WHERE m.server_id = $1
+            GROUP BY r.emoji
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC 
+            ORDER BY COUNT(*) DESC
             LIMIT 10`
 
         const rows = await database.query(selectSQL, [message.guild.id])
         let result = ""
         for (let i = 0; i < rows.length; i++)
-            result += `${rows[i]["message"]} was used ${rows[i]["count"]} times! \n`
+            result += `${rows[i]["emoji"]} was used ${rows[i]["count"]} times! \n`
 
         const top = new discord.EmbedBuilder()
             .setColor(config.color_hex)
-            .setTitle(`Top 10 most used emotes in ${message.guild.name}`)
+            .setTitle(`Top 10 most used reactions in ${message.guild.name}`)
             .setDescription(result)
 
         bot.messageHandler.send(message, { embeds: [top] })
     }
 
     async mention(message, mentioned) {
-        const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-            FROM messages
-            WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
-            AND server_id = $1 AND user_id = $2
-            GROUP BY LOWER(message)
+        const selectSQL = `SELECT r.emoji as emoji, COUNT(*) as count
+            FROM reactions r
+            JOIN messages m ON r.message_id = m.id
+            WHERE m.server_id = $1 AND r.user_id = $2
+            GROUP BY r.emoji
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC 
+            ORDER BY COUNT(*) DESC
             LIMIT 10`
 
         const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
         let result = ""
         for (let i = 0; i < rows.length; i++)
-            result += `${rows[i]["message"]} said ${rows[i]["count"]} times! \n`
+            result += `${rows[i]["emoji"]} was used ${rows[i]["count"]} times! \n`
 
-        const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+        const username = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
 
         const top = new discord.EmbedBuilder()
             .setColor(config.color_hex)
-            .setTitle(`Top 10 most used emotes in ${message.guild.name} used by \`${userName}\``)
+            .setTitle(`Top 10 most used reactions in ${message.guild.name} used by \`${username}\``)
             .setDescription(result)
 
         bot.messageHandler.send(message, { embeds: [top] })
     }
 
     async perPerson(message) {
-        const selectSQL = `SELECT user_id, server_id, COUNT(*) as count
-            FROM messages
-            WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
-            AND server_id = $1
-            GROUP BY user_id, server_id
+        const selectSQL = `SELECT r.user_id, m.server_id, COUNT(*) as count
+            FROM reactions r
+            JOIN messages m ON r.message_id = m.id
+            WHERE m.server_id = $1
+            GROUP BY r.user_id, m.server_id
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC`
 
@@ -89,12 +89,12 @@ class EmotesLister extends Lister {
             let result = ""
             for (const row of pageRows) {
                 const userName = await bot.userHandler.getDisplayName(row["user_id"], row["server_id"])
-                result += `\`${userName}\` has posted ${row["count"]} emotes! \n`
+                result += `\`${userName}\` has reacted ${row["count"]} times! \n`
             }
 
             return new discord.EmbedBuilder()
                 .setColor(config.color_hex)
-                .setTitle(`Top 10 posters in ${message.guild.name}`)
+                .setTitle(`Top reactors in ${message.guild.name}`)
                 .setDescription(result)
                 .setFooter({ text: `Page ${pageNum}/${totalPages}` })
         })

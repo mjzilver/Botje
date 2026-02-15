@@ -23,7 +23,7 @@ module.exports = {
         if (!args[0]) {
             const emoteNames = files.map(f => f.replace(".png", ""))
 
-            const pages = createPages(emoteNames, 50, (pageEmotes, pageNum, totalPages) => {
+            const pages = await createPages(emoteNames, 50, (pageEmotes, pageNum, totalPages) => {
                 const result = pageEmotes.join(", ")
 
                 return new discord.EmbedBuilder()

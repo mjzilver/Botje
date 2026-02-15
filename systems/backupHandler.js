@@ -71,6 +71,7 @@ module.exports = class BackupHandler {
         })
     }
 
+    // TODO: use pg_dump
     async backupDatabase(destination = null) {
         return new Promise((resolve, reject) => {
             const timeStamp = Date.now()
@@ -91,22 +92,23 @@ module.exports = class BackupHandler {
 
             const selectSQL = "SELECT * FROM messages;"
 
-            database.query(selectSQL, [], rows => {
-                if (!rows || rows.length === 0) {
-                    writeStream.write("COMMIT;\n")
-                    return writeStream.end(() => {
-                        logger.console(`Database exported successfully to ${dbBackupPath}`)
-                        resolve(dbBackupPath)
-                    })
-                }
-
+            ;(async () => {
                 try {
+                    const rows = await database.query(selectSQL, [])
+
+                    if (!rows || rows.length === 0) {
+                        writeStream.write("COMMIT;\n")
+                        return writeStream.end(() => {
+                            logger.console(`Database exported successfully to ${dbBackupPath}`)
+                            resolve(dbBackupPath)
+                        })
+                    }
+
                     const values = rows.map(row =>
                         format(
                             "(%L, %L, %L, %L, %L, %L, %L)",
                             row.id,
                             row.user_id,
-                            row.user_name,
                             row.message,
                             row.channel_id,
                             row.server_id,
@@ -116,7 +118,7 @@ module.exports = class BackupHandler {
 
                     const insertStatement = `
                     INSERT INTO messages
-                    (id, user_id, user_name, message, channel_id, server_id, datetime)
+                    (id, user_id, message, channel_id, server_id, datetime)
                     VALUES
                     ${values}
                     ON CONFLICT (id) DO NOTHING;
@@ -132,7 +134,7 @@ module.exports = class BackupHandler {
                 } catch (err) {
                     reject(err)
                 }
-            })
+            })()
         })
     }
 }

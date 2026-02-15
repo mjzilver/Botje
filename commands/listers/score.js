@@ -27,8 +27,8 @@ class ScoreLister extends Lister {
         super()
     }
 
-    mention(message, mentioned) {
-        const selectSQL = `SELECT user_id, user_name, message
+    async mention(message, mentioned) {
+        const selectSQL = `SELECT user_id, message
             FROM messages 
             WHERE server_id = $1 AND user_id = $2 `
 
@@ -39,70 +39,69 @@ class ScoreLister extends Lister {
             "score": 0
         }
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
-            for (let i = 0; i < rows.length; i++) {
-                userdata["points"] += this.calculateScore(rows[i]["message"])
-                userdata["total"] += rows[i]["message"].length
-            }
+        const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
+        for (let i = 0; i < rows.length; i++) {
+            userdata["points"] += this.calculateScore(rows[i]["message"])
+            userdata["total"] += rows[i]["message"].length
+        }
 
-            userdata["quality"] = ((userdata["points"] / userdata["total"]) / 2)
-            userdata["score"] = Math.round(userdata["total"] * userdata["quality"])
+        userdata["quality"] = ((userdata["points"] / userdata["total"]) / 2)
+        userdata["score"] = Math.round(userdata["total"] * userdata["quality"])
 
-            bot.messageHandler.send(message, `${mentioned.username}'s post score is ${userdata["score"]}`)
-        })
+        const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+        bot.messageHandler.send(message, `\`${userName}\`'s post score is ${userdata["score"]}`)
     }
 
-    perPerson(message) {
-        const selectSQL = `SELECT user_id, user_name, message
+    async perPerson(message) {
+        const selectSQL = `SELECT user_id, message
             FROM messages 
             WHERE server_id = $1
             ORDER BY user_id`
 
         const userdata = {}
 
-        database.query(selectSQL, [message.guild.id], rows => {
-            for (let i = 0; i < rows.length; i++) {
-                const userName = rows[i]["user_name"]
+        const rows = await database.query(selectSQL, [message.guild.id])
+        for (let i = 0; i < rows.length; i++) {
+            const userName = await bot.userHandler.getDisplayName(rows[i]["user_id"], message.guild.id)
 
-                if (!userdata[userName])
-                    userdata[userName] = {
-                        "points": 0,
-                        "total": 0,
-                        "quality": 0,
-                        "score": 0
-                    }
+            if (!userdata[userName])
+                userdata[userName] = {
+                    "points": 0,
+                    "total": 0,
+                    "quality": 0,
+                    "score": 0
+                }
 
-                userdata[userName]["points"] += this.calculateScore(rows[i]["message"])
-                userdata[userName]["total"] += rows[i]["message"].length
-            }
+            userdata[userName]["points"] += this.calculateScore(rows[i]["message"])
+            userdata[userName]["total"] += rows[i]["message"].length
+        }
 
-            const sorted = []
-            for (const user in userdata) {
-                // magical calculation
-                userdata[user]["quality"] = (userdata[user]["points"] / userdata[user]["total"]) / 2
-                userdata[user]["score"] = Math.round(userdata[user]["total"] * userdata[user]["quality"])
+        const sorted = []
+        for (const user in userdata) {
+            // magical calculation
+            userdata[user]["quality"] = (userdata[user]["points"] / userdata[user]["total"]) / 2
+            userdata[user]["score"] = Math.round(userdata[user]["total"] * userdata[user]["quality"])
 
-                sorted.push([user, userdata[user]["score"]])
-            }
+            sorted.push([user, userdata[user]["score"]])
+        }
 
-            sorted.sort((a, b) => {
-                return b[1] - a[1]
-            })
-
-            const pages = createPages(sorted, 10, (pageRows, pageNum, totalPages) => {
-                let result = ""
-                for (const row of pageRows)
-                    result += `${row[0]}'s post score is ${row[1]} \n`
-
-                return new discord.EmbedBuilder()
-                    .setColor(config.color_hex)
-                    .setTitle(`Top posters by score in ${message.guild.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` })
-            })
-
-            sendPaginatedEmbed(message, pages)
+        sorted.sort((a, b) => {
+            return b[1] - a[1]
         })
+
+        const pages = await createPages(sorted, 10, (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows)
+                result += `\`${row[0]}\`'s post score is ${row[1]} \n`
+
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top posters by score in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
+        })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     calculateScore(message) {

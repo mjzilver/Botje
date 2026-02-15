@@ -26,11 +26,11 @@ class SaidLister extends Lister {
         super()
     }
 
-    total(message) {
-        this.perPerson(message)
+    async total(message) {
+        await this.perPerson(message)
     }
 
-    perPerson(message) {
+    async perPerson(message) {
         const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
             FROM messages
             WHERE message NOT LIKE '%<%' AND server_id = $1
@@ -39,24 +39,23 @@ class SaidLister extends Lister {
             ORDER BY COUNT(*) DESC 
             LIMIT 10`
 
-        database.query(selectSQL, [message.guild.id], rows => {
-            let result = ""
-            for (let i = 0;
-                (i < rows.length && i <= 10); i++)
-                result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
+        const rows = await database.query(selectSQL, [message.guild.id])
+        let result = ""
+        for (let i = 0;
+            (i < rows.length && i <= 10); i++)
+            result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
 
-            const top = new discord.EmbedBuilder()
-                .setColor(config.color_hex)
-                .setTitle(`Top 10 most used phrases in ${message.guild.name}`)
-                .setDescription(result)
+        const top = new discord.EmbedBuilder()
+            .setColor(config.color_hex)
+            .setTitle(`Top 10 most used phrases in ${message.guild.name}`)
+            .setDescription(result)
 
-            bot.messageHandler.send(message, {
-                embeds: [top]
-            })
+        bot.messageHandler.send(message, {
+            embeds: [top]
         })
     }
 
-    mention(message, mentioned) {
+    async mention(message, mentioned) {
         const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
             FROM messages
             WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%' 
@@ -66,20 +65,20 @@ class SaidLister extends Lister {
             ORDER BY COUNT(*) DESC 
             LIMIT 10`
 
-        database.query(selectSQL, [message.guild.id, mentioned.id], rows => {
-            let result = ""
-            for (let i = 0;
-                (i < rows.length && i <= 10); i++)
-                result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
+        const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
+        let result = ""
+        for (let i = 0;
+            (i < rows.length && i <= 10); i++)
+            result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
 
-            const top = new discord.EmbedBuilder()
-                .setColor(config.color_hex)
-                .setTitle(`Top 10 most used phrases in ${message.guild.name} by ${mentioned.username}`)
-                .setDescription(result)
+        const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+        const top = new discord.EmbedBuilder()
+            .setColor(config.color_hex)
+            .setTitle(`Top 10 most used phrases in ${message.guild.name} by \`${userName}\``)
+            .setDescription(result)
 
-            bot.messageHandler.send(message, {
-                embeds: [top]
-            })
+        bot.messageHandler.send(message, {
+            embeds: [top]
         })
     }
 }
