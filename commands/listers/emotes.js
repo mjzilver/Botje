@@ -34,20 +34,26 @@ class EmotesLister extends Lister {
             AND server_id = $1
             GROUP BY LOWER(message)
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC 
-            LIMIT 10`
+            ORDER BY COUNT(*) DESC
+            LIMIT 100`
 
         const rows = await database.query(selectSQL, [message.guild.id])
-        let result = ""
-        for (let i = 0; i < rows.length; i++)
-            result += `${rows[i]["message"]} was used ${rows[i]["count"]} times! \n`
+        if (!rows || rows.length === 0)
+            return bot.messageHandler.send(message, `No emotes found in ${message.guild.name}`)
 
-        const top = new discord.EmbedBuilder()
-            .setColor(config.color_hex)
-            .setTitle(`Top 10 most used emotes in ${message.guild.name}`)
-            .setDescription(result)
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows)
+                result += `${row["message"]} was used ${row["count"]} times! \n`
 
-        bot.messageHandler.send(message, { embeds: [top] })
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top emotes in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
+        })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     async mention(message, mentioned) {
@@ -57,22 +63,30 @@ class EmotesLister extends Lister {
             AND server_id = $1 AND user_id = $2
             GROUP BY LOWER(message)
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC 
-            LIMIT 10`
+            ORDER BY COUNT(*) DESC
+            LIMIT 1000`
 
         const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
-        let result = ""
-        for (let i = 0; i < rows.length; i++)
-            result += `${rows[i]["message"]} said ${rows[i]["count"]} times! \n`
+        if (!rows || rows.length === 0) {
+            const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+            return bot.messageHandler.send(message, `No emotes found for ${userName}`)
+        }
 
         const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
 
-        const top = new discord.EmbedBuilder()
-            .setColor(config.color_hex)
-            .setTitle(`Top 10 most used emotes in ${message.guild.name} used by \`${userName}\``)
-            .setDescription(result)
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows)
+                result += `${row["message"]} said ${row["count"]} times! \n`
 
-        bot.messageHandler.send(message, { embeds: [top] })
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Emotes used by ${userName} in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
+        })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     async perPerson(message) {

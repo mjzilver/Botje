@@ -4,6 +4,7 @@ const Lister = require("./lister.js")
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
 const { config } = require("../../systems/settings")
+const { sendPaginatedEmbed, createPages } = require("../../systems/pagination")
 
 module.exports = {
     "name": "said",
@@ -27,7 +28,7 @@ class SaidLister extends Lister {
     }
 
     async total(message) {
-        await this.perPerson(message)
+        return this.perPerson(message)
     }
 
     async perPerson(message) {
@@ -36,23 +37,26 @@ class SaidLister extends Lister {
             WHERE message NOT LIKE '%<%' AND server_id = $1
             GROUP BY LOWER(message)
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC 
-            LIMIT 10`
+            ORDER BY COUNT(*) DESC
+            LIMIT 100`
 
         const rows = await database.query(selectSQL, [message.guild.id])
-        let result = ""
-        for (let i = 0;
-            (i < rows.length && i <= 10); i++)
-            result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`
+        if (!rows || rows.length === 0)
+            return bot.messageHandler.send(message, `No repeated phrases found in ${message.guild.name}`)
 
-        const top = new discord.EmbedBuilder()
-            .setColor(config.color_hex)
-            .setTitle(`Top 10 most used phrases in ${message.guild.name}`)
-            .setDescription(result)
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows)
+                result += `${row["message"]} was said ${row["count"]} times \n`
 
-        bot.messageHandler.send(message, {
-            embeds: [top]
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top most used phrases in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
         })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     async mention(message, mentioned) {

@@ -20,10 +20,12 @@ module.exports = class MessageHandler {
 
         let promise
 
-        if (call.isSlashCommand && call.interaction)
-            promise = call.interaction.replied
+        if (call.isSlashCommand && call.interaction) {
+            const alreadyDeferredOrReplied = call.interaction.deferred || call.interaction.replied
+            promise = alreadyDeferredOrReplied
                 ? call.interaction.followUp(content)
                 : call.interaction.reply(content)
+        }
         else
             promise = useReply ? call.reply(content).catch(err => {
                 logger.error("Failed to reply to message (likely deleted):", err.message)

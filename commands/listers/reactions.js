@@ -34,20 +34,25 @@ class ReactionsLister extends Lister {
             WHERE m.server_id = $1
             GROUP BY r.emoji
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC
-            LIMIT 10`
+            ORDER BY COUNT(*) DESC`
 
         const rows = await database.query(selectSQL, [message.guild.id])
-        let result = ""
-        for (let i = 0; i < rows.length; i++)
-            result += `${rows[i]["emoji"]} was used ${rows[i]["count"]} times! \n`
+        if (!rows || rows.length === 0)
+            return bot.messageHandler.send(message, `No reactions found in ${message.guild.name}`)
 
-        const top = new discord.EmbedBuilder()
-            .setColor(config.color_hex)
-            .setTitle(`Top 10 most used reactions in ${message.guild.name}`)
-            .setDescription(result)
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows)
+                result += `${row["emoji"]} was used ${row["count"]} times! \n`
 
-        bot.messageHandler.send(message, { embeds: [top] })
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top reactions in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
+        })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     async mention(message, mentioned) {
@@ -57,22 +62,29 @@ class ReactionsLister extends Lister {
             WHERE m.server_id = $1 AND r.user_id = $2
             GROUP BY r.emoji
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC
-            LIMIT 10`
+            ORDER BY COUNT(*) DESC`
 
         const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
-        let result = ""
-        for (let i = 0; i < rows.length; i++)
-            result += `${rows[i]["emoji"]} was used ${rows[i]["count"]} times! \n`
+        if (!rows || rows.length === 0) {
+            const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+            return bot.messageHandler.send(message, `No reactions found for ${userName}`)
+        }
 
-        const username = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+        const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
 
-        const top = new discord.EmbedBuilder()
-            .setColor(config.color_hex)
-            .setTitle(`Top 10 most used reactions in ${message.guild.name} used by \`${username}\``)
-            .setDescription(result)
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows)
+                result += `${row["emoji"]} was used ${row["count"]} times! \n`
 
-        bot.messageHandler.send(message, { embeds: [top] })
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Reactions used by ${userName} in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
+        })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     async perPerson(message) {

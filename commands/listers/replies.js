@@ -34,23 +34,28 @@ class RepliesLister extends Lister {
             WHERE m.server_id = $1
             GROUP BY m.user_id, t.user_id
             HAVING COUNT(*) > 0
-            ORDER BY COUNT(*) DESC
-            LIMIT 25`
+            ORDER BY COUNT(*) DESC`
 
         const rows = await database.query(selectSQL, [message.guild.id])
-        let result = ""
-        for (const row of rows) {
-            const fromName = await bot.userHandler.getDisplayName(row["from_user"], message.guild.id)
-            const toName = await bot.userHandler.getDisplayName(row["to_user"], message.guild.id)
-            result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`
-        }
+        if (!rows || rows.length === 0)
+            return bot.messageHandler.send(message, `No reply relationships found in ${message.guild.name}`)
 
-        const embed = new discord.EmbedBuilder()
-            .setColor(config.color_hex)
-            .setTitle(`Top reply relationships in ${message.guild.name}`)
-            .setDescription(result)
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows) {
+                const fromName = await bot.userHandler.getDisplayName(row["from_user"], message.guild.id)
+                const toName = await bot.userHandler.getDisplayName(row["to_user"], message.guild.id)
+                result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`
+            }
 
-        bot.messageHandler.send(message, { embeds: [embed] })
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Top reply relationships in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
+        })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     async mention(message, mentioned) {
@@ -64,19 +69,28 @@ class RepliesLister extends Lister {
             LIMIT 10`
 
         const rows = await database.query(selectSQL, [message.guild.id, mentioned.id])
-        let result = ""
-        const fromName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
-        for (const row of rows) {
-            const toName = await bot.userHandler.getDisplayName(row["to_user"], message.guild.id)
-            result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`
+        if (!rows || rows.length === 0) {
+            const fromName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
+            return bot.messageHandler.send(message, `No replies found for ${fromName}`)
         }
 
-        const embed = new discord.EmbedBuilder()
-            .setColor(config.color_hex)
-            .setTitle(`Who ${fromName} replies to most in ${message.guild.name}`)
-            .setDescription(result)
+        const fromName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
 
-        bot.messageHandler.send(message, { embeds: [embed] })
+        const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = ""
+            for (const row of pageRows) {
+                const toName = await bot.userHandler.getDisplayName(row["to_user"], message.guild.id)
+                result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`
+            }
+
+            return new discord.EmbedBuilder()
+                .setColor(config.color_hex)
+                .setTitle(`Who ${fromName} replies to most in ${message.guild.name}`)
+                .setDescription(result)
+                .setFooter({ text: `Page ${pageNum}/${totalPages}` })
+        })
+
+        sendPaginatedEmbed(message, pages)
     }
 
     async perPerson(message) {

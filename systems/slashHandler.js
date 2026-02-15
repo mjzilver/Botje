@@ -165,10 +165,20 @@ module.exports = class Slashhandler {
     async handleInteraction(interaction) {
         if (!interaction.isChatInputCommand()) return
 
+        logger.debug(`Received interaction: ${interaction.commandName} from ${interaction.user.tag} (${interaction.user.id})`)
+
         const commandDef = this.slashCommands.find(c => c.name === interaction.commandName)
 
         if (!commandDef)
             return interaction.reply({ content: "Unknown command", ephemeral: true })
+
+        // Defer reply for long-running commands
+        try {
+            if (!interaction.deferred && !interaction.replied)
+                await interaction.deferReply()
+        } catch (err) {
+            logger.debug(`Failed to defer interaction: ${err.message}`)
+        }
 
         const pseudoMessage = this.interactionToMessage(interaction, commandDef.command.name)
         await commandDef.command.function(pseudoMessage)
