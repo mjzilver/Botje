@@ -3,8 +3,8 @@ const discord = require("discord.js")
 const Lister = require("./lister.js")
 const bot = require("../../systems/bot")
 const database = require("../../systems/database")
-const { config } = require("../../systems/settings")
 const { sendPaginatedEmbed, createPages } = require("../../systems/pagination")
+const { config } = require("../../systems/settings")
 
 module.exports = {
     "name": "said",

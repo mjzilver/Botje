@@ -1,13 +1,11 @@
+const { spawn } = require("child_process")
 const fs = require("fs")
 const path = require("path")
 const { pipeline } = require("stream/promises")
 
 const axios = require("axios")
-const format = require("pg-format")
 
-const database = require("./database")
 const logger = require("./logger")
-const { spawn } = require("child_process")
 const { config } = require("./settings")
 
 module.exports = class BackupHandler {
@@ -86,27 +84,26 @@ module.exports = class BackupHandler {
 
             const dbBackupPath = path.join(basePath, `backup-${timeStamp}.sql`)
             const writeStream = fs.createWriteStream(dbBackupPath, { flags: "w" })
-            writeStream.on("error", (err) => reject(err))
+            writeStream.on("error", err => reject(err))
 
             const connStr = `postgresql://${encodeURIComponent(config.db.user)}:${encodeURIComponent(config.db.password)}@${config.db.host}:${config.db.port}/${encodeURIComponent(config.db.database)}`
 
             const dump = spawn("pg_dump", ["--format=p", "--no-owner", "--no-acl", connStr])
 
-            dump.on("error", (err) => {
+            dump.on("error", err => {
                 writeStream.destroy()
                 reject(err)
             })
 
-            dump.stderr.on("data", (chunk) => {
+            dump.stderr.on("data", chunk => {
                 logger.error(`pg_dump stderr: ${chunk.toString()}`)
             })
 
             dump.stdout.pipe(writeStream)
 
-            dump.on("close", (code) => {
-                if (code !== 0) {
+            dump.on("close", code => {
+                if (code !== 0)
                     return reject(new Error(`pg_dump exited with code ${code}`))
-                }
 
                 writeStream.end(() => {
                     logger.console(`Database exported successfully to ${dbBackupPath}`)

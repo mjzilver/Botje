@@ -25,12 +25,12 @@ module.exports = class MessageHandler {
             promise = alreadyDeferredOrReplied
                 ? call.interaction.followUp(content)
                 : call.interaction.reply(content)
-        }
-        else
+        } else {
             promise = useReply ? call.reply(content).catch(err => {
                 logger.error("Failed to reply to message (likely deleted):", err.message)
                 throw err
             }) : call.channel.send(content)
+        }
 
         promise.then(reply => {
             this.addCommandCall(call, reply)
