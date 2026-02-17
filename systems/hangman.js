@@ -4,6 +4,7 @@ const bot = require("./bot")
 const logger = require("./logger")
 const { config } = require("./settings")
 const { pickRandomItem } = require("./utils")
+const { textOnly, replaceAt } = require("./stringHelpers")
 
 class hangman {
     constructor() {
@@ -48,7 +49,7 @@ class hangman {
 
         while (this.word === "") {
             chosenword = pickRandomItem(words)
-            chosenword[0] = chosenword[0].textOnly()
+            chosenword[0] = textOnly(chosenword[0])
             chosenword[0] = chosenword[0].replace(bot.dictionary.getNonSelectorsRegex(), "").trim()
             if (chosenword[1] > 10 && chosenword[0].length >= 5 && chosenword[0].length <= 20 && chosenword[0].match(/[a-z]+/i))
                 this.word = chosenword[0]
@@ -86,7 +87,7 @@ class hangman {
                     if (this.word.includes(geussedContent)) {
                         for (let i = 0; i < this.word.length; i++)
                             if (this.word[i] === geussedContent)
-                                this.visibleWord = this.visibleWord.replaceAt(i, geussedContent)
+                                this.visibleWord = replaceAt(this.visibleWord, i, geussedContent)
 
                         content = `Good guess! The word contains ${geussedContent}`
                     } else {

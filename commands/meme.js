@@ -4,6 +4,7 @@ const Jimp = require("jimp")
 
 const bot = require("../systems/bot")
 const database = require("../systems/database")
+const { replaceFancyQuotes } = require("../systems/stringHelpers")
 
 module.exports = {
     "name": "meme",
@@ -67,8 +68,8 @@ async function processPicture(url, top, bottom, message) {
         const chosenFile = files[Math.floor(Math.random() * files.length)]
         url = `${path}/${chosenFile}`
     }
-    top = top ? top.toUpperCase().trim().replaceFancyQuotes() : ""
-    bottom = bottom ? bottom.toUpperCase().trim().replaceFancyQuotes() : ""
+    top = top ? replaceFancyQuotes(top.toUpperCase().trim()) : ""
+    bottom = bottom ? replaceFancyQuotes(bottom.toUpperCase().trim()) : ""
 
     Jimp.read(url, (_, image) => {
         Jimp.loadFont("assets/font.fnt").then(font => {

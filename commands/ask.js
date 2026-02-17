@@ -5,7 +5,8 @@ const { config } = require("../systems/settings")
 
 async function buildChain(message) {
     const username = message.author.bot ? "bot" : "user"
-    let chain = `${username}: ${message.content.removeCommand()}`
+    const { removeCommand } = require("../systems/stringHelpers")
+    let chain = `${username}: ${removeCommand(message.content)}`
 
     if (message.reference && message.reference.messageId)
         try {
@@ -40,7 +41,8 @@ module.exports = {
             userQuestion = await buildChain(message)
             promptTemplate = config.llm.conversation_prompt
         } else {
-            userQuestion = message.content.removeCommand()
+            const { removeCommand } = require("../systems/stringHelpers")
+            userQuestion = removeCommand(message.content)
             promptTemplate = config.llm.base_prompt
         }
 

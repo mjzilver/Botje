@@ -4,6 +4,7 @@ const discord = require("discord.js")
 const bot = require("../systems/bot")
 const logger = require("../systems/logger")
 const { config } = require("../systems/settings")
+const { capitalize } = require("../systems/stringHelpers")
 
 module.exports = {
     "name": "weather",
@@ -39,7 +40,7 @@ module.exports = {
                     .setTitle(`Weather in ${result.name} ${result.sys.country}`)
                     .setThumbnail(`https://openweathermap.org/img/wn/${result.weather[0].icon}@2x.png`)
                     .addFields(
-                        { name: "Current Weather", value: result.weather[0].description.capitalize() },
+                        { name: "Current Weather", value: capitalize(result.weather[0].description) },
                         { name: "Temperature", value: `${result.main.temp}°C`, inline: true },
                         { name: "Feels like", value: `${result.main.feels_like}°C`, inline: true },
                         { name: "Humidity", value: `${result.main.humidity}%`, inline: true },
@@ -52,7 +53,7 @@ module.exports = {
 
                 bot.messageHandler.send(message, { embeds: [weatherEmbed] })
             } else {
-                bot.messageHandler.send(message, result.message.capitalize())
+                bot.messageHandler.send(message, capitalize(result.message))
                 logger.warn(`Weather error on ${city}`)
             }
         } catch (err) {

@@ -74,7 +74,8 @@ module.exports = class Dictionary {
 
         for (const i in this.words) {
             let processedWord = this.words[i][0]
-            processedWord = processedWord.textOnly()
+            const { textOnly } = require("./stringHelpers")
+            processedWord = textOnly(processedWord)
             if (processedWord.length === length && this.words[i][1] > 20)
                 result.push(processedWord)
         }

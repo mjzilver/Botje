@@ -7,6 +7,7 @@ const axios = require("axios")
 
 const logger = require("./logger")
 const { config } = require("./settings")
+const { sanitizeFilename } = require("./stringHelpers")
 
 module.exports = class BackupHandler {
     constructor(bot) {
@@ -35,7 +36,7 @@ module.exports = class BackupHandler {
                 ? destination
                 : path.join("backups", "emotes")
 
-            const guildPath = path.join(basePath, guildName.sanitizeFilename())
+            const guildPath = path.join(basePath, sanitizeFilename(guildName))
             const emojiLink = `https://cdn.discordapp.com/emojis/${emoji.id}.png`
             const emojiPath = path.join(
                 guildPath,

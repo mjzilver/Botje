@@ -4,9 +4,11 @@ const bot = require("../systems/bot")
 const database = require("../systems/database")
 const logger = require("../systems/logger")
 const { config } = require("../systems/settings")
+const { isLink, isImage } = require("../systems/stringHelpers")
 
+// This is required by reddit
 const botHeader = {
-    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1" // This is required by reddit
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
 }
 
 const axiosInstance = axios.create({
@@ -76,7 +78,7 @@ async function handleRedditImages(message, sub, children) {
         const filteredImages = []
 
         for (let i = 0; i < children.length; i++)
-            if (!(children[i].data.url in foundImages) && children[i].data.url.isLink())
+            if (!(children[i].data.url in foundImages) && isLink(children[i].data.url))
                 filteredImages.push(children[i])
 
         if (filteredImages.length > 0) {
@@ -104,7 +106,7 @@ async function handleRedditImages(message, sub, children) {
 }
 
 function embedImage(message, post, sub) {
-    if (post.url.isImage()) {
+    if (isImage(post.url)) {
         const image = {
             color: parseInt(config.color_hex.replace("#", ""), 16),
             title: post.title,

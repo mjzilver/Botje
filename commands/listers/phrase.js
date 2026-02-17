@@ -5,6 +5,7 @@ const bot = require("../../systems/bot")
 const database = require("../../systems/database")
 const { sendPaginatedEmbed, createPages } = require("../../systems/pagination")
 const { config } = require("../../systems/settings")
+const { removeQuotes } = require("../../systems/stringHelpers")
 
 module.exports = {
     "name": "phrase",
@@ -39,7 +40,7 @@ class PhraseLister extends Lister {
     process(message) {
         const { mention, leaderboard, percent, args } = this.parseArgs(message, { preserveQuotes: true })
 
-        const word = args[0]?.removeQuotes().toLowerCase()
+        const word = args[0] ? removeQuotes(args[0]).toLowerCase() : undefined
 
         if (!word)
             return bot.messageHandler.send(message, phraseHelperMessage)

@@ -8,6 +8,7 @@ const bot = require("../systems/bot")
 const llm = require("../systems/llm")
 const logger = require("../systems/logger")
 const { config } = require("../systems/settings")
+const { removeCommand } = require("../systems/stringHelpers")
 
 function guessFilename(card) {
     if (card.type === "major") {
@@ -47,7 +48,7 @@ module.exports = {
 
         const attachment = new discord.AttachmentBuilder(buffer, { name: `${card.name_short}.png` })
 
-        const userQuestion = message.content.removeCommand().trim()
+        const userQuestion = removeCommand(message.content).trim()
         const meaning = isReversed ? card.meaning_rev : card.meaning_up
 
         const tarotEmbed = new discord.EmbedBuilder()

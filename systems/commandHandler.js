@@ -2,6 +2,7 @@ const { PermissionFlagsBits } = require("discord.js")
 
 const logger = require("./logger")
 const { config } = require("./settings")
+const { removePrefix, normalizeSpaces, capitalize } = require("./stringHelpers")
 const LimitedList = require("./types/limitedList")
 const { randomBetween } = require("./utils")
 
@@ -38,7 +39,7 @@ module.exports = class CommandHandler {
     }
 
     parseMessageArguments(message) {
-        const args = message.content.removePrefix().normalizeSpaces().split(" ")
+        const args = normalizeSpaces(removePrefix(message.content)).split(" ")
         const command = args.shift().toLowerCase()
         return { command, args }
     }
@@ -49,7 +50,7 @@ module.exports = class CommandHandler {
         else if (command in this.admincommands)
             this.handleAdminCommand(command, message)
         else if (!readback)
-            this.bot.messageHandler.reply(message, `${command.capitalize()} is not a command, please try again.`)
+            this.bot.messageHandler.reply(message, `${capitalize(command)} is not a command, please try again.`)
         else
             this.bot.messageHandler.markComplete(message)
     }
@@ -58,7 +59,7 @@ module.exports = class CommandHandler {
         if (message.author.id === config.owner || message.member.permissions.has(PermissionFlagsBits.Administrator))
             this.admincommands[command](message)
         else
-            this.bot.messageHandler.reply(message, `${command.capitalize()} is an admin command, and you are not allowed to use it.`)
+            this.bot.messageHandler.reply(message, `${capitalize(command)} is an admin command, and you are not allowed to use it.`)
     }
 
     handleNonCommandMessage(message) {
@@ -83,7 +84,7 @@ module.exports = class CommandHandler {
     redo(message) {
         message.channel.messages.fetch(this.bot.messageHandler.findFromReply(message))
             .then(callMessage => {
-                const args = callMessage.content.removePrefix().normalizeSpaces().split(" ")
+                const args = normalizeSpaces(removePrefix(callMessage.content)).split(" ")
                 const command = args.shift().toLowerCase()
 
                 logger.debug(`Redoing this command === '${callMessage.author.username}' issued '${command}'${args.length >= 1 ? ` with arguments '${args}'` : ""} in channel '${message.channel.name}' in server '${message.channel.guild.name}'`)

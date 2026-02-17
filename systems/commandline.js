@@ -21,8 +21,11 @@ class commandLine {
 
         if (command in this.commands)
             this.commands[command].function(args)
-        else if (command.textOnly() !== "")
-            logger.console(`${command} is not a command`)
+        else {
+            const { textOnly } = require("./stringHelpers")
+            if (textOnly(command) !== "")
+                logger.console(`${command} is not a command`)
+        }
     }
 }
 

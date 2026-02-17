@@ -2,6 +2,7 @@ const bot = require("../systems/bot")
 const database = require("../systems/database")
 const logger = require("../systems/logger")
 const { randomBetween, levenshtein, pickRandomItem } = require("../systems/utils")
+const { textOnly, removePrefix, normalizeSpaces } = require("../systems/stringHelpers")
 
 module.exports = {
     "name": "speak",
@@ -11,7 +12,7 @@ module.exports = {
         { type: "string", name: "sentence", description: "The sentence to base the response on", required: false }
     ],
     "function": async function speak(message) {
-        const matches = message.content.textOnly().match(/(?:think of|about) +(.+)/i)
+        const matches = textOnly(message.content).match(/(?:think of|about) +(.+)/i)
 
         if (matches && matches[1] !== "")
             await findTopic(message, matches[1])
@@ -24,12 +25,11 @@ async function findByWord(message) {
     const earliest = new Date()
     earliest.setMonth(earliest.getMonth() - 5)
 
-    const words = message.content.removePrefix()
+    let _words = removePrefix(message.content)
         .replace(new RegExp(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http(.*)|speak)\b/gi), "")
-        .textOnly()
-        .replace(bot.dictionary.getNonSelectorsRegex(), "")
-        .trim()
-        .split(" ")
+    _words = textOnly(_words)
+    _words = _words.replace(bot.dictionary.getNonSelectorsRegex(), "").trim()
+    const words = _words.split(" ")
 
     if (words && words.length >= 1 && words[0]) {
         if (words.length > 1)
@@ -83,7 +83,7 @@ async function findByWord(message) {
             const rows = await database.queryRandomMessage(selectSQL, [])
             if (rows) {
                 logger.debug(`Sending message with '${words[0]}' in it`)
-                bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
+                bot.messageHandler.send(message, normalizeSpaces(rows[0]["message"]))
             }
         }
     } else {
@@ -104,7 +104,7 @@ async function findRandom(message) {
 
     const rows = await database.queryRandomMessage(selectSQL, [])
     if (rows)
-        bot.messageHandler.send(message, rows[0]["message"].normalizeSpaces())
+                bot.messageHandler.send(message, normalizeSpaces(rows[0]["message"]))
 }
 
 async function findTopic(message, topic) {
@@ -147,9 +147,9 @@ async function findTopic(message, topic) {
     const picker = randomBetween(0, 2)
 
     if (picker === 0)
-        bot.messageHandler.reply(message, `${first}`.normalizeSpaces())
+        bot.messageHandler.reply(message, normalizeSpaces(`${first}`))
     else if (picker === 1)
-        bot.messageHandler.reply(message, `${first} ${pickRandomItem(linkerwords)} ${second}`.normalizeSpaces())
+        bot.messageHandler.reply(message, normalizeSpaces(`${first} ${pickRandomItem(linkerwords)} ${second}`))
     else
-        bot.messageHandler.reply(message, `${first}, ${second} ${pickRandomItem(linkerwords)} ${third}`.normalizeSpaces())
+        bot.messageHandler.reply(message, normalizeSpaces(`${first}, ${second} ${pickRandomItem(linkerwords)} ${third}`))
 }

@@ -1,6 +1,7 @@
 const bot = require("../systems/bot")
 const database = require("../systems/database")
 const { randomBetween } = require("../systems/utils")
+const { capitalize } = require("../systems/stringHelpers")
 
 module.exports = {
     "name": "talk",
@@ -53,7 +54,7 @@ module.exports = {
                     previousWord = currentWord
                 }
 
-            bot.messageHandler.send(message, sentence.capitalize())
+            bot.messageHandler.send(message, capitalize(sentence))
         }
     }
 }

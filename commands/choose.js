@@ -1,5 +1,6 @@
 const bot = require("../systems/bot")
 const { pickRandomItem } = require("../systems/utils")
+const { removePrefix } = require("../systems/stringHelpers")
 
 module.exports = {
     "name": "choose",
@@ -9,7 +10,7 @@ module.exports = {
         { type: "string", name: "choices", description: "Options separated by | (e.g., pizza | pasta | salad)", required: true }
     ],
     "function": async function choose(message) {
-        const filtered = message.content.removePrefix().replace(/choose /g, "")
+        const filtered = removePrefix(message.content).replace(/choose /g, "")
         const items = filtered.split("|")
 
         const presets = ["You should", "You ought to", "I pick", "I tell you", "An Angel told me in a dream that", "The tarot card reads"]
