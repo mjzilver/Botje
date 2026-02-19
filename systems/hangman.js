@@ -3,8 +3,8 @@ const discord = require("discord.js")
 const bot = require("./bot")
 const logger = require("./logger")
 const { config } = require("./settings")
-const { pickRandomItem } = require("./utils")
 const { textOnly, replaceAt } = require("./stringHelpers")
+const { pickRandomItem } = require("./utils")
 
 class hangman {
     constructor() {

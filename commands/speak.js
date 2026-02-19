@@ -1,8 +1,8 @@
 const bot = require("../systems/bot")
 const database = require("../systems/database")
 const logger = require("../systems/logger")
-const { randomBetween, levenshtein, pickRandomItem } = require("../systems/utils")
 const { textOnly, removePrefix, normalizeSpaces } = require("../systems/stringHelpers")
+const { randomBetween, levenshtein, pickRandomItem } = require("../systems/utils")
 
 module.exports = {
     "name": "speak",
@@ -104,7 +104,7 @@ async function findRandom(message) {
 
     const rows = await database.queryRandomMessage(selectSQL, [])
     if (rows)
-                bot.messageHandler.send(message, normalizeSpaces(rows[0]["message"]))
+        bot.messageHandler.send(message, normalizeSpaces(rows[0]["message"]))
 }
 
 async function findTopic(message, topic) {

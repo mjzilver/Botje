@@ -1,6 +1,6 @@
 const bot = require("../systems/bot")
-const { pickRandomItem } = require("../systems/utils")
 const { removePrefix } = require("../systems/stringHelpers")
+const { pickRandomItem } = require("../systems/utils")
 
 module.exports = {
     "name": "choose",

@@ -1,10 +1,9 @@
 const projectPackage = require("../package.json")
 const logger = require("./logger")
 
-
 class Webhook {
     constructor(bot) {
-        this.bot = bot;
+        this.bot = bot
     }
 
     async fetch(channel) {
@@ -21,7 +20,6 @@ class Webhook {
         }
         return null
     }
-
 
     async sendMessage(channelid, text, userid) {
         const channel = this.bot.client.channels.cache.get(channelid)
@@ -45,4 +43,4 @@ class Webhook {
     }
 }
 
-module.exports = Webhook;
+module.exports = Webhook

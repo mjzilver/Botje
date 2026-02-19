@@ -1,7 +1,7 @@
 const bot = require("../systems/bot")
 const database = require("../systems/database")
-const { randomBetween } = require("../systems/utils")
 const { capitalize } = require("../systems/stringHelpers")
+const { randomBetween } = require("../systems/utils")
 
 module.exports = {
     "name": "talk",

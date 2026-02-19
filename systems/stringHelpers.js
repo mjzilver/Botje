@@ -21,7 +21,7 @@ function textOnly(str) {
 }
 
 function removeQuotes(str) {
-    return str.replace(new RegExp(/\"/gi, "gi"), "")
+    return str.replace(new RegExp(/"/gi, "gi"), "")
 }
 
 function removePrefix(str) {
@@ -37,7 +37,7 @@ function removeCommands(str) {
 }
 
 function replaceFancyQuotes(str) {
-    return str.replace(/[“”„]/g, '"')
+    return str.replace(/[“”„]/g, "\"")
         .replace(/[‘’‚‛]/g, "'")
 }
 

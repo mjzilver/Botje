@@ -1,11 +1,10 @@
 
 const Webhook = require("./webhook")
 
-
 module.exports = class EmoteInjector {
     constructor(bot) {
-        this.bot = bot;
-        this.webhook = new Webhook(bot);
+        this.bot = bot
+        this.webhook = new Webhook(bot)
     }
 
     async handleMessage(message) {
@@ -38,9 +37,9 @@ module.exports = class EmoteInjector {
         }
 
         if (hasCorrections) {
-            const success = await this.webhook.sendMessage(message.channel.id, correctedMessage, message.author.id);
+            const success = await this.webhook.sendMessage(message.channel.id, correctedMessage, message.author.id)
             if (success)
-                this.bot.messageHandler.delete(message);
+                this.bot.messageHandler.delete(message)
         }
     }
 }

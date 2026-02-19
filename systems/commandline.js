@@ -19,9 +19,9 @@ class commandLine {
         const args = input.split(" ")
         const command = args.shift().toLowerCase()
 
-        if (command in this.commands)
+        if (command in this.commands) {
             this.commands[command].function(args)
-        else {
+        } else {
             const { textOnly } = require("./stringHelpers")
             if (textOnly(command) !== "")
                 logger.console(`${command} is not a command`)
