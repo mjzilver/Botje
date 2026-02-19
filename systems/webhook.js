@@ -1,9 +1,11 @@
 const projectPackage = require("../package.json")
-const bot = require("./bot")
 const logger = require("./logger")
 
+
 class Webhook {
-    constructor() { }
+    constructor(bot) {
+        this.bot = bot;
+    }
 
     async fetch(channel) {
         if (channel && channel.isTextBased() && channel.guild) {
@@ -20,8 +22,9 @@ class Webhook {
         return null
     }
 
+
     async sendMessage(channelid, text, userid) {
-        const channel = bot.client.channels.cache.get(channelid)
+        const channel = this.bot.client.channels.cache.get(channelid)
         if (!channel) return false
 
         try {
@@ -42,4 +45,4 @@ class Webhook {
     }
 }
 
-module.exports = new Webhook()
+module.exports = Webhook;
