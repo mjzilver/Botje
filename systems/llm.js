@@ -12,7 +12,7 @@ function acquireSlot() {
             activeRequests++
             resolve()
         } else {
-            logger.debug(`LLM request queued. Queue length: ${requestQueue.length + 1}`)
+            logger.debug(`LLM request queued. Requests ahead in the queue: ${requestQueue.length}`)
             requestQueue.push(resolve)
         }
     })
