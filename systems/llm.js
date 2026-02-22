@@ -1,7 +1,36 @@
 const logger = require("./logger")
 const { config } = require("./settings")
 
+const MAX_CONCURRENT_REQUESTS = config.llm.max_concurrent_requests
+
+let activeRequests = 0
+const requestQueue = []
+
+function acquireSlot() {
+    return new Promise(resolve => {
+        if (activeRequests < MAX_CONCURRENT_REQUESTS) {
+            activeRequests++
+            resolve()
+        } else {
+            logger.debug(`LLM request queued. Queue length: ${requestQueue.length + 1}`)
+            requestQueue.push(resolve)
+        }
+    })
+}
+
+function releaseSlot() {
+    activeRequests--
+
+    if (requestQueue.length > 0) {
+        activeRequests++
+        const next = requestQueue.shift()
+        next()
+    }
+}
+
 async function streamToMessage(message, prompt, filterFn = null) {
+    await acquireSlot()
+
     const controller = new AbortController()
     const signal = controller.signal
 
@@ -24,22 +53,20 @@ async function streamToMessage(message, prompt, filterFn = null) {
         let shouldAbort = false
 
         while (true) {
-            if (shouldAbort)
-                break
+            if (shouldAbort) break
 
             const { done, value } = await reader.read()
-            if (done)
-                break
+            if (done) break
 
             const chunk = decoder.decode(value, { stream: true }).trim()
             if (!chunk) continue
 
             for (const line of chunk.split("\n")) {
-                if (shouldAbort)
-                    break
+                if (shouldAbort) break
 
                 try {
                     const json = JSON.parse(line)
+
                     if (json.error) {
                         logger.error(`LLM error: ${json.error}`)
                         throw new Error(json.error)
@@ -47,6 +74,7 @@ async function streamToMessage(message, prompt, filterFn = null) {
 
                     if (json.response) {
                         accumulated += json.response
+
                         const toDisplay = filterFn
                             ? filterFn(firstChunk ? json.response : accumulated)
                             : accumulated
@@ -56,15 +84,13 @@ async function streamToMessage(message, prompt, filterFn = null) {
                             firstChunk = false
                         } catch (err) {
                             logger.debug(`Message edit failed (likely deleted), aborting stream: ${err.message}`)
-
                             controller.abort()
                             shouldAbort = true
                             break
                         }
                     }
                 } catch (err) {
-                    if (err.message.includes("LLM error"))
-                        throw err
+                    if (err.message.includes("LLM error")) throw err
                     logger.warn("Skipping invalid JSON line:", line, err)
                 }
             }
@@ -78,6 +104,8 @@ async function streamToMessage(message, prompt, filterFn = null) {
             logger.error("Failed to contact LLM:", err)
             throw err
         }
+    } finally {
+        releaseSlot()
     }
 }
 
