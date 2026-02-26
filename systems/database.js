@@ -1,7 +1,10 @@
 const { Pool } = require("pg")
+const format = require("pg-format")
 
 const logger = require("./logger")
 const { config } = require("./settings")
+
+const DEBUG_SQL = true
 
 class Database {
     constructor() {
@@ -76,8 +79,25 @@ class Database {
     }
 
     async query(sql, params = []) {
+        let start, end
+        if (DEBUG_SQL) {
+            start = Date.now()
+        }
         try {
             const result = await this.pool.query(sql, params)
+            if (DEBUG_SQL) {
+                end = Date.now()
+                const duration = end - start
+                if (duration > 1000) {
+                    let interpolated
+                    try {
+                        interpolated = format.withArray(sql.replace(/\$(\d+)/g, "%L"), params)
+                    } catch (e) {
+                        interpolated = `[pg-format error] ${e.message}`
+                    }
+                    logger.warn(`[Slow Query] (${duration} ms) ${interpolated}`)
+                }
+            }
             return result.rows
         } catch (err) {
             logger.error(`SQL Error:\n${sql}\n${err}`)
