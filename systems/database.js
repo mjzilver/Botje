@@ -76,13 +76,28 @@ class Database {
                 PRIMARY KEY(user_id, server_id, user_name)
             )
         `)
+
+        await this.query(`
+            CREATE TABLE IF NOT EXISTS words (
+                word_id SERIAL PRIMARY KEY,
+                word text UNIQUE NOT NULL
+            )
+        `)
+
+        await this.query(`
+            CREATE TABLE IF NOT EXISTS word_messages (
+                word_id int,
+                message_id bigint,
+                PRIMARY KEY(word_id, message_id)
+            )
+        `)
     }
 
     async query(sql, params = []) {
-        let start, end
-        if (DEBUG_SQL) {
+        let start; let end
+        if (DEBUG_SQL)
             start = Date.now()
-        }
+
         try {
             const result = await this.pool.query(sql, params)
             if (DEBUG_SQL) {
@@ -170,8 +185,9 @@ class Database {
             )
 
             await this.insertMessage(message)
+            await this.insertWords(message.id, message.cleanContent)
         } catch {
-            logger.info(`Failed to store message: ${message.content} (likely left server) Author: ${message.author.tag}`)
+            logger.info(`Failed to store message: ${message.cleanContent} (likely left server) Author: ${message.author.tag}`)
         }
     }
 
@@ -182,7 +198,7 @@ class Database {
                 [message.cleanContent, message.id]
             )
         } catch {
-            logger.error(`Failed to update: ${message.content}`)
+            logger.error(`Failed to update: ${message.cleanContent}`)
         }
     }
 
@@ -242,6 +258,91 @@ class Database {
         if (message.reactions.cache.size > 0)
             for (const reaction of message.reactions.cache.values())
                 await this.insertReaction(reaction)
+    }
+
+    async insertWords(id, content) {
+        const words = content
+            .toLowerCase()
+            .split(/\s+/)
+            .filter(word => word.length > 0)
+
+        for (const word of words)
+            try {
+                const result = await this.query(
+                    "INSERT INTO words (word) VALUES ($1) ON CONFLICT (word) DO UPDATE SET word = EXCLUDED.word RETURNING word_id",
+                    [word]
+                )
+                const wordId = result[0].word_id
+
+                await this.query(
+                    "INSERT INTO word_messages (word_id, message_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+                    [wordId, id]
+                )
+            } catch {
+                logger.error(`Failed to store word: ${word}`)
+            }
+    }
+
+    async bulkInsertWords(messages) {
+        const wordSet = new Set()
+        const relations = []
+
+        for (const msg of messages) {
+            const words = msg.message
+                .toLowerCase()
+                .split(/\s+/)
+                .filter(w => w.length > 1)
+
+            const uniqueWords = [...new Set(words)]
+
+            for (const word of uniqueWords) {
+                wordSet.add(word)
+                relations.push([word, msg.id])
+            }
+        }
+
+        const uniqueWords = [...wordSet]
+        if (uniqueWords.length === 0) return
+
+        await this.query(`
+            INSERT INTO words(word)
+            SELECT UNNEST($1::text[])
+            ON CONFLICT DO NOTHING `,
+        [uniqueWords]
+        )
+
+        const rows = await this.query(
+            "SELECT word_id, word FROM words WHERE word = ANY($1)",
+            [uniqueWords]
+        )
+
+        const wordMap = new Map()
+        for (const row of rows)
+            wordMap.set(row.word, row.word_id)
+
+        const wordIds = []
+        const messageIds = []
+
+        for (const [word, messageId] of relations) {
+            const id = wordMap.get(word)
+            if (!id) continue
+
+            wordIds.push(id)
+            messageIds.push(messageId)
+        }
+
+        const chunkSize = 30000
+        for (let i = 0; i < wordIds.length; i += chunkSize) {
+            const wordChunk = wordIds.slice(i, i + chunkSize)
+            const msgChunk = messageIds.slice(i, i + chunkSize)
+
+            await this.query(`
+                INSERT INTO word_messages(word_id, message_id)
+                SELECT * FROM UNNEST($1::int[], $2::bigint[])
+                ON CONFLICT DO NOTHING `,
+            [wordChunk, msgChunk]
+            )
+        }
     }
 }
 

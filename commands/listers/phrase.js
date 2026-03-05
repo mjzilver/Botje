@@ -56,14 +56,16 @@ class PhraseLister extends Lister {
     }
 
     async perPerson(message, word) {
-        const selectSQL = `SELECT user_id, server_id, count(message) as count
-            FROM messages
-            WHERE LOWER(message) LIKE $1 AND server_id = $2
-            GROUP BY user_id, server_id
-            HAVING count(message) > 1
-            ORDER BY count(message) DESC`
+        const selectSQL = `SELECT m.user_id, m.server_id, COUNT(*) as count
+            FROM word_messages wm
+            JOIN words w ON wm.word_id = w.word_id
+            JOIN messages m ON m.id = wm.message_id
+            WHERE w.word = $1 AND m.server_id = $2
+            GROUP BY m.user_id, m.server_id
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC`
 
-        const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id])
+        const rows = await database.query(selectSQL, [word.toLowerCase(), message.guild.id])
         if (!rows || rows.length === 0)
             return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name}`)
 
@@ -85,39 +87,46 @@ class PhraseLister extends Lister {
     }
 
     async total(message, word) {
-        const selectSQL = `SELECT COUNT(*) as count
-            FROM messages
-            WHERE LOWER(message) LIKE $1 AND server_id = $2 `
+        const selectSQL = `SELECT COUNT(*) AS count
+            FROM word_messages wm
+            JOIN words w ON wm.word_id = w.word_id
+            JOIN messages m ON m.id = wm.message_id
+            WHERE w.word = $1
+            AND m.server_id = $2 `
 
-        const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id])
+        const rows = await database.query(selectSQL, [word.toLowerCase(), message.guild.id])
         bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
     }
 
     async mention(message, mentioned, word) {
         const selectSQL = `SELECT COUNT(*) as count
-            FROM messages
-            WHERE LOWER(message) LIKE $1 
-            AND server_id = $2 AND user_id = $3 `
+            FROM word_messages wm
+            JOIN words w ON wm.word_id = w.word_id
+            JOIN messages m ON m.id = wm.message_id
+            WHERE w.word = $1 
+            AND m.server_id = $2 AND m.user_id = $3`
 
-        const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id])
+        const rows = await database.query(selectSQL, [word.toLowerCase(), message.guild.id, mentioned.id])
         const userName = await bot.userHandler.getDisplayName(mentioned.id, message.guild.id)
         bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages from \`${userName}\` in this server that contain ${word}`)
     }
 
     async percentage(message, word) {
-        const selectSQL = `SELECT user_id, server_id, count(message) as count,
-                (SElECT COUNT(m2.message) 
+        const selectSQL = `SELECT m.user_id, m.server_id, COUNT(*) as count,
+                (SELECT COUNT(m2.message) 
                 FROM messages AS m2
-                WHERE m2.user_id = messages.user_id
-                AND m2.server_id = messages.server_id) as total
-            FROM messages
-            WHERE LOWER(message) LIKE $1
-            AND server_id = $2
-            GROUP BY messages.user_id, messages.server_id
-            HAVING count(message) > 1
-            ORDER BY count(message) DESC`
+                WHERE m2.user_id = m.user_id
+                AND m2.server_id = m.server_id) as total
+            FROM word_messages wm
+            JOIN words w ON wm.word_id = w.word_id
+            JOIN messages m ON m.id = wm.message_id
+            WHERE w.word = $1
+            AND m.server_id = $2
+            GROUP BY m.user_id, m.server_id
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC`
 
-        const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id])
+        const rows = await database.query(selectSQL, [word.toLowerCase(), message.guild.id])
         if (!rows || rows.length === 0)
             return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name}`)
 
