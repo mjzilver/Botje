@@ -28,11 +28,15 @@ class EmotesLister extends Lister {
     }
 
     async total(message) {
-        const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-            FROM messages
-            WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
-            AND server_id = $1
-            GROUP BY LOWER(message)
+        const selectSQL = `WITH normalized AS (
+                SELECT LOWER(message) AS message
+                FROM messages
+                WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
+                AND server_id = $1
+            )
+            SELECT message, COUNT(*) as count
+            FROM normalized
+            GROUP BY message
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC
             LIMIT 100`
@@ -57,11 +61,15 @@ class EmotesLister extends Lister {
     }
 
     async mention(message, mentioned) {
-        const selectSQL = `SELECT LOWER(message) as message, COUNT(*) as count
-            FROM messages
-            WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
-            AND server_id = $1 AND user_id = $2
-            GROUP BY LOWER(message)
+        const selectSQL = `WITH normalized AS (
+                SELECT LOWER(message) AS message
+                FROM messages
+                WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
+                AND server_id = $1 AND user_id = $2
+            )
+            SELECT message, COUNT(*) as count
+            FROM normalized
+            GROUP BY message
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC
             LIMIT 1000`

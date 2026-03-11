@@ -67,13 +67,19 @@ class CountLister extends Lister {
     }
 
     async percentage(message) {
-        const selectSQL = `SELECT user_id, server_id, COUNT(*) as count,
-			(SElECT COUNT(message) FROM messages WHERE server_id = $1) as total
-			FROM messages
-			WHERE server_id = $1
-			GROUP BY user_id, server_id
-			HAVING COUNT(*) > 1
-			ORDER BY COUNT(*) DESC`
+        const selectSQL = `WITH totals AS (
+                SELECT server_id, COUNT(*) AS total
+                FROM messages
+                WHERE server_id = $1
+                GROUP BY server_id
+            )
+            SELECT m.user_id, m.server_id, COUNT(*) as count, t.total
+            FROM messages m
+            JOIN totals t ON m.server_id = t.server_id
+            WHERE m.server_id = $1
+            GROUP BY m.user_id, m.server_id, t.total
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC`
         const rows = await database.query(selectSQL, [message.guild.id])
         const pages = await createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = ""

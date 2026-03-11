@@ -2,6 +2,7 @@ const fs = require("fs")
 
 const database = require("./database")
 const logger = require("./logger")
+const { textOnly } = require("./stringHelpers")
 
 module.exports = class Dictionary {
     constructor() {
@@ -74,7 +75,6 @@ module.exports = class Dictionary {
 
         for (const i in this.words) {
             let processedWord = this.words[i][0]
-            const { textOnly } = require("./stringHelpers")
             processedWord = textOnly(processedWord)
             if (processedWord.length === length && this.words[i][1] > 20)
                 result.push(processedWord)

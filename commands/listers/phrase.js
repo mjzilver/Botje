@@ -58,7 +58,7 @@ class PhraseLister extends Lister {
     async perPerson(message, word) {
         const selectSQL = `SELECT user_id, server_id, count(message) as count
             FROM messages
-            WHERE LOWER(message) LIKE $1 AND server_id = $2
+            WHERE message ILIKE $1 AND server_id = $2
             GROUP BY user_id, server_id
             HAVING count(message) > 1
             ORDER BY count(message) DESC`
@@ -87,7 +87,7 @@ class PhraseLister extends Lister {
     async total(message, word) {
         const selectSQL = `SELECT COUNT(*) as count
             FROM messages
-            WHERE LOWER(message) LIKE $1 AND server_id = $2 `
+            WHERE message ILIKE $1 AND server_id = $2 `
 
         const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id])
         bot.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`)
@@ -96,7 +96,7 @@ class PhraseLister extends Lister {
     async mention(message, mentioned, word) {
         const selectSQL = `SELECT COUNT(*) as count
             FROM messages
-            WHERE LOWER(message) LIKE $1 
+            WHERE message ILIKE $1 
             AND server_id = $2 AND user_id = $3 `
 
         const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id])
@@ -105,27 +105,35 @@ class PhraseLister extends Lister {
     }
 
     async percentage(message, word) {
-        const selectSQL = `SELECT user_id, server_id, count(message) as count,
-                (SElECT COUNT(m2.message) 
-                FROM messages AS m2
-                WHERE m2.user_id = messages.user_id
-                AND m2.server_id = messages.server_id) as total
-            FROM messages
-            WHERE LOWER(message) LIKE $1
-            AND server_id = $2
-            GROUP BY messages.user_id, messages.server_id
-            HAVING count(message) > 1
-            ORDER BY count(message) DESC`
+        const selectSQL = `WITH filtered AS (
+                SELECT user_id, server_id, COUNT(*) AS count
+                FROM messages
+                WHERE message ILIKE $1
+                AND server_id = $2
+                GROUP BY user_id, server_id
+                HAVING COUNT(*) > 1
+            ), totals AS (
+                SELECT user_id, server_id, COUNT(*) AS total
+                FROM messages
+                WHERE server_id = $2
+                GROUP BY user_id, server_id
+            )
+            SELECT filtered.user_id, filtered.server_id, filtered.count, totals.total
+            FROM filtered
+            JOIN totals
+            ON filtered.user_id = totals.user_id
+            AND filtered.server_id = totals.server_id
+            ORDER BY filtered.count DESC`
 
         const rows = await database.query(selectSQL, [`%${word}%`, message.guild.id])
         if (!rows || rows.length === 0)
             return bot.messageHandler.send(message, `Nothing found for ${word} in ${message.guild.name}`)
 
         // Sort by percentage
-        const sortedRows = rows.map(async row => ({
+        const sortedRows = (await Promise.all(rows.map(async (row) => ({
             userName: await bot.userHandler.getDisplayName(row["user_id"], row["server_id"]),
             percentage: ((parseInt(row["count"]) / parseInt(row["total"])) * 100).toFixed(3)
-        })).sort((a, b) => b.percentage - a.percentage)
+        })))).sort((a, b) => b.percentage - a.percentage)
 
         const pages = await createPages(sortedRows, 10, (pageRows, pageNum, totalPages) => {
             let result = ""

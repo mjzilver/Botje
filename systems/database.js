@@ -29,6 +29,8 @@ class Database {
     }
 
     async initializeDatabase() {
+        await this.query("CREATE EXTENSION IF NOT EXISTS pg_trgm")
+
         await this.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)")
 
         await this.query(`
@@ -41,6 +43,23 @@ class Database {
                 server_id bigint,
                 reply_to bigint NULL
             )
+        `)
+
+        await this.query(`
+            CREATE INDEX IF NOT EXISTS idx_message_trgm ON messages 
+            USING gin(message gin_trgm_ops)
+        `)
+
+        await this.query(`
+            CREATE INDEX IF NOT EXISTS idx_messages_server_user ON messages (server_id, user_id)
+        `)
+
+        await this.query(`
+            CREATE INDEX IF NOT EXISTS idx_messages_server_datetime ON messages (server_id, datetime)
+        `)
+
+        await this.query(`
+            CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages (reply_to)
         `)
 
         await this.query(`
@@ -59,6 +78,14 @@ class Database {
                 timestamp bigint,
                 PRIMARY KEY(message_id, user_id, emoji)
             )
+        `)
+
+        await this.query(`
+            CREATE INDEX IF NOT EXISTS idx_reactions_user_message ON reactions (user_id, message_id)
+        `)
+
+        await this.query(`
+            CREATE INDEX IF NOT EXISTS idx_reactions_message_emoji ON reactions (message_id, emoji)
         `)
 
         await this.query(`

@@ -55,44 +55,47 @@ class ScoreLister extends Lister {
     async perPerson(message) {
         const selectSQL = `SELECT user_id, message
             FROM messages 
-            WHERE server_id = $1
-            ORDER BY user_id`
+            WHERE server_id = $1`
 
         const userdata = {}
 
         const rows = await database.query(selectSQL, [message.guild.id])
         for (let i = 0; i < rows.length; i++) {
-            const userName = await bot.userHandler.getDisplayName(rows[i]["user_id"], message.guild.id)
+            const userId = rows[i]["user_id"]
 
-            if (!userdata[userName])
-                userdata[userName] = {
+            if (!userdata[userId])
+                userdata[userId] = {
                     "points": 0,
                     "total": 0,
                     "quality": 0,
                     "score": 0
                 }
 
-            userdata[userName]["points"] += this.calculateScore(rows[i]["message"])
-            userdata[userName]["total"] += rows[i]["message"].length
+            userdata[userId]["points"] += this.calculateScore(rows[i]["message"])
+            userdata[userId]["total"] += rows[i]["message"].length
         }
 
         const sorted = []
-        for (const user in userdata) {
+        for (const userId in userdata) {
             // magical calculation
-            userdata[user]["quality"] = (userdata[user]["points"] / userdata[user]["total"]) / 2
-            userdata[user]["score"] = Math.round(userdata[user]["total"] * userdata[user]["quality"])
+            userdata[userId]["quality"] = (userdata[userId]["points"] / userdata[userId]["total"]) / 2
+            userdata[userId]["score"] = Math.round(userdata[userId]["total"] * userdata[userId]["quality"])
 
-            sorted.push([user, userdata[user]["score"]])
+            sorted.push([userId, userdata[userId]["score"]])
         }
 
         sorted.sort((a, b) => {
             return b[1] - a[1]
         })
 
+        const userNames = {}
+        for (const [userId] of sorted)
+            userNames[userId] = await bot.userHandler.getDisplayName(userId, message.guild.id)
+
         const pages = await createPages(sorted, 10, (pageRows, pageNum, totalPages) => {
             let result = ""
             for (const row of pageRows)
-                result += `\`${row[0]}\`'s post score is ${row[1]} \n`
+                result += `\`${userNames[row[0]]}\`'s post score is ${row[1]} \n`
 
             return new discord.EmbedBuilder()
                 .setColor(config.color_hex)
