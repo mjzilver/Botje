@@ -1,8 +1,16 @@
-import type { ILogger } from "../interfaces";
 import type { LlmConfig } from "../interfaces/config";
 import { toError } from "./utils";
 import type { BotMessage } from "../interfaces/discord";
-import type { IMessageHandler } from "../interfaces";
+import type { IMessageHandler } from "./messageHandler";
+import type { ILogger } from "./logger";
+
+export interface ILlmService {
+    streamToMessage(
+        message: BotMessage,
+        prompt: string,
+        filterFn?: ((text: string) => string) | null,
+    ): Promise<string | undefined>;
+}
 
 export class LlmService {
     private config: LlmConfig;

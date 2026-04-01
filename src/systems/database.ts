@@ -1,10 +1,28 @@
 import { Pool } from "pg";
 import type { QueryResultRow } from "pg";
 import format from "pg-format";
-import type { IDatabase, ILogger, SqlParam } from "../interfaces";
+import type { ILogger } from "./logger";
 import type { BotConfig } from "../interfaces/config";
 import { isGuildMessage } from "../interfaces/discord";
 import type { BotMessage, BotReaction, GuildBotMessage } from "../interfaces/discord";
+
+export type SqlParam = string | number | boolean | null | Date | Buffer;
+
+export interface IDatabase {
+    query<T extends QueryResultRow = QueryResultRow>(sql: string, params?: SqlParam[]): Promise<T[]>;
+    insert(sql: string, params?: SqlParam[]): Promise<void>;
+    getCount(selectQuery: string, parameters?: SqlParam[]): Promise<number>;
+    queryRandomMessage<T extends QueryResultRow = QueryResultRow>(
+        selectQuery: string,
+        parameters?: SqlParam[],
+    ): Promise<T[]>;
+    ensureUserExists(user: { id: string }, serverId: string | null, displayName?: string | null): Promise<void>;
+    storeMessage(message: BotMessage): Promise<void>;
+    updateMessage(message: BotMessage): Promise<void>;
+    insertMessage(message: GuildBotMessage): Promise<void>;
+    insertReaction(reaction: BotReaction): Promise<void>;
+    getCurrentUsername(userId: string, serverId: string): Promise<string | null>;
+}
 
 const DEBUG_SQL = true;
 

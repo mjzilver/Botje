@@ -1,10 +1,34 @@
-import type { BotMessage, GuildBotMessage, MessageContent } from "./discord";
+import type { BotMessage } from "./discord";
 import type { Client, SlashCommandBuilder } from "discord.js";
-import type { QueryResultRow } from "pg";
 import type { BotConfig } from "./config";
 import type { LoadedCommands } from "../systems/commandLoader";
+import type { SqlParam, IDatabase } from "../systems/database";
+import type { IMessageHandler } from "../systems/messageHandler";
+import type { LogEntry, ILogger } from "../systems/logger";
+import type { IUserHandler } from "../systems/userHandler";
+import type { IPagination } from "../systems/pagination";
+import type { IBackupHandler } from "../systems/backupHandler";
+import type { IHangman } from "../systems/hangman";
+import type { ILlmService } from "../systems/llm";
+import type { IDictionary } from "../systems/dictionary";
 
-export type SqlParam = string | number | boolean | null | Date | Buffer;
+export type { SqlParam, IDatabase };
+
+export type { IMessageHandler };
+
+export type { LogEntry, ILogger };
+
+export type { IUserHandler };
+
+export type { IPagination };
+
+export type { IBackupHandler };
+
+export type { IHangman };
+
+export type { ILlmService };
+
+export type { IDictionary };
 
 export interface CommandOption {
     type: "user" | "string" | "integer";
@@ -39,103 +63,6 @@ export interface IClCommand {
     disabled?: boolean;
     aliases?: string;
     function(input: string[], context: IBotContext): void | Promise<void>;
-}
-
-export interface IMessageHandler {
-    send(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined>;
-    reply(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined>;
-    edit(replyObj: BotMessage, newContent: MessageContent): Promise<BotMessage>;
-    delete(message: BotMessage): Promise<void>;
-    react(message: BotMessage, emoji: string): Promise<void>;
-    addCommandCall(call: BotMessage, reply: BotMessage): void;
-    markComplete(call: BotMessage): void;
-    findFromReply(replyMessage: BotMessage): string | undefined;
-}
-
-export interface IDatabase {
-    query<T extends QueryResultRow = QueryResultRow>(sql: string, params?: SqlParam[]): Promise<T[]>;
-    insert(sql: string, params?: SqlParam[]): Promise<void>;
-    getCount(selectQuery: string, parameters?: SqlParam[]): Promise<number>;
-    queryRandomMessage<T extends QueryResultRow = QueryResultRow>(
-        selectQuery: string,
-        parameters?: SqlParam[],
-    ): Promise<T[]>;
-    ensureUserExists(user: { id: string }, serverId: string | null, displayName?: string | null): Promise<void>;
-    storeMessage(message: BotMessage): Promise<void>;
-    updateMessage(message: BotMessage): Promise<void>;
-    insertMessage(message: GuildBotMessage): Promise<void>;
-    insertReaction(reaction: import("./discord").BotReaction): Promise<void>;
-    getCurrentUsername(userId: string, serverId: string): Promise<string | null>;
-}
-
-export interface LogEntry {
-    level: string;
-    message: string;
-    timestamp: string;
-}
-
-export interface ILogger {
-    error(msg: string | Error): void;
-    warn(msg: string): void;
-    info(msg: string): void;
-    debug(msg: string): void;
-    startup(msg: string): void;
-    console(msg: string): void;
-    repeat(msg: string): void;
-    printColumns(arrays: string[][], headers?: string[]): void;
-    printRows(rows: Array<[string, string | number]>, logFn?: (msg: string) => void): void;
-}
-
-export interface IHttpClient {
-    get<T>(
-        url: string,
-        options?: Record<string, string>,
-    ): Promise<{ data: T; headers: Record<string, string>; status: number }>;
-    post<T>(
-        url: string,
-        body: Record<string, SqlParam>,
-        options?: Record<string, string>,
-    ): Promise<{ data: T; status: number }>;
-    stream(
-        url: string,
-        body: Record<string, SqlParam>,
-        options?: Record<string, string>,
-    ): Promise<NodeJS.ReadableStream>;
-}
-
-export interface IUserHandler {
-    getDisplayName(userId: string, serverId: string): Promise<string>;
-}
-
-export interface IPagination {
-    createPages<T>(
-        items: T[],
-        itemsPerPage: number,
-        formatPage: (items: T[], pageNum: number, totalPages: number) => Promise<MessageContent> | MessageContent,
-    ): Promise<MessageContent[]>;
-    sendPaginatedEmbed(message: BotMessage, pages: MessageContent[], timeout?: number): Promise<BotMessage | undefined>;
-}
-
-export interface IBackupHandler {
-    backupAllEmotes(destination?: string | null): Promise<void>;
-    backupConfig(destination?: string | null): Promise<void>;
-    backupDatabase(destination?: string | null): Promise<void>;
-}
-
-export interface IHangman {
-    run(message: BotMessage): void;
-}
-
-export interface ILlmService {
-    streamToMessage(
-        message: BotMessage,
-        prompt: string,
-        filterFn?: ((text: string) => string) | null,
-    ): Promise<string | undefined>;
-}
-
-export interface IDictionary {
-    getNonSelectorsRegex(): RegExp;
 }
 
 export interface IBotContext {

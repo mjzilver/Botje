@@ -4,9 +4,15 @@ import fs from "fs";
 import path from "path";
 import { pipeline } from "stream/promises";
 import axios from "axios";
-import type { ILogger } from "../interfaces";
+import type { ILogger } from "./logger";
 import type { BotConfig } from "../interfaces/config";
 import { sanitizeFilename } from "./stringHelpers";
+
+export interface IBackupHandler {
+    backupAllEmotes(destination?: string | null): Promise<void>;
+    backupConfig(destination?: string | null): Promise<void>;
+    backupDatabase(destination?: string | null): Promise<void>;
+}
 
 interface BotEmoji {
     id: string;

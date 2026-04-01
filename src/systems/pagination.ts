@@ -1,6 +1,15 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder } from "discord.js";
-import type { IMessageHandler } from "../interfaces";
+import type { IMessageHandler } from "./messageHandler";
 import type { BotMessage, MessageContent } from "../interfaces/discord";
+
+export interface IPagination {
+    createPages<T>(
+        items: T[],
+        itemsPerPage: number,
+        formatPage: (items: T[], pageNum: number, totalPages: number) => Promise<MessageContent> | MessageContent,
+    ): Promise<MessageContent[]>;
+    sendPaginatedEmbed(message: BotMessage, pages: MessageContent[], timeout?: number): Promise<BotMessage | undefined>;
+}
 
 type PageObject = Exclude<MessageContent, string | EmbedBuilder>;
 type Page = MessageContent;

@@ -1,5 +1,22 @@
 import Winston from "winston";
-import type { ILogger, LogEntry } from "../interfaces";
+
+export interface LogEntry {
+    level: string;
+    message: string;
+    timestamp: string;
+}
+
+export interface ILogger {
+    error(msg: string | Error): void;
+    warn(msg: string): void;
+    info(msg: string): void;
+    debug(msg: string): void;
+    startup(msg: string): void;
+    console(msg: string): void;
+    repeat(msg: string): void;
+    printColumns(arrays: string[][], headers?: string[]): void;
+    printRows(rows: Array<[string, string | number]>, logFn?: (msg: string) => void): void;
+}
 
 const { combine, timestamp, colorize, printf, json } = Winston.format;
 const loggerLevels: Winston.config.AbstractConfigSetLevels = {

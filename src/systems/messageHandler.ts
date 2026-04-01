@@ -1,9 +1,21 @@
 import * as discord from "discord.js";
-import type { IDatabase, IMessageHandler, ILogger } from "../interfaces";
+import type { IDatabase } from "./database";
+import type { ILogger } from "./logger";
 import type { BotConfig } from "../interfaces/config";
 import type { BotMessage, MessageContent } from "../interfaces/discord";
 import { toBotMessage } from "./messageAdapter";
 import { toError } from "./utils";
+
+export interface IMessageHandler {
+    send(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined>;
+    reply(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined>;
+    edit(replyObj: BotMessage, newContent: MessageContent): Promise<BotMessage>;
+    delete(message: BotMessage): Promise<void>;
+    react(message: BotMessage, emoji: string): Promise<void>;
+    addCommandCall(call: BotMessage, reply: BotMessage): void;
+    markComplete(call: BotMessage): void;
+    findFromReply(replyMessage: BotMessage): string | undefined;
+}
 
 const COMMAND_CALL_SQL = `INSERT INTO command_calls (call_id, reply_id, timestamp)
         VALUES ($1::bigint, $2::bigint, $3::bigint)

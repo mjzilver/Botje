@@ -1,6 +1,10 @@
 import * as discord from "discord.js";
-import type { IDatabase, IUserHandler } from "../interfaces";
-import type { ILogger } from "../interfaces";
+import type { IDatabase } from "./database";
+import type { ILogger } from "./logger";
+
+export interface IUserHandler {
+    getDisplayName(userId: string, serverId: string): Promise<string>;
+}
 
 export class UserHandler implements IUserHandler {
     private db: IDatabase;

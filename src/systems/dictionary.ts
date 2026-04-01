@@ -1,8 +1,13 @@
 import fs from "fs";
 import path from "path";
-import type { IDatabase, ILogger } from "../interfaces";
+import type { IDatabase } from "./database";
+import type { ILogger } from "./logger";
 import { textOnly } from "./stringHelpers";
 import { toError } from "./utils";
+
+export interface IDictionary {
+    getNonSelectorsRegex(): RegExp;
+}
 
 type WordEntry = [word: string, frequency: number];
 const DICTIONARY_TOP_WORDS = 200;

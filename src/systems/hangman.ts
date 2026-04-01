@@ -1,12 +1,17 @@
 import { AttachmentBuilder, EmbedBuilder } from "discord.js";
 import path from "path";
-import type { IMessageHandler, ILogger } from "../interfaces";
+import type { IMessageHandler } from "./messageHandler";
+import type { ILogger } from "./logger";
 import wordsJson from "../json/words.json";
 import type { BotConfig } from "../interfaces/config";
 import type { BotMessage } from "../interfaces/discord";
 import type { Dictionary } from "./dictionary";
 import { pickRandomItem } from "./utils";
 import { textOnly as textOnlyHelper, replaceAt as replaceAtHelper } from "./stringHelpers";
+
+export interface IHangman {
+    run(message: BotMessage): void;
+}
 
 export class HangmanGame {
     private word = "";
