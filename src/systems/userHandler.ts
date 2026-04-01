@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
 import type { IDatabase, IUserHandler } from "../interfaces";
 import type { ILogger } from "../interfaces";
+
 export class UserHandler implements IUserHandler {
     private db: IDatabase;
     private logger: ILogger;
@@ -12,6 +13,7 @@ export class UserHandler implements IUserHandler {
         this.logger = logger;
         this.client = client;
     }
+
     async getDisplayName(userId: string, serverId: string): Promise<string> {
         if (!userId || !serverId) return UserHandler.UNKNOWN_USER;
         this.userCache[serverId] ??= {};
@@ -20,8 +22,10 @@ export class UserHandler implements IUserHandler {
         const fromDb = await this.db.getCurrentUsername(userId, serverId);
         if (fromDb) {
             serverCache[userId] = fromDb;
+
             return fromDb;
         }
+
         const client = this.client;
         try {
             const guild = await client.guilds.fetch(serverId);
@@ -39,6 +43,7 @@ export class UserHandler implements IUserHandler {
                 serverCache[userId] = UserHandler.UNKNOWN_USER;
             }
         }
+
         return serverCache[userId];
     }
 }

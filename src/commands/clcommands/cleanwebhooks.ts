@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 export default {
     name: "cleanwebhooks",
     description: "removes all webhooks from all text channels",

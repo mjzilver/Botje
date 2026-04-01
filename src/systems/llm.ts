@@ -2,6 +2,7 @@ import type { ILogger } from "../interfaces";
 import type { LlmConfig } from "../interfaces/config";
 import type { BotMessage } from "../interfaces/discord";
 import type { IMessageHandler } from "../interfaces";
+
 export class LlmService {
     private config: LlmConfig;
     private logger: ILogger;
@@ -13,6 +14,7 @@ export class LlmService {
         this.logger = logger;
         this.messageHandler = messageHandler;
     }
+
     private acquireSlot(): Promise<void> {
         return new Promise((resolve) => {
             if (this.activeRequests < this.config.max_concurrent_requests) {
@@ -24,6 +26,7 @@ export class LlmService {
             }
         });
     }
+
     private releaseSlot(): void {
         this.activeRequests--;
         if (this.requestQueue.length > 0) {
@@ -32,6 +35,7 @@ export class LlmService {
             next();
         }
     }
+
     async streamToMessage(
         message: BotMessage,
         prompt: string,
@@ -92,6 +96,7 @@ export class LlmService {
                     }
                 }
             }
+
             return accumulated;
         } catch (err) {
             if ((err as Error).name === "AbortError") {

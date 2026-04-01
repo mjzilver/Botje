@@ -1,4 +1,5 @@
 import type { CommandInteraction, EmbedBuilder } from "discord.js";
+
 export interface ComponentCollectorInteraction {
     user: { id: string };
     customId: string;
@@ -6,10 +7,12 @@ export interface ComponentCollectorInteraction {
     reply(content: MessageContent): Promise<void>;
     update(content: MessageContent): Promise<void>;
 }
+
 export interface ComponentCollector {
     on(event: "collect", handler: (interaction: ComponentCollectorInteraction) => void): void;
     on(event: "end", handler: () => void): void;
 }
+
 export interface BotMessage {
     id: string;
     content: string;
@@ -73,6 +76,7 @@ export interface BotMessage {
     delete(): Promise<void>;
     createMessageComponentCollector(options: { componentType: number; time: number }): ComponentCollector;
 }
+
 export interface BotGuild {
     id: string;
     name: string;
@@ -90,12 +94,15 @@ export interface BotGuild {
         cache: Map<string, BotEmoji>;
     };
 }
+
 export interface GuildBotMessage extends BotMessage {
     guild: BotGuild;
 }
+
 export function isGuildMessage(message: BotMessage): message is GuildBotMessage {
     return message.guild !== null;
 }
+
 export interface BotMember {
     id: string;
     displayName: string;
@@ -105,6 +112,7 @@ export interface BotMember {
     };
     user: BotUser;
 }
+
 export interface BotUser {
     id: string;
     username: string;
@@ -113,6 +121,7 @@ export interface BotUser {
     displayAvatarURL(options?: { size?: number }): string;
     equals(other: BotUser): boolean;
 }
+
 export interface BotReaction {
     emoji: {
         name: string | null;
@@ -124,12 +133,14 @@ export interface BotReaction {
     };
     message: { id: string; content: string | null };
 }
+
 export interface BotEmoji {
     id: string;
     name: string | null;
     imageURL(options?: { size?: number }): string;
     guild: BotGuild;
 }
+
 export interface AnyChannel {
     id: string;
     name?: string;
@@ -158,6 +169,7 @@ export interface AnyChannel {
         ): Promise<Map<string, BotMessage> | BotMessage>;
     };
 }
+
 export type MessageContent =
     | string
     | EmbedBuilder

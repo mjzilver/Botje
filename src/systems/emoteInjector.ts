@@ -2,7 +2,9 @@ import * as discord from "discord.js";
 import type { BotMessage } from "../interfaces/discord";
 import type { IMessageHandler } from "../interfaces";
 import type { WebhookService } from "./webhook";
+
 const UNMATCHED_EMOTE_PATTERN = /(?<!<a?):([a-zA-Z0-9_]+):(?!\d+>)/g;
+
 export class EmoteInjector {
     private webhook: WebhookService;
     private messageHandler: IMessageHandler;
@@ -12,6 +14,7 @@ export class EmoteInjector {
         this.messageHandler = messageHandler;
         this.client = client;
     }
+
     async handleMessage(message: BotMessage): Promise<void> {
         if (message.author.bot) return;
         const guild = message.guild as discord.Guild | null;

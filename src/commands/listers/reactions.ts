@@ -3,6 +3,7 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+
 class ReactionsLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT r.emoji as emoji, COUNT(*) as count
@@ -18,6 +19,7 @@ class ReactionsLister extends Lister {
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row["emoji"]} was used ${row["count"]} times! \n`;
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top reactions in ${message.guild?.name}`)
@@ -26,6 +28,7 @@ class ReactionsLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     override async mention(
         message: GuildBotMessage,
         mentioned: {
@@ -47,6 +50,7 @@ class ReactionsLister extends Lister {
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row["emoji"]} was used ${row["count"]} times! \n`;
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Reactions used by ${userName} in ${message.guild?.name}`)
@@ -55,6 +59,7 @@ class ReactionsLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT r.user_id, m.server_id, COUNT(*) as count
             FROM reactions r
@@ -70,6 +75,7 @@ class ReactionsLister extends Lister {
                 const userName = await context.userHandler.getDisplayName(row["user_id"], row["server_id"]);
                 result += `\`${userName}\` has reacted ${row["count"]} times! \n`;
             }
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top reactors in ${message.guild?.name}`)
@@ -78,10 +84,12 @@ class ReactionsLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     override percentage(message: GuildBotMessage, context: IBotContext): void {
         context.messageHandler.reply(message, "This command does not work with %");
     }
 }
+
 export default {
     name: "reactions",
     description: "shows top reactions in server",

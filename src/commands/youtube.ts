@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { ICommand } from "../interfaces";
 import { toError } from "../systems/utils";
+
 export default {
     name: "youtube",
     description: "searches for a youtube video",

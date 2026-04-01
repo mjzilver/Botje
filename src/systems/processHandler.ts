@@ -1,6 +1,7 @@
 import type { CommandHandler } from "./commandHandler";
 import type { ILogger } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
+
 export function registerProcessHandlers(
     getCommandHandler: () => CommandHandler | undefined,
     getMessageHandler: () =>

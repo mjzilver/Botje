@@ -1,5 +1,6 @@
 import fs from "fs";
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 export default {
     name: "erase",
     description: "erases the log",

@@ -8,9 +8,11 @@ import { LimitedList } from "./types/limitedList";
 import { normalizeSpaces, makeStringHelpers, capitalize } from "./stringHelpers";
 import { randomBetween } from "./utils";
 import { CooldownTracker } from "./cooldownTracker";
+
 const SPEAK_MIN_TIMEOUT_MINUTES = 20;
 const SPEAK_MAX_TIMEOUT_MINUTES = 60;
 const SPEAK_RANDOM_CHANCE = 20;
+
 export class CommandHandler {
     private commands: Record<string, ICommand>;
     private admincommands: Record<string, ICommand>;
@@ -25,6 +27,7 @@ export class CommandHandler {
         id: string;
         equals?(other: { id: string }): boolean;
     } | null;
+
     private context: IBotContext;
     commandList: LimitedList<BotMessage>;
     private messageCounter = 0;
@@ -57,6 +60,7 @@ export class CommandHandler {
         this.commandList = new LimitedList<BotMessage>(10);
         this.prefixRegex = new RegExp(deps.config.prefix, "i");
     }
+
     handleCommand(message: BotMessage, isReadback = false): void {
         const botUser = this.getBotUser();
         const isBotMessage = botUser && message.author.id === botUser.id;
@@ -77,14 +81,17 @@ export class CommandHandler {
             this.handleNonCommandMessage(message);
         }
     }
+
     parseMessageArguments(message: BotMessage): {
         command: string;
         args: string[];
     } {
         const args = normalizeSpaces(this.strHelpers.removePrefix(message.content)).split(" ");
         const command = (args.shift() ?? "").toLowerCase();
+
         return { command, args };
     }
+
     private handleCommandType(
         command: string,
         _args: string[],
@@ -98,6 +105,7 @@ export class CommandHandler {
             this.messageHandler.reply(message, `${capitalize(command)} is not a command, please try again.`);
         else this.messageHandler.markComplete(message);
     }
+
     private handleAdminCommand(command: string, message: BotMessage, isAdmin: boolean): void {
         const isOwner = message.author.id === this.config.owner;
         if (isOwner || isAdmin) this.admincommands[command].function(message, this.context);
@@ -107,6 +115,7 @@ export class CommandHandler {
                 `${capitalize(command)} is an admin command, and you are not allowed to use it.`,
             );
     }
+
     handleNonCommandMessage(message: BotMessage): void {
         const now = new Date();
         const timePassed = (now.getTime() - this.lastMessageSent.getTime()) / 60000;
@@ -126,8 +135,10 @@ export class CommandHandler {
                     this.commands["speak"]?.function(message, this.context);
             }
         }
+
         this.messageCounter++;
     }
+
     redo(message: BotMessage, fetchMessage: (id: string) => Promise<BotMessage>): void {
         const callId = this.messageHandler.findFromReply(message);
         if (!callId) return;
@@ -144,9 +155,11 @@ export class CommandHandler {
                 this.logger.error(`Redo failed: ${err}`);
             });
     }
+
     isUserBanned(message: BotMessage): boolean {
         return message.author.id in this.disallowed;
     }
+
     isUserAllowed(message: BotMessage, canSendMessage = false): boolean {
         if (this.isUserBanned(message)) return false;
         const timeoutMs = this.config.timeoutDuration * 1000;
@@ -158,8 +171,10 @@ export class CommandHandler {
                 `Please wait ${remaining} second${remaining > 1 ? "s" : ""} before making another request.`,
             );
         }
+
         return false;
     }
+
     handleDM(message: BotMessage): void {
         if (message.author.bot) return;
         const { command } = this.parseMessageArguments(message);

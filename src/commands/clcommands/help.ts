@@ -1,4 +1,5 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 export default {
     name: "help",
     description: "shows description and format for each console command",

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createSilentLogger } from "../../systems/logger";
+
 describe("createSilentLogger", () => {
     it("returns a logger with all ILogger methods", () => {
         const logger = createSilentLogger();
@@ -56,6 +57,7 @@ describe("logger.printColumns", () => {
             output.push(msg);
             original(msg);
         };
+
         logger.printColumns([["Alice"], ["42"]], ["Name", "Score"]);
         expect(output.length).toBeGreaterThan(0);
         expect(output[0]).toMatch(/Name/);

@@ -3,11 +3,14 @@ import Jimp from "jimp";
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { replaceFancyQuotes } from "../systems/stringHelpers";
+
 function getURL(message: BotMessage): string {
     if ((message.attachments?.size ?? 0) >= 1) return message.attachments?.first()?.url ?? "";
     if ((message.embeds?.length ?? 0) >= 1) return message.embeds?.[0]?.url ?? "";
+
     return "";
 }
+
 async function processPicture(
     url: string | null,
     top: string,
@@ -21,6 +24,7 @@ async function processPicture(
         const chosenFile = files[Math.floor(Math.random() * files.length)];
         url = `${path}/${chosenFile}`;
     }
+
     top = top ? replaceFancyQuotes(top.toUpperCase().trim()) : "";
     bottom = bottom ? replaceFancyQuotes(bottom.toUpperCase().trim()) : "";
     let image = await Jimp.read(url);
@@ -45,6 +49,7 @@ async function processPicture(
     await image.writeAsync("assets/meme.png");
     context.messageHandler.reply(message, { files: ["assets/meme.png"] });
 }
+
 export default {
     name: "meme",
     description: "turn an image into a meme, include picture by uploading, replying or URL",
@@ -57,13 +62,14 @@ export default {
     async function(message, context) {
         const args = message.content.split(" ");
         args.shift();
-        let url = "";
+        let url: string;
         if (message.reference?.messageId) {
             const fetched = await message.channel.messages.fetch(message.reference.messageId);
             url = getURL(fetched);
         } else {
             url = getURL(message);
         }
+
         if (args[0]?.indexOf("http") === 0) url = args.shift() ?? "";
         const [top, bottom] = (args.join(" ").split("|") || []).slice(0, 2);
         if (args[0] === "?" || !args[0]) {
@@ -78,11 +84,14 @@ export default {
                 const middle = content.lastIndexOf(" ", content.length / 2);
                 const top = content.substring(0, middle);
                 const bottom = content.substring(middle + 1);
+
                 return processPicture(url ?? null, top, bottom, message, context);
             }
+
             return context.messageHandler.reply(message, "Can't find anything related, but this is your fault");
         } else if (top) {
             if (url.match(/\.(jpeg|jpg|gif|png)/gi)) return processPicture(url, top, bottom, message, context);
+
             return processPicture(null, top, bottom, message, context);
         }
     },

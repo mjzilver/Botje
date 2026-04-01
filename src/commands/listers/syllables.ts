@@ -4,6 +4,7 @@ import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
 import { countVowelGroups } from "../../systems/stringHelpers";
+
 class SyllableLister extends Lister {
     override async mention(
         message: GuildBotMessage,
@@ -25,6 +26,7 @@ class SyllableLister extends Lister {
                 userdata.total += 1;
             }
         }
+
         userdata.average = Math.round(userdata.syllables / userdata.total);
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         context.messageHandler.send(
@@ -32,6 +34,7 @@ class SyllableLister extends Lister {
             `\`${userName}\` has an average of ${userdata.average} syllables per post`,
         );
     }
+
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT user_id, message FROM messages WHERE server_id = $1`;
         const userdata: Record<
@@ -55,11 +58,13 @@ class SyllableLister extends Lister {
                 userdata[userId].total += 1;
             }
         }
+
         const sorted: [string, number][] = [];
         for (const userId in userdata) {
             userdata[userId].average = Math.round(userdata[userId].syllables / userdata[userId].total);
             sorted.push([userId, userdata[userId].average]);
         }
+
         sorted.sort((a, b) => b[1] - a[1]);
         const userNames: Record<string, string> = {};
         for (const [userId] of sorted)
@@ -71,6 +76,7 @@ class SyllableLister extends Lister {
                 let result = "";
                 for (const row of pageRows)
                     result += `\`${userNames[row[0]]}\` has an average of ${row[1]} syllables per post \n`;
+
                 return new discord.EmbedBuilder()
                     .setColor(context.config.color_hex)
                     .setTitle(`Top most intellectual posters in ${message.guild?.name}`)
@@ -80,11 +86,14 @@ class SyllableLister extends Lister {
         );
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     calculateSyllables(message: string): number {
         const normalized = message.replace(/e /i, "").replace(/ y/i, "");
+
         return countVowelGroups(normalized);
     }
 }
+
 export default {
     name: "syllables",
     description: "shows the top users with the most syllables in their posts",

@@ -1,5 +1,6 @@
 import Winston from "winston";
 import type { ILogger, LogEntry } from "../interfaces";
+
 const { combine, timestamp, colorize, printf, json } = Winston.format;
 const loggerLevels: Winston.config.AbstractConfigSetLevels = {
     error: 0,
@@ -17,6 +18,7 @@ Winston.addColors({
 });
 let activeTransports: Winston.transport[] = [];
 let activeWinstonLogger: Winston.Logger;
+
 function createLogger(consoleLevel = "startup", fileLevel: string | null = "debug", logFile = "bot.log"): ILogger {
     activeTransports = [
         new Winston.transports.Console({
@@ -37,6 +39,7 @@ function createLogger(consoleLevel = "startup", fileLevel: string | null = "debu
             }),
         );
     }
+
     activeWinstonLogger = Winston.createLogger({
         levels: loggerLevels,
         transports: activeTransports,
@@ -89,9 +92,12 @@ function createLogger(consoleLevel = "startup", fileLevel: string | null = "debu
             }
         },
     };
+
     return ilogger;
 }
+
 export const logger = createLogger();
+
 export function createSilentLogger(): ILogger {
     return createLogger("error", null);
 }
@@ -112,4 +118,5 @@ export function queryLogs(
         callback(err as Error | null, results as { file?: LogEntry[] });
     });
 }
+
 export default logger;

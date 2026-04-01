@@ -1,4 +1,5 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 export default {
     name: "checkdupes",
     description: "checks the database for duplicate entries",

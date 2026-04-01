@@ -1,4 +1,5 @@
 import type { ICommand } from "../interfaces";
+
 export default {
     name: "ping",
     description: "prints the current reaction speed of bot in milliseconds",

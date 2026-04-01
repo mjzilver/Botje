@@ -10,6 +10,7 @@ import {
 import type { ICommand, ILogger, CommandOption, IBotContext } from "../interfaces";
 import type { BotMessage, BotUser, BotReaction, MessageContent, ComponentCollector } from "../interfaces/discord";
 import { toBotChannel } from "./messageAdapter";
+
 export class SlashHandler {
     private logger: ILogger;
     private client: discord.Client;
@@ -20,6 +21,7 @@ export class SlashHandler {
         this.client = client;
         this.context = context;
     }
+
     buildSlashCommand(command: ICommand): SlashCommandBuilder {
         if (command.slashCommand) return command.slashCommand;
         const builder = new SlashCommandBuilder()
@@ -31,10 +33,13 @@ export class SlashHandler {
                 builder.addSubcommand((subcommand) => {
                     subcommand.setName(sub.name).setDescription(sub.description ?? "No description");
                     if (sub.options) this.addOptionsToBuilder(subcommand, sub.options);
+
                     return subcommand;
                 });
+
         return builder;
     }
+
     private addOptionsToBuilder(
         builder: {
             addUserOption(fn: (o: SlashCommandUserOption) => SlashCommandUserOption): void;
@@ -48,6 +53,7 @@ export class SlashHandler {
                 builder.addUserOption((o) => {
                     o.setName(opt.name).setDescription(opt.description ?? "No description");
                     if (opt.required) o.setRequired(true);
+
                     return o;
                 });
             else if (opt.type === "string")
@@ -55,17 +61,20 @@ export class SlashHandler {
                     o.setName(opt.name).setDescription(opt.description ?? "No description");
                     if (opt.required) o.setRequired(true);
                     if (opt.choices) for (const c of opt.choices) o.addChoices(c);
+
                     return o;
                 });
             else if (opt.type === "integer")
                 builder.addIntegerOption((o) => {
                     o.setName(opt.name).setDescription(opt.description ?? "No description");
                     if (opt.required) o.setRequired(true);
+
                     return o;
                 });
             else this.logger.warn(`[SlashCommands] Unsupported option type "${opt.type}" for "${opt.name}"`);
         }
     }
+
     interactionToMessage(interaction: discord.ChatInputCommandInteraction, commandName: string): BotMessage {
         const args: string[] = [];
         const subcommand = interaction.options.getSubcommand(false);
@@ -83,6 +92,7 @@ export class SlashHandler {
                 args.push(String(option.value));
             }
         }
+
         const fullContent = args.length > 0 ? `${commandName} ${args.join(" ")}` : commandName;
         const pseudoMessage: BotMessage = {
             id: interaction.id,
@@ -112,8 +122,10 @@ export class SlashHandler {
                 time: number;
             }): ComponentCollector => ({ on: () => {} }),
         };
+
         return pseudoMessage;
     }
+
     async handleInteraction(interaction: discord.ChatInputCommandInteraction): Promise<void> {
         const commandName = interaction.commandName;
         const found = this.slashCommands.find((sc) => sc.name === commandName);
@@ -121,9 +133,11 @@ export class SlashHandler {
         try {
             await interaction.deferReply();
         } catch {}
+
         const pseudoMessage = this.interactionToMessage(interaction, commandName);
         found.command.function(pseudoMessage, this.context);
     }
+
     async registerCommands(commands: Record<string, ICommand>): Promise<void> {
         const builders: ReturnType<SlashCommandBuilder["toJSON"]>[] = [];
         this.slashCommands = [];

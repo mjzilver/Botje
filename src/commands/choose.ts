@@ -1,5 +1,6 @@
 import type { ICommand } from "../interfaces";
 import { pickRandomItem } from "../systems/utils";
+
 export default {
     name: "choose",
     description: "chooses one of the options given",
@@ -28,6 +29,7 @@ export default {
                 message,
                 `Please provide at least two options \nUse format \`${this.format}\``,
             );
+
         return context.messageHandler.reply(message, `${pickRandomItem(presets)} \`${pickRandomItem(items).trim()}\``);
     },
 } satisfies ICommand;

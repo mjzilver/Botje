@@ -1,14 +1,18 @@
 import type { BotConfig } from "../interfaces/config";
+
 export function makeStringHelpers(config: Pick<BotConfig, "prefix">) {
     function removePrefix(str: string): string {
         return str.replace(new RegExp(config.prefix, "i"), "");
     }
+
     function removeCommand(str: string): string {
         return str.replace(new RegExp(`^${config.prefix}[a-zA-Z]+\\s*`, "i"), "");
     }
+
     function removeCommands(str: string): string {
         return str.replace(new RegExp(`${config.prefix}[a-zA-Z]+\\s*`, "ig"), "");
     }
+
     return { removePrefix, removeCommand, removeCommands };
 }
 export function capitalize(str: string): string {

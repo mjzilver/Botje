@@ -1,6 +1,7 @@
 import type { ICommand } from "../../interfaces";
 import { MessageIterator } from "../../systems/messageIterator";
 import type { IterableMessage } from "../../systems/messageIterator";
+
 export default {
     name: "deleteafter",
     description: "deletes messages after the replied-to message",

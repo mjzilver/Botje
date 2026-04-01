@@ -3,6 +3,7 @@ import * as discord from "discord.js";
 import type { ICommand } from "../interfaces";
 import { capitalize } from "../systems/stringHelpers";
 import { toError } from "../systems/utils";
+
 export default {
     name: "weather",
     description: "shows the current weather and weather info from the mentioned city",

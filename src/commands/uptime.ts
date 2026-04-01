@@ -1,5 +1,6 @@
 import type { ICommand } from "../interfaces";
 import { formatUptime } from "../systems/utils";
+
 export default {
     name: "uptime",
     description: "show how long bot has been online in this session",

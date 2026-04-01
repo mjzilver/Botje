@@ -4,6 +4,7 @@ import Jimp from "jimp";
 import type { ICommand } from "../interfaces";
 import { makeStringHelpers } from "../systems/stringHelpers";
 import cardData from "../json/card_data.json";
+
 interface TarotCard {
     type: "major" | "minor";
     value_int: number;
@@ -13,6 +14,7 @@ interface TarotCard {
     meaning_up: string;
     meaning_rev: string;
 }
+
 export function guessFilename(card: TarotCard): string | null {
     if (card.type === "major") {
         return `${String(card.value_int).padStart(2, "0")}-${card.name.replace(/\s+/g, "").replace(/[^a-zA-Z0-9]/g, "")}.png`;
@@ -20,10 +22,13 @@ export function guessFilename(card: TarotCard): string | null {
         if (!card.suit) return null;
         const suit = card.suit.charAt(0).toUpperCase() + card.suit.slice(1);
         const num = String(card.value_int).padStart(2, "0");
+
         return `${suit}${num}.png`;
     }
+
     return null;
 }
+
 export default {
     name: "tarot",
     description: "draws a tarot card specially for you",
@@ -36,8 +41,10 @@ export default {
         const filename = guessFilename(card);
         if (!filename) {
             context.logger.error(`Could not determine filename for card: ${card.name}`);
+
             return;
         }
+
         let image = await Jimp.read(path.join(__dirname, "../../assets/tarot", filename));
         if (isReversed) image = image.rotate(180);
         const buffer = await image.getBufferAsync(Jimp.MIME_PNG);

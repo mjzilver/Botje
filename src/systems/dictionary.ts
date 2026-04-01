@@ -3,9 +3,11 @@ import path from "path";
 import type { IDatabase, ILogger } from "../interfaces";
 import { textOnly } from "./stringHelpers";
 import { toError } from "./utils";
+
 type WordEntry = [word: string, frequency: number];
 const DICTIONARY_TOP_WORDS = 200;
 const MIN_WORD_FREQUENCY = 20;
+
 export class Dictionary {
     words: WordEntry[] = [];
     private wordsPath: string;
@@ -21,6 +23,7 @@ export class Dictionary {
             this.generateWordsFile();
         }
     }
+
     private loadWordsFromFile(): void {
         const stream = fs.createReadStream(this.wordsPath, { encoding: "utf8" });
         let rawData = "";
@@ -34,6 +37,7 @@ export class Dictionary {
             this.logger.error(toError(err));
         });
     }
+
     async generateWordsFile(): Promise<void> {
         const sql = `
             SELECT LOWER(message) as message
@@ -57,20 +61,24 @@ export class Dictionary {
             this.logger.error(toError(err));
         }
     }
+
     getWordsByLength(length: number): string[] {
         return this.words
             .filter(([word, freq]) => {
                 const processed = textOnly(word);
+
                 return processed.length === length && freq > MIN_WORD_FREQUENCY;
             })
             .map(([word]) => textOnly(word));
     }
+
     getNonSelectorsRegex(amount = 100): RegExp {
         const max = Math.min(this.words.length, amount);
         const terms = this.words
             .slice(0, max)
             .map(([w]) => w)
             .join("|");
+
         return new RegExp(`\\b((${terms})\\s)\\b`, "gmi");
     }
 }

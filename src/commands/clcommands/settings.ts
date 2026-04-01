@@ -1,5 +1,6 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
 import { Settings } from "../../systems/settings";
+
 export default {
     name: "settings",
     description: "changes the bot's settings",

@@ -1,4 +1,5 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 export default {
     name: "clear",
     description: "clears the console without effecting the logs",

@@ -1,4 +1,5 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 export default {
     name: "backupemotes",
     description: "Saves all emotes to backups/emotes/<guildId>",

@@ -3,6 +3,7 @@ import type { ICommand, IBotContext } from "../../interfaces";
 import type { BotMessage } from "../../interfaces/discord";
 import { MessageIterator } from "../../systems/messageIterator";
 import type { IterableMessage, IteratorStats } from "../../systems/messageIterator";
+
 async function nukechannel(channel: discord.TextChannel, context: IBotContext): Promise<void> {
     if (channel && channel.type === discord.ChannelType.GuildText) {
         context.logger.warn(`NUKING channel: ${channel.name}`);
@@ -19,6 +20,7 @@ async function nukechannel(channel: discord.TextChannel, context: IBotContext): 
         await iterator.iterate(channel);
     }
 }
+
 async function nukeguild(message: BotMessage, context: IBotContext): Promise<void> {
     for (const [, channel] of context.client.channels.cache.entries())
         if (
@@ -27,6 +29,7 @@ async function nukeguild(message: BotMessage, context: IBotContext): Promise<voi
         )
             await nukechannel(channel as discord.TextChannel, context);
 }
+
 export default {
     name: "nuke",
     description: "deletes every message in the server (owner only)",

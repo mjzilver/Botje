@@ -4,6 +4,7 @@ import type { ICommand, IBotContext } from "../interfaces";
 import { toError } from "../systems/utils";
 import { isLink, isImage } from "../systems/stringHelpers";
 import type { BotMessage } from "../interfaces/discord";
+
 interface RedditPost {
     url: string;
     title: string;
@@ -25,6 +26,7 @@ const botHeader = {
         "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1",
 };
 const axiosInstance = axios.create({ headers: botHeader, maxRedirects: 10 });
+
 export function buildRedditUrl(sub: string, sort: string, time: string, last = ""): string {
     return `https://www.reddit.com/r/${sub}/${sort}.json?sort=${sort}&t=${time}&limit=100&after=${last}`;
 }
@@ -35,8 +37,10 @@ export function parseRedditArgs(content: string): { sub: string; sort: string; t
     let time = "month";
     if (["top", "hot", "new"].includes(args[2])) sort = args[2];
     if (["hour", "day", "week", "month", "year", "all"].includes(args[3])) time = args[3];
+
     return { sub, sort, time };
 }
+
 async function getRedditImage(message: BotMessage, context: IBotContext, last = ""): Promise<void> {
     const { sub, sort, time } = parseRedditArgs(message.content);
     const url = buildRedditUrl(sub, sort, time, last);
@@ -49,6 +53,7 @@ async function getRedditImage(message: BotMessage, context: IBotContext, last = 
         context.logger.error(toError(err));
     }
 }
+
 async function handleRedditImages(
     message: BotMessage,
     sub: string,
@@ -81,6 +86,7 @@ async function handleRedditImages(
         context.logger.error(toError(err));
     }
 }
+
 function embedImage(message: BotMessage, post: RedditPost, sub: string, context: IBotContext): void {
     if (isImage(post.url)) {
         const image = new discord.EmbedBuilder()
@@ -100,6 +106,7 @@ function embedImage(message: BotMessage, post: RedditPost, sub: string, context:
         context.messageHandler.send(message, `${post.title} \n${post.url} \n<https://reddit.com${post.permalink}>`);
     }
 }
+
 function handleImgur(message: BotMessage, post: RedditPost, sub: string, context: IBotContext): void {
     axiosInstance
         .get(post.url)
@@ -114,6 +121,7 @@ function handleImgur(message: BotMessage, post: RedditPost, sub: string, context
         })
         .catch((err) => context.logger.error(toError(err)));
 }
+
 function handleRedirect(message: BotMessage, post: RedditPost, context: IBotContext): void {
     axiosInstance
         .get(post.url)
@@ -141,6 +149,7 @@ function handleRedirect(message: BotMessage, post: RedditPost, context: IBotCont
         })
         .catch((err) => context.logger.error(toError(err)));
 }
+
 async function insertPost(post: RedditPost, sub: string, context: IBotContext): Promise<void> {
     const insertSQL =
         "INSERT INTO images (link, sub) VALUES ($1, $2) ON CONFLICT (link) DO UPDATE SET sub = EXCLUDED.sub;";
@@ -151,6 +160,7 @@ async function insertPost(post: RedditPost, sub: string, context: IBotContext): 
         context.logger.error(toError(err));
     }
 }
+
 export default {
     name: "reddit",
     description: "gets a random link from the given subreddit",

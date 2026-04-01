@@ -3,6 +3,7 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+
 class RepliesLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT m.user_id as from_user, t.user_id as to_user, COUNT(*) as count
@@ -22,6 +23,7 @@ class RepliesLister extends Lister {
                 const toName = await context.userHandler.getDisplayName(row["to_user"], message.guild.id);
                 result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`;
             }
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top reply relationships in ${message.guild?.name}`)
@@ -30,6 +32,7 @@ class RepliesLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     override async mention(
         message: GuildBotMessage,
         mentioned: {
@@ -55,6 +58,7 @@ class RepliesLister extends Lister {
                 const toName = await context.userHandler.getDisplayName(row["to_user"], message.guild.id);
                 result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`;
             }
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Who ${fromName} replies to most in ${message.guild?.name}`)
@@ -63,6 +67,7 @@ class RepliesLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT user_id, server_id, COUNT(*) as count
             FROM messages
@@ -77,6 +82,7 @@ class RepliesLister extends Lister {
                 const userName = await context.userHandler.getDisplayName(row["user_id"], row["server_id"]);
                 result += `\`${userName}\` has sent ${row["count"]} replies! \n`;
             }
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top repliers in ${message.guild?.name}`)
@@ -85,10 +91,12 @@ class RepliesLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     override percentage(message: GuildBotMessage, context: IBotContext): void {
         context.messageHandler.reply(message, "This command does not work with %");
     }
 }
+
 export default {
     name: "replies",
     description: "shows reply relationships (who replies to whom and how often)",

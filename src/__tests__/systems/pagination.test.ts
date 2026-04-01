@@ -8,6 +8,7 @@ function makeMessageHandler(sentMessages: MessageContent[] = []): IMessageHandle
     return {
         send: vi.fn().mockImplementation((_msg, content) => {
             sentMessages.push(content);
+
             return Promise.resolve({
                 createMessageComponentCollector: () => ({
                     on: vi.fn(),
@@ -55,6 +56,7 @@ describe("Pagination.createPages", () => {
         const received: Array<{ pageNum: number; totalPages: number }> = [];
         await pagination.createPages([1, 2, 3, 4, 5], 2, (_slice, pageNum, totalPages) => {
             received.push({ pageNum, totalPages });
+
             return new EmbedBuilder();
         });
         expect(received).toEqual([
@@ -69,6 +71,7 @@ describe("Pagination.createPages", () => {
         const slices: number[][] = [];
         await pagination.createPages([10, 20, 30, 40, 50], 2, (slice) => {
             slices.push(slice);
+
             return new EmbedBuilder();
         });
         expect(slices).toEqual([[10, 20], [30, 40], [50]]);

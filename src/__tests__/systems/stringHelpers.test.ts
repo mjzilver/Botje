@@ -12,6 +12,7 @@ import {
     replaceAt,
     makeStringHelpers,
 } from "../../systems/stringHelpers";
+
 describe("capitalize", () => {
     it("capitalizes first letter and lowercases rest", () => {
         expect(capitalize("hello")).toBe("Hello");

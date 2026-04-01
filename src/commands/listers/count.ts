@@ -3,12 +3,14 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+
 class CountLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1";
         const rows = await context.database.query(selectSQL, [message.guild.id]);
         context.messageHandler.send(message, `Ive found ${rows[0]["count"]} messages in ${message.guild?.name}`);
     }
+
     override async mention(
         message: GuildBotMessage,
         mentioned: {
@@ -24,6 +26,7 @@ class CountLister extends Lister {
             `Ive found ${rows[0]["count"]} messages by \`${userName}\` in this server`,
         );
     }
+
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT user_id, server_id, COUNT(*) as count
             FROM messages
@@ -38,6 +41,7 @@ class CountLister extends Lister {
                 const userName = await context.userHandler.getDisplayName(row["user_id"], row["server_id"]);
                 result += `\`${userName}\` has posted ${row["count"]} messages! \n`;
             }
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top 10 posters in ${message.guild?.name}`)
@@ -46,6 +50,7 @@ class CountLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `WITH totals AS (
                 SELECT server_id, COUNT(*) AS total
@@ -67,6 +72,7 @@ class CountLister extends Lister {
                 const userName = await context.userHandler.getDisplayName(row["user_id"], row["server_id"]);
                 result += `\`${userName}\` has posted ${Math.round((parseInt(row["count"]) / parseInt(row["total"])) * 100)}% of all messages! \n`;
             }
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top 10 posters in ${message.guild?.name}`)
@@ -76,6 +82,7 @@ class CountLister extends Lister {
         context.pagination.sendPaginatedEmbed(message, pages);
     }
 }
+
 export default {
     name: "count",
     description: "counts messages in the server",

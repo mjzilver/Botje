@@ -8,11 +8,13 @@ import type { MessageHandler } from "./messageHandler";
 import type { SlashHandler } from "./slashHandler";
 import type { BackupHandler } from "./backupHandler";
 import { toBotMessage, toPartialBotMessage, toBotReaction } from "./messageAdapter";
+
 type EmojiLike = {
     id: string;
     name: string;
     guild: { name: string };
 };
+
 export class EventListener {
     constructor(
         client: discord.Client,
@@ -32,6 +34,7 @@ export class EventListener {
         this.attachEmojiHandlers(client, backupHandler);
         this.attachInteractionHandler(client, slashHandler);
     }
+
     private attachErrorHandlers(client: discord.Client, logger: ILogger): void {
         client.on(Events.ShardError, (err: Error) => {
             logger.error(`Shard error: ${err.message}`);
@@ -40,11 +43,13 @@ export class EventListener {
             logger.error(`Client error: ${err.message}`);
         });
     }
+
     private attachInteractionHandler(client: discord.Client, slashHandler: SlashHandler): void {
         client.on(Events.InteractionCreate, (interaction: discord.Interaction) => {
             if (interaction.isChatInputCommand()) slashHandler.handleInteraction(interaction);
         });
     }
+
     private attachMessageHandlers(
         client: discord.Client,
         db: IDatabase,
@@ -78,6 +83,7 @@ export class EventListener {
             },
         );
     }
+
     private attachReactionHandlers(
         client: discord.Client,
         db: IDatabase,
@@ -106,6 +112,7 @@ export class EventListener {
             },
         );
     }
+
     private attachEmojiHandlers(client: discord.Client, backupHandler: BackupHandler): void {
         client.on(Events.GuildEmojiCreate, (emoji: EmojiLike) => {
             backupHandler.saveEmoji(emoji, emoji.guild.name);

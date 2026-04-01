@@ -1,4 +1,5 @@
 import type { ICommand } from "../interfaces";
+
 export default {
     name: "hangman",
     description: "play a hangman minigame",

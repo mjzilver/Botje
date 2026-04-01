@@ -7,10 +7,12 @@ import axios from "axios";
 import type { ILogger } from "../interfaces";
 import type { BotConfig } from "../interfaces/config";
 import { sanitizeFilename } from "./stringHelpers";
+
 interface BotEmoji {
     id: string;
     name: string | null;
 }
+
 export class BackupHandler {
     private logger: ILogger;
     private config: BotConfig;
@@ -20,6 +22,7 @@ export class BackupHandler {
         this.config = config;
         this.client = client;
     }
+
     async backupAllEmotes(destination: string | null = null): Promise<void> {
         this.logger.console("Saving all emotes...");
         const client = this.client;
@@ -29,6 +32,7 @@ export class BackupHandler {
         await Promise.all(tasks);
         this.logger.console("All emotes saved successfully");
     }
+
     saveEmoji(
         emoji: BotEmoji,
         guildName: string,
@@ -52,6 +56,7 @@ export class BackupHandler {
                 .catch(reject);
         });
     }
+
     backupConfig(destination: string | null = null): Promise<void> {
         return new Promise((resolve, reject) => {
             const basePath = destination ?? "backups/config";
@@ -65,6 +70,7 @@ export class BackupHandler {
             }
         });
     }
+
     backupDatabase(destination: string | null = null): Promise<void> {
         return new Promise((resolve, reject) => {
             const timestamp = Date.now();
@@ -74,6 +80,7 @@ export class BackupHandler {
             } catch (err) {
                 return reject(err);
             }
+
             const dbPath = path.join(basePath, `backup-${timestamp}.sql`);
             const writeStream = fs.createWriteStream(dbPath, { flags: "w" });
             writeStream.on("error", reject);

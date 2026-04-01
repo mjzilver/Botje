@@ -1,6 +1,7 @@
 import type { ICommand } from "../interfaces";
 import { capitalize } from "../systems/stringHelpers";
 import { randomBetween } from "../systems/utils";
+
 export default {
     name: "talk",
     description: "makes the bot talk via predictive text or as if it were the mentioned user",
@@ -28,9 +29,11 @@ export default {
                     if (!Array.isArray(chain[prevWord])) chain[prevWord] = [];
                     chain[prevWord].push(word);
                 }
+
                 prevWord = word;
             }
         }
+
         let sentence = "";
         const sentenceLength = randomBetween(8, 15);
         if (chain[""]) {
@@ -43,6 +46,7 @@ export default {
                     previousWord = currentWord;
                 }
             }
+
             context.messageHandler.send(message, capitalize(sentence));
         }
     },

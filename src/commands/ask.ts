@@ -1,11 +1,15 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import { makeStringHelpers } from "../systems/stringHelpers";
 import type { BotMessage } from "../interfaces/discord";
+
 const bannedPhrases = ["bot:", "user:", "[user]:", "[bot]:"];
+
 function filterBotReply(filtered: string): string {
     for (const phrase of bannedPhrases) filtered = filtered.replace(new RegExp(phrase, "gi"), "").trim();
+
     return filtered || "thinking...";
 }
+
 async function buildChain(
     message: BotMessage,
     removeCommandFn: (s: string) => string,
@@ -23,8 +27,10 @@ async function buildChain(
             );
         }
     }
+
     return chain;
 }
+
 export default {
     name: "ask",
     description: "asks via an LLM",
@@ -41,6 +47,7 @@ export default {
             userQuestion = removeCommand(message.content);
             promptTemplate = context.config.llm?.base_prompt ?? "";
         }
+
         const prompt = promptTemplate.replace("{userQuestion}", userQuestion);
         const discordMsg = await context.messageHandler.reply(message, "Thinking...");
         if (!discordMsg) return;

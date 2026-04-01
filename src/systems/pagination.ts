@@ -1,13 +1,16 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder } from "discord.js";
 import type { IMessageHandler } from "../interfaces";
 import type { BotMessage, MessageContent } from "../interfaces/discord";
+
 type PageObject = Exclude<MessageContent, string | EmbedBuilder>;
 type Page = MessageContent;
+
 export class Pagination {
     private messageHandler: IMessageHandler;
     constructor(messageHandler: IMessageHandler) {
         this.messageHandler = messageHandler;
     }
+
     async sendPaginatedEmbed(message: BotMessage, pages: Page[], timeout = 300000): Promise<BotMessage | undefined> {
         if (!pages || pages.length === 0) throw new Error("Pages array cannot be empty");
         if (pages.length === 1) return this.messageHandler.send(message, pages[0]);
@@ -38,8 +41,10 @@ export class Pagination {
                     : page instanceof EmbedBuilder
                       ? { embeds: [page] }
                       : (page as PageObject);
+
             return { ...base, components: [getButtons()] };
         };
+
         const sentMessage = await this.messageHandler.send(message, getPageContent(currentPage));
         if (!sentMessage) return undefined;
         const collector = sentMessage.createMessageComponentCollector({
@@ -63,8 +68,10 @@ export class Pagination {
                 } as MessageContent)
                 .catch(() => {});
         });
+
         return sentMessage;
     }
+
     async createPages<T>(
         items: T[],
         itemsPerPage: number,
@@ -76,6 +83,7 @@ export class Pagination {
             const slice = items.slice(i * itemsPerPage, (i + 1) * itemsPerPage);
             pages.push(await formatPage(slice, i + 1, totalPages));
         }
+
         return pages;
     }
 }

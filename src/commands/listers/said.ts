@@ -3,10 +3,12 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+
 class SaidLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
         return this.perPerson(message, context);
     }
+
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `WITH normalized AS (
                 SELECT LOWER(message) AS message
@@ -25,6 +27,7 @@ class SaidLister extends Lister {
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row["message"]} was said ${row["count"]} times \n`;
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top most used phrases in ${message.guild?.name}`)
@@ -33,6 +36,7 @@ class SaidLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     override async mention(
         message: GuildBotMessage,
         mentioned: {
@@ -64,6 +68,7 @@ class SaidLister extends Lister {
         context.messageHandler.send(message, { embeds: [top] });
     }
 }
+
 export default {
     name: "said",
     description: "shows the most repeated phrases in the server",

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { CooldownTracker } from "../../systems/cooldownTracker";
+
 describe("CooldownTracker", () => {
     let tracker: CooldownTracker;
     beforeEach(() => {

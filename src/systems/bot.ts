@@ -1,49 +1,20 @@
 import fs from "fs";
 import path from "path";
 import * as discord from "discord.js";
-import { Pool } from "pg";
 import type { BotConfig } from "../interfaces/config";
 import type { ILogger } from "../interfaces";
 import { toBotMessage } from "./messageAdapter";
-import { Database } from "./database";
-import { MessageHandler } from "./messageHandler";
-import { CommandHandler } from "./commandHandler";
-import { EventListener } from "./eventListener";
-import { ReplyHandler } from "./replyHandler";
-import { SlashHandler } from "./slashHandler";
-import { UserHandler } from "./userHandler";
-import { EmoteInjector } from "./emoteInjector";
-import { WebhookService } from "./webhook";
-import { BackupHandler } from "./backupHandler";
-import { Dictionary } from "./dictionary";
-import { HangmanGame } from "./hangman";
-import { Pagination } from "./pagination";
-import { loadCommands, type LoadedCommands } from "./commandLoader";
 import { setBotContext } from "./botContext";
-import { LlmService } from "./llm";
-import replyPatterns from "../json/reply.json";
+import { SystemRegistry } from "./systemRegistry";
+
 const DISALLOWED_PATH = path.resolve(__dirname, "../json/disallowed.json");
+
 export class Bot {
-    client: discord.Client;
-    config: BotConfig;
-    logger: ILogger;
-    disallowed: Record<string, boolean> = {};
-    database!: Database;
-    messageHandler!: MessageHandler;
-    commandHandler!: CommandHandler;
-    replyHandler!: ReplyHandler;
-    slashHandler!: SlashHandler;
-    userHandler!: UserHandler;
-    emoteInjector!: EmoteInjector;
-    webhook!: WebhookService;
-    backupHandler!: BackupHandler;
-    dictionary!: Dictionary;
-    hangman!: HangmanGame;
-    pagination!: Pagination;
-    llm!: LlmService;
-    eventListener!: EventListener;
-    loadedCommands!: LoadedCommands;
-    private version: string;
+    readonly client: discord.Client;
+    registry!: SystemRegistry;
+    private readonly config: BotConfig;
+    private readonly logger: ILogger;
+    private readonly version: string;
     constructor(config: BotConfig, logger: ILogger, version = "3.0.0") {
         this.config = config;
         this.logger = logger;
@@ -78,6 +49,7 @@ export class Bot {
         this.login();
         setInterval(() => this.login(), 5 * 60 * 1000);
     }
+
     login(): void {
         if (!this.client.isReady()) {
             this.logger.startup("Attempting to log in");
@@ -88,58 +60,15 @@ export class Bot {
             this.client.login(key);
         }
     }
+
     private async loadSystems(): Promise<void> {
-        this.loadDisallowed();
-        const pool = new Pool({
-            user: this.config.db.user,
-            host: this.config.db.host,
-            database: this.config.db.database,
-            password: this.config.db.password,
-            port: this.config.db.port,
-        });
-        this.database = new Database(pool, this.logger, this.config);
-        await this.database.initialize();
-        this.messageHandler = new MessageHandler(this.database, this.logger, this.config);
-        await this.messageHandler.loadCommandCalls();
-        this.replyHandler = new ReplyHandler(this.messageHandler, this.logger, replyPatterns);
-        this.dictionary = new Dictionary(this.database, this.logger);
-        this.hangman = new HangmanGame(this.messageHandler, this.dictionary, this.config, this.logger);
-        this.pagination = new Pagination(this.messageHandler);
-        this.llm = new LlmService(this.config.llm, this.logger, this.messageHandler);
-        const loadedCommands = loadCommands(path.resolve(__dirname, ".."), this.logger);
-        this.loadedCommands = loadedCommands;
-        this.commandHandler = new CommandHandler({
-            commands: loadedCommands,
-            messageHandler: this.messageHandler,
-            replyHandler: this.replyHandler,
-            logger: this.logger,
-            config: this.config,
-            disallowed: this.disallowed,
-            getBotUser: () => this.client.user,
-            context: this,
-        });
-        this.messageHandler.setCommandListRemover((msg) => this.commandHandler.commandList.remove(msg));
-        this.webhook = new WebhookService(this.logger, this.client);
-        this.emoteInjector = new EmoteInjector(this.webhook, this.messageHandler, this.client);
-        this.userHandler = new UserHandler(this.database, this.logger, this.client);
-        this.backupHandler = new BackupHandler(this.logger, this.config, this.client);
-        this.slashHandler = new SlashHandler(this.logger, this.client, this);
-        await this.slashHandler.registerCommands(loadedCommands.commands);
-        this.eventListener = new EventListener(
-            this.client,
-            this.database,
-            this.commandHandler,
-            this.messageHandler,
-            this.emoteInjector,
-            this.slashHandler,
-            this.backupHandler,
-            this.config,
-            this.logger,
-            this.disallowed,
-        );
-        setBotContext(this);
+        const disallowed = this.loadDisallowed();
+        this.registry = new SystemRegistry(this.config, this.logger, this.client);
+        await this.registry.initialize(disallowed);
+        setBotContext(this.registry);
         if (this.config.scan_on_startup === true || this.config.scan_on_startup === "1") this.scanOnStartup();
     }
+
     private scanOnStartup(): void {
         this.logger.startup("Reading messages since startup");
         const yesterday = Date.now() - 24 * 60 * 60 * 1000;
@@ -154,29 +83,33 @@ export class Bot {
                             .filter((m: discord.Message) => m.createdTimestamp > yesterday)
                             .forEach((m: discord.Message) => {
                                 const msg = toBotMessage(m);
-                                this.database.storeMessage(msg);
+                                this.registry.database.storeMessage(msg);
                                 if (m.content.match(new RegExp(this.config.prefix, "i"))) {
-                                    const calls = this.messageHandler.getCommandCalls();
+                                    const calls = this.registry.messageHandler.getCommandCalls();
                                     if (!(m.id in calls))
-                                        if (!this.commandHandler.isUserBanned(msg))
-                                            this.commandHandler.handleCommand(msg, true);
+                                        if (!this.registry.commandHandler.isUserBanned(msg))
+                                            this.registry.commandHandler.handleCommand(msg, true);
                                 }
                             });
                     });
             });
     }
-    private loadDisallowed(): void {
+
+    private loadDisallowed(): Record<string, boolean> {
         try {
             if (fs.existsSync(DISALLOWED_PATH)) {
                 const data = fs.readFileSync(DISALLOWED_PATH, "utf8");
-                this.disallowed = JSON.parse(data);
+
+                return JSON.parse(data) as Record<string, boolean>;
             } else {
                 fs.writeFileSync(DISALLOWED_PATH, "{}", "utf8");
-                this.disallowed = {};
+
+                return {};
             }
         } catch (err) {
             this.logger.error(`Error loading disallowed.json: ${err}`);
-            this.disallowed = {};
+
+            return {};
         }
     }
 }

@@ -1,4 +1,5 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 export default {
     name: "backupdb",
     description: "exports the database to an SQL file",

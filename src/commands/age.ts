@@ -1,4 +1,5 @@
 import type { ICommand } from "../interfaces";
+
 export default {
     name: "age",
     description: "shows how long bot has been living in this server",

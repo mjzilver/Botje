@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 export default {
     name: "list",
     description: "lists all channels in all guilds",
@@ -17,6 +18,7 @@ export default {
             const nameB = b.channel.guild.name.toLowerCase();
             if (nameA < nameB) return -1;
             if (nameA > nameB) return 1;
+
             return 0;
         });
         context.logger.printColumns(

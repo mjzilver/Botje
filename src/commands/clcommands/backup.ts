@@ -3,10 +3,13 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import type { IClCommand, IBotContext } from "../../interfaces";
+
 function getUsbMounts(): string[] {
     const output = execSync("findmnt -rn -o TARGET | grep '^/media/'", { encoding: "utf8" });
+
     return output.trim().split("\n").filter(Boolean);
 }
+
 function isValidDirectory(dir: string): boolean {
     try {
         return (
@@ -16,6 +19,7 @@ function isValidDirectory(dir: string): boolean {
         return false;
     }
 }
+
 export default {
     name: "backup",
     description: "Backs up everything to a drive",
@@ -24,13 +28,17 @@ export default {
         if (!input[0]) {
             context.logger.console("Available mount points:");
             getUsbMounts().forEach((m) => context.logger.console(`- ${m}`));
+
             return;
         }
+
         const destination = path.resolve(input[0]);
         if (!isValidDirectory(destination)) {
             context.logger.console(`Invalid or unwritable directory: ${destination}`);
+
             return;
         }
+
         const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "bot-backup-"));
         const backupDir = path.join(tmpDir, "backup");
         fs.mkdirSync(backupDir, { recursive: true });

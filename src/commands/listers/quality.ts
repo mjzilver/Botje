@@ -3,6 +3,7 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+
 class QualityLister extends Lister {
     override async mention(
         message: GuildBotMessage,
@@ -33,6 +34,7 @@ class QualityLister extends Lister {
         const userQuality = parseFloat(rows[0]["percentage_unique"]).toFixed(2);
         context.messageHandler.send(message, `\`${userName}\`'s post quality is ${userQuality}%`);
     }
+
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT user_id,
             COUNT(*) AS total_messages,
@@ -50,6 +52,7 @@ class QualityLister extends Lister {
                 const userName = await context.userHandler.getDisplayName(row["user_id"], message.guild.id);
                 result += `\`${userName}\`'s post quality is ${parseFloat(row["percentage_unique"]).toFixed(2)}% \n`;
             }
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top 10 quality posters in ${message.guild?.name}`)
@@ -59,6 +62,7 @@ class QualityLister extends Lister {
         context.pagination.sendPaginatedEmbed(message, pages);
     }
 }
+
 export default {
     name: "quality",
     description: "shows post quality (uniqueness)",

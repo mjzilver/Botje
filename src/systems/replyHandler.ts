@@ -2,6 +2,7 @@ import type { IMessageHandler, ILogger } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { pickRandomItem } from "./utils";
 import { CooldownTracker } from "./cooldownTracker";
+
 interface ReplyPattern {
     name: string;
     regex: string;
@@ -10,6 +11,7 @@ interface ReplyPattern {
     mention: boolean;
     timeout: number;
 }
+
 export class ReplyHandler {
     private replyPatterns: ReplyPattern[];
     private compiledPatterns: Map<string, RegExp>;
@@ -22,6 +24,7 @@ export class ReplyHandler {
         this.replyPatterns = patterns;
         this.compiledPatterns = new Map(patterns.map((p) => [p.name, new RegExp(p.regex, "gi")]));
     }
+
     process(message: BotMessage): boolean {
         let matched = false;
         for (const pattern of this.replyPatterns) {
@@ -34,6 +37,7 @@ export class ReplyHandler {
                 matched = true;
             }
         }
+
         return matched;
     }
 }

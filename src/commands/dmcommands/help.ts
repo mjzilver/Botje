@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
 import type { ICommand } from "../../interfaces";
 import packageJson from "../../../package.json";
+
 export default {
     name: "help",
     description: "sends this helpful message",
@@ -16,6 +17,7 @@ export default {
             .setTitle(":robot: Current DirectMessage commands: :robot:")
             .setDescription(helpMessage)
             .setFooter({ text: `Current Version: ${packageJson.version}` });
+
         return context.messageHandler.send(message, { embeds: [help] });
     },
 } satisfies ICommand;

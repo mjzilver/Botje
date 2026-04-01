@@ -16,8 +16,8 @@
     "beta": "ts-node-dev --respawn --transpile-only src/start.ts --beta",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "prettier --check src",
-    "lint-fix": "prettier --write src"
+    "lint": "prettier --check src && eslint src",
+    "lint-fix": "prettier --write src && eslint --fix src"
   },
   "dependencies": {
     "axios": "^1.13.5",
@@ -28,16 +28,19 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.0.0",
     "@types/pg": "^8.11.0",
     "@types/pg-format": "^1.0.5",
     "@vitest/coverage-v8": "^2.0.0",
     "escomplex": "^2.0.0-alpha",
+    "eslint": "^10.4.0",
     "esprima": "^4.0.1",
     "prettier": "^3.8.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.4.0",
+    "typescript-eslint": "^8.60.0",
     "typhonjs-escomplex": "^0.1.0",
     "vitest": "^2.0.0"
   }

@@ -2,11 +2,13 @@ import { describe, it, expect, vi } from "vitest";
 import { Database } from "../../systems/database";
 import { createSilentLogger } from "../../systems/logger";
 import type { Pool } from "pg";
+
 function makeMockPool(rows: Record<string, unknown>[] = []): Pool {
     return {
         query: vi.fn().mockResolvedValue({ rows }),
     } as unknown as Pool;
 }
+
 const testConfig = { prefix: "^(b! ?)" };
 const logger = createSilentLogger();
 describe("Database.getCount", () => {

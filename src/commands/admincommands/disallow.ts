@@ -1,6 +1,8 @@
 import fs from "fs";
 import type { ICommand } from "../../interfaces";
+
 const DISALLOWED_PATH = "json/disallowed.json";
+
 export default {
     name: "disallow",
     description: "disallows or re-allows a user from using the bot",
@@ -26,6 +28,7 @@ export default {
         } else {
             return context.messageHandler.send(message, "You need to @ someone to disallow them");
         }
+
         fs.writeFile(DISALLOWED_PATH, JSON.stringify(disallowed), (err) => {
             if (err) context.logger.error(err);
         });

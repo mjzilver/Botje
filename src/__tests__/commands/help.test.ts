@@ -16,6 +16,7 @@ function makeCommand(name: string): ICommand {
 
 function makeContext(commands: Record<string, ICommand>): IBotContext {
     const pages: MessageContent[] = [];
+
     return {
         loadedCommands: {
             commands,
@@ -118,6 +119,7 @@ describe("help command – execution", () => {
                 formatter: (items: T[], p: number, total: number) => MessageContent,
             ) => {
                 capturedFormatter = formatter as typeof capturedFormatter;
+
                 return [formatter(items, 1, 1)];
             },
         );
@@ -139,6 +141,7 @@ describe("help command – execution", () => {
                 formatter: (items: T[], p: number, total: number) => MessageContent,
             ) => {
                 capturedFormatter = formatter as typeof capturedFormatter;
+
                 return [formatter(items, 1, 1)];
             },
         );

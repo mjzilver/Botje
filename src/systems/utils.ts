@@ -9,6 +9,7 @@ export function levenshtein(a: string, b: string): number {
             if (b.charAt(i - 1) === a.charAt(j - 1)) matrix[i][j] = matrix[i - 1][j - 1];
             else
                 matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+
     return matrix[b.length][a.length];
 }
 export function findClosestMatchInList(word: string, wordList: string[] | Record<string, number>): string {
@@ -22,6 +23,7 @@ export function findClosestMatchInList(word: string, wordList: string[] | Record
     } else {
         list = wordList;
     }
+
     word = word.toLowerCase();
     let closestMatch = "";
     let difference = Number.MAX_VALUE;
@@ -39,6 +41,7 @@ export function findClosestMatchInList(word: string, wordList: string[] | Record
             }
         }
     }
+
     return closestMatch;
 }
 export function formatUptime(ms: number): string {
@@ -46,6 +49,7 @@ export function formatUptime(ms: number): string {
     const hours = Math.floor((ms / 3600000) % 24);
     const minutes = Math.floor((ms / 60000) % 60);
     const seconds = Math.ceil((ms / 1000) % 60);
+
     return [
         days ? `${days} days, ` : "",
         hours ? `${hours} hours, ` : "",
@@ -58,6 +62,7 @@ export function randomBetween(min: number, max: number): number {
 }
 export function pickRandomItem<T>(array: T[]): T {
     if (!Array.isArray(array) || array.length === 0) throw new Error("Array must be non-empty to pick a random item");
+
     return array[randomBetween(0, array.length - 1)];
 }
 

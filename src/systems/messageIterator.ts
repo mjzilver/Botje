@@ -1,4 +1,5 @@
 import type { ILogger } from "../interfaces";
+
 export interface IterableMessage {
     id: string;
     author?: {
@@ -8,6 +9,7 @@ export interface IterableMessage {
     content?: string;
     delete(): Promise<unknown>;
 }
+
 interface FetchableChannel {
     name?: string | null;
     lastMessageId?: string | null;
@@ -18,15 +20,18 @@ interface FetchableChannel {
         name?: string | null;
     };
 }
+
 export interface IteratorStats {
     totalProcessed: number;
 }
+
 export interface IteratorOptions {
     onMessage?(message: IterableMessage): Promise<void> | void;
     onComplete?(stats: IteratorStats): void;
     limit?: number;
     logProgress?: boolean;
 }
+
 export class MessageIterator {
     private onMessage: (message: IterableMessage) => Promise<void> | void;
     private onComplete: ((stats: IteratorStats) => void) | null;
@@ -41,23 +46,29 @@ export class MessageIterator {
         this.limit = options.limit ?? Infinity;
         this.logProgress = options.logProgress !== false;
     }
+
     async iterate(channel: FetchableChannel, startMessageId?: string | null): Promise<void> {
         const messageId = startMessageId ?? channel.lastMessageId;
         if (!messageId) {
             if (this.logProgress) this.logger.console(`No messages found in ${channel.name ?? "channel"}`);
             this.onComplete?.(this.stats);
+
             return;
         }
+
         await this.fetchBatch(channel, messageId);
     }
+
     private async fetchBatch(channel: FetchableChannel, messageId: string): Promise<void> {
         const remaining = this.limit - this.stats.totalProcessed;
         if (remaining <= 0) {
             if (this.logProgress)
                 this.logger.console(`Limit reached: ${this.stats.totalProcessed} messages from ${channel.name}`);
             this.onComplete?.(this.stats);
+
             return;
         }
+
         const fetchLimit = Math.min(100, remaining);
         try {
             const messages = await channel.messages.fetch({ limit: fetchLimit, before: messageId });
@@ -65,14 +76,17 @@ export class MessageIterator {
                 if (this.logProgress)
                     this.logger.console(`End reached: ${this.stats.totalProcessed} messages from ${channel.name}`);
                 this.onComplete?.(this.stats);
+
                 return;
             }
+
             let lastId = messageId;
             for (const [id, message] of messages) {
                 await this.onMessage(message);
                 lastId = id;
                 this.stats.totalProcessed++;
             }
+
             if (this.logProgress && messages.size === 100)
                 this.logger.console(
                     `${this.stats.totalProcessed} messages from ${channel.name} in ${channel.guild?.name ?? "DM"}`,

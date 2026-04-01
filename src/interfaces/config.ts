@@ -5,10 +5,12 @@ export interface DbConfig {
     password: string;
     port: number;
 }
+
 export interface ImageConfig {
     size: number;
     magnification: number;
 }
+
 export interface LlmConfig {
     model: string;
     api: string;
@@ -18,6 +20,7 @@ export interface LlmConfig {
     tarot_prompt: string;
     max_concurrent_requests: number;
 }
+
 export interface BotConfig {
     prefix: string;
     discord_api_key: string;

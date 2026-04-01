@@ -1,6 +1,7 @@
 import type { ICommand } from "../../interfaces";
 import { MessageIterator } from "../../systems/messageIterator";
 import type { IterableMessage } from "../../systems/messageIterator";
+
 export default {
     name: "purge",
     description: "removes bot messages and messages with the bot prefix from the channel",

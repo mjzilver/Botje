@@ -2,6 +2,7 @@ import fs from "fs";
 import * as discord from "discord.js";
 import type { ICommand } from "../interfaces";
 import { findClosestMatchInList } from "../systems/utils";
+
 export default {
     name: "getemote",
     description: "gets the emote, or lists all emotes if no name provided",
@@ -19,6 +20,7 @@ export default {
                 50,
                 (pageEmotes: string[], pageNum: number, totalPages: number) => {
                     const result = pageEmotes.join(", ");
+
                     return new discord.EmbedBuilder()
                         .setColor(context.config.color_hex)
                         .setTitle(`Emotes backed up for ${message.guild?.name}`)

@@ -43,5 +43,6 @@ export function loadCommands(baseDir: string, logger: ILogger): LoadedCommands {
     logger.startup(`[CommandLoader] Loaded ${Object.keys(admincommands).length} admin commands`);
     logger.startup(`[CommandLoader] Loaded ${Object.keys(clcommands).length} clcommands`);
     logger.startup(`[CommandLoader] Loaded ${Object.keys(dmcommands).length} dmcommands`);
+
     return { commands, admincommands, dmcommands, clcommands };
 }

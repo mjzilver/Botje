@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { LimitedList } from "../../../systems/types/limitedList";
+
 describe("LimitedList", () => {
     it("stores items up to limit", () => {
         const list = new LimitedList<number>(3);

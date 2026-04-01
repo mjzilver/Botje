@@ -5,7 +5,9 @@ import type { IDatabase, ILogger, SqlParam } from "../interfaces";
 import type { BotConfig } from "../interfaces/config";
 import { isGuildMessage } from "../interfaces/discord";
 import type { BotMessage, BotReaction, GuildBotMessage } from "../interfaces/discord";
+
 const DEBUG_SQL = true;
+
 export class Database implements IDatabase {
     private pool: Pool;
     private logger: ILogger;
@@ -15,6 +17,7 @@ export class Database implements IDatabase {
         this.logger = logger;
         this.config = config;
     }
+
     async initialize(): Promise<void> {
         try {
             await this.initializeSchema();
@@ -24,6 +27,7 @@ export class Database implements IDatabase {
             throw e;
         }
     }
+
     private async initializeSchema(): Promise<void> {
         await this.query("CREATE EXTENSION IF NOT EXISTS pg_trgm");
         await this.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)");
@@ -88,6 +92,7 @@ export class Database implements IDatabase {
             )
         `);
     }
+
     async query<T extends QueryResultRow = QueryResultRow>(sql: string, params: SqlParam[] = []): Promise<T[]> {
         let start: number | undefined;
         if (DEBUG_SQL) start = Date.now();
@@ -102,18 +107,22 @@ export class Database implements IDatabase {
                     } catch (e) {
                         interpolated = `[pg-format error] ${(e as Error).message}`;
                     }
+
                     this.logger.warn(`[Slow Query] (${duration} ms) ${interpolated}`);
                 }
             }
+
             return result.rows as T[];
         } catch (err) {
             this.logger.error(`SQL Error:\n${sql}\n${err}`);
             throw err;
         }
     }
+
     async insert(sql: string, params: SqlParam[] = []): Promise<void> {
         await this.query(sql, params);
     }
+
     async ensureUserExists(
         user: {
             id: string;
@@ -130,6 +139,7 @@ export class Database implements IDatabase {
                 [user.id, serverId, displayName, Date.now()],
             );
     }
+
     async getCurrentUsername(userId: string, serverId: string): Promise<string | null> {
         const rows = await this.query<{
             user_name: string;
@@ -140,15 +150,19 @@ export class Database implements IDatabase {
              LIMIT 1`,
             [userId, serverId],
         );
+
         return rows.length ? rows[0].user_name : null;
     }
+
     async getCount(selectQuery: string, parameters: SqlParam[] = []): Promise<number> {
         const countQuery = `SELECT COUNT(*) AS count FROM (${selectQuery}) AS sub`;
         const rows = await this.query<{
             count: string;
         }>(countQuery, parameters);
+
         return parseInt(rows[0].count, 10);
     }
+
     async queryRandomMessage<T extends QueryResultRow = QueryResultRow>(
         selectQuery: string,
         parameters: SqlParam[] = [],
@@ -157,8 +171,10 @@ export class Database implements IDatabase {
         if (count === 0) return [];
         const offset = Math.floor(Math.random() * count);
         const queryWithOffset = `${selectQuery} LIMIT 1 OFFSET $${parameters.length + 1}`;
+
         return this.query<T>(queryWithOffset, [...parameters, offset]);
     }
+
     async storeMessage(message: BotMessage): Promise<void> {
         if (
             message.cleanContent === "" ||
@@ -177,6 +193,7 @@ export class Database implements IDatabase {
             );
         }
     }
+
     async updateMessage(message: BotMessage): Promise<void> {
         try {
             await this.query("UPDATE messages SET message = $1 WHERE id = $2::bigint", [
@@ -187,6 +204,7 @@ export class Database implements IDatabase {
             this.logger.error(`Failed to update: ${message.content}`);
         }
     }
+
     async insertReaction(reaction: BotReaction): Promise<void> {
         let users = reaction.users.cache;
         if (users.size === 0)
@@ -194,6 +212,7 @@ export class Database implements IDatabase {
                 users = await reaction.users.fetch();
             } catch {
                 this.logger.error("Failed to fetch users for reaction");
+
                 return;
             }
         for (const user of users.values())
@@ -208,6 +227,7 @@ export class Database implements IDatabase {
                 this.logger.error("Failed to store reaction");
             }
     }
+
     async insertMessage(message: GuildBotMessage): Promise<void> {
         let replyTo: string | null = null;
         if (message.reference?.messageId)
@@ -217,6 +237,7 @@ export class Database implements IDatabase {
             } catch {
                 this.logger.error("Failed to fetch replied message");
             }
+
         await this.query(
             `INSERT INTO messages
             (id, user_id, message, channel_id, server_id, datetime, reply_to)
@@ -235,6 +256,7 @@ export class Database implements IDatabase {
         if (message.reactions.cache.size > 0)
             for (const reaction of message.reactions.cache.values()) await this.insertReaction(reaction);
     }
+
     static fromConfig(config: BotConfig, logger: ILogger): Database {
         const pool = new Pool({
             user: config.db.user,
@@ -243,6 +265,7 @@ export class Database implements IDatabase {
             password: config.db.password,
             port: config.db.port,
         });
+
         return new Database(pool, logger, config);
     }
 }

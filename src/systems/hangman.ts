@@ -7,6 +7,7 @@ import type { BotMessage } from "../interfaces/discord";
 import type { Dictionary } from "./dictionary";
 import { pickRandomItem } from "./utils";
 import { textOnly as textOnlyHelper, replaceAt as replaceAtHelper } from "./stringHelpers";
+
 export class HangmanGame {
     private word = "";
     private visibleWord = "";
@@ -32,6 +33,7 @@ export class HangmanGame {
         this.logger = logger;
         this.assetsDir = assetsDir;
     }
+
     run(message: BotMessage): void {
         const args = message.cleanContent.toLowerCase().split(" ");
         switch (args[1]) {
@@ -46,11 +48,14 @@ export class HangmanGame {
                 this.help(message);
         }
     }
+
     private start(message: BotMessage): void {
         if (!this.hasEnded) {
             this.messageHandler.send(message, "A game of hangman is still ongoing");
+
             return;
         }
+
         this.word = "";
         this.visibleWord = "";
         this.tries = 0;
@@ -63,22 +68,27 @@ export class HangmanGame {
             w = w.replace(nonSelectors, "").trim();
             if (candidate[1] > 10 && w.length >= 5 && w.length <= 20 && /[a-z]+/i.test(w)) this.word = w;
         }
+
         this.visibleWord = "―".repeat(this.word.length);
         this.hasEnded = false;
         this.messageHandler.send(message, "Starting new hangman game.");
         this.logger.debug(`Hangman word: ${this.word}`);
         this.sendEmbed(message);
     }
+
     private guess(message: BotMessage, guessedContent: string | undefined): void {
         if (this.hasEnded) {
             this.messageHandler.send(message, "This hangman game has ended...");
+
             return;
         }
         if (!guessedContent) {
             this.messageHandler.send(message, "Not a valid guess!");
+
             return;
         }
-        let content = "";
+
+        let content: string;
         if (guessedContent.length > 1) {
             if (guessedContent === this.word) {
                 content = `You guessed the word ${this.word} after ${this.tries} tries -- You have won!`;
@@ -106,12 +116,15 @@ export class HangmanGame {
             content = "You've won by guessing all the letters!";
             this.hasEnded = true;
         }
+
         this.sendEmbed(message, content);
     }
+
     private help(message: BotMessage): void {
         if (this.hasEnded) this.start(message);
         else this.sendEmbed(message);
     }
+
     private sendEmbed(message: BotMessage, content = ""): void {
         const attachment = new AttachmentBuilder(path.join(this.assetsDir, `${this.tries}.png`), {
             name: "hangman.png",

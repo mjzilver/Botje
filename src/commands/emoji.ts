@@ -2,6 +2,7 @@ import * as discord from "discord.js";
 import type { ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import emojiValues from "../json/emoji.json";
+
 export default {
     name: "emoji",
     description: "turns your message into emojis",
@@ -20,6 +21,7 @@ export default {
                             (emojiValues as Record<string, string>)[`letter_${c}`],
                         );
                 }
+
                 setTimeout(() => context.messageHandler.delete(message), 1000);
             });
         } else {
@@ -32,6 +34,7 @@ export default {
                     result += " ";
                 }
             }
+
             context.messageHandler.send(message, result);
         }
     },

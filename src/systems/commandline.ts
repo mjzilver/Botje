@@ -1,8 +1,10 @@
 import readline from "readline";
 import type { IBotContext, ILogger } from "../interfaces";
+
 interface ClCommand {
     function(args: string[], context: IBotContext): void | Promise<void>;
 }
+
 export class CommandLine {
     private commands: Record<string, ClCommand>;
     private logger: ILogger;
@@ -13,6 +15,7 @@ export class CommandLine {
         this.context = context;
         this.start();
     }
+
     private start(): void {
         const rl = readline.createInterface({ input: process.stdin });
         rl.on("line", async (line: string) => {

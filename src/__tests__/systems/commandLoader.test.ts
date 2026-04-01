@@ -3,19 +3,25 @@ import fs from "fs";
 import path from "path";
 import { loadCommands } from "../../systems/commandLoader";
 import { createSilentLogger } from "../../systems/logger";
+
 const logger = createSilentLogger();
+
 function makeTmpDir(): string {
     const dir = path.join("/tmp", `botje-cltest-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     fs.mkdirSync(dir, { recursive: true });
+
     return dir;
 }
+
 function writeCommand(dir: string, file: string, obj: object): void {
     const content = `module.exports = ${JSON.stringify(obj)}`;
     fs.writeFileSync(path.join(dir, file), content);
 }
+
 function teardown(dir: string): void {
     fs.rmSync(dir, { recursive: true, force: true });
 }
+
 describe("loadCommands – non-existent dir", () => {
     it("returns empty collections when base dir does not exist", () => {
         const result = loadCommands("/tmp/does-not-exist-ever", logger);

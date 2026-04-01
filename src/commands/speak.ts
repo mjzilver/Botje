@@ -3,6 +3,7 @@ import { textOnly, normalizeSpaces, countVowelGroups } from "../systems/stringHe
 import { makeStringHelpers } from "../systems/stringHelpers";
 import { randomBetween, levenshtein, pickRandomItem } from "../systems/utils";
 import type { BotMessage } from "../interfaces/discord";
+
 async function findByWord(message: BotMessage, context: IBotContext): Promise<void> {
     const { removePrefix } = makeStringHelpers(context.config);
     const earliest = new Date();
@@ -39,6 +40,7 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
                             highestAmount = amount;
                         }
                 }
+
                 chosenMessage = chosenMessage.replace(/@.*/gi, "");
                 context.logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`);
                 context.messageHandler.send(message, chosenMessage);
@@ -61,6 +63,7 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
         await findRandom(message, context);
     }
 }
+
 async function findRandom(message: BotMessage, context: IBotContext): Promise<void> {
     context.logger.debug("Sending randomly selected message");
     const earliest = new Date();
@@ -74,6 +77,7 @@ async function findRandom(message: BotMessage, context: IBotContext): Promise<vo
     }>(selectSQL, []);
     if (rows) context.messageHandler.send(message, normalizeSpaces(rows[0]["message"]));
 }
+
 async function findTopic(message: BotMessage, topic: string, context: IBotContext): Promise<void> {
     const selectSQL = `SELECT LOWER(message) as message
         FROM messages
@@ -85,20 +89,25 @@ async function findTopic(message: BotMessage, topic: string, context: IBotContex
     if (rows.length < 3) {
         context.logger.debug("Not enough info about topic -- redirecting to the regular method");
         message.content = message.content.replace(/(about|think|of)/gi, "");
+
         return await findByWord(message, context);
     }
+
     const IS_ARE_REGEX = /\b(?:is|are)\b/gi;
     let first = rows[0].message;
     let second = rows[1].message;
     let third = rows[2].message;
     context.logger.debug(`Picked terms related to '${topic}', first '${first}', second '${second}', third '${third}'`);
+
     function extractTopicPhrase(msg: string, topicStr: string, removeTopic = false, regex?: RegExp): string {
         const topicLower = topicStr.toLowerCase();
         const idx = msg.indexOf(topicLower);
         if (idx === -1) return msg;
         const result = removeTopic ? msg.substring(idx + topicLower.length) : msg.substring(idx);
+
         return regex ? result.replace(regex, "").trim() : result.trim();
     }
+
     first = extractTopicPhrase(first, topic);
     second = extractTopicPhrase(second, topic, true, IS_ARE_REGEX);
     third = extractTopicPhrase(third, topic, true, IS_ARE_REGEX);
@@ -113,6 +122,7 @@ async function findTopic(message: BotMessage, topic: string, context: IBotContex
             normalizeSpaces(`${first}, ${second} ${pickRandomItem(linkerwords)} ${third}`),
         );
 }
+
 export default {
     name: "speak",
     description: "makes the bot speak via recycled messages",

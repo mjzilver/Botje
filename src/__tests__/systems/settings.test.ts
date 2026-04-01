@@ -4,16 +4,20 @@ import os from "os";
 import path from "path";
 import { Settings } from "../../systems/settings";
 import type { BotConfig } from "../../interfaces/config";
+
 const MINIMAL_CONFIG: Partial<BotConfig> = {
     prefix: "!",
     timeoutDuration: 30,
 };
 const noop = { error: () => {} };
+
 function writeTempConfig(data: object): string {
     const file = path.join(os.tmpdir(), `settings-test-${Date.now()}.json`);
     fs.writeFileSync(file, JSON.stringify(data), "utf8");
+
     return file;
 }
+
 describe("Settings", () => {
     let tmpFile: string;
     beforeEach(() => {

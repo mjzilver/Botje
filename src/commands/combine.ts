@@ -3,7 +3,9 @@ import Jimp from "jimp";
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { findClosestMatchInList, pickRandomItem } from "../systems/utils";
+
 const emoteParser = /:(.+?)(~.*)?:[0-9]*/;
+
 async function processCombination(
     image1: string,
     image2: string,
@@ -27,6 +29,7 @@ async function processCombination(
         });
     });
 }
+
 export default {
     name: "combine",
     description: "combines two emotes into one",
@@ -52,10 +55,13 @@ export default {
             if (!files.includes(image1) || !files.includes(image2)) {
                 image1 = findClosestMatchInList(args[0], files);
                 image2 = findClosestMatchInList(args[1], files);
+
                 return processCombination(image1, image2, message, context);
             }
+
             return processCombination(image1, image2, message, context);
         }
+
         return processCombination(image1, image2, message, context);
     },
 } satisfies ICommand;

@@ -4,6 +4,7 @@ import { Lister } from "./lister";
 import { isGuildMessage } from "../../interfaces/discord";
 import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
 import { removeQuotes } from "../../systems/stringHelpers";
+
 const phraseHelperMessage = `Please specify a word or phrase to search for!
 
 **Usage:**
@@ -12,12 +13,15 @@ const phraseHelperMessage = `Please specify a word or phrase to search for!
 • \`phrase @user hello\` - count uses by specific user
 • \`phrase top hello\` - leaderboard of who says it most
 • \`phrase percent hello\` - percentage of each user's messages containing it`;
+
 class PhraseLister extends Lister {
     override process(message: BotMessage, context: IBotContext): void {
         if (!isGuildMessage(message)) {
             context.messageHandler.reply(message, "This command only works in a server.");
+
             return;
         }
+
         const { mention, leaderboard, percent, args } = this.parseArgs(message, { preserveQuotes: true });
         const word = args[0] ? removeQuotes(args[0]).toLowerCase() : undefined;
         if (!word) return void context.messageHandler.send(message, phraseHelperMessage);
@@ -26,6 +30,7 @@ class PhraseLister extends Lister {
         else if (percent) this.phrasePercentage(message, word, context);
         else this.phraseTotal(message, word, context);
     }
+
     private async phraseLeaderboard(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT user_id, server_id, count(message) as count
             FROM messages
@@ -42,6 +47,7 @@ class PhraseLister extends Lister {
                 const userName = await context.userHandler.getDisplayName(row["user_id"], row["server_id"]);
                 result += `\`${userName}\` has said ${word} ${row["count"]} times! \n`;
             }
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top users for "${word}" in ${message.guild?.name}`)
@@ -50,6 +56,7 @@ class PhraseLister extends Lister {
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
+
     private async phraseTotal(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2`;
         const rows = await context.database.query(selectSQL, [`%${word}%`, message.guild.id]);
@@ -58,6 +65,7 @@ class PhraseLister extends Lister {
             `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`,
         );
     }
+
     private async phraseWithMention(
         message: GuildBotMessage,
         mentioned: { id: string },
@@ -72,6 +80,7 @@ class PhraseLister extends Lister {
             `Ive found ${rows[0]["count"]} messages from \`${userName}\` in this server that contain ${word}`,
         );
     }
+
     private async phrasePercentage(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
         const selectSQL = `WITH filtered AS (
                 SELECT user_id, server_id, COUNT(*) AS count
@@ -109,6 +118,7 @@ class PhraseLister extends Lister {
             let result = "";
             for (const row of pageRows)
                 result += `\`${row.userName}\` has said ${word} in ${row.percentage}% of their messages! \n`;
+
             return new discord.EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top users by percentage for "${word}" in ${message.guild?.name}`)
@@ -118,6 +128,7 @@ class PhraseLister extends Lister {
         context.pagination.sendPaginatedEmbed(message, pages);
     }
 }
+
 export default {
     name: "phrase",
     description: "shows how many times a word/phrase has been used in the server",
