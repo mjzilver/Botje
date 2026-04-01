@@ -1,8 +1,10 @@
 import type { ICommand } from "../../interfaces";
 import { queryLogs } from "../../systems/logger";
 import type { LogEntry } from "../../interfaces";
+import type { QueryOptions } from "winston";
 
-const logOptions = { limit: 5, order: "desc", level: "error" };
+const LOG_LEVEL = "error";
+const logOptions: QueryOptions = { limit: 5, order: "desc", fields: [] };
 
 export default {
     name: "log",
@@ -17,7 +19,7 @@ export default {
             }
 
             let logs: LogEntry[] = results.file ?? [];
-            if (logOptions.level) logs = logs.filter((log) => log.level === logOptions.level);
+            logs = logs.filter((log) => log.level === LOG_LEVEL);
             logs = logs.slice(0, logOptions.limit);
             if (logs.length === 0) {
                 context.messageHandler.send(message, "No logs found in the last 24 hours.");

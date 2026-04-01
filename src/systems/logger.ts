@@ -128,10 +128,10 @@ export function getCurrentLogLevel(): string {
     return activeTransports[0]?.level ?? "startup";
 }
 export function queryLogs(
-    options: { limit?: number; order?: string; level?: string },
+    options: Winston.QueryOptions,
     callback: (err: Error | null, results: { file?: LogEntry[] }) => void,
 ): void {
-    activeWinstonLogger.query(options as unknown as Winston.QueryOptions, (err, results) => {
+    activeWinstonLogger.query(options, (err, results) => {
         callback(err as Error | null, results as { file?: LogEntry[] });
     });
 }
