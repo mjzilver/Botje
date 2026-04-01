@@ -7,7 +7,7 @@ import type { EmoteInjector } from "./emoteInjector";
 import type { MessageHandler } from "./messageHandler";
 import type { SlashHandler } from "./slashHandler";
 import type { BackupHandler } from "./backupHandler";
-import { toBotMessage, toPartialBotMessage, toBotReaction } from "./messageAdapter";
+import { toBotMessage, toBotReaction } from "./messageAdapter";
 
 type EmojiLike = {
     id: string;
@@ -76,7 +76,7 @@ export class EventListener {
             ) => {
                 if (!newMessage.author || newMessage.author.id in disallowed) return;
                 if (newMessage.channel.type !== ChannelType.DM && newMessage.content !== null) {
-                    const botMsg = toPartialBotMessage(newMessage as discord.Message);
+                    const botMsg = toBotMessage(newMessage as discord.Message);
                     await db.updateMessage(botMsg);
                     emoteInjector.handleMessage(botMsg);
                 }

@@ -50,8 +50,8 @@ export class MessageHandler implements IMessageHandler {
         }
 
         let promise: Promise<BotMessage>;
-        if (call.isSlashCommand && call.interaction) {
-            const interaction = call.interaction;
+        if (call.isSlashCommand && call.slashInteraction) {
+            const interaction = call.slashInteraction;
             promise =
                 interaction.deferred || interaction.replied
                     ? interaction
@@ -89,9 +89,11 @@ export class MessageHandler implements IMessageHandler {
     }
 
     react(message: BotMessage, emoji: string): Promise<void> {
-        return message.react(emoji).catch((err) => {
+        message.react(emoji).catch((err) => {
             this.logger.debug(`Failed to react (likely deleted): ${(err as Error).message}`);
         });
+
+        return Promise.resolve();
     }
 
     edit(replyObj: BotMessage, newContent: MessageContent): Promise<BotMessage> {
@@ -108,9 +110,11 @@ export class MessageHandler implements IMessageHandler {
     }
 
     delete(message: BotMessage): Promise<void> {
-        return message.delete().catch((err) => {
+        message.delete().catch((err) => {
             this.logger.debug(`Failed to delete (likely already deleted): ${(err as Error).message}`);
         });
+
+        return Promise.resolve();
     }
 
     findFromReply(replyMessage: BotMessage): string | undefined {

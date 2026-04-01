@@ -113,7 +113,7 @@ export class SlashHandler {
             reactions: { cache: new Map<string, BotReaction>(), resolve: () => null },
             reference: null,
             isSlashCommand: true,
-            interaction,
+            slashInteraction: interaction,
             reply: (_content: MessageContent) => Promise.resolve(pseudoMessage),
             react: (_emoji: string) => Promise.resolve(),
             edit: (_content: MessageContent) => Promise.resolve(pseudoMessage),
