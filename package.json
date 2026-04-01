@@ -1,0 +1,44 @@
+{
+  "name": "botje",
+  "version": "3.0.0",
+  "description": "Versatile & fun Discord bot.",
+  "main": "dist/start.js",
+  "author": "Mick Jari",
+  "email": "4ilverj@gmail.com",
+  "license": "GPL 3.0",
+  "repository": "https://github.com/mjzilver/botje",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc && cp -r src/json dist/json",
+    "start": "node dist/start.js",
+    "dev": "ts-node src/start.ts",
+    "beta": "ts-node-dev --respawn --transpile-only src/start.ts --beta",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "prettier --check src",
+    "lint-fix": "prettier --write src"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "discord.js": "^14.25.1",
+    "jimp": "^0.22.12",
+    "pg": "^8.12.0",
+    "pg-format": "^1.0.4",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
+    "@types/pg-format": "^1.0.5",
+    "@vitest/coverage-v8": "^2.0.0",
+    "escomplex": "^2.0.0-alpha",
+    "esprima": "^4.0.1",
+    "prettier": "^3.8.3",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.0",
+    "typhonjs-escomplex": "^0.1.0",
+    "vitest": "^2.0.0"
+  }
+}

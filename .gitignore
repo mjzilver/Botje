@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Test coverage
+coverage/
+
+# Secrets & local config — use config.example.json as template
+config.json
+
+# Runtime artefacts
+bot.log
+*.log
+
+# Transient JSON files
+src/json/disallowed.json
+src/json/words.json
+
+# Generated meme output
+assets/meme.png
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Todos
+todo.md
