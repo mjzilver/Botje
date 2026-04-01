@@ -1,5 +1,6 @@
 import type { ILogger } from "../interfaces";
 import type { LlmConfig } from "../interfaces/config";
+import { toError } from "./utils";
 import type { BotMessage } from "../interfaces/discord";
 import type { IMessageHandler } from "../interfaces";
 
@@ -91,7 +92,7 @@ export class LlmService {
                             }
                         }
                     } catch (err) {
-                        if ((err as Error).message?.includes("LLM error")) throw err;
+                        if (toError(err).message?.includes("LLM error")) throw err;
                         this.logger.warn(`Skipping invalid JSON line: ${line}`);
                     }
                 }
@@ -99,10 +100,10 @@ export class LlmService {
 
             return accumulated;
         } catch (err) {
-            if ((err as Error).name === "AbortError") {
+            if (toError(err).name === "AbortError") {
                 this.logger.info("LLM stream aborted.");
             } else {
-                this.logger.error(`Failed to contact LLM: ${err}`);
+                this.logger.error(toError(err));
                 throw err;
             }
         } finally {

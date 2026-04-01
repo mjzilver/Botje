@@ -1,5 +1,6 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import { makeStringHelpers } from "../systems/stringHelpers";
+import { toError } from "../systems/utils";
 import type { BotMessage } from "../interfaces/discord";
 
 const bannedPhrases = ["bot:", "user:", "[user]:", "[bot]:"];
@@ -54,7 +55,8 @@ export default {
         try {
             await context.llm.streamToMessage(discordMsg, prompt, filterBotReply);
             await context.messageHandler.react(discordMsg, "🤖");
-        } catch {
+        } catch (err) {
+            context.logger.error(toError(err));
             await context.messageHandler.edit(discordMsg, "Error contacting LLM.");
         }
     },

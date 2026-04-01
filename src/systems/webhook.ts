@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
 import type { ILogger } from "../interfaces";
+import { toError } from "./utils";
 
 const BOT_NAME = "botje";
 
@@ -35,7 +36,7 @@ export class WebhookService {
 
             return true;
         } catch (err) {
-            this.logger.error(`Failed to send webhook message: ${(err as Error).message}`);
+            this.logger.error(`Failed to send webhook message: ${toError(err).message}`);
 
             return false;
         }

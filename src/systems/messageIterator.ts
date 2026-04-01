@@ -1,4 +1,5 @@
 import type { ILogger } from "../interfaces";
+import { toError } from "./utils";
 
 export interface IterableMessage {
     id: string;
@@ -98,7 +99,7 @@ export class MessageIterator {
                 this.onComplete?.(this.stats);
             }
         } catch (err) {
-            this.logger.error(`Error fetching from ${channel.name}: ${(err as Error).message}`);
+            this.logger.error(`Error fetching from ${channel.name}: ${toError(err).message}`);
             this.onComplete?.(this.stats);
         }
     }

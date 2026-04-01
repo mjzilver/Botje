@@ -1,4 +1,5 @@
 import * as discord from "discord.js";
+import { toError } from "./utils";
 import {
     SlashCommandBuilder,
     SlashCommandUserOption,
@@ -155,7 +156,7 @@ export class SlashHandler {
                 builders.push(builder.toJSON());
                 this.slashCommands.push({ name: command.name, command });
             } catch (err) {
-                this.logger.warn(`[SlashCommands] Failed to build /${name}: ${(err as Error).message}`);
+                this.logger.warn(`[SlashCommands] Failed to build /${name}: ${toError(err).message}`);
             }
         }
         try {
@@ -166,11 +167,11 @@ export class SlashHandler {
                     await guild.commands.set(builders);
                     this.logger.startup(`[SlashCommands] Registered to guild: ${guild.name}`);
                 } catch (err) {
-                    this.logger.warn(`[SlashCommands] Failed for guild ${guild.name}: ${(err as Error).message}`);
+                    this.logger.warn(`[SlashCommands] Failed for guild ${guild.name}: ${toError(err).message}`);
                 }
             }
         } catch (err) {
-            this.logger.error(`[SlashCommands] Registration failed: ${err}`);
+            this.logger.error(`[SlashCommands] Registration failed: ${toError(err).message}`);
         }
     }
 }
