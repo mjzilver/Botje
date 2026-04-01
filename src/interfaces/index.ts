@@ -1,5 +1,5 @@
 import type { BotMessage, GuildBotMessage, MessageContent } from "./discord";
-import type { SlashCommandBuilder } from "discord.js";
+import type { Client, SlashCommandBuilder } from "discord.js";
 import type { QueryResultRow } from "pg";
 import type { BotConfig } from "./config";
 import type { LoadedCommands } from "../systems/commandLoader";
@@ -138,30 +138,6 @@ export interface IDictionary {
     getNonSelectorsRegex(): RegExp;
 }
 
-interface IClientChannelMessage {
-    id: string;
-    author?: { id: string; bot?: boolean };
-    content?: string;
-    delete(): Promise<unknown>;
-}
-
-interface IClientChannel {
-    type: number;
-    name?: string | null;
-    lastMessageId?: string | null;
-    messages?: {
-        fetch(options: { limit: number; before: string }): Promise<Map<string, IClientChannelMessage>>;
-    };
-    guild?: { name?: string | null };
-}
-
-export interface IBotClient {
-    user: { id: string } | null;
-    readyTimestamp: number | null;
-    channels: { cache: Map<string, IClientChannel> };
-    destroy(): void;
-}
-
 export interface IBotContext {
     database: IDatabase;
     messageHandler: IMessageHandler;
@@ -174,6 +150,6 @@ export interface IBotContext {
     llm: ILlmService;
     loadedCommands: LoadedCommands;
     dictionary: IDictionary;
-    client: IBotClient;
+    client: Client;
     disallowed: Record<string, boolean>;
 }
