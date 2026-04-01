@@ -1,4 +1,23 @@
-import type { CommandInteraction, EmbedBuilder } from "discord.js";
+import type {
+    CommandInteraction,
+    EmbedBuilder,
+    AttachmentBuilder,
+    Guild,
+    GuildMember,
+    User,
+    MessageReaction,
+    GuildEmoji,
+} from "discord.js";
+
+export type BotGuild = Guild;
+
+export type BotMember = GuildMember;
+
+export type BotUser = User;
+
+export type BotReaction = MessageReaction;
+
+export type BotEmoji = GuildEmoji;
 
 export interface ComponentCollectorInteraction {
     user: { id: string };
@@ -16,13 +35,7 @@ export interface ComponentCollector {
 export interface BotMessage {
     id: string;
     content: string;
-    author: {
-        id: string;
-        username: string;
-        tag: string;
-        bot: boolean;
-        displayAvatarURL(options?: { size?: number }): string;
-    };
+    author: BotUser;
     channel: {
         id: string;
         type: number;
@@ -55,15 +68,9 @@ export interface BotMessage {
     cleanContent: string;
     attachments?: {
         size: number;
-        first():
-            | {
-                  url?: string;
-              }
-            | undefined;
+        first(): { url?: string } | undefined;
     };
-    embeds?: {
-        url?: string;
-    }[];
+    embeds?: { url?: string }[];
     reactions: {
         cache: Map<string, BotReaction>;
         resolve(emoji: string): BotReaction | null;
@@ -77,24 +84,6 @@ export interface BotMessage {
     createMessageComponentCollector(options: { componentType: number; time: number }): ComponentCollector;
 }
 
-export interface BotGuild {
-    id: string;
-    name: string;
-    ownerId?: string;
-    members: {
-        fetch(id: string): Promise<BotMember>;
-        cache: Map<string, BotMember> & {
-            find(fn: (m: BotMember) => boolean): BotMember | undefined;
-        };
-    };
-    channels: {
-        cache: Map<string, AnyChannel>;
-    };
-    emojis: {
-        cache: Map<string, BotEmoji>;
-    };
-}
-
 export interface GuildBotMessage extends BotMessage {
     guild: BotGuild;
 }
@@ -103,80 +92,13 @@ export function isGuildMessage(message: BotMessage): message is GuildBotMessage 
     return message.guild !== null;
 }
 
-export interface BotMember {
-    id: string;
-    displayName: string;
-    joinedAt?: Date;
-    permissions: {
-        has(flag: bigint): boolean;
-    };
-    user: BotUser;
-}
-
-export interface BotUser {
-    id: string;
-    username: string;
-    tag: string;
-    bot: boolean;
-    displayAvatarURL(options?: { size?: number }): string;
-    equals(other: BotUser): boolean;
-}
-
-export interface BotReaction {
-    emoji: {
-        name: string | null;
-    };
-    count: number | null;
-    users: {
-        cache: Map<string, BotUser>;
-        fetch(): Promise<Map<string, BotUser>>;
-    };
-    message: { id: string; content: string | null };
-}
-
-export interface BotEmoji {
-    id: string;
-    name: string | null;
-    imageURL(options?: { size?: number }): string;
-    guild: BotGuild;
-}
-
-export interface AnyChannel {
-    id: string;
-    name?: string;
-    type: number;
-    guild?: {
-        id?: string;
-        name?: string;
-    };
-    send?(content: MessageContent): Promise<BotMessage>;
-    fetchWebhooks?(): Promise<
-        Map<
-            string,
-            {
-                delete(): Promise<void>;
-            }
-        >
-    >;
-    messages?: {
-        fetch(
-            options:
-                | {
-                      limit: number;
-                      before?: string;
-                  }
-                | string,
-        ): Promise<Map<string, BotMessage> | BotMessage>;
-    };
-}
-
 export type MessageContent =
     | string
     | EmbedBuilder
     | {
           content?: string;
           embeds?: EmbedBuilder[];
-          files?: (string | import("discord.js").AttachmentBuilder)[];
+          files?: (string | AttachmentBuilder)[];
           components?: object[];
           ephemeral?: boolean;
       };

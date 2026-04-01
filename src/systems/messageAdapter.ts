@@ -10,7 +10,7 @@ export function toPartialBotMessage(message: discord.Message | discord.PartialMe
 }
 
 export function toBotReaction(reaction: discord.MessageReaction | discord.PartialMessageReaction): BotReaction {
-    return reaction as unknown as BotReaction;
+    return reaction as BotReaction;
 }
 
 export function toBotChannel(channel: discord.TextBasedChannel | null): BotMessage["channel"] {

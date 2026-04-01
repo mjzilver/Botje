@@ -5,9 +5,7 @@ export default {
     description: "shows how long bot has been living in this server",
     format: "age",
     function(message, context) {
-        const member = message.guild?.members?.cache?.find(
-            (u: { id: string; joinedAt?: Date }) => u.id === context.client.user?.id,
-        );
+        const member = message.guild?.members?.cache?.find((u) => u.id === context.client.user?.id);
         const joined = new Date(member?.joinedAt ?? Date.now());
         const now = new Date();
         const diff = now.getTime() - joined.getTime();
