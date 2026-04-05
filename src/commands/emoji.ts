@@ -1,29 +1,34 @@
-import * as discord from "discord.js";
 import type { ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import emojiValues from "../json/emoji.json";
+import { toError } from "../systems/utils";
 
 export default {
     name: "emoji",
     description: "turns your message into emojis",
     format: "emoji [string]",
     options: [{ type: "string", name: "text", description: "The text to convert into emojis", required: true }],
-    function(message, context) {
-        if (message.type === discord.MessageType.Reply) {
-            message.channel.messages.fetch(message.reference!.messageId!).then((result: BotMessage) => {
-                const replyMessage = result;
-                const sentence = message.content.split(" ").slice(1).join(" ").toLowerCase();
-                for (let i = 0; i < sentence.length; i++) {
-                    const c = sentence.charAt(i);
-                    if (c >= "a" && c <= "z")
-                        context.messageHandler.react(
-                            replyMessage,
-                            (emojiValues as Record<string, string>)[`letter_${c}`],
-                        );
-                }
+    async function(message, context) {
+        if (message.type === 19) {
+            const messageId = message.reference?.messageId;
+            if (!messageId) return;
+            let replyMessage: BotMessage;
+            try {
+                replyMessage = await message.channel.messages.fetch(messageId);
+            } catch (err) {
+                context.logger.error(toError(err));
 
-                setTimeout(() => context.messageHandler.delete(message), 1000);
-            });
+                return;
+            }
+
+            const sentence = message.content.split(" ").slice(1).join(" ").toLowerCase();
+            for (let i = 0; i < sentence.length; i++) {
+                const c = sentence.charAt(i);
+                if (c >= "a" && c <= "z")
+                    context.messageHandler.react(replyMessage, (emojiValues as Record<string, string>)[`letter_${c}`]);
+            }
+
+            setTimeout(() => context.messageHandler.delete(message), 1000);
         } else {
             const sentence = message.content.split(" ").slice(1).join(" ").toLowerCase();
             let result = "";

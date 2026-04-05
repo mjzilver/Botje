@@ -1,12 +1,13 @@
 import type {
+    ActionRowBuilder,
+    AttachmentBuilder,
     CommandInteraction,
     EmbedBuilder,
-    AttachmentBuilder,
     Guild,
-    GuildMember,
-    User,
-    MessageReaction,
     GuildEmoji,
+    GuildMember,
+    MessageReaction,
+    User,
 } from "discord.js";
 
 export type BotGuild = Guild;
@@ -99,6 +100,6 @@ export type MessageContent =
           content?: string;
           embeds?: EmbedBuilder[];
           files?: (string | AttachmentBuilder)[];
-          components?: object[];
+          components?: ActionRowBuilder[];
           ephemeral?: boolean;
       };

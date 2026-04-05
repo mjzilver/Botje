@@ -55,12 +55,12 @@ export class MessageHandler implements IMessageHandler {
             promise =
                 interaction.deferred || interaction.replied
                     ? interaction
-                          .followUp(content as Parameters<typeof interaction.followUp>[0])
+                          .followUp(content as discord.InteractionReplyOptions)
                           .then((m) => toBotMessage(m as discord.Message))
-                    : interaction.reply(content as Parameters<typeof interaction.reply>[0]).then(() => call);
+                    : interaction.reply(content as discord.InteractionReplyOptions).then(() => call);
         } else if (useReply) {
             promise = call.reply(content).catch((err) => {
-                this.logger.error(`Failed to reply (likely deleted): ${(err as Error).message}`);
+                this.logger.error(`Failed to reply (likely deleted): ${toError(err).message}`);
                 throw err;
             });
         } else {
@@ -90,7 +90,7 @@ export class MessageHandler implements IMessageHandler {
 
     react(message: BotMessage, emoji: string): Promise<void> {
         message.react(emoji).catch((err) => {
-            this.logger.debug(`Failed to react (likely deleted): ${(err as Error).message}`);
+            this.logger.debug(`Failed to react (likely deleted): ${toError(err).message}`);
         });
 
         return Promise.resolve();
@@ -103,7 +103,7 @@ export class MessageHandler implements IMessageHandler {
                 .edit(newContent)
                 .then(resolve)
                 .catch((err) => {
-                    this.logger.debug(`Failed to edit (likely deleted): ${(err as Error).message}`);
+                    this.logger.debug(`Failed to edit (likely deleted): ${toError(err).message}`);
                     reject(err);
                 });
         });
@@ -111,7 +111,7 @@ export class MessageHandler implements IMessageHandler {
 
     delete(message: BotMessage): Promise<void> {
         message.delete().catch((err) => {
-            this.logger.debug(`Failed to delete (likely already deleted): ${(err as Error).message}`);
+            this.logger.debug(`Failed to delete (likely already deleted): ${toError(err).message}`);
         });
 
         return Promise.resolve();

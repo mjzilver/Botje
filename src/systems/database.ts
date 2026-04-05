@@ -5,6 +5,7 @@ import type { ILogger } from "./logger";
 import type { BotConfig } from "../interfaces/config";
 import { isGuildMessage } from "../interfaces/discord";
 import type { BotMessage, BotReaction, GuildBotMessage } from "../interfaces/discord";
+import { toError } from "./utils";
 
 export type SqlParam = string | number | boolean | null | Date | Buffer;
 
@@ -123,7 +124,7 @@ export class Database implements IDatabase {
                     try {
                         interpolated = format.withArray(sql.replace(/\$(\d+)/g, "%L"), params);
                     } catch (e) {
-                        interpolated = `[pg-format error] ${(e as Error).message}`;
+                        interpolated = `[pg-format error] ${toError(e).message}`;
                     }
 
                     this.logger.warn(`[Slow Query] (${duration} ms) ${interpolated}`);
