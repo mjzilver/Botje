@@ -1,12 +1,11 @@
 import * as discord from "discord.js";
 import { ChannelType, Events } from "discord.js";
 import type { IDatabase, ILogger } from "../interfaces";
-import type { BotConfig } from "../interfaces/config";
 import type { CommandHandler } from "./commandHandler";
 import type { EmoteInjector } from "./emoteInjector";
-import type { MessageHandler } from "./messageHandler";
 import type { SlashHandler } from "./slashHandler";
 import type { BackupHandler } from "./backupHandler";
+import type { ReactionHandler } from "./reactionHandler";
 import { toBotMessage, toBotReaction } from "./messageAdapter";
 
 type EmojiLike = {
@@ -20,17 +19,16 @@ export class EventListener {
         client: discord.Client,
         db: IDatabase,
         commandHandler: CommandHandler,
-        messageHandler: MessageHandler,
         emoteInjector: EmoteInjector,
         slashHandler: SlashHandler,
         backupHandler: BackupHandler,
-        config: BotConfig,
         logger: ILogger,
         disallowed: Record<string, boolean>,
+        reactionHandler: ReactionHandler,
     ) {
         this.attachErrorHandlers(client, logger);
         this.attachMessageHandlers(client, db, commandHandler, emoteInjector, disallowed);
-        this.attachReactionHandlers(client, db, commandHandler, messageHandler, config, logger);
+        this.attachReactionHandlers(client, reactionHandler);
         this.attachEmojiHandlers(client, backupHandler);
         this.attachInteractionHandler(client, slashHandler);
     }
@@ -84,31 +82,13 @@ export class EventListener {
         );
     }
 
-    private attachReactionHandlers(
-        client: discord.Client,
-        db: IDatabase,
-        commandHandler: CommandHandler,
-        messageHandler: MessageHandler,
-        config: BotConfig,
-        logger: ILogger,
-    ): void {
+    private attachReactionHandlers(client: discord.Client, reactionHandler: ReactionHandler): void {
         client.on(
             Events.MessageReactionAdd,
             async (reaction: discord.MessageReaction | discord.PartialMessageReaction) => {
                 const botReaction = toBotReaction(reaction);
-                await db.insertReaction(botReaction);
                 const botMessage = toBotMessage(reaction.message as discord.Message);
-                if (!botMessage.author || botMessage.author.id !== client.user?.id) return;
-                const emojiName = reaction.emoji.name;
-                if (emojiName === config.negative_emoji) {
-                    const positiveReaction = botMessage.reactions.resolve(config.positive_emoji);
-                    if ((reaction.count ?? 0) >= 3 && (reaction.count ?? 0) > (positiveReaction?.count ?? 0)) {
-                        setTimeout(() => messageHandler.delete(botMessage), 5000);
-                        logger.warn(`Post deleted due to downvotes: ${botMessage.content}`);
-                    }
-                } else if (emojiName === config.redo_emoji) {
-                    commandHandler.redo(botMessage, (id) => botMessage.channel.messages.fetch(id));
-                }
+                await reactionHandler.process(botReaction, false, botMessage);
             },
         );
     }

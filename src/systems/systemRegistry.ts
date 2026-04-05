@@ -18,6 +18,7 @@ import { HangmanGame } from "./hangman";
 import { Pagination } from "./pagination";
 import { loadCommands, type LoadedCommands } from "./commandLoader";
 import { LlmService } from "./llm";
+import { ReactionHandler } from "./reactionHandler";
 import replyPatterns from "../json/reply.json";
 
 export class SystemRegistry implements IBotContext {
@@ -35,6 +36,7 @@ export class SystemRegistry implements IBotContext {
     backupHandler!: BackupHandler;
     slashHandler!: SlashHandler;
     eventListener!: EventListener;
+    reactionHandler!: ReactionHandler;
     loadedCommands!: LoadedCommands;
     disallowed!: Record<string, boolean>;
     readonly config: BotConfig;
@@ -83,17 +85,24 @@ export class SystemRegistry implements IBotContext {
         this.backupHandler = new BackupHandler(this.logger, this.config, this.client);
         this.slashHandler = new SlashHandler(this.logger, this.client, this);
         await this.slashHandler.registerCommands(loadedCommands.commands);
+        this.reactionHandler = new ReactionHandler(
+            this.database,
+            this.commandHandler,
+            this.messageHandler,
+            this.config,
+            this.logger,
+            () => this.client.user?.id,
+        );
         this.eventListener = new EventListener(
             this.client,
             this.database,
             this.commandHandler,
-            this.messageHandler,
             this.emoteInjector,
             this.slashHandler,
             this.backupHandler,
-            this.config,
             this.logger,
             this.disallowed,
+            this.reactionHandler,
         );
     }
 }
