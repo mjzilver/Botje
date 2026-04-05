@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -25,7 +25,7 @@ class EmotesLister extends Lister {
             let result = "";
             for (const row of pageRows) result += `${row["message"]} was used ${row["count"]} times! \n`;
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top emotes in ${message.guild?.name}`)
                 .setDescription(result)
@@ -61,7 +61,7 @@ class EmotesLister extends Lister {
             let result = "";
             for (const row of pageRows) result += `${row["message"]} said ${row["count"]} times! \n`;
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Emotes used by ${userName} in ${message.guild?.name}`)
                 .setDescription(result)
@@ -86,7 +86,7 @@ class EmotesLister extends Lister {
                 result += `\`${userName}\` has posted ${row["count"]} emotes! \n`;
             }
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top 10 posters in ${message.guild?.name}`)
                 .setDescription(result)

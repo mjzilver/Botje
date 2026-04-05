@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand, IBotContext } from "../../interfaces";
 import { Lister } from "./lister";
 import { isGuildMessage } from "../../interfaces/discord";
@@ -48,7 +48,7 @@ class PhraseLister extends Lister {
                 result += `\`${userName}\` has said ${word} ${row.count} times! \n`;
             }
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top users for "${word}" in ${message.guild?.name}`)
                 .setDescription(result)
@@ -120,7 +120,7 @@ class PhraseLister extends Lister {
             for (const row of pageRows)
                 result += `\`${row.userName}\` has said ${word} in ${row.percentage}% of their messages! \n`;
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top users by percentage for "${word}" in ${message.guild?.name}`)
                 .setDescription(result)

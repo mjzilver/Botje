@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -28,7 +28,7 @@ class SaidLister extends Lister {
             let result = "";
             for (const row of pageRows) result += `${row["message"]} was said ${row["count"]} times \n`;
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top most used phrases in ${message.guild?.name}`)
                 .setDescription(result)
@@ -61,7 +61,7 @@ class SaidLister extends Lister {
         for (let i = 0; i < rows.length && i <= 10; i++)
             result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`;
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        const top = new discord.EmbedBuilder()
+        const top = new EmbedBuilder()
             .setColor(context.config.color_hex)
             .setTitle(`Top 10 most used phrases in ${message.guild?.name} by \`${userName}\``)
             .setDescription(result);

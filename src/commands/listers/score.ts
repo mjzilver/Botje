@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -70,7 +70,7 @@ class ScoreLister extends Lister {
                 let result = "";
                 for (const row of pageRows) result += `\`${userNames[row[0]]}\`'s post score is ${row[1]} \n`;
 
-                return new discord.EmbedBuilder()
+                return new EmbedBuilder()
                     .setColor(context.config.color_hex)
                     .setTitle(`Top posters by score in ${message.guild?.name}`)
                     .setDescription(result)

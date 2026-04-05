@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { ChannelType } from "../../interfaces/discord";
 import type { IClCommand, IBotContext } from "../../interfaces";
 import save from "./save";
 
@@ -8,6 +8,6 @@ export default {
     format: "scan [amount]?",
     function(input: string[], context: IBotContext) {
         for (const [channelId, channel] of context.client.channels.cache.entries())
-            if (channel.type === discord.ChannelType.GuildText) save.function([channelId, ...input], context);
+            if (channel.type === ChannelType.GuildText) save.function([channelId, ...input], context);
     },
 } satisfies IClCommand;

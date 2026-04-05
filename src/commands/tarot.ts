@@ -1,5 +1,5 @@
 import path from "path";
-import * as discord from "discord.js";
+import { EmbedBuilder, AttachmentBuilder } from "../interfaces/discord";
 import Jimp from "jimp";
 import type { ICommand } from "../interfaces";
 import { makeStringHelpers } from "../systems/stringHelpers";
@@ -48,10 +48,10 @@ export default {
         let image = await Jimp.read(path.join(__dirname, "../../assets/tarot", filename));
         if (isReversed) image = image.rotate(180);
         const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
-        const attachment = new discord.AttachmentBuilder(buffer, { name: `${card.name_short}.png` });
+        const attachment = new AttachmentBuilder(buffer, { name: `${card.name_short}.png` });
         const userQuestion = removeCommand(message.content).trim();
         const meaning = isReversed ? card.meaning_rev : card.meaning_up;
-        const tarotEmbed = new discord.EmbedBuilder()
+        const tarotEmbed = new EmbedBuilder()
             .setColor(context.config.color_hex)
             .setTitle(`Your card is: ${card.name} ${isReversed ? "(Reversed)" : ""}`)
             .setImage(`attachment://${card.name_short}.png`)

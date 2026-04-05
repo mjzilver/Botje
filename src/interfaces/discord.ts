@@ -103,3 +103,7 @@ export type MessageContent =
           components?: ActionRowBuilder[];
           ephemeral?: boolean;
       };
+
+export { EmbedBuilder, AttachmentBuilder, ChannelType } from "discord.js";
+
+export type { TextChannel } from "discord.js";

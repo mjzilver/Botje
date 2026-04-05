@@ -1,5 +1,5 @@
 import axios from "axios";
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand, IBotContext } from "../interfaces";
 import { toError } from "../systems/utils";
 import { isLink, isImage } from "../systems/stringHelpers";
@@ -89,7 +89,7 @@ async function handleRedditImages(
 
 function embedImage(message: BotMessage, post: RedditPost, sub: string, context: IBotContext): void {
     if (isImage(post.url)) {
-        const image = new discord.EmbedBuilder()
+        const image = new EmbedBuilder()
             .setColor(parseInt(context.config.color_hex.replace("#", ""), 16))
             .setTitle(post.title)
             .addFields(

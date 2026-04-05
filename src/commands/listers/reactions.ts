@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -20,7 +20,7 @@ class ReactionsLister extends Lister {
             let result = "";
             for (const row of pageRows) result += `${row["emoji"]} was used ${row["count"]} times! \n`;
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top reactions in ${message.guild?.name}`)
                 .setDescription(result)
@@ -51,7 +51,7 @@ class ReactionsLister extends Lister {
             let result = "";
             for (const row of pageRows) result += `${row["emoji"]} was used ${row["count"]} times! \n`;
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Reactions used by ${userName} in ${message.guild?.name}`)
                 .setDescription(result)
@@ -76,7 +76,7 @@ class ReactionsLister extends Lister {
                 result += `\`${userName}\` has reacted ${row["count"]} times! \n`;
             }
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top reactors in ${message.guild?.name}`)
                 .setDescription(result)

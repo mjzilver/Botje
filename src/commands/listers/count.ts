@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -41,7 +41,7 @@ class CountLister extends Lister {
                 result += `\`${userName}\` has posted ${row.count} messages! \n`;
             }
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top 10 posters in ${message.guild?.name}`)
                 .setDescription(result)
@@ -75,7 +75,7 @@ class CountLister extends Lister {
                 result += `\`${userName}\` has posted ${Math.round((parseInt(row.count) / parseInt(row.total)) * 100)}% of all messages! \n`;
             }
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top 10 posters in ${message.guild?.name}`)
                 .setDescription(result)

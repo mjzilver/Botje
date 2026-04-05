@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { ChannelType, type TextChannel } from "../../interfaces/discord";
 import type { IClCommand, IBotContext } from "../../interfaces";
 
 export default {
@@ -8,11 +8,10 @@ export default {
     function(_input: string[], context: IBotContext) {
         const channels: {
             channelId: string;
-            channel: discord.TextChannel;
+            channel: TextChannel;
         }[] = [];
         for (const [channelId, channel] of context.client.channels.cache.entries())
-            if (channel.type === discord.ChannelType.GuildText)
-                channels.push({ channelId, channel: channel as discord.TextChannel });
+            if (channel.type === ChannelType.GuildText) channels.push({ channelId, channel: channel as TextChannel });
         channels.sort((a, b) => {
             const nameA = a.channel.guild.name.toLowerCase();
             const nameB = b.channel.guild.name.toLowerCase();

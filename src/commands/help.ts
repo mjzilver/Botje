@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand } from "../interfaces";
 import packageJson from "../../package.json";
 
@@ -15,7 +15,7 @@ export default {
                 let helpMessage = `**Here is a list of all the commands *you* can use: **\nFormat: \`()\` = optional argument, \`[]\` = required argument\n`;
                 for (const command of pageCommands) helpMessage += `\`${command.format}\`: ${command.description} \n`;
 
-                return new discord.EmbedBuilder()
+                return new EmbedBuilder()
                     .setColor(context.config.color_hex)
                     .setTitle(":robot: Current commands: :robot:")
                     .setDescription(helpMessage)

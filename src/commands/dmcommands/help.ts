@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import packageJson from "../../../package.json";
 
@@ -12,7 +12,7 @@ export default {
             "**Here is a list of all the commands *you* can use in private message (use b!help in a server to see server commands):  \n**";
         for (const [, command] of Object.entries(dmcommands))
             helpMessage += `\`${command.format}\`: ${command.description} \n`;
-        const help = new discord.EmbedBuilder()
+        const help = new EmbedBuilder()
             .setColor(context.config.color_hex)
             .setTitle(":robot: Current DirectMessage commands: :robot:")
             .setDescription(helpMessage)

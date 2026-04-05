@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -77,7 +77,7 @@ class SyllableLister extends Lister {
                 for (const row of pageRows)
                     result += `\`${userNames[row[0]]}\` has an average of ${row[1]} syllables per post \n`;
 
-                return new discord.EmbedBuilder()
+                return new EmbedBuilder()
                     .setColor(context.config.color_hex)
                     .setTitle(`Top most intellectual posters in ${message.guild?.name}`)
                     .setDescription(result)

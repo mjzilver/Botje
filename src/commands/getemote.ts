@@ -1,5 +1,5 @@
 import fs from "fs";
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand } from "../interfaces";
 import { findClosestMatchInList } from "../systems/utils";
 
@@ -21,7 +21,7 @@ export default {
                 (pageEmotes: string[], pageNum: number, totalPages: number) => {
                     const result = pageEmotes.join(", ");
 
-                    return new discord.EmbedBuilder()
+                    return new EmbedBuilder()
                         .setColor(context.config.color_hex)
                         .setTitle(`Emotes backed up for ${message.guild?.name}`)
                         .setDescription(result)

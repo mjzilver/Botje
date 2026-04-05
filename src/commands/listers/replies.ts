@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -24,7 +24,7 @@ class RepliesLister extends Lister {
                 result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`;
             }
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top reply relationships in ${message.guild?.name}`)
                 .setDescription(result)
@@ -59,7 +59,7 @@ class RepliesLister extends Lister {
                 result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`;
             }
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Who ${fromName} replies to most in ${message.guild?.name}`)
                 .setDescription(result)
@@ -83,7 +83,7 @@ class RepliesLister extends Lister {
                 result += `\`${userName}\` has sent ${row["count"]} replies! \n`;
             }
 
-            return new discord.EmbedBuilder()
+            return new EmbedBuilder()
                 .setColor(context.config.color_hex)
                 .setTitle(`Top repliers in ${message.guild?.name}`)
                 .setDescription(result)

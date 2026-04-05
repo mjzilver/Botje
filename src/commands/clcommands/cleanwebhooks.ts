@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { ChannelType, type TextChannel } from "../../interfaces/discord";
 import type { IClCommand, IBotContext } from "../../interfaces";
 
 export default {
@@ -7,12 +7,11 @@ export default {
     format: "cleanwebhooks",
     async function(_input: string[], context: IBotContext) {
         for (const [, channel] of context.client.channels.cache.entries()) {
-            if (channel.type === discord.ChannelType.GuildText) {
-                (channel as discord.TextChannel).fetchWebhooks().then((webhooks) => {
-                    webhooks.forEach((webhook) => {
-                        context.logger.console(String(webhook));
-                        webhook.delete();
-                    });
+            if (channel.type === ChannelType.GuildText) {
+                const webhooks = await (channel as TextChannel).fetchWebhooks();
+                webhooks.forEach((webhook) => {
+                    context.logger.console(String(webhook));
+                    webhook.delete();
                 });
             }
         }

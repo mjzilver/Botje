@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import { ChannelType } from "../../interfaces/discord";
 import type { IClCommand, IBotContext } from "../../interfaces";
 import { MessageIterator } from "../../systems/messageIterator";
 import type { IterableMessage, IteratorStats } from "../../systems/messageIterator";
@@ -13,7 +13,7 @@ export default {
             const channelId = input[0];
             const amount = input[1]?.length !== 0 ? parseInt(input[1] ?? "1000000") : 1000000;
             const channel = channels.get(channelId);
-            if (channel && channel.type === discord.ChannelType.GuildText && channel.messages) {
+            if (channel && channel.type === ChannelType.GuildText && channel.messages) {
                 const messages = channel.messages;
                 const textChannel = { ...channel, messages };
                 const iterator = new MessageIterator(context.logger, {

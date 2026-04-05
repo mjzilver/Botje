@@ -1,5 +1,5 @@
 import axios from "axios";
-import * as discord from "discord.js";
+import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand } from "../interfaces";
 import { capitalize } from "../systems/stringHelpers";
 import { toError } from "../systems/utils";
@@ -29,7 +29,7 @@ export default {
                     "en-UK",
                     options,
                 );
-                const weatherEmbed = new discord.EmbedBuilder()
+                const weatherEmbed = new EmbedBuilder()
                     .setColor(context.config.color_hex)
                     .setTitle(`Weather in ${result.name} ${result.sys.country}`)
                     .setThumbnail(`https://openweathermap.org/img/wn/${result.weather[0].icon}@2x.png`)
