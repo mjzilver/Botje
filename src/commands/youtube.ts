@@ -9,7 +9,7 @@ export default {
     options: [{ type: "string", name: "keyword", description: "Search term", required: true }],
     async function(message, context) {
         const keyword = message.content.split(/\s+/).slice(1).join(" ");
-        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${keyword}&key=${context.config.youtube_api_key}`;
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${encodeURIComponent(keyword)}&key=${context.config.youtube_api_key}`;
         context.logger.debug(`"${message.author?.username}" requested youtube video with keyword "${keyword}"`);
         try {
             const response = await axios.get(url);

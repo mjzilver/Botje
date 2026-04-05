@@ -31,7 +31,7 @@ class QualityLister extends Lister {
                 message,
                 `\`${userName}\` does not have enough qualifying messages.`,
             );
-        const userQuality = parseFloat(rows[0]["percentage_unique"]).toFixed(2);
+        const userQuality = parseFloat(rows[0].percentage_unique).toFixed(2);
         context.messageHandler.send(message, `\`${userName}\`'s post quality is ${userQuality}%`);
     }
 
@@ -45,12 +45,14 @@ class QualityLister extends Lister {
         GROUP BY user_id
         HAVING COUNT(*) > 1000
         ORDER BY percentage_unique DESC, user_id`;
-        const rows = await context.database.query(selectSQL, [message.guild.id]);
+        const rows = await context.database.query<{ user_id: string; percentage_unique: string }>(selectSQL, [
+            message.guild.id,
+        ]);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
-                const userName = await context.userHandler.getDisplayName(row["user_id"], message.guild.id);
-                result += `\`${userName}\`'s post quality is ${parseFloat(row["percentage_unique"]).toFixed(2)}% \n`;
+                const userName = await context.userHandler.getDisplayName(row.user_id, message.guild.id);
+                result += `\`${userName}\`'s post quality is ${parseFloat(row.percentage_unique).toFixed(2)}% \n`;
             }
 
             return new discord.EmbedBuilder()

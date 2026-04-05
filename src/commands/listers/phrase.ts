@@ -44,8 +44,8 @@ class PhraseLister extends Lister {
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
-                const userName = await context.userHandler.getDisplayName(row["user_id"], row["server_id"]);
-                result += `\`${userName}\` has said ${word} ${row["count"]} times! \n`;
+                const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
+                result += `\`${userName}\` has said ${word} ${row.count} times! \n`;
             }
 
             return new discord.EmbedBuilder()
@@ -59,11 +59,8 @@ class PhraseLister extends Lister {
 
     private async phraseTotal(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2`;
-        const rows = await context.database.query(selectSQL, [`%${word}%`, message.guild.id]);
-        context.messageHandler.send(
-            message,
-            `Ive found ${rows[0]["count"]} messages in this server that contain ${word}`,
-        );
+        const rows = await context.database.query<{ count: string }>(selectSQL, [`%${word}%`, message.guild.id]);
+        context.messageHandler.send(message, `Ive found ${rows[0].count} messages in this server that contain ${word}`);
     }
 
     private async phraseWithMention(
@@ -73,11 +70,15 @@ class PhraseLister extends Lister {
         context: IBotContext,
     ): Promise<void> {
         const selectSQL = `SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2 AND user_id = $3`;
-        const rows = await context.database.query(selectSQL, [`%${word}%`, message.guild.id, mentioned.id]);
+        const rows = await context.database.query<{ count: string }>(selectSQL, [
+            `%${word}%`,
+            message.guild.id,
+            mentioned.id,
+        ]);
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         context.messageHandler.send(
             message,
-            `Ive found ${rows[0]["count"]} messages from \`${userName}\` in this server that contain ${word}`,
+            `Ive found ${rows[0].count} messages from \`${userName}\` in this server that contain ${word}`,
         );
     }
 
@@ -109,8 +110,8 @@ class PhraseLister extends Lister {
         const sortedRows = (
             await Promise.all(
                 rows.map(async (row) => ({
-                    userName: await context.userHandler.getDisplayName(row["user_id"], row["server_id"]),
-                    percentage: ((parseInt(row["count"]) / parseInt(row["total"])) * 100).toFixed(3),
+                    userName: await context.userHandler.getDisplayName(row.user_id, row.server_id),
+                    percentage: ((parseInt(row.count) / parseInt(row.total)) * 100).toFixed(3),
                 })),
             )
         ).sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));

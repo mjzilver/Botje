@@ -1,6 +1,7 @@
 import type { CommandHandler } from "./commandHandler";
 import type { ILogger } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
+import { toError } from "./utils";
 
 export function registerProcessHandlers(
     getCommandHandler: () => CommandHandler | undefined,
@@ -16,7 +17,7 @@ export function registerProcessHandlers(
         const messageHandler = getMessageHandler();
         const last = commandHandler?.commandList.get();
         if (last && messageHandler) messageHandler.reply(last, "An error occured, this is probably your fault!");
-        logger.error(error);
+        logger.error(toError(error));
     });
     process.on("unhandledRejection", (error: unknown) => {
         const commandHandler = getCommandHandler();
@@ -24,6 +25,6 @@ export function registerProcessHandlers(
         const last = commandHandler?.commandList.get();
         if (last && messageHandler)
             messageHandler.reply(last, "An error occured, this is probably your fault, do not @me!");
-        logger.error(error instanceof Error ? error : String(error));
+        logger.error(toError(error));
     });
 }

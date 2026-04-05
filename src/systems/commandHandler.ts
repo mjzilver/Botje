@@ -6,7 +6,7 @@ import type { ReplyHandler } from "./replyHandler";
 import type { LoadedCommands } from "./commandLoader";
 import { LimitedList } from "./types/limitedList";
 import { normalizeSpaces, makeStringHelpers, capitalize } from "./stringHelpers";
-import { randomBetween } from "./utils";
+import { randomBetween, toError } from "./utils";
 import { CooldownTracker } from "./cooldownTracker";
 
 const SPEAK_MIN_TIMEOUT_MINUTES = 20;
@@ -139,21 +139,20 @@ export class CommandHandler {
         this.messageCounter++;
     }
 
-    redo(message: BotMessage, fetchMessage: (id: string) => Promise<BotMessage>): void {
+    async redo(message: BotMessage, fetchMessage: (id: string) => Promise<BotMessage>): Promise<void> {
         const callId = this.messageHandler.findFromReply(message);
         if (!callId) return;
-        fetchMessage(callId)
-            .then((callMessage) => {
-                const { command } = this.parseMessageArguments(callMessage);
-                this.logger.debug(`Redoing '${callMessage.author.username}' command '${command}'`);
-                if (command in this.commands) {
-                    this.commands[command].function(callMessage, this.context);
-                    this.messageHandler.delete(message);
-                }
-            })
-            .catch((err) => {
-                this.logger.error(`Redo failed: ${err}`);
-            });
+        try {
+            const callMessage = await fetchMessage(callId);
+            const { command } = this.parseMessageArguments(callMessage);
+            this.logger.debug(`Redoing '${callMessage.author.username}' command '${command}'`);
+            if (command in this.commands) {
+                this.commands[command].function(callMessage, this.context);
+                this.messageHandler.delete(message);
+            }
+        } catch (err) {
+            this.logger.error(toError(err));
+        }
     }
 
     isUserBanned(message: BotMessage): boolean {

@@ -6,6 +6,7 @@ import type { ILogger } from "../interfaces";
 import { toBotMessage } from "./messageAdapter";
 import { setBotContext } from "./botContext";
 import { SystemRegistry } from "./systemRegistry";
+import { toError } from "./utils";
 
 const DISALLOWED_PATH = path.resolve(__dirname, "../json/disallowed.json");
 
@@ -78,7 +79,7 @@ export class Bot {
                 const textChannel = ch as discord.TextChannel;
                 textChannel.messages
                     .fetch({ limit: 100 })
-                    .then((messages: discord.Collection<string, discord.Message>) => {
+                    .then(async (messages: discord.Collection<string, discord.Message>) => {
                         messages
                             .filter((m: discord.Message) => m.createdTimestamp > yesterday)
                             .forEach((m: discord.Message) => {
@@ -91,7 +92,8 @@ export class Bot {
                                             this.registry.commandHandler.handleCommand(msg, true);
                                 }
                             });
-                    });
+                    })
+                    .catch((err) => this.logger.error(toError(err)));
             });
     }
 

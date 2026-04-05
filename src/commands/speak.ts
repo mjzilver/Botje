@@ -33,10 +33,10 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
                 for (let i = 0; i < rows.length; i++) {
                     let amount = 0;
                     for (let j = 0; j < regexPatterns.length; j++)
-                        if (rows[i]["message"].match(regexPatterns[j])) amount += 30 - j * j;
+                        if (rows[i].message.match(regexPatterns[j])) amount += 30 - j * j;
                     if (amount > highestAmount)
-                        if (levenshtein(rows[i]["message"], message.content) > 15) {
-                            chosenMessage = rows[i]["message"];
+                        if (levenshtein(rows[i].message, message.content) > 15) {
+                            chosenMessage = rows[i].message;
                             highestAmount = amount;
                         }
                 }
@@ -56,7 +56,7 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
             }>(selectSQL, []);
             if (rows) {
                 context.logger.debug(`Sending message with '${words[0]}' in it`);
-                context.messageHandler.send(message, normalizeSpaces(rows[0]["message"]));
+                context.messageHandler.send(message, normalizeSpaces(rows[0].message));
             }
         }
     } else {
@@ -75,7 +75,7 @@ async function findRandom(message: BotMessage, context: IBotContext): Promise<vo
     const rows = await context.database.queryRandomMessage<{
         message: string;
     }>(selectSQL, []);
-    if (rows) context.messageHandler.send(message, normalizeSpaces(rows[0]["message"]));
+    if (rows) context.messageHandler.send(message, normalizeSpaces(rows[0].message));
 }
 
 async function findTopic(message: BotMessage, topic: string, context: IBotContext): Promise<void> {

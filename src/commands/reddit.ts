@@ -107,47 +107,47 @@ function embedImage(message: BotMessage, post: RedditPost, sub: string, context:
     }
 }
 
-function handleImgur(message: BotMessage, post: RedditPost, sub: string, context: IBotContext): void {
-    axiosInstance
-        .get(post.url)
-        .then((res) => {
-            if (res.request.res.responseUrl.includes("removed.png")) {
-                context.logger.debug("Found removed.png, finding new image");
-                getRedditImage(message, context);
-            } else {
-                post.url = res.request.res.responseUrl;
-                embedImage(message, post, sub, context);
-            }
-        })
-        .catch((err) => context.logger.error(toError(err)));
+async function handleImgur(message: BotMessage, post: RedditPost, sub: string, context: IBotContext): Promise<void> {
+    try {
+        const res = await axiosInstance.get(post.url);
+        if (res.request.res.responseUrl.includes("removed.png")) {
+            context.logger.debug("Found removed.png, finding new image");
+            getRedditImage(message, context);
+        } else {
+            post.url = res.request.res.responseUrl;
+            embedImage(message, post, sub, context);
+        }
+    } catch (err) {
+        context.logger.error(toError(err));
+    }
 }
 
-function handleRedirect(message: BotMessage, post: RedditPost, context: IBotContext): void {
-    axiosInstance
-        .get(post.url)
-        .then(async (res) => {
-            const redirectUrl = res.request.res.responseUrl;
-            context.logger.console(`Redirected to ${redirectUrl}`);
-            let url = decodeURIComponent(redirectUrl);
-            if (redirectUrl.includes("over18"))
-                url = url.substring(
-                    url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length,
+async function handleRedirect(message: BotMessage, post: RedditPost, context: IBotContext): Promise<void> {
+    try {
+        const res = await axiosInstance.get(post.url);
+        const redirectUrl = res.request.res.responseUrl;
+        context.logger.console(`Redirected to ${redirectUrl}`);
+        let url = decodeURIComponent(redirectUrl);
+        if (redirectUrl.includes("over18"))
+            url = url.substring(
+                url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length,
+            );
+        try {
+            const response = await axiosInstance.get(`${url}.json`);
+            const body = response.data;
+            const videoLink = body?.[0]?.data?.children?.[0]?.data?.secure_media?.reddit_video?.fallback_url;
+            if (videoLink)
+                context.messageHandler.send(
+                    message,
+                    `${post.title} \n${videoLink} \n<https://reddit.com${post.permalink}>`,
                 );
-            try {
-                const response = await axiosInstance.get(`${url}.json`);
-                const body = response.data;
-                const videoLink = body?.[0]?.data?.children?.[0]?.data?.secure_media?.reddit_video?.fallback_url;
-                if (videoLink)
-                    context.messageHandler.send(
-                        message,
-                        `${post.title} \n${videoLink} \n<https://reddit.com${post.permalink}>`,
-                    );
-                else getRedditImage(message, context);
-            } catch (err) {
-                context.logger.error(toError(err));
-            }
-        })
-        .catch((err) => context.logger.error(toError(err)));
+            else getRedditImage(message, context);
+        } catch (err) {
+            context.logger.error(toError(err));
+        }
+    } catch (err) {
+        context.logger.error(toError(err));
+    }
 }
 
 async function insertPost(post: RedditPost, sub: string, context: IBotContext): Promise<void> {

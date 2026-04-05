@@ -16,7 +16,7 @@ export default {
         const city = args.join(" ");
         try {
             const response = await axios.get(
-                `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${context.config.weather_api_key}&units=metric&mode=JSON`,
+                `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${context.config.weather_api_key}&units=metric&mode=JSON`,
             );
             const result = response.data;
             if (result.cod === 200) {

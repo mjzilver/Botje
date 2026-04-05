@@ -1,6 +1,6 @@
 import os from "os";
 import type { IClCommand, IBotContext } from "../../interfaces";
-import { formatUptime } from "../../systems/utils";
+import { formatUptime, toError } from "../../systems/utils";
 
 const formatter = new Intl.NumberFormat("en-GB");
 
@@ -28,7 +28,7 @@ export default {
                 ["Uptime", formattedUptime],
             ];
             const sql = `SELECT pg_size_pretty(pg_database_size('botdb')) AS size, COUNT(messages.id) as count FROM messages`;
-            const rows = await context.database.query(sql, []);
+            const rows = await context.database.query<{ size: string; count: string }>(sql, []);
             if (rows.length === 0) {
                 context.logger.error("No data found in the database.");
 
@@ -36,13 +36,13 @@ export default {
             }
 
             printRows.push(
-                ["Database Size", String(rows[0]["size"])],
-                ["Message Count", formatter.format(Number(rows[0]["count"]))],
+                ["Database Size", String(rows[0].size)],
+                ["Message Count", formatter.format(Number(rows[0].count))],
             );
             printRows.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
             context.logger.printRows(printRows as [string, string | number][]);
         } catch (error) {
-            context.logger.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+            context.logger.error(toError(error));
         }
     },
 } satisfies IClCommand;
