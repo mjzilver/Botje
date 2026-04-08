@@ -21,12 +21,12 @@ class SaidLister extends Lister {
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC
             LIMIT 100`;
-        const rows = await context.database.query(selectSQL, [message.guild.id]);
+        const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [message.guild.id]);
         if (!rows || rows.length === 0)
             return void context.messageHandler.send(message, `No repeated phrases found in ${message.guild?.name}`);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
-            for (const row of pageRows) result += `${row["message"]} was said ${row["count"]} times \n`;
+            for (const row of pageRows) result += `${row.message} was said ${row.count} times \n`;
 
             return new EmbedBuilder()
                 .setColor(context.config.color_hex)
@@ -56,10 +56,13 @@ class SaidLister extends Lister {
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC
             LIMIT 10`;
-        const rows = await context.database.query(selectSQL, [message.guild.id, mentioned.id]);
+        const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [
+            message.guild.id,
+            mentioned.id,
+        ]);
         let result = "";
         for (let i = 0; i < rows.length && i <= 10; i++)
-            result += `${rows[i]["message"]} was said ${rows[i]["count"]} times \n`;
+            result += `${rows[i].message} was said ${rows[i].count} times \n`;
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         const top = new EmbedBuilder()
             .setColor(context.config.color_hex)

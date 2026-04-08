@@ -13,15 +13,17 @@ class RepliesLister extends Lister {
             GROUP BY m.user_id, t.user_id
             HAVING COUNT(*) > 0
             ORDER BY COUNT(*) DESC`;
-        const rows = await context.database.query(selectSQL, [message.guild.id]);
+        const rows = await context.database.query<{ from_user: string; to_user: string; count: string }>(selectSQL, [
+            message.guild.id,
+        ]);
         if (!rows || rows.length === 0)
             return void context.messageHandler.send(message, `No reply relationships found in ${message.guild?.name}`);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
-                const fromName = await context.userHandler.getDisplayName(row["from_user"], message.guild.id);
-                const toName = await context.userHandler.getDisplayName(row["to_user"], message.guild.id);
-                result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`;
+                const fromName = await context.userHandler.getDisplayName(row.from_user, message.guild.id);
+                const toName = await context.userHandler.getDisplayName(row.to_user, message.guild.id);
+                result += `\`${fromName}\` sent ${row.count} replies to \`${toName}\`\n`;
             }
 
             return new EmbedBuilder()
@@ -48,15 +50,18 @@ class RepliesLister extends Lister {
             HAVING COUNT(*) > 0
             ORDER BY COUNT(*) DESC
             LIMIT 10`;
-        const rows = await context.database.query(selectSQL, [message.guild.id, mentioned.id]);
+        const rows = await context.database.query<{ to_user: string; count: string }>(selectSQL, [
+            message.guild.id,
+            mentioned.id,
+        ]);
         const fromName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         if (!rows || rows.length === 0)
             return void context.messageHandler.send(message, `No replies found for ${fromName}`);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
-                const toName = await context.userHandler.getDisplayName(row["to_user"], message.guild.id);
-                result += `\`${fromName}\` sent ${row["count"]} replies to \`${toName}\`\n`;
+                const toName = await context.userHandler.getDisplayName(row.to_user, message.guild.id);
+                result += `\`${fromName}\` sent ${row.count} replies to \`${toName}\`\n`;
             }
 
             return new EmbedBuilder()
@@ -75,12 +80,14 @@ class RepliesLister extends Lister {
             GROUP BY user_id, server_id
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC`;
-        const rows = await context.database.query(selectSQL, [message.guild.id]);
+        const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
+            message.guild.id,
+        ]);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
-                const userName = await context.userHandler.getDisplayName(row["user_id"], row["server_id"]);
-                result += `\`${userName}\` has sent ${row["count"]} replies! \n`;
+                const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
+                result += `\`${userName}\` has sent ${row.count} replies! \n`;
             }
 
             return new EmbedBuilder()

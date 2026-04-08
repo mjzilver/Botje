@@ -20,8 +20,8 @@ class ScoreLister extends Lister {
             message: string;
         }>(selectSQL, [message.guild.id, mentioned.id]);
         for (let i = 0; i < rows.length; i++) {
-            userdata.points += this.calculateScore(rows[i]["message"]);
-            userdata.total += rows[i]["message"].length;
+            userdata.points += this.calculateScore(rows[i].message);
+            userdata.total += rows[i].message.length;
         }
 
         userdata.quality = userdata.points / userdata.total / 2;
@@ -46,10 +46,10 @@ class ScoreLister extends Lister {
             message: string;
         }>(selectSQL, [message.guild.id]);
         for (let i = 0; i < rows.length; i++) {
-            const userId = rows[i]["user_id"];
+            const userId = rows[i].user_id;
             if (!userdata[userId]) userdata[userId] = { points: 0, total: 0, quality: 0, score: 0 };
-            userdata[userId].points += this.calculateScore(rows[i]["message"]);
-            userdata[userId].total += rows[i]["message"].length;
+            userdata[userId].points += this.calculateScore(rows[i].message);
+            userdata[userId].total += rows[i].message.length;
         }
 
         const sorted: [string, number][] = [];

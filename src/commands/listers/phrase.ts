@@ -38,7 +38,10 @@ class PhraseLister extends Lister {
             GROUP BY user_id, server_id
             HAVING count(message) > 1
             ORDER BY count(message) DESC`;
-        const rows = await context.database.query(selectSQL, [`%${word}%`, message.guild.id]);
+        const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
+            `%${word}%`,
+            message.guild.id,
+        ]);
         if (!rows || rows.length === 0)
             return void context.messageHandler.send(message, `Nothing found for ${word} in ${message.guild?.name}`);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {

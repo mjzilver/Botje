@@ -18,12 +18,12 @@ class EmotesLister extends Lister {
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC
             LIMIT 100`;
-        const rows = await context.database.query(selectSQL, [message.guild.id]);
+        const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [message.guild.id]);
         if (!rows || rows.length === 0)
             return void context.messageHandler.send(message, `No emotes found in ${message.guild?.name}`);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
-            for (const row of pageRows) result += `${row["message"]} was used ${row["count"]} times! \n`;
+            for (const row of pageRows) result += `${row.message} was used ${row.count} times! \n`;
 
             return new EmbedBuilder()
                 .setColor(context.config.color_hex)
@@ -53,13 +53,16 @@ class EmotesLister extends Lister {
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC
             LIMIT 1000`;
-        const rows = await context.database.query(selectSQL, [message.guild.id, mentioned.id]);
+        const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [
+            message.guild.id,
+            mentioned.id,
+        ]);
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         if (!rows || rows.length === 0)
             return void context.messageHandler.send(message, `No emotes found for ${userName}`);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
-            for (const row of pageRows) result += `${row["message"]} said ${row["count"]} times! \n`;
+            for (const row of pageRows) result += `${row.message} said ${row.count} times! \n`;
 
             return new EmbedBuilder()
                 .setColor(context.config.color_hex)
@@ -78,12 +81,14 @@ class EmotesLister extends Lister {
             GROUP BY user_id, server_id
             HAVING COUNT(*) > 1
             ORDER BY COUNT(*) DESC`;
-        const rows = await context.database.query(selectSQL, [message.guild.id]);
+        const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
+            message.guild.id,
+        ]);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
-                const userName = await context.userHandler.getDisplayName(row["user_id"], row["server_id"]);
-                result += `\`${userName}\` has posted ${row["count"]} emotes! \n`;
+                const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
+                result += `\`${userName}\` has posted ${row.count} emotes! \n`;
             }
 
             return new EmbedBuilder()

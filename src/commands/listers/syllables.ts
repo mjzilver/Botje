@@ -20,7 +20,7 @@ class SyllableLister extends Lister {
             message: string;
         }>(selectSQL, [message.guild.id, mentioned.id]);
         for (let i = 0; i < rows.length; i++) {
-            const syllables = this.calculateSyllables(rows[i]["message"]);
+            const syllables = this.calculateSyllables(rows[i].message);
             if (syllables >= 1) {
                 userdata.syllables += syllables;
                 userdata.total += 1;
@@ -50,9 +50,9 @@ class SyllableLister extends Lister {
             message: string;
         }>(selectSQL, [message.guild.id]);
         for (let i = 0; i < rows.length; i++) {
-            const userId = rows[i]["user_id"];
+            const userId = rows[i].user_id;
             if (!userdata[userId]) userdata[userId] = { syllables: 0, total: 0, average: 0 };
-            const syllables = this.calculateSyllables(rows[i]["message"]);
+            const syllables = this.calculateSyllables(rows[i].message);
             if (syllables >= 1) {
                 userdata[userId].syllables += syllables;
                 userdata[userId].total += 1;
