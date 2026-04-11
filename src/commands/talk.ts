@@ -14,13 +14,14 @@ export default {
               }
             | undefined;
         const chain: Record<string, string[]> = {};
-        let selectSQL = `SELECT message FROM messages WHERE message NOT LIKE '%<%'`;
-        if (mention) selectSQL += ` AND user_id = ${mention.id}`;
+        const selectSQL = mention
+            ? `SELECT message FROM messages WHERE message NOT LIKE '%<%' AND user_id = $1`
+            : `SELECT message FROM messages WHERE message NOT LIKE '%<%'`;
         const rows = await context.database.query<{
             message: string;
-        }>(selectSQL, []);
+        }>(selectSQL, mention ? [mention.id] : []);
         for (let i = 0; i < rows.length; i++) {
-            const words = rows[i]["message"].split(" ");
+            const words = rows[i].message.split(" ");
             let prevWord = "";
             for (let j = 0; j < words.length; j++) {
                 const word = words[j].toLowerCase();
