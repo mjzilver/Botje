@@ -43,6 +43,12 @@ export function parseRedditArgs(content: string): { sub: string; sort: string; t
 
 async function getRedditImage(message: BotMessage, context: IBotContext, last = ""): Promise<void> {
     const { sub, sort, time } = parseRedditArgs(message.content);
+    if (!sub || !/^[A-Za-z0-9_]{1,21}$/.test(sub)) {
+        context.messageHandler.send(message, "Please provide a valid subreddit name.");
+
+        return;
+    }
+
     const url = buildRedditUrl(sub, sort, time, last);
     try {
         const response = await axiosInstance.get(url);
