@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { mockDeep } from "vitest-mock-extended";
 import type { Client } from "discord.js";
 import type { IBotContext } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
@@ -35,71 +35,21 @@ export const TEST_CONFIG: BotConfig = {
 };
 
 export function makeMockContext(overrides?: Partial<IBotContext>): IBotContext {
-    const defaults = {
-        database: {
-            query: vi.fn().mockResolvedValue([]),
-            insert: vi.fn().mockResolvedValue(undefined),
-            getCount: vi.fn().mockResolvedValue(0),
-            queryRandomMessage: vi.fn().mockResolvedValue(undefined),
-            ensureUserExists: vi.fn().mockResolvedValue(undefined),
-            storeMessage: vi.fn().mockResolvedValue(undefined),
-            updateMessage: vi.fn().mockResolvedValue(undefined),
-            insertMessage: vi.fn().mockResolvedValue(undefined),
-            insertReaction: vi.fn().mockResolvedValue(undefined),
-            getCurrentUsername: vi.fn().mockResolvedValue(null),
-        },
-        messageHandler: {
-            send: vi.fn().mockResolvedValue(undefined),
-            reply: vi.fn().mockResolvedValue(undefined),
-            edit: vi.fn().mockResolvedValue(undefined),
-            delete: vi.fn().mockResolvedValue(undefined),
-            react: vi.fn().mockResolvedValue(undefined),
-            addCommandCall: vi.fn(),
-            markComplete: vi.fn(),
-            findFromReply: vi.fn().mockReturnValue(undefined),
-        },
-        logger: {
-            error: vi.fn(),
-            warn: vi.fn(),
-            info: vi.fn(),
-            debug: vi.fn(),
-            startup: vi.fn(),
-            console: vi.fn(),
-            repeat: vi.fn(),
-            printColumns: vi.fn(),
-            printRows: vi.fn(),
-        },
-        config: TEST_CONFIG,
-        userHandler: {
-            getDisplayName: vi.fn().mockResolvedValue("TestUser"),
-        },
-        pagination: {
-            createPages: vi.fn().mockResolvedValue([]),
-            sendPaginatedEmbed: vi.fn().mockResolvedValue(undefined),
-        },
-        backupHandler: {
-            backupAllEmotes: vi.fn().mockResolvedValue(undefined),
-            backupConfig: vi.fn().mockResolvedValue(undefined),
-            backupDatabase: vi.fn().mockResolvedValue(undefined),
-        },
-        hangman: {
-            run: vi.fn(),
-        },
-        llm: {
-            streamToMessage: vi.fn().mockResolvedValue(undefined),
-        },
-        loadedCommands: {
-            commands: {},
-            admincommands: {},
-            dmcommands: {},
-            clcommands: {},
-        },
-        dictionary: {
-            getNonSelectorsRegex: vi.fn().mockReturnValue(/(?!)/),
-        },
-        client: {} as unknown as Client,
-        disallowed: {},
-    };
+    const ctx = mockDeep<IBotContext>();
 
-    return { ...defaults, ...overrides } as unknown as IBotContext;
+    ctx.config = TEST_CONFIG;
+    ctx.loadedCommands = { commands: {}, admincommands: {}, dmcommands: {}, clcommands: {} };
+    ctx.disallowed = {};
+    ctx.client = mockDeep<Client>();
+
+    ctx.database.query.mockResolvedValue([]);
+    ctx.database.getCount.mockResolvedValue(0);
+    ctx.database.getCurrentUsername.mockResolvedValue(null);
+    ctx.userHandler.getDisplayName.mockResolvedValue("TestUser");
+    ctx.pagination.createPages.mockResolvedValue([]);
+    ctx.dictionary.getNonSelectorsRegex.mockReturnValue(/(?!)/);
+
+    if (overrides) Object.assign(ctx, overrides);
+
+    return ctx;
 }
