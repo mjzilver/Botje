@@ -1,15 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
+import type { Client } from "discord.js";
 
 import ageCommand from "../../commands/age";
-import type { IBotContext } from "../../interfaces";
 import type { BotMessage } from "../../interfaces/discord";
-
-function makeContext(botUserId = "bot-id"): IBotContext {
-    return {
-        messageHandler: { reply: vi.fn() },
-        client: { user: { id: botUserId } },
-    } as unknown as IBotContext;
-}
+import { makeMockContext } from "../helpers/mockContext";
 
 function makeMessage(joinedAt?: Date): BotMessage {
     const member = joinedAt ? { id: "bot-id", joinedAt } : undefined;
@@ -36,7 +30,7 @@ describe("age command", () => {
 
     it("replies with the bot's age when joinedAt is available", () => {
         const joined = new Date(Date.now() - 2 * 365 * 24 * 3600 * 1000);
-        const context = makeContext();
+        const context = makeMockContext({ client: { user: { id: "bot-id" } } as unknown as Client });
 
         ageCommand.function(makeMessage(joined), context);
 
@@ -49,7 +43,7 @@ describe("age command", () => {
 
     it("includes the birthday date in the reply", () => {
         const joined = new Date("2022-03-15T00:00:00Z");
-        const context = makeContext();
+        const context = makeMockContext({ client: { user: { id: "bot-id" } } as unknown as Client });
 
         ageCommand.function(makeMessage(joined), context);
 
@@ -60,7 +54,7 @@ describe("age command", () => {
     });
 
     it("falls back gracefully when the guild has no member entry", () => {
-        const context = makeContext();
+        const context = makeMockContext({ client: { user: { id: "bot-id" } } as unknown as Client });
 
         const messageWithNoMember = {
             content: "!age",

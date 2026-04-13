@@ -1,25 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 
 import chooseCommand from "../../commands/choose";
-import type { IBotContext } from "../../interfaces";
-import type { BotMessage } from "../../interfaces/discord";
-
-function makeContext(): IBotContext {
-    return {
-        messageHandler: {
-            send: vi.fn(),
-            reply: vi.fn(),
-        },
-    } as unknown as IBotContext;
-}
-
-function makeMessage(content: string): BotMessage {
-    return {
-        content,
-        author: { id: "u1", bot: false },
-        channel: { id: "ch1" },
-    } as unknown as BotMessage;
-}
+import { makeMockContext } from "../helpers/mockContext";
+import { makeMessage } from "../helpers/mockMessage";
 
 describe("choose command", () => {
     it("has name 'choose'", () => {
@@ -27,7 +10,7 @@ describe("choose command", () => {
     });
 
     it("replies with an error when fewer than two options are given", () => {
-        const context = makeContext();
+        const context = makeMockContext();
 
         chooseCommand.function(makeMessage("!choose onlyone"), context);
 
@@ -38,7 +21,7 @@ describe("choose command", () => {
     });
 
     it("replies with one of the provided options", () => {
-        const context = makeContext();
+        const context = makeMockContext();
 
         chooseCommand.function(makeMessage("!choose pizza | pasta"), context);
 
@@ -48,7 +31,7 @@ describe("choose command", () => {
     });
 
     it("trims whitespace around option names", () => {
-        const context = makeContext();
+        const context = makeMockContext();
 
         chooseCommand.function(makeMessage("!choose  cake  |  pie  "), context);
 
@@ -58,7 +41,7 @@ describe("choose command", () => {
     });
 
     it("handles three or more options", () => {
-        const context = makeContext();
+        const context = makeMockContext();
 
         chooseCommand.function(makeMessage("!choose a | b | c"), context);
 

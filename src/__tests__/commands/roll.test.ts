@@ -1,22 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 
 import rollCommand from "../../commands/roll";
-import type { IBotContext } from "../../interfaces";
-import type { BotMessage } from "../../interfaces/discord";
-
-function makeContext(): IBotContext {
-    return {
-        messageHandler: { reply: vi.fn() },
-    } as unknown as IBotContext;
-}
-
-function makeMessage(content: string): BotMessage {
-    return {
-        content,
-        author: { id: "u1", bot: false },
-        channel: { id: "ch1" },
-    } as unknown as BotMessage;
-}
+import { makeMockContext } from "../helpers/mockContext";
+import { makeMessage } from "../helpers/mockMessage";
 
 describe("roll command", () => {
     it("has name 'roll'", () => {
@@ -24,7 +10,7 @@ describe("roll command", () => {
     });
 
     it("rolls between 0 and the given max when one numeric argument is provided", () => {
-        const context = makeContext();
+        const context = makeMockContext();
 
         rollCommand.function(makeMessage("!roll 100"), context);
 
@@ -37,7 +23,7 @@ describe("roll command", () => {
     });
 
     it("rolls between min and max when two numeric arguments are provided", () => {
-        const context = makeContext();
+        const context = makeMockContext();
 
         rollCommand.function(makeMessage("!roll 10 20"), context);
 
@@ -50,7 +36,7 @@ describe("roll command", () => {
     });
 
     it("falls back to a timestamp-based roll when no numeric argument is given", () => {
-        const context = makeContext();
+        const context = makeMockContext();
 
         rollCommand.function(makeMessage("!roll"), context);
 
@@ -61,7 +47,7 @@ describe("roll command", () => {
     });
 
     it("falls back to timestamp roll when the argument is not a number", () => {
-        const context = makeContext();
+        const context = makeMockContext();
 
         rollCommand.function(makeMessage("!roll notanumber"), context);
 

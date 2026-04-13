@@ -1,23 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
+import type { Client } from "discord.js";
 
 import uptimeCommand from "../../commands/uptime";
-import type { IBotContext } from "../../interfaces";
-import type { BotMessage } from "../../interfaces/discord";
-
-function makeContext(readyTimestamp: number | null = Date.now() - 3661000): IBotContext {
-    return {
-        messageHandler: { send: vi.fn() },
-        client: { readyTimestamp },
-    } as unknown as IBotContext;
-}
-
-function makeMessage(): BotMessage {
-    return {
-        content: "!uptime",
-        author: { id: "u1", bot: false },
-        channel: { id: "ch1" },
-    } as unknown as BotMessage;
-}
+import { makeMockContext } from "../helpers/mockContext";
+import { makeMessage } from "../helpers/mockMessage";
 
 describe("uptime command", () => {
     it("has name 'uptime'", () => {
@@ -25,9 +11,9 @@ describe("uptime command", () => {
     });
 
     it("sends a message containing the formatted uptime", () => {
-        const context = makeContext();
+        const context = makeMockContext({ client: { readyTimestamp: Date.now() - 3661000 } as unknown as Client });
 
-        uptimeCommand.function(makeMessage(), context);
+        uptimeCommand.function(makeMessage("!uptime"), context);
 
         expect(context.messageHandler.send).toHaveBeenCalledWith(
             expect.anything(),
@@ -36,9 +22,9 @@ describe("uptime command", () => {
     });
 
     it("includes hours and minutes in the formatted output for a >1h uptime", () => {
-        const context = makeContext(Date.now() - 3661000);
+        const context = makeMockContext({ client: { readyTimestamp: Date.now() - 3661000 } as unknown as Client });
 
-        uptimeCommand.function(makeMessage(), context);
+        uptimeCommand.function(makeMessage("!uptime"), context);
 
         const msg = vi.mocked(context.messageHandler.send).mock.calls[0][1] as string;
 
@@ -47,9 +33,9 @@ describe("uptime command", () => {
     });
 
     it("handles a null readyTimestamp without throwing", () => {
-        const context = makeContext(null);
+        const context = makeMockContext({ client: { readyTimestamp: null } as unknown as Client });
 
-        expect(() => uptimeCommand.function(makeMessage(), context)).not.toThrow();
+        expect(() => uptimeCommand.function(makeMessage("!uptime"), context)).not.toThrow();
         expect(context.messageHandler.send).toHaveBeenCalled();
     });
 });

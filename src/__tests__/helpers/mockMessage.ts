@@ -8,6 +8,7 @@ interface MessageOptions {
     isBot?: boolean;
     channelId?: string;
     channelType?: number;
+    createdTimestamp?: number;
 }
 
 export function makeMessage(content: string, opts: MessageOptions = {}): BotMessage {
@@ -19,6 +20,7 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
         isBot = false,
         channelId = "channel-id",
         channelType = 0,
+        createdTimestamp = Date.now(),
     } = opts;
 
     const guild = {
@@ -55,7 +57,7 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
         member,
         mentions: { users: Object.assign(new Map(), { first: () => undefined }) },
         createdAt: new Date(),
-        createdTimestamp: Date.now(),
+        createdTimestamp,
         cleanContent: content,
         reactions: {
             cache: new Map(),
