@@ -1,4 +1,3 @@
-import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand, IBotContext } from "../../interfaces";
 import { Lister } from "./lister";
 import { isGuildMessage } from "../../interfaces/discord";
@@ -51,11 +50,13 @@ class PhraseLister extends Lister {
                 result += `\`${userName}\` has said ${word} ${row.count} times! \n`;
             }
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top users for "${word}" in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top users for "${word}" in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
@@ -123,11 +124,13 @@ class PhraseLister extends Lister {
             for (const row of pageRows)
                 result += `\`${row.userName}\` has said ${word} in ${row.percentage}% of their messages! \n`;
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top users by percentage for "${word}" in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top users by percentage for "${word}" in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }

@@ -1,4 +1,4 @@
-import { isGuildMessage } from "../../interfaces/discord";
+import { EmbedBuilder, isGuildMessage } from "../../interfaces/discord";
 import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
 
@@ -77,5 +77,19 @@ export abstract class Lister {
 
     percentage(message: GuildBotMessage, context: IBotContext): void {
         context.messageHandler.reply(message, "This command does not work with %");
+    }
+
+    protected buildPageEmbed(
+        color: `#${string}`,
+        title: string,
+        description: string,
+        pageNum: number,
+        totalPages: number,
+    ): EmbedBuilder {
+        return new EmbedBuilder()
+            .setColor(color)
+            .setTitle(title)
+            .setDescription(description)
+            .setFooter({ text: `Page ${pageNum}/${totalPages}` });
     }
 }

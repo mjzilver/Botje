@@ -1,4 +1,3 @@
-import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -20,11 +19,13 @@ class ReactionsLister extends Lister {
             let result = "";
             for (const row of pageRows) result += `${row.emoji} was used ${row.count} times! \n`;
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top reactions in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top reactions in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
@@ -54,11 +55,13 @@ class ReactionsLister extends Lister {
             let result = "";
             for (const row of pageRows) result += `${row.emoji} was used ${row.count} times! \n`;
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Reactions used by ${userName} in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Reactions used by ${userName} in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
@@ -81,11 +84,13 @@ class ReactionsLister extends Lister {
                 result += `\`${userName}\` has reacted ${row.count} times! \n`;
             }
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top reactors in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top reactors in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }

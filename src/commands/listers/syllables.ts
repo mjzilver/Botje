@@ -1,4 +1,3 @@
-import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -77,11 +76,13 @@ class SyllableLister extends Lister {
                 for (const row of pageRows)
                     result += `\`${userNames[row[0]]}\` has an average of ${row[1]} syllables per post \n`;
 
-                return new EmbedBuilder()
-                    .setColor(context.config.color_hex)
-                    .setTitle(`Top most intellectual posters in ${message.guild?.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+                return this.buildPageEmbed(
+                    context.config.color_hex,
+                    `Top most intellectual posters in ${message.guild?.name}`,
+                    result,
+                    pageNum,
+                    totalPages,
+                );
             },
         );
         context.pagination.sendPaginatedEmbed(message, pages);

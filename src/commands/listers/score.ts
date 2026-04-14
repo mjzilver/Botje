@@ -1,4 +1,3 @@
-import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -70,11 +69,13 @@ class ScoreLister extends Lister {
                 let result = "";
                 for (const row of pageRows) result += `\`${userNames[row[0]]}\`'s post score is ${row[1]} \n`;
 
-                return new EmbedBuilder()
-                    .setColor(context.config.color_hex)
-                    .setTitle(`Top posters by score in ${message.guild?.name}`)
-                    .setDescription(result)
-                    .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+                return this.buildPageEmbed(
+                    context.config.color_hex,
+                    `Top posters by score in ${message.guild?.name}`,
+                    result,
+                    pageNum,
+                    totalPages,
+                );
             },
         );
         context.pagination.sendPaginatedEmbed(message, pages);

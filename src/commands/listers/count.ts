@@ -1,4 +1,3 @@
-import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -41,11 +40,13 @@ class CountLister extends Lister {
                 result += `\`${userName}\` has posted ${row.count} messages! \n`;
             }
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top 10 posters in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top 10 posters in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
@@ -75,11 +76,13 @@ class CountLister extends Lister {
                 result += `\`${userName}\` has posted ${Math.round((parseInt(row.count) / parseInt(row.total)) * 100)}% of all messages! \n`;
             }
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top 10 posters in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top 10 posters in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }

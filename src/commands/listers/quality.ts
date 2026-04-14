@@ -1,4 +1,3 @@
-import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -55,11 +54,13 @@ class QualityLister extends Lister {
                 result += `\`${userName}\`'s post quality is ${parseFloat(row.percentage_unique).toFixed(2)}% \n`;
             }
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top 10 quality posters in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top 10 quality posters in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }

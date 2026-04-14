@@ -1,4 +1,3 @@
-import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
@@ -26,11 +25,13 @@ class RepliesLister extends Lister {
                 result += `\`${fromName}\` sent ${row.count} replies to \`${toName}\`\n`;
             }
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top reply relationships in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top reply relationships in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
@@ -64,11 +65,13 @@ class RepliesLister extends Lister {
                 result += `\`${fromName}\` sent ${row.count} replies to \`${toName}\`\n`;
             }
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Who ${fromName} replies to most in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Who ${fromName} replies to most in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }
@@ -90,11 +93,13 @@ class RepliesLister extends Lister {
                 result += `\`${userName}\` has sent ${row.count} replies! \n`;
             }
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top repliers in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top repliers in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }

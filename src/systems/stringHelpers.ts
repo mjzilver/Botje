@@ -1,4 +1,5 @@
 import type { BotConfig } from "../interfaces/config";
+import type { BotMessage } from "../interfaces/discord";
 
 export function makeStringHelpers(config: Pick<BotConfig, "prefix">) {
     function removePrefix(str: string): string {
@@ -44,4 +45,10 @@ export function sanitizeFilename(str: string): string {
 }
 export function replaceAt(str: string, index: number, replacement: string): string {
     return str.substring(0, index) + replacement + str.substring(index + replacement.length);
+}
+export function getAttachmentUrl(message: BotMessage): string {
+    if ((message.attachments?.size ?? 0) >= 1) return message.attachments?.first()?.url ?? "";
+    if ((message.embeds?.length ?? 0) >= 1) return message.embeds?.[0]?.url ?? "";
+
+    return "";
 }

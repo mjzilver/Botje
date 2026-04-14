@@ -1,5 +1,5 @@
-import { EmbedBuilder } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
+import { EmbedBuilder } from "../../interfaces/discord";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
@@ -28,11 +28,13 @@ class SaidLister extends Lister {
             let result = "";
             for (const row of pageRows) result += `${row.message} was said ${row.count} times \n`;
 
-            return new EmbedBuilder()
-                .setColor(context.config.color_hex)
-                .setTitle(`Top most used phrases in ${message.guild?.name}`)
-                .setDescription(result)
-                .setFooter({ text: `Page ${pageNum}/${totalPages}` });
+            return this.buildPageEmbed(
+                context.config.color_hex,
+                `Top most used phrases in ${message.guild?.name}`,
+                result,
+                pageNum,
+                totalPages,
+            );
         });
         context.pagination.sendPaginatedEmbed(message, pages);
     }

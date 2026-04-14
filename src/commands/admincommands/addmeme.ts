@@ -2,15 +2,8 @@ import fs from "fs";
 import { pipeline } from "stream/promises";
 import axios from "axios";
 import type { ICommand } from "../../interfaces";
-import type { BotMessage } from "../../interfaces/discord";
 import { toError } from "../../systems/utils";
-
-function getURL(message: BotMessage): string {
-    if ((message.attachments?.size ?? 0) >= 1) return message.attachments?.first()?.url ?? "";
-    if ((message.embeds?.length ?? 0) >= 1) return message.embeds?.[0]?.url ?? "";
-
-    return "";
-}
+import { getAttachmentUrl } from "../../systems/stringHelpers";
 
 export default {
     name: "addmeme",
@@ -22,9 +15,9 @@ export default {
         let url: string;
         if (message.reference?.messageId) {
             const fetched = await message.channel.messages.fetch(message.reference.messageId);
-            url = getURL(fetched as BotMessage);
+            url = getAttachmentUrl(fetched);
         } else {
-            url = getURL(message);
+            url = getAttachmentUrl(message);
         }
 
         if (args[0]?.indexOf("http") === 0) url = args.shift() ?? "";

@@ -2,14 +2,7 @@ import fs from "fs";
 import Jimp from "jimp";
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { replaceFancyQuotes } from "../systems/stringHelpers";
-
-function getURL(message: BotMessage): string {
-    if ((message.attachments?.size ?? 0) >= 1) return message.attachments?.first()?.url ?? "";
-    if ((message.embeds?.length ?? 0) >= 1) return message.embeds?.[0]?.url ?? "";
-
-    return "";
-}
+import { replaceFancyQuotes, getAttachmentUrl } from "../systems/stringHelpers";
 
 async function processPicture(
     url: string | null,
@@ -65,9 +58,9 @@ export default {
         let url: string;
         if (message.reference?.messageId) {
             const fetched = await message.channel.messages.fetch(message.reference.messageId);
-            url = getURL(fetched);
+            url = getAttachmentUrl(fetched);
         } else {
-            url = getURL(message);
+            url = getAttachmentUrl(message);
         }
 
         if (args[0]?.indexOf("http") === 0) url = args.shift() ?? "";
