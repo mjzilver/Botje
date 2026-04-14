@@ -52,14 +52,8 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
             id: channelId,
             type: channelType,
             name: "test-channel",
-            messages: {
-                fetch: async (idOrOpts: string | { limit: number; before?: string }) => {
-                    if (typeof idOrOpts === "string") return makeMessage("!ping");
-
-                    return new Map();
-                },
-            },
             send: vi.fn().mockResolvedValue(undefined),
+            messages: { fetch: vi.fn() },
         },
         guild,
         member,
@@ -67,15 +61,12 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
         createdAt: new Date(),
         createdTimestamp,
         cleanContent: content,
-        reactions: {
-            cache: new Map(),
-            resolve: () => null,
-        },
+        reactions: { cache: new Map(), resolve: () => null },
         reply: vi.fn().mockResolvedValue(undefined),
         react: vi.fn().mockResolvedValue(undefined),
         edit: vi.fn().mockResolvedValue(undefined),
         delete: vi.fn().mockResolvedValue(undefined),
-        createMessageComponentCollector: () => ({ on: () => undefined }),
+        createMessageComponentCollector: vi.fn().mockReturnValue({ on: vi.fn() }),
     } as unknown as BotMessage;
 }
 
