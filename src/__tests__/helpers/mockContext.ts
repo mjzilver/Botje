@@ -1,6 +1,5 @@
 import { vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
-import type { Client } from "discord.js";
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
 
@@ -45,14 +44,6 @@ export function makeMockContext(overrides?: Partial<IBotContext>): IBotContext {
     ctx.config = TEST_CONFIG;
     ctx.loadedCommands = { commands: {}, admincommands: {}, dmcommands: {}, clcommands: {} };
     ctx.disallowed = {};
-    ctx.client = mockDeep<Client>();
-
-    ctx.database.query.mockResolvedValue([]);
-    ctx.database.getCount.mockResolvedValue(0);
-    ctx.database.getCurrentUsername.mockResolvedValue(null);
-    ctx.userHandler.getDisplayName.mockResolvedValue("TestUser");
-    ctx.pagination.createPages.mockResolvedValue([]);
-    ctx.dictionary.getNonSelectorsRegex.mockReturnValue(/(?!)/);
 
     if (overrides) Object.assign(ctx, overrides);
 
