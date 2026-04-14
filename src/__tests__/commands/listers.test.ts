@@ -8,8 +8,7 @@ import emotesCommand from "../../commands/listers/emotes";
 import scoreCommand from "../../commands/listers/score";
 import syllablesCommand from "../../commands/listers/syllables";
 import phraseCommand from "../../commands/listers/phrase";
-import { makeMockContext } from "../helpers/mockContext";
-import { makeMessage, makeNoGuildMessage } from "../helpers/mockMessage";
+import { makeMockContext , makeMessage, makeNoGuildMessage } from "@test/helpers";
 
 describe("count lister", () => {
     it("has name 'count'", () => expect(countCommand.name).toBe("count"));

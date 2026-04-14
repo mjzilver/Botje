@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@test/*": ["src/__tests__/*"]
+    },
     "target": "ES2022",
     "module": "commonjs",
     "lib": ["ES2022"],

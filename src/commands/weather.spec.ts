@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import weatherCommand from "./weather";
-import { makeMockContext } from "../__tests__/helpers/mockContext";
-import { makeMessage } from "../__tests__/helpers/mockMessage";
+import { makeMockContext , makeMessage } from "@test/helpers";
 
 describe("weather", () => {
     it("has name 'weather'", () => expect(weatherCommand.name).toBe("weather"));

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import askCommand from "../../../commands/ask";
-import { makeMockContext } from "../../helpers/mockContext";
-import { makeMessage } from "../../helpers/mockMessage";
+import { makeMockContext , makeMessage } from "@test/helpers";
 
 describe("ask — integration", () => {
     it("replies Thinking..., calls llm, then reacts on success", async () => {

@@ -11,8 +11,7 @@ vi.mock("fs", () => ({
 import logCommand from "../../../commands/admincommands/log";
 import nukeCommand from "../../../commands/admincommands/nuke";
 import purgeCommand from "../../../commands/admincommands/purge";
-import { makeMockContext } from "../../helpers/mockContext";
-import { makeMessage } from "../../helpers/mockMessage";
+import { makeMockContext , makeMessage } from "@test/helpers";
 
 describe("addmeme", () => {
     it("has name 'addmeme'", () => expect(addmemeCommand.name).toBe("addmeme"));

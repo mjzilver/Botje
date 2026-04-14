@@ -3,7 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import { Pagination } from "../../systems/pagination";
 import type { IMessageHandler } from "../../interfaces";
 import type { MessageContent } from "../../interfaces/discord";
-import { makeMessage } from "../helpers/mockMessage";
+import { makeMessage } from "@test/helpers";
 
 function makeMessageHandler(sentMessages: MessageContent[] = []): IMessageHandler {
     return {

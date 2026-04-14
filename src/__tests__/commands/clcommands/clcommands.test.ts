@@ -15,7 +15,7 @@ import saveCommand from "../../../commands/clcommands/save";
 import scanCommand from "../../../commands/clcommands/scan";
 import cleanwebhooksCommand from "../../../commands/clcommands/cleanwebhooks";
 import listCommand from "../../../commands/clcommands/list";
-import { makeMockContext, TEST_CONFIG } from "../../helpers/mockContext";
+import { makeMockContext, TEST_CONFIG } from "@test/helpers";
 import type { IClCommand } from "../../../interfaces";
 
 describe("help (cl)", () => {

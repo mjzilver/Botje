@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import dmHelpCommand from "./help";
-import { makeMockContext } from "../../__tests__/helpers/mockContext";
-import { makeMessage } from "../../__tests__/helpers/mockMessage";
+import { makeMockContext , makeMessage } from "@test/helpers";
 
 describe("dmcommands/help", () => {
     it("has name 'help'", () => expect(dmHelpCommand.name).toBe("help"));

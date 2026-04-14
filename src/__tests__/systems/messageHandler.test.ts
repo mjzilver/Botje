@@ -5,7 +5,7 @@ import { MessageHandler } from "../../systems/messageHandler";
 import type { IDatabase, ILogger } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
 import type { BotMessage, MessageContent } from "../../interfaces/discord";
-import { makeMessage } from "../helpers/mockMessage";
+import { makeMessage } from "@test/helpers";
 
 const config = {
     positive_emoji: "👍",

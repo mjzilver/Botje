@@ -3,8 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import helpCommand from "../../commands/help";
 import type { ICommand } from "../../interfaces";
 import type { MessageContent } from "../../interfaces/discord";
-import { makeCommand, makeMockContext } from "../helpers/mockContext";
-import { makeMessage } from "../helpers/mockMessage";
+import { makeCommand, makeMockContext , makeMessage } from "@test/helpers";
 
 describe("help command – metadata", () => {
     it("has name 'help'", () => {

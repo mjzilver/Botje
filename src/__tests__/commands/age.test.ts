@@ -3,7 +3,7 @@ import type { Client } from "discord.js";
 
 import ageCommand from "../../commands/age";
 import type { BotMessage } from "../../interfaces/discord";
-import { makeMockContext } from "../helpers/mockContext";
+import { makeMockContext } from "@test/helpers";
 
 function makeMessage(joinedAt?: Date): BotMessage {
     const member = joinedAt ? { id: "bot-id", joinedAt } : undefined;

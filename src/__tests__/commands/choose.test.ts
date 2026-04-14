@@ -1,8 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 
 import chooseCommand from "../../commands/choose";
-import { makeMockContext } from "../helpers/mockContext";
-import { makeMessage } from "../helpers/mockMessage";
+import { makeMockContext , makeMessage } from "@test/helpers";
 
 describe("choose command", () => {
     it("has name 'choose'", () => {

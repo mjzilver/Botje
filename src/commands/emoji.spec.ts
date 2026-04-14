@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import emojiCommand from "./emoji";
-import { makeMockContext } from "../__tests__/helpers/mockContext";
-import { makeMessage } from "../__tests__/helpers/mockMessage";
+import { makeMockContext , makeMessage } from "@test/helpers";
 
 describe("emoji", () => {
     it("has name 'emoji'", () => expect(emojiCommand.name).toBe("emoji"));
