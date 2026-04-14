@@ -1,42 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mockDeep } from "vitest-mock-extended";
 
 import { MessageHandler } from "../../systems/messageHandler";
 import type { IDatabase, ILogger } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
 import type { BotMessage, MessageContent } from "../../interfaces/discord";
-
-function makeMockDb(): IDatabase {
-    return {
-        insert: vi.fn(),
-        query: vi.fn().mockResolvedValue([]),
-    } as unknown as IDatabase;
-}
-
-function makeMockLogger(): ILogger {
-    return { debug: vi.fn(), error: vi.fn(), warn: vi.fn(), info: vi.fn() } as unknown as ILogger;
-}
+import { makeMessage } from "../helpers/mockMessage";
 
 const config = {
     positive_emoji: "👍",
     negative_emoji: "👎",
 } as unknown as BotConfig;
-
-function makeMessage(id = "msg-1"): BotMessage {
-    return {
-        id,
-        content: "!ping",
-        createdAt: new Date(1000),
-        createdTimestamp: 1000,
-        author: { id: "u1", username: "user", bot: false },
-        channel: { id: "ch1", name: "general", send: vi.fn() },
-        reply: vi.fn(),
-        react: vi.fn().mockResolvedValue(undefined),
-        edit: vi.fn(),
-        delete: vi.fn().mockResolvedValue(undefined),
-        reactions: undefined,
-        isSlashCommand: false,
-    } as unknown as BotMessage;
-}
 
 function makeSentMessage(id = "sent-1"): BotMessage {
     return { id, reactions: undefined } as unknown as BotMessage;
@@ -48,14 +22,15 @@ describe("MessageHandler", () => {
     let handler: MessageHandler;
 
     beforeEach(() => {
-        db = makeMockDb();
-        logger = makeMockLogger();
+        db = mockDeep<IDatabase>();
+        db.query.mockResolvedValue([]);
+        logger = mockDeep<ILogger>();
         handler = new MessageHandler(db, logger, config);
     });
 
     describe("send", () => {
         it("calls channel.send with the provided content", async () => {
-            const call = makeMessage();
+            const call = makeMessage("!ping");
             const sent = makeSentMessage();
 
             vi.mocked(call.channel.send).mockResolvedValue(sent);
@@ -66,7 +41,7 @@ describe("MessageHandler", () => {
         });
 
         it("returns undefined and logs an error when content is empty", async () => {
-            const call = makeMessage();
+            const call = makeMessage("!ping");
             const result = await handler.send(call, "");
 
             expect(result).toBeUndefined();
@@ -76,7 +51,7 @@ describe("MessageHandler", () => {
 
     describe("reply", () => {
         it("calls the message's own reply method with the content", async () => {
-            const call = makeMessage();
+            const call = makeMessage("!ping");
             const sent = makeSentMessage();
 
             vi.mocked(call.reply).mockResolvedValue(sent);
@@ -87,7 +62,7 @@ describe("MessageHandler", () => {
         });
 
         it("returns undefined and logs an error when content is empty", async () => {
-            const call = makeMessage();
+            const call = makeMessage("!ping");
             const result = await handler.reply(call, "" as MessageContent);
 
             expect(result).toBeUndefined();
@@ -97,7 +72,7 @@ describe("MessageHandler", () => {
 
     describe("react", () => {
         it("calls message.react with the given emoji", async () => {
-            const msg = makeMessage();
+            const msg = makeMessage("!ping");
 
             await handler.react(msg, "👍");
 
@@ -105,7 +80,7 @@ describe("MessageHandler", () => {
         });
 
         it("swallows errors from message.react and logs debug", async () => {
-            const msg = makeMessage();
+            const msg = makeMessage("!ping");
 
             vi.mocked(msg.react).mockRejectedValue(new Error("deleted"));
 
@@ -116,7 +91,7 @@ describe("MessageHandler", () => {
 
     describe("edit", () => {
         it("calls message.edit with the new content", async () => {
-            const msg = makeMessage();
+            const msg = makeMessage("!ping");
             const edited = makeSentMessage();
 
             vi.mocked(msg.edit).mockResolvedValue(edited);
@@ -127,7 +102,7 @@ describe("MessageHandler", () => {
         });
 
         it("rejects when message.edit rejects", async () => {
-            const msg = makeMessage();
+            const msg = makeMessage("!ping");
 
             vi.mocked(msg.edit).mockRejectedValue(new Error("deleted"));
 
@@ -137,7 +112,7 @@ describe("MessageHandler", () => {
 
     describe("delete", () => {
         it("calls message.delete", async () => {
-            const msg = makeMessage();
+            const msg = makeMessage("!ping");
 
             await handler.delete(msg);
 
@@ -145,7 +120,7 @@ describe("MessageHandler", () => {
         });
 
         it("swallows delete errors and logs debug", async () => {
-            const msg = makeMessage();
+            const msg = makeMessage("!ping");
 
             vi.mocked(msg.delete).mockRejectedValue(new Error("already gone"));
 
@@ -156,7 +131,7 @@ describe("MessageHandler", () => {
 
     describe("findFromReply", () => {
         it("returns the call id for a known reply id", async () => {
-            const call = makeMessage("call-1");
+            const call = makeMessage("!ping", { id: "call-1" });
             const sent = makeSentMessage("reply-1");
 
             vi.mocked(call.channel.send).mockResolvedValue(sent);
@@ -176,7 +151,7 @@ describe("MessageHandler", () => {
 
     describe("markComplete", () => {
         it("calls db.insert with the call id", () => {
-            const call = makeMessage("call-1");
+            const call = makeMessage("!ping", { id: "call-1" });
 
             handler.markComplete(call);
 
@@ -185,7 +160,7 @@ describe("MessageHandler", () => {
 
         it("calls the command list remover if registered", () => {
             const remover = vi.fn();
-            const call = makeMessage();
+            const call = makeMessage("!ping");
 
             handler.setCommandListRemover(remover);
             handler.markComplete(call);
@@ -196,7 +171,7 @@ describe("MessageHandler", () => {
 
     describe("addCommandCall", () => {
         it("tracks the call-to-reply mapping", async () => {
-            const call = makeMessage("call-1");
+            const call = makeMessage("!ping", { id: "call-1" });
             const reply = makeSentMessage("reply-1");
 
             vi.mocked(call.channel.send).mockResolvedValue(reply);
@@ -206,7 +181,7 @@ describe("MessageHandler", () => {
         });
 
         it("calls db.insert with call and reply ids", () => {
-            const call = makeMessage("c1");
+            const call = makeMessage("!ping", { id: "c1" });
             const reply = makeSentMessage("r1");
 
             handler.addCommandCall(call, reply);
@@ -241,7 +216,7 @@ describe("MessageHandler", () => {
         });
 
         it("returned copy does not mutate internal state", async () => {
-            const call = makeMessage("c1");
+            const call = makeMessage("!ping", { id: "c1" });
             const sent = makeSentMessage("r1");
 
             vi.mocked(call.channel.send).mockResolvedValue(sent);

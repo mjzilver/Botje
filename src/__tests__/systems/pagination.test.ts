@@ -2,7 +2,8 @@ import { describe, it, expect, vi } from "vitest";
 import { EmbedBuilder } from "discord.js";
 import { Pagination } from "../../systems/pagination";
 import type { IMessageHandler } from "../../interfaces";
-import type { BotMessage, MessageContent } from "../../interfaces/discord";
+import type { MessageContent } from "../../interfaces/discord";
+import { makeMessage } from "../helpers/mockMessage";
 
 function makeMessageHandler(sentMessages: MessageContent[] = []): IMessageHandler {
     return {
@@ -21,14 +22,6 @@ function makeMessageHandler(sentMessages: MessageContent[] = []): IMessageHandle
         setCommandListRemover: vi.fn(),
         loadCommandCalls: vi.fn().mockResolvedValue(undefined),
     } as unknown as IMessageHandler;
-}
-
-function makeMessage(): BotMessage {
-    return {
-        author: { id: "user1", username: "tester", bot: false },
-        content: "",
-        channel: { id: "ch1", name: "test", messages: { fetch: vi.fn() } },
-    } as unknown as BotMessage;
 }
 
 describe("Pagination.createPages", () => {
@@ -83,7 +76,7 @@ describe("Pagination.sendPaginatedEmbed – single page", () => {
         const sent: MessageContent[] = [];
         const pagination = new Pagination(makeMessageHandler(sent));
         const embed = new EmbedBuilder().setTitle("Hello");
-        await pagination.sendPaginatedEmbed(makeMessage(), [embed]);
+        await pagination.sendPaginatedEmbed(makeMessage("!test"), [embed]);
         expect(sent).toHaveLength(1);
         expect(sent[0]).toBeInstanceOf(EmbedBuilder);
     });
@@ -94,7 +87,7 @@ describe("Pagination.sendPaginatedEmbed – multiple pages", () => {
         const sent: MessageContent[] = [];
         const pagination = new Pagination(makeMessageHandler(sent));
         const pages = [new EmbedBuilder().setTitle("Page 1"), new EmbedBuilder().setTitle("Page 2")];
-        await pagination.sendPaginatedEmbed(makeMessage(), pages);
+        await pagination.sendPaginatedEmbed(makeMessage("!test"), pages);
         expect(sent).toHaveLength(1);
         const content = sent[0] as { embeds?: EmbedBuilder[]; components?: unknown[] };
         expect(content.embeds).toHaveLength(1);
@@ -103,13 +96,13 @@ describe("Pagination.sendPaginatedEmbed – multiple pages", () => {
 
     it("throws when pages array is empty", async () => {
         const pagination = new Pagination(makeMessageHandler());
-        await expect(pagination.sendPaginatedEmbed(makeMessage(), [])).rejects.toThrow("Pages array cannot be empty");
+        await expect(pagination.sendPaginatedEmbed(makeMessage("!test"), [])).rejects.toThrow("Pages array cannot be empty");
     });
 
     it("preserves string pages by wrapping with content property", async () => {
         const sent: MessageContent[] = [];
         const pagination = new Pagination(makeMessageHandler(sent));
-        await pagination.sendPaginatedEmbed(makeMessage(), ["page one", "page two"]);
+        await pagination.sendPaginatedEmbed(makeMessage("!test"), ["page one", "page two"]);
         const content = sent[0] as { content?: string; components?: unknown[] };
         expect(content.content).toBe("page one");
         expect(content.components).toBeDefined();

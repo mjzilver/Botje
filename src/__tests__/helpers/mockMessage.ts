@@ -1,6 +1,8 @@
+import { vi } from "vitest";
 import type { BotMessage, BotGuild, BotMember } from "../../interfaces/discord";
 
 interface MessageOptions {
+    id?: string;
     authorId?: string;
     guildId?: string;
     guildOwnerId?: string;
@@ -13,6 +15,7 @@ interface MessageOptions {
 
 export function makeMessage(content: string, opts: MessageOptions = {}): BotMessage {
     const {
+        id = "msg-id",
         authorId = "user-id",
         guildId = "guild-id",
         guildOwnerId = "owner-id",
@@ -37,7 +40,7 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
     } as unknown as BotMember;
 
     return {
-        id: "msg-id",
+        id,
         content,
         author: { id: authorId, username: "TestUser", bot: isBot },
         channel: {
@@ -51,7 +54,7 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
                     return new Map();
                 },
             },
-            send: async () => makeMessage("bot reply"),
+            send: vi.fn().mockResolvedValue(undefined),
         },
         guild,
         member,
@@ -63,10 +66,14 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
             cache: new Map(),
             resolve: () => null,
         },
-        reply: async () => makeMessage("reply"),
-        react: async () => undefined,
-        edit: async () => makeMessage(content),
-        delete: async () => undefined,
+        reply: vi.fn().mockResolvedValue(undefined),
+        react: vi.fn().mockResolvedValue(undefined),
+        edit: vi.fn().mockResolvedValue(undefined),
+        delete: vi.fn().mockResolvedValue(undefined),
         createMessageComponentCollector: () => ({ on: () => undefined }),
     } as unknown as BotMessage;
+}
+
+export function makeNoGuildMessage(content: string): BotMessage {
+    return { ...makeMessage(content), guild: null } as unknown as BotMessage;
 }

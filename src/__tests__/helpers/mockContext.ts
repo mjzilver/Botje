@@ -1,6 +1,7 @@
+import { vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 import type { Client } from "discord.js";
-import type { IBotContext } from "../../interfaces";
+import type { IBotContext, ICommand } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
 
 export const TEST_CONFIG: BotConfig = {
@@ -33,6 +34,10 @@ export const TEST_CONFIG: BotConfig = {
     },
     scan_on_startup: false,
 };
+
+export function makeCommand(name = "test", overrides?: Partial<ICommand>): ICommand {
+    return { name, description: `${name} description`, format: name, function: vi.fn(), ...overrides };
+}
 
 export function makeMockContext(overrides?: Partial<IBotContext>): IBotContext {
     const ctx = mockDeep<IBotContext>();

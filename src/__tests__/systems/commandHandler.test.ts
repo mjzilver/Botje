@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { mockDeep } from "vitest-mock-extended";
 
 import { CommandHandler } from "../../systems/commandHandler";
 import type { IMessageHandler, ILogger, ICommand, IBotContext } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
-import type { BotMessage } from "../../interfaces/discord";
 import type { ReplyHandler } from "../../systems/replyHandler";
 import type { LoadedCommands } from "../../systems/commandLoader";
+import { makeCommand } from "../helpers/mockContext";
+import { makeMessage } from "../helpers/mockMessage";
 
 const config = {
     prefix: "!",
@@ -13,40 +15,6 @@ const config = {
     timeoutDuration: 5,
     speakEvery: 10,
 } as unknown as BotConfig;
-
-function makeMockMessageHandler(): IMessageHandler {
-    return {
-        send: vi.fn(),
-        reply: vi.fn(),
-        findFromReply: vi.fn(),
-        delete: vi.fn(),
-        markComplete: vi.fn(),
-    } as unknown as IMessageHandler;
-}
-
-function makeMockLogger(): ILogger {
-    return { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), startup: vi.fn() } as unknown as ILogger;
-}
-
-function makeMockReplyHandler(matched = false): ReplyHandler {
-    return { process: vi.fn().mockReturnValue(matched) } as unknown as ReplyHandler;
-}
-
-function makeCommand(): ICommand {
-    return { name: "test", description: "", format: "", function: vi.fn() };
-}
-
-function makeMessage(content: string, opts?: { isAdmin?: boolean; userId?: string; isBot?: boolean }): BotMessage {
-    return {
-        id: "msg-1",
-        content,
-        createdAt: new Date(),
-        createdTimestamp: Date.now(),
-        author: { id: opts?.userId ?? "user-1", username: "testuser", bot: opts?.isBot ?? false },
-        channel: { id: "ch-1", name: "general" },
-        member: { permissions: { has: vi.fn().mockReturnValue(opts?.isAdmin ?? false) } },
-    } as unknown as BotMessage;
-}
 
 function makeHandler(opts?: {
     commands?: Record<string, ICommand>;
@@ -57,7 +25,7 @@ function makeHandler(opts?: {
     replyHandler?: ReplyHandler;
     getBotUser?: () => { id: string } | null;
 }): { handler: CommandHandler; mh: IMessageHandler } {
-    const mh = opts?.mh ?? makeMockMessageHandler();
+    const mh = opts?.mh ?? mockDeep<IMessageHandler>();
     const context = { messageHandler: mh } as unknown as IBotContext;
     const commands: LoadedCommands = {
         commands: opts?.commands ?? {},
@@ -68,8 +36,8 @@ function makeHandler(opts?: {
     const handler = new CommandHandler({
         commands,
         messageHandler: mh,
-        replyHandler: opts?.replyHandler ?? makeMockReplyHandler(),
-        logger: makeMockLogger(),
+        replyHandler: opts?.replyHandler ?? mockDeep<ReplyHandler>(),
+        logger: mockDeep<ILogger>(),
         config,
         disallowed: opts?.disallowed ?? {},
         getBotUser: opts?.getBotUser ?? (() => ({ id: "bot-id" })),
@@ -84,7 +52,7 @@ describe("CommandHandler", () => {
         it("ignores messages authored by the bot itself", () => {
             const { handler, mh } = makeHandler({ getBotUser: () => ({ id: "bot-id" }) });
 
-            handler.handleCommand(makeMessage("!test", { userId: "bot-id" }));
+            handler.handleCommand(makeMessage("!test", { authorId: "bot-id" }));
 
             expect(mh.reply).not.toHaveBeenCalled();
             expect(mh.send).not.toHaveBeenCalled();
@@ -138,7 +106,7 @@ describe("CommandHandler", () => {
             const adminCmd = makeCommand();
             const { handler } = makeHandler({ admincommands: { nuke: adminCmd } });
 
-            handler.handleCommand(makeMessage("!nuke", { userId: "owner-id" }));
+            handler.handleCommand(makeMessage("!nuke", { authorId: "owner-id" }));
 
             expect(adminCmd.function).toHaveBeenCalledOnce();
         });
@@ -150,7 +118,7 @@ describe("CommandHandler", () => {
                 disallowed: { "banned-id": true },
             });
 
-            handler.handleCommand(makeMessage("!test", { userId: "banned-id" }));
+            handler.handleCommand(makeMessage("!test", { authorId: "banned-id" }));
 
             expect(cmd.function).not.toHaveBeenCalled();
         });
@@ -169,13 +137,13 @@ describe("CommandHandler", () => {
         it("returns true for a user in the disallowed list", () => {
             const { handler } = makeHandler({ disallowed: { "bad-id": true } });
 
-            expect(handler.isUserBanned(makeMessage("!", { userId: "bad-id" }))).toBe(true);
+            expect(handler.isUserBanned(makeMessage("!", { authorId: "bad-id" }))).toBe(true);
         });
 
         it("returns false for a user not in the disallowed list", () => {
             const { handler } = makeHandler();
 
-            expect(handler.isUserBanned(makeMessage("!", { userId: "good-id" }))).toBe(false);
+            expect(handler.isUserBanned(makeMessage("!", { authorId: "good-id" }))).toBe(false);
         });
     });
 
@@ -217,7 +185,7 @@ describe("CommandHandler", () => {
         it("returns false for banned users regardless of timing", () => {
             const { handler } = makeHandler({ disallowed: { "bad-id": true } });
 
-            expect(handler.isUserAllowed(makeMessage("!", { userId: "bad-id" }))).toBe(false);
+            expect(handler.isUserAllowed(makeMessage("!", { authorId: "bad-id" }))).toBe(false);
         });
 
         it("sends a wait message when canSendMessage is true and user is on cooldown", () => {

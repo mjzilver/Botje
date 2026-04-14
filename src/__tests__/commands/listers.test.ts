@@ -9,12 +9,7 @@ import scoreCommand from "../../commands/listers/score";
 import syllablesCommand from "../../commands/listers/syllables";
 import phraseCommand from "../../commands/listers/phrase";
 import { makeMockContext } from "../helpers/mockContext";
-import { makeMessage } from "../helpers/mockMessage";
-import type { BotMessage } from "../../interfaces/discord";
-
-function makeNoGuildMessage(content: string): BotMessage {
-    return { ...makeMessage(content), guild: null } as unknown as BotMessage;
-}
+import { makeMessage, makeNoGuildMessage } from "../helpers/mockMessage";
 
 describe("count lister", () => {
     it("has name 'count'", () => expect(countCommand.name).toBe("count"));
