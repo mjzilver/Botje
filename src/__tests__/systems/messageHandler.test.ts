@@ -23,7 +23,7 @@ describe("MessageHandler", () => {
 
     beforeEach(() => {
         db = mockDeep<IDatabase>();
-        db.query.mockResolvedValue([]);
+        vi.mocked(db.query).mockResolvedValue([]);
         logger = mockDeep<ILogger>();
         handler = new MessageHandler(db, logger, config);
     });

@@ -101,7 +101,7 @@ describe("logger.error", () => {
     it("handles non-Error messages without throwing", () => {
         const logger = createSilentLogger();
         expect(() => logger.error("plain message")).not.toThrow();
-        expect(() => logger.error(42)).not.toThrow();
-        expect(() => logger.error(null)).not.toThrow();
+        expect(() => logger.error(42 as unknown as string)).not.toThrow();
+        expect(() => logger.error(null as unknown as string)).not.toThrow();
     });
 });

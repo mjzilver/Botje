@@ -10,7 +10,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "tsc && cp -r src/json dist/json",
+    "build": "tsc -p tsconfig.build.json && cp -r src/json dist/json",
     "start": "node dist/start.js",
     "dev": "ts-node src/start.ts",
     "beta": "ts-node-dev --respawn --transpile-only src/start.ts --beta",
