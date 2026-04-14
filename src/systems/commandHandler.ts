@@ -117,26 +117,33 @@ export class CommandHandler {
     }
 
     handleNonCommandMessage(message: BotMessage): void {
-        const now = new Date();
-        const timePassed = (now.getTime() - this.lastMessageSent.getTime()) / 60000;
         if (!this.replyHandler.process(message)) {
-            const speakThreshold =
-                this.messageCounter >= this.config.speakEvery || randomBetween(1, SPEAK_RANDOM_CHANCE) === 1;
-            const timeGate = timePassed >= randomBetween(SPEAK_MIN_TIMEOUT_MINUTES, SPEAK_MAX_TIMEOUT_MINUTES);
-            if (speakThreshold && timeGate) {
+            const now = new Date();
+            const timePassed = (now.getTime() - this.lastMessageSent.getTime()) / 60000;
+            if (this.shouldSpeakSpontaneously(timePassed)) {
                 this.commands["speak"]?.function(message, this.context);
                 this.lastMessageSent = now;
                 this.messageCounter = 0;
-            } else if (message.content.match(/\bbot(je)?\b/gi)) {
-                if (
-                    (message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false) ||
-                    this.isUserAllowed(message, false)
-                )
-                    this.commands["speak"]?.function(message, this.context);
+            } else {
+                this.maybeSpeakOnMention(message);
             }
         }
-
         this.messageCounter++;
+    }
+
+    private shouldSpeakSpontaneously(timePassed: number): boolean {
+        const speakThreshold =
+            this.messageCounter >= this.config.speakEvery || randomBetween(1, SPEAK_RANDOM_CHANCE) === 1;
+        const timeGate = timePassed >= randomBetween(SPEAK_MIN_TIMEOUT_MINUTES, SPEAK_MAX_TIMEOUT_MINUTES);
+
+        return speakThreshold && timeGate;
+    }
+
+    private maybeSpeakOnMention(message: BotMessage): void {
+        if (!message.content.match(/\bbot(je)?\b/gi)) return;
+        const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
+        if (isAdmin || this.isUserAllowed(message, false))
+            this.commands["speak"]?.function(message, this.context);
     }
 
     async redo(message: BotMessage, fetchMessage: (id: string) => Promise<BotMessage>): Promise<void> {

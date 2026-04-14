@@ -75,26 +75,28 @@ export class Bot {
         const yesterday = Date.now() - 24 * 60 * 60 * 1000;
         this.client.channels.cache
             .filter((ch) => ch.type === discord.ChannelType.GuildText && (ch as discord.TextChannel).viewable)
-            .forEach((ch) => {
-                const textChannel = ch as discord.TextChannel;
-                textChannel.messages
-                    .fetch({ limit: 100 })
-                    .then(async (messages: discord.Collection<string, discord.Message>) => {
-                        messages
-                            .filter((m: discord.Message) => m.createdTimestamp > yesterday)
-                            .forEach((m: discord.Message) => {
-                                const msg = toBotMessage(m);
-                                this.registry.database.storeMessage(msg);
-                                if (m.content.match(new RegExp(this.config.prefix, "i"))) {
-                                    const calls = this.registry.messageHandler.getCommandCalls();
-                                    if (!(m.id in calls))
-                                        if (!this.registry.commandHandler.isUserBanned(msg))
-                                            this.registry.commandHandler.handleCommand(msg, true);
-                                }
-                            });
-                    })
-                    .catch((err) => this.logger.error(toError(err)));
-            });
+            .forEach((ch) => this.scanChannel(ch as discord.TextChannel, yesterday));
+    }
+
+    private async scanChannel(channel: discord.TextChannel, since: number): Promise<void> {
+        try {
+            const messages = await channel.messages.fetch({ limit: 100 });
+            messages
+                .filter((m) => m.createdTimestamp > since)
+                .forEach((m) => this.processScannedMessage(m));
+        } catch (err) {
+            this.logger.error(toError(err));
+        }
+    }
+
+    private processScannedMessage(m: discord.Message): void {
+        const msg = toBotMessage(m);
+        this.registry.database.storeMessage(msg);
+        if (!m.content.match(new RegExp(this.config.prefix, "i"))) return;
+        const calls = this.registry.messageHandler.getCommandCalls();
+        if (m.id in calls) return;
+        if (!this.registry.commandHandler.isUserBanned(msg))
+            this.registry.commandHandler.handleCommand(msg, true);
     }
 
     private loadDisallowed(): Record<string, boolean> {
