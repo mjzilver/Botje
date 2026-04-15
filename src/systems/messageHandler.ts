@@ -49,35 +49,39 @@ export class MessageHandler implements IMessageHandler {
             return undefined;
         }
 
-        let promise: Promise<BotMessage>;
-        if (call.isSlashCommand && call.slashInteraction) {
-            const interaction = call.slashInteraction;
-            promise =
-                interaction.deferred || interaction.replied
-                    ? interaction
-                          .followUp(content as discord.InteractionReplyOptions)
-                          .then((m) => toBotMessage(m as discord.Message))
-                    : interaction.reply(content as discord.InteractionReplyOptions).then(() => call);
-        } else if (useReply) {
-            promise = call.reply(content).catch((err) => {
-                this.logger.error(`Failed to reply (likely deleted): ${toError(err).message}`);
-                throw err;
-            });
-        } else {
-            promise = call.channel.send(content);
+        let reply: BotMessage;
+        try {
+            if (call.isSlashCommand && call.slashInteraction) {
+                const interaction = call.slashInteraction;
+                if (interaction.deferred || interaction.replied) {
+                    reply = toBotMessage(
+                        (await interaction.followUp(content as discord.InteractionReplyOptions)) as discord.Message,
+                    );
+                } else {
+                    await interaction.reply(content as discord.InteractionReplyOptions);
+                    reply = call;
+                }
+            } else if (useReply) {
+                try {
+                    reply = await call.reply(content);
+                } catch (err) {
+                    this.logger.error(`Failed to reply (likely deleted): ${toError(err).message}`);
+                    throw err;
+                }
+            } else {
+                reply = await call.channel.send(content);
+            }
+        } catch {
+            return undefined;
         }
 
-        return promise
-            .then((reply) => {
-                this.addCommandCall(call, reply);
-                if (reply.reactions) {
-                    this.react(reply, this.config.positive_emoji);
-                    this.react(reply, this.config.negative_emoji);
-                }
+        this.addCommandCall(call, reply);
+        if (reply.reactions) {
+            this.react(reply, this.config.positive_emoji);
+            this.react(reply, this.config.negative_emoji);
+        }
 
-                return reply;
-            })
-            .catch(() => undefined);
+        return reply;
     }
 
     send(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined> {
@@ -96,17 +100,14 @@ export class MessageHandler implements IMessageHandler {
         return Promise.resolve();
     }
 
-    edit(replyObj: BotMessage, newContent: MessageContent): Promise<BotMessage> {
-        return new Promise((resolve, reject) => {
-            if (!replyObj) return reject(new Error("No reply object"));
-            replyObj
-                .edit(newContent)
-                .then(resolve)
-                .catch((err) => {
-                    this.logger.debug(`Failed to edit (likely deleted): ${toError(err).message}`);
-                    reject(err);
-                });
-        });
+    async edit(replyObj: BotMessage, newContent: MessageContent): Promise<BotMessage> {
+        if (!replyObj) throw new Error("No reply object");
+        try {
+            return await replyObj.edit(newContent);
+        } catch (err) {
+            this.logger.debug(`Failed to edit (likely deleted): ${toError(err).message}`);
+            throw err;
+        }
     }
 
     delete(message: BotMessage): Promise<void> {

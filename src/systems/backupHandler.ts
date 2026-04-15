@@ -39,42 +39,30 @@ export class BackupHandler {
         this.logger.console("All emotes saved successfully");
     }
 
-    saveEmoji(
+    async saveEmoji(
         emoji: BotEmoji,
         guildName: string,
         filenameExtra = "",
         destination: string | null = null,
     ): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const basePath = destination ?? path.join("backups", "emotes");
-            const guildPath = path.join(basePath, sanitizeFilename(guildName));
-            const emojiLink = `https://cdn.discordapp.com/emojis/${emoji.id}.png`;
-            const emojiPath = path.join(guildPath, `${emoji.name}${filenameExtra}.png`);
-            fs.mkdirSync(guildPath, { recursive: true });
-            if (fs.existsSync(emojiPath) && fs.statSync(emojiPath).size >= 10) return resolve(emojiPath);
-            this.logger.console(`Saving ${emoji.name} at ${emojiPath}`);
-            axios
-                .get(emojiLink, { responseType: "stream" })
-                .then((response) =>
-                    pipeline(response.data as NodeJS.ReadableStream, fs.createWriteStream(emojiPath, { flags: "w" })),
-                )
-                .then(() => resolve(emojiPath))
-                .catch(reject);
-        });
+        const basePath = destination ?? path.join("backups", "emotes");
+        const guildPath = path.join(basePath, sanitizeFilename(guildName));
+        const emojiLink = `https://cdn.discordapp.com/emojis/${emoji.id}.png`;
+        const emojiPath = path.join(guildPath, `${emoji.name}${filenameExtra}.png`);
+        fs.mkdirSync(guildPath, { recursive: true });
+        if (fs.existsSync(emojiPath) && fs.statSync(emojiPath).size >= 10) return emojiPath;
+        this.logger.console(`Saving ${emoji.name} at ${emojiPath}`);
+        const response = await axios.get(emojiLink, { responseType: "stream" });
+        await pipeline(response.data as NodeJS.ReadableStream, fs.createWriteStream(emojiPath, { flags: "w" }));
+
+        return emojiPath;
     }
 
-    backupConfig(destination: string | null = null): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const basePath = destination ?? "backups/config";
-            try {
-                fs.mkdirSync(basePath, { recursive: true });
-                fs.copyFileSync("config.json", path.join(basePath, "config.json"));
-                this.logger.console(`Config backed up to ${basePath}`);
-                resolve();
-            } catch (err) {
-                reject(err);
-            }
-        });
+    async backupConfig(destination: string | null = null): Promise<void> {
+        const basePath = destination ?? "backups/config";
+        fs.mkdirSync(basePath, { recursive: true });
+        fs.copyFileSync("config.json", path.join(basePath, "config.json"));
+        this.logger.console(`Config backed up to ${basePath}`);
     }
 
     backupDatabase(destination: string | null = null): Promise<void> {

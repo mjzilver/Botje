@@ -14,20 +14,17 @@ async function processCombination(
 ): Promise<void> {
     const path = `backups/emotes/${message.guild?.id}/`;
     const outputPath = "assets/combined.png";
-    Jimp.read(path + image1).then((img1) => {
-        Jimp.read(path + image2).then((img2) => {
-            img1.resize(128, 128);
-            img2.resize(128, 128);
-            img1.crop(0, 0, 128, 64);
-            img2.crop(0, 64, 128, 64);
-            const combined = new Jimp(128, 128);
-            combined.composite(img1, 0, 0);
-            combined.composite(img2, 0, 64);
-            combined.write(outputPath, () => {
-                context.messageHandler.reply(message, { files: [outputPath] });
-            });
-        });
-    });
+    const img1 = await Jimp.read(path + image1);
+    const img2 = await Jimp.read(path + image2);
+    img1.resize(128, 128);
+    img2.resize(128, 128);
+    img1.crop(0, 0, 128, 64);
+    img2.crop(0, 64, 128, 64);
+    const combined = new Jimp(128, 128);
+    combined.composite(img1, 0, 0);
+    combined.composite(img2, 0, 64);
+    await combined.writeAsync(outputPath);
+    context.messageHandler.reply(message, { files: [outputPath] });
 }
 
 export default {
