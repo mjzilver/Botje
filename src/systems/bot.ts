@@ -111,7 +111,7 @@ export class Bot {
                 return {};
             }
         } catch (err) {
-            this.logger.error(`Error loading disallowed.json: ${err}`);
+            this.logger.error(`Error loading disallowed.json: ${toError(err).message}`);
 
             return {};
         }

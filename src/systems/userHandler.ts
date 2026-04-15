@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
 import type { IDatabase } from "./database";
 import type { ILogger } from "./logger";
+import { toError } from "./utils";
 
 export interface IUserHandler {
     getDisplayName(userId: string, serverId: string): Promise<string>;
@@ -37,13 +38,13 @@ export class UserHandler implements IUserHandler {
             serverCache[userId] = member.displayName;
             await this.db.ensureUserExists(member.user, serverId, member.displayName);
         } catch (err) {
-            this.logger.debug(`Could not fetch guild member ${userId} in ${serverId}: ${err}`);
+            this.logger.debug(`Could not fetch guild member ${userId} in ${serverId}: ${toError(err).message}`);
             try {
                 const user = await client.users.fetch(userId);
                 serverCache[userId] = user.username;
                 await this.db.ensureUserExists(user, serverId, user.username);
             } catch (err2) {
-                this.logger.debug(`Could not fetch user ${userId}: ${err2}`);
+                this.logger.debug(`Could not fetch user ${userId}: ${toError(err2).message}`);
                 serverCache[userId] = UserHandler.UNKNOWN_USER;
             }
         }

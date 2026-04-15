@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import type { BotConfig } from "../interfaces/config";
 import type { ILogger } from "../interfaces";
+import { toError } from "./utils";
 
 const DEFAULT_CONFIG_PATH = path.resolve(process.cwd(), "config.json");
 
@@ -21,7 +22,7 @@ export class Settings {
 
             return JSON.parse(data) as BotConfig;
         } catch (err) {
-            this.logger.error(`Error loading config file: ${err}`);
+            this.logger.error(`Error loading config file: ${toError(err).message}`);
 
             return {} as BotConfig;
         }
@@ -40,7 +41,7 @@ export class Settings {
         try {
             fs.writeFileSync(this.configPath, JSON.stringify(this._config, null, 2), "utf8");
         } catch (err) {
-            this.logger.error(`Error saving config file: ${err}`);
+            this.logger.error(`Error saving config file: ${toError(err).message}`);
         }
     }
 }

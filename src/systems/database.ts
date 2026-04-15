@@ -133,7 +133,7 @@ export class Database implements IDatabase {
 
             return result.rows as T[];
         } catch (err) {
-            this.logger.error(`SQL Error:\n${sql}\n${err}`);
+            this.logger.error(`SQL Error:\n${sql}\n${toError(err).message}`);
             throw err;
         }
     }
