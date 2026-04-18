@@ -1,6 +1,5 @@
 import type { ICommand, IBotContext } from "../interfaces";
-import { textOnly, normalizeSpaces, countVowelGroups } from "../systems/stringHelpers";
-import { makeStringHelpers } from "../systems/stringHelpers";
+import { textOnly, normalizeSpaces, countVowelGroups, makeStringHelpers } from "../systems/stringHelpers";
 import { randomBetween, levenshtein, pickRandomItem } from "../systems/utils";
 import type { BotMessage } from "../interfaces/discord";
 
@@ -8,11 +7,11 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
     const { removePrefix } = makeStringHelpers(context.config);
     const earliest = new Date();
     earliest.setMonth(earliest.getMonth() - 5);
-    let _words = removePrefix(message.content).replace(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http.*|speak)\b/gi, "");
-    _words = textOnly(_words);
-    _words = _words.replace(context.dictionary.getNonSelectorsRegex(), "").trim();
-    const words = _words.split(" ");
-    if (words && words.length >= 1 && words[0]) {
+    let filtered = removePrefix(message.content).replace(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http.*|speak)\b/gi, "");
+    filtered = textOnly(filtered);
+    filtered = filtered.replace(context.dictionary.getNonSelectorsRegex(), "").trim();
+    const words = filtered.split(" ");
+    if (words[0]) {
         if (words.length > 1) {
             words.sort((a, b) => countVowelGroups(b) - countVowelGroups(a));
         }
@@ -21,24 +20,23 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
                 WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
                 AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
                 AND LENGTH(message) < 150 AND LENGTH(message) > 10
-                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}`;
+                AND datetime < $1 AND datetime < $2`;
             const rows = await context.database.query<{
                 message: string;
-            }>(selectSQL, []);
-            if (rows) {
+            }>(selectSQL, [message.createdAt.getTime(), earliest.getTime()]);
+            if (rows.length > 0) {
                 context.logger.debug(`Sending message with '${words.join(",")}" in it`);
                 let highestAmount = 0;
                 let chosenMessage = "";
                 const regexPatterns = words.map((w: string) => new RegExp(w, "gmi"));
-                for (let i = 0; i < rows.length; i++) {
+                for (const row of rows) {
                     let amount = 0;
-                    for (let j = 0; j < regexPatterns.length; j++)
-                        if (rows[i].message.match(regexPatterns[j])) amount += 30 - j * j;
-                    if (amount > highestAmount)
-                        if (levenshtein(rows[i].message, message.content) > 15) {
-                            chosenMessage = rows[i].message;
-                            highestAmount = amount;
-                        }
+                    for (const [j, pattern] of regexPatterns.entries())
+                        if (row.message.match(pattern)) amount += 30 - j * j;
+                    if (amount > highestAmount && levenshtein(row.message, message.content) > 15) {
+                        chosenMessage = row.message;
+                        highestAmount = amount;
+                    }
                 }
 
                 chosenMessage = chosenMessage.replace(/@.*/gi, "");
@@ -49,12 +47,12 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
             const selectSQL = `SELECT message FROM messages
                 WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
                 AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-                AND message LIKE '%${words[0]}%' AND LENGTH(message) > 10
-                AND datetime < ${message.createdAt.getTime()} AND datetime < ${earliest.getTime()}`;
+                AND message LIKE $1 AND LENGTH(message) > 10
+                AND datetime < $2 AND datetime < $3`;
             const rows = await context.database.queryRandomMessage<{
                 message: string;
-            }>(selectSQL, []);
-            if (rows) {
+            }>(selectSQL, [`%${words[0]}%`, message.createdAt.getTime(), earliest.getTime()]);
+            if (rows.length > 0) {
                 context.logger.debug(`Sending message with '${words[0]}' in it`);
                 context.messageHandler.send(message, normalizeSpaces(rows[0].message));
             }
@@ -71,26 +69,26 @@ async function findRandom(message: BotMessage, context: IBotContext): Promise<vo
     const selectSQL = `SELECT message FROM messages
         WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
         AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-        AND datetime < ${earliest.getTime()} AND LENGTH(message) > 10`;
+        AND datetime < $1 AND LENGTH(message) > 10`;
     const rows = await context.database.queryRandomMessage<{
         message: string;
-    }>(selectSQL, []);
-    if (rows) context.messageHandler.send(message, normalizeSpaces(rows[0].message));
+    }>(selectSQL, [earliest.getTime()]);
+    if (rows.length > 0) context.messageHandler.send(message, normalizeSpaces(rows[0].message));
 }
 
 async function findTopic(message: BotMessage, topic: string, context: IBotContext): Promise<void> {
     const selectSQL = `SELECT LOWER(message) as message
         FROM messages
-        WHERE message LIKE '%${topic} is%' OR message LIKE '%${topic} are%'
+        WHERE (message LIKE $1 OR message LIKE $2)
         AND message NOT LIKE '%<%' AND LENGTH(message) > 10`;
     const rows = await context.database.query<{
         message: string;
-    }>(selectSQL, []);
+    }>(selectSQL, [`%${topic} is%`, `%${topic} are%`]);
     if (rows.length < 3) {
         context.logger.debug("Not enough info about topic -- redirecting to the regular method");
         message.content = message.content.replace(/(about|think|of)/gi, "");
 
-        return await findByWord(message, context);
+        return findByWord(message, context);
     }
 
     const IS_ARE_REGEX = /\b(?:is|are)\b/gi;

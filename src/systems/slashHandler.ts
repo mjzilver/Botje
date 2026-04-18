@@ -1,5 +1,4 @@
 import * as discord from "discord.js";
-import { toError } from "./utils";
 import {
     SlashCommandBuilder,
     SlashCommandUserOption,
@@ -11,11 +10,12 @@ import {
 import type { ICommand, ILogger, CommandOption, IBotContext } from "../interfaces";
 import type { BotMessage, BotUser, BotReaction, MessageContent, ComponentCollector } from "../interfaces/discord";
 import { toBotChannel } from "./messageAdapter";
+import { toError } from "./utils";
 
 export class SlashHandler {
     private logger: ILogger;
     private client: discord.Client;
-    private slashCommands: Array<{ name: string; command: ICommand }> = [];
+    private slashCommands: { name: string; command: ICommand }[] = [];
     private context: IBotContext;
     constructor(logger: ILogger, client: discord.Client, context: IBotContext) {
         this.logger = logger;
@@ -27,7 +27,7 @@ export class SlashHandler {
         if (command.slashCommand) return command.slashCommand;
         const builder = new SlashCommandBuilder()
             .setName(command.name)
-            .setDescription(command.description || "No description available");
+            .setDescription(command.description ?? "No description available");
         if (command.options && !command.subcommands) this.addOptionsToBuilder(builder, command.options);
         if (command.subcommands)
             for (const sub of command.subcommands)
@@ -61,7 +61,7 @@ export class SlashHandler {
                 builder.addStringOption((o) => {
                     o.setName(opt.name).setDescription(opt.description ?? "No description");
                     if (opt.required) o.setRequired(true);
-                    if (opt.choices) for (const c of opt.choices) o.addChoices(c);
+                    if (opt.choices) for (const choice of opt.choices) o.addChoices(choice);
 
                     return o;
                 });

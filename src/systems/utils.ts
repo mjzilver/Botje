@@ -16,10 +16,7 @@ export function findClosestMatchInList(word: string, wordList: string[] | Record
     if (!word) return "";
     let list: Record<string, number>;
     if (Array.isArray(wordList)) {
-        list = {};
-        wordList.forEach((item) => {
-            list[item] = 1;
-        });
+        list = Object.fromEntries(wordList.map((item) => [item, 1]));
     } else {
         list = wordList;
     }
@@ -69,3 +66,5 @@ export function pickRandomItem<T>(array: T[]): T {
 export function toError(err: unknown): Error {
     return err instanceof Error ? err : new Error(String(err));
 }
+
+export const ONE_DAY_MS = 24 * 60 * 60 * 1000;

@@ -6,7 +6,7 @@ import type { ILogger } from "../interfaces";
 import { toBotMessage } from "./messageAdapter";
 import { setBotContext } from "./botContext";
 import { SystemRegistry } from "./systemRegistry";
-import { toError } from "./utils";
+import { toError, ONE_DAY_MS } from "./utils";
 
 const DISALLOWED_PATH = path.resolve(__dirname, "../json/disallowed.json");
 
@@ -54,10 +54,9 @@ export class Bot {
     login(): void {
         if (!this.client.isReady()) {
             this.logger.startup("Attempting to log in");
-            const key = process.argv.includes("--beta")
-                ? this.config.discord_api_key_beta
-                : this.config.discord_api_key;
-            if (process.argv.includes("--beta")) this.logger.startup("Logging in with beta key");
+            const isBeta = process.argv.includes("--beta");
+            const key = isBeta ? this.config.discord_api_key_beta : this.config.discord_api_key;
+            if (isBeta) this.logger.startup("Logging in with beta key");
             this.client.login(key);
         }
     }
@@ -72,7 +71,7 @@ export class Bot {
 
     private scanOnStartup(): void {
         this.logger.startup("Reading messages since startup");
-        const yesterday = Date.now() - 24 * 60 * 60 * 1000;
+        const yesterday = Date.now() - ONE_DAY_MS;
         this.client.channels.cache
             .filter((ch) => ch.type === discord.ChannelType.GuildText && (ch as discord.TextChannel).viewable)
             .forEach((ch) => this.scanChannel(ch as discord.TextChannel, yesterday));
@@ -89,14 +88,14 @@ export class Bot {
         }
     }
 
-    private processScannedMessage(m: discord.Message): void {
-        const msg = toBotMessage(m);
-        this.registry.database.storeMessage(msg);
-        if (!m.content.match(new RegExp(this.config.prefix, "i"))) return;
+    private processScannedMessage(rawMessage: discord.Message): void {
+        const message = toBotMessage(rawMessage);
+        this.registry.database.storeMessage(message);
+        if (!rawMessage.content.match(new RegExp(this.config.prefix, "i"))) return;
         const calls = this.registry.messageHandler.getCommandCalls();
-        if (m.id in calls) return;
-        if (!this.registry.commandHandler.isUserBanned(msg))
-            this.registry.commandHandler.handleCommand(msg, true);
+        if (rawMessage.id in calls) return;
+        if (!this.registry.commandHandler.isUserBanned(message))
+            this.registry.commandHandler.handleCommand(message, true);
     }
 
     private loadDisallowed(): Record<string, boolean> {

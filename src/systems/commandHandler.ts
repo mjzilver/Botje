@@ -29,7 +29,7 @@ export class CommandHandler {
     } | null;
 
     private context: IBotContext;
-    commandList: LimitedList<BotMessage>;
+    public commandList: LimitedList<BotMessage>;
     private messageCounter = 0;
     private lastMessageSent = new Date();
     private cooldown = new CooldownTracker();
@@ -76,7 +76,7 @@ export class CommandHandler {
             if (!isReadback) this.commandList.push(message);
             const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
             if (isAdmin || this.isUserAllowed(message, !isReadback))
-                this.handleCommandType(command, args, isReadback, message, isAdmin);
+                this.handleCommandType(command, isReadback, message, isAdmin);
         } else if (!message.author.bot) {
             this.handleNonCommandMessage(message);
         }
@@ -94,7 +94,6 @@ export class CommandHandler {
 
     private handleCommandType(
         command: string,
-        _args: string[],
         readback: boolean,
         message: BotMessage,
         isAdmin: boolean,

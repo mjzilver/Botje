@@ -4,7 +4,7 @@ import type { ILogger } from "./logger";
 import type { BotConfig } from "../interfaces/config";
 import type { BotMessage, MessageContent } from "../interfaces/discord";
 import { toBotMessage } from "./messageAdapter";
-import { toError } from "./utils";
+import { toError, ONE_DAY_MS } from "./utils";
 
 export interface IMessageHandler {
     send(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined>;
@@ -37,7 +37,7 @@ export class MessageHandler implements IMessageHandler {
         this.removeFromCommandList = fn;
     }
 
-    private async _sendMessage(
+    private async sendMessage(
         call: BotMessage,
         content: MessageContent,
         useReply: boolean,
@@ -66,7 +66,8 @@ export class MessageHandler implements IMessageHandler {
                     reply = await call.reply(content);
                 } catch (err) {
                     this.logger.error(`Failed to reply (likely deleted): ${toError(err).message}`);
-                    throw err;
+
+                    return undefined;
                 }
             } else {
                 reply = await call.channel.send(content);
@@ -85,19 +86,19 @@ export class MessageHandler implements IMessageHandler {
     }
 
     send(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined> {
-        return this._sendMessage(call, content, false);
+        return this.sendMessage(call, content, false);
     }
 
     reply(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined> {
-        return this._sendMessage(call, content, true);
+        return this.sendMessage(call, content, true);
     }
 
-    react(message: BotMessage, emoji: string): Promise<void> {
-        message.react(emoji).catch((err) => {
+    async react(message: BotMessage, emoji: string): Promise<void> {
+        try {
+            await message.react(emoji);
+        } catch (err) {
             this.logger.debug(`Failed to react (likely deleted): ${toError(err).message}`);
-        });
-
-        return Promise.resolve();
+        }
     }
 
     async edit(replyObj: BotMessage, newContent: MessageContent): Promise<BotMessage> {
@@ -110,17 +111,16 @@ export class MessageHandler implements IMessageHandler {
         }
     }
 
-    delete(message: BotMessage): Promise<void> {
-        message.delete().catch((err) => {
+    async delete(message: BotMessage): Promise<void> {
+        try {
+            await message.delete();
+        } catch (err) {
             this.logger.debug(`Failed to delete (likely already deleted): ${toError(err).message}`);
-        });
-
-        return Promise.resolve();
+        }
     }
 
     findFromReply(replyMessage: BotMessage): string | undefined {
-        for (const [callId, replyId] of Object.entries(this.commandCalls))
-            if (replyId === replyMessage.id) return callId;
+        return Object.entries(this.commandCalls).find(([, replyId]) => replyId === replyMessage.id)?.[0];
     }
 
     markComplete(call: BotMessage): void {
@@ -135,7 +135,7 @@ export class MessageHandler implements IMessageHandler {
     }
 
     async loadCommandCalls(): Promise<void> {
-        const since = Date.now() - 24 * 60 * 60 * 1000;
+        const since = Date.now() - ONE_DAY_MS;
         const sql = `SELECT call_id, reply_id FROM command_calls
         WHERE timestamp > $1
         ORDER BY timestamp DESC`;

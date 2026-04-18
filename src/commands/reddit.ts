@@ -1,7 +1,7 @@
 import axios from "axios";
 import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand, IBotContext } from "../interfaces";
-import { toError } from "../systems/utils";
+import { toError, pickRandomItem } from "../systems/utils";
 import { isLink, isImage } from "../systems/stringHelpers";
 import type { BotMessage } from "../interfaces/discord";
 
@@ -53,7 +53,7 @@ async function getRedditImage(message: BotMessage, context: IBotContext, last = 
     try {
         const response = await axiosInstance.get(url);
         const body = response.data;
-        if (body?.data?.children) handleRedditImages(message, sub, body.data.children, context);
+        if (body?.data?.children) await handleRedditImages(message, sub, body.data.children, context);
         else context.messageHandler.send(message, "No images were found");
     } catch (err) {
         context.logger.error(toError(err));
@@ -75,8 +75,7 @@ async function handleRedditImages(
         for (const row of rows) foundImages[row.link] = true;
         const filteredImages = children.filter((c) => !(c.data.url in foundImages) && isLink(c.data.url));
         if (filteredImages.length > 0) {
-            const chosen = Math.floor(Math.random() * filteredImages.length);
-            const post = filteredImages[chosen].data;
+            const post = pickRandomItem(filteredImages).data;
             if (post.url.match(/imgur\.com/gi)) handleImgur(message, post, sub, context);
             else embedImage(message, post, sub, context);
             insertPost(post, sub, context);

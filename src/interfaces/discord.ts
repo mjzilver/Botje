@@ -79,9 +79,9 @@ export interface BotMessage {
     isSlashCommand?: boolean;
     slashInteraction?: CommandInteraction;
     reply(content: MessageContent): Promise<BotMessage>;
-    react(emoji: string): Promise<unknown>;
+    react(emoji: string): Promise<void>;
     edit(content: MessageContent): Promise<BotMessage>;
-    delete(): Promise<unknown>;
+    delete(): Promise<void>;
     createMessageComponentCollector(options: { componentType: number; time: number }): ComponentCollector;
 }
 
