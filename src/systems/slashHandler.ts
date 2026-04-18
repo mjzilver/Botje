@@ -115,9 +115,14 @@ export class SlashHandler {
             isSlashCommand: true,
             slashInteraction: interaction,
             reply: (_content: MessageContent) => Promise.resolve(pseudoMessage),
-            react: (_emoji: string) => Promise.resolve(),
+            react: (_emoji: string) => Promise.resolve({
+                count: 0,
+                emoji: { name: null },
+                message: { id: pseudoMessage.id },
+                users: { cache: new Map<string, BotUser>(), fetch: () => Promise.resolve(new Map<string, BotUser>()) },
+            }),
             edit: (_content: MessageContent) => Promise.resolve(pseudoMessage),
-            delete: () => Promise.resolve(),
+            delete: () => Promise.resolve(pseudoMessage),
             createMessageComponentCollector: (_options: {
                 componentType: number;
                 time: number;

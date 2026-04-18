@@ -6,7 +6,6 @@ import type {
     Guild,
     GuildEmoji,
     GuildMember,
-    MessageReaction,
     User,
 } from "discord.js";
 
@@ -16,9 +15,17 @@ export type BotMember = GuildMember;
 
 export type BotUser = User;
 
-export type BotReaction = MessageReaction;
-
 export type BotEmoji = GuildEmoji;
+
+export interface BotReaction {
+    count: number | null;
+    emoji: { name: string | null };
+    message: { id: string };
+    users: {
+        cache: Map<string, BotUser>;
+        fetch(): Promise<Map<string, BotUser>>;
+    };
+}
 
 export interface ComponentCollectorInteraction {
     user: { id: string };
@@ -79,9 +86,9 @@ export interface BotMessage {
     isSlashCommand?: boolean;
     slashInteraction?: CommandInteraction;
     reply(content: MessageContent): Promise<BotMessage>;
-    react(emoji: string): Promise<unknown>;
+    react(emoji: string): Promise<BotReaction>;
     edit(content: MessageContent): Promise<BotMessage>;
-    delete(): Promise<unknown>;
+    delete(): Promise<BotMessage>;
     createMessageComponentCollector(options: { componentType: number; time: number }): ComponentCollector;
 }
 
