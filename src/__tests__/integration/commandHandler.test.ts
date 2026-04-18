@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { CommandHandler } from "../../systems/commandHandler";
 import { ReplyHandler } from "../../systems/replyHandler";
 import type { ICommand } from "../../interfaces";
-import { makeMockContext, TEST_CONFIG , makeMessage } from "@test/helpers";
+import { makeMockContext, TEST_CONFIG, makeMessage } from "@test/helpers";
 
 function stubCommand(name: string): ICommand {
     return {

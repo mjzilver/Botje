@@ -92,12 +92,7 @@ export class CommandHandler {
         return { command, args };
     }
 
-    private handleCommandType(
-        command: string,
-        readback: boolean,
-        message: BotMessage,
-        isAdmin: boolean,
-    ): void {
+    private handleCommandType(command: string, readback: boolean, message: BotMessage, isAdmin: boolean): void {
         if (command in this.commands) this.commands[command].function(message, this.context);
         else if (command in this.admincommands) this.handleAdminCommand(command, message, isAdmin);
         else if (!readback)
@@ -127,6 +122,7 @@ export class CommandHandler {
                 this.maybeSpeakOnMention(message);
             }
         }
+
         this.messageCounter++;
     }
 
@@ -141,8 +137,7 @@ export class CommandHandler {
     private maybeSpeakOnMention(message: BotMessage): void {
         if (!message.content.match(/\bbot(je)?\b/gi)) return;
         const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
-        if (isAdmin || this.isUserAllowed(message, false))
-            this.commands["speak"]?.function(message, this.context);
+        if (isAdmin || this.isUserAllowed(message, false)) this.commands["speak"]?.function(message, this.context);
     }
 
     async redo(message: BotMessage, fetchMessage: (id: string) => Promise<BotMessage>): Promise<void> {

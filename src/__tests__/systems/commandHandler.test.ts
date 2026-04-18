@@ -6,7 +6,7 @@ import type { IMessageHandler, ILogger, ICommand, IBotContext } from "../../inte
 import type { BotConfig } from "../../interfaces/config";
 import type { ReplyHandler } from "../../systems/replyHandler";
 import type { LoadedCommands } from "../../systems/commandLoader";
-import { makeCommand , makeMessage } from "@test/helpers";
+import { makeCommand, makeMessage } from "@test/helpers";
 
 const config = {
     prefix: "!",

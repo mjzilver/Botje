@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import speakCommand from "../../../commands/speak";
-import { makeMockContext , makeMessage } from "@test/helpers";
+import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("speak — integration", () => {
     it("sends a message from the database when no word argument is given", async () => {

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import pingCommand from "../../commands/ping";
 import type { IBotContext } from "../../interfaces";
 import type { BotMessage } from "../../interfaces/discord";
-import { makeMockContext , makeMessage } from "@test/helpers";
+import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("ping command", () => {
     let context: IBotContext;

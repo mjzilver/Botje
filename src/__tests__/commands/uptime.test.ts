@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import type { Client } from "discord.js";
 
 import uptimeCommand from "../../commands/uptime";
-import { makeMockContext , makeMessage } from "@test/helpers";
+import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("uptime command", () => {
     it("has name 'uptime'", () => {

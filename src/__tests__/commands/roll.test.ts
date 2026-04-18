@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 
 import rollCommand from "../../commands/roll";
-import { makeMockContext , makeMessage } from "@test/helpers";
+import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("roll command", () => {
     it("has name 'roll'", () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import pingCommand from "../../../commands/ping";
 import rollCommand from "../../../commands/roll";
 import chooseCommand from "../../../commands/choose";
-import { makeMockContext , makeMessage } from "@test/helpers";
+import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("ping — integration", () => {
     it("sends Ping? and then edits with latency", async () => {

@@ -7,7 +7,10 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
     const { removePrefix } = makeStringHelpers(context.config);
     const earliest = new Date();
     earliest.setMonth(earliest.getMonth() - 5);
-    let filtered = removePrefix(message.content).replace(/(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http.*|speak)\b/gi, "");
+    let filtered = removePrefix(message.content).replace(
+        /(:.+:|<.+>|@.*|\b[a-z] |\bbot(?:je)?\b|http.*|speak)\b/gi,
+        "",
+    );
     filtered = textOnly(filtered);
     filtered = filtered.replace(context.dictionary.getNonSelectorsRegex(), "").trim();
     const words = filtered.split(" ");

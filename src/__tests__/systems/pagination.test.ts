@@ -96,7 +96,9 @@ describe("Pagination.sendPaginatedEmbed – multiple pages", () => {
 
     it("throws when pages array is empty", async () => {
         const pagination = new Pagination(makeMessageHandler());
-        await expect(pagination.sendPaginatedEmbed(makeMessage("!test"), [])).rejects.toThrow("Pages array cannot be empty");
+        await expect(pagination.sendPaginatedEmbed(makeMessage("!test"), [])).rejects.toThrow(
+            "Pages array cannot be empty",
+        );
     });
 
     it("preserves string pages by wrapping with content property", async () => {

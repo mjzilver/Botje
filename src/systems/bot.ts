@@ -80,9 +80,7 @@ export class Bot {
     private async scanChannel(channel: discord.TextChannel, since: number): Promise<void> {
         try {
             const messages = await channel.messages.fetch({ limit: 100 });
-            messages
-                .filter((m) => m.createdTimestamp > since)
-                .forEach((m) => this.processScannedMessage(m));
+            messages.filter((m) => m.createdTimestamp > since).forEach((m) => this.processScannedMessage(m));
         } catch (err) {
             this.logger.error(toError(err));
         }

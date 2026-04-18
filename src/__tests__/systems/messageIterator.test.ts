@@ -123,8 +123,6 @@ describe("MessageIterator.iterate", () => {
 
         await iterator.iterate(channel, "custom-start");
 
-        expect(channel.messages.fetch).toHaveBeenCalledWith(
-            expect.objectContaining({ before: "custom-start" }),
-        );
+        expect(channel.messages.fetch).toHaveBeenCalledWith(expect.objectContaining({ before: "custom-start" }));
     });
 });

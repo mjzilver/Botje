@@ -23,7 +23,9 @@ describe("help (cl)", () => {
 
     it("calls printColumns with clcommand data", () => {
         const stub: IClCommand = { name: "ping", description: "test", format: "ping", function: vi.fn() };
-        const context = makeMockContext({ loadedCommands: { clcommands: { ping: stub }, commands: {}, admincommands: {}, dmcommands: {} } });
+        const context = makeMockContext({
+            loadedCommands: { clcommands: { ping: stub }, commands: {}, admincommands: {}, dmcommands: {} },
+        });
 
         helpCommand.function([], context);
 
@@ -38,7 +40,9 @@ describe("commands (cl)", () => {
     it("has name 'commands'", () => expect(commandsCommand.name).toBe("commands"));
 
     it("calls printColumns with command data", () => {
-        const context = makeMockContext({ loadedCommands: { commands: {}, admincommands: {}, dmcommands: {}, clcommands: {} } });
+        const context = makeMockContext({
+            loadedCommands: { commands: {}, admincommands: {}, dmcommands: {}, clcommands: {} },
+        });
 
         commandsCommand.function([], context);
 
@@ -72,9 +76,7 @@ describe("level (cl)", () => {
 
         levelCommand.function([], context);
 
-        expect(context.logger.console).toHaveBeenCalledWith(
-            expect.stringContaining("Available logging levels"),
-        );
+        expect(context.logger.console).toHaveBeenCalledWith(expect.stringContaining("Available logging levels"));
     });
 });
 
@@ -91,9 +93,7 @@ describe("settings (cl)", () => {
         settingsCommand.function([], context);
 
         expect(context.logger.console).toHaveBeenCalledWith("Current settings:");
-        expect(context.logger.console).toHaveBeenCalledWith(
-            expect.stringContaining(TEST_CONFIG.prefix),
-        );
+        expect(context.logger.console).toHaveBeenCalledWith(expect.stringContaining(TEST_CONFIG.prefix));
     });
 });
 
@@ -119,9 +119,7 @@ describe("checkduplicates (cl)", () => {
     it("logs duplicate count from database", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.database.query).mockResolvedValue([
-            { message: "hello", datetime: 123, count: "2" },
-        ]);
+        vi.mocked(context.database.query).mockResolvedValue([{ message: "hello", datetime: 123, count: "2" }]);
 
         await checkdupesCommand.function([], context);
 

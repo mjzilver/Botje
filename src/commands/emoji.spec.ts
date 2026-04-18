@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import emojiCommand from "./emoji";
-import { makeMockContext , makeMessage } from "@test/helpers";
+import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("emoji", () => {
     it("has name 'emoji'", () => expect(emojiCommand.name).toBe("emoji"));
@@ -10,9 +10,6 @@ describe("emoji", () => {
 
         await emojiCommand.function(makeMessage("!emoji abc"), context);
 
-        expect(context.messageHandler.send).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.any(String),
-        );
+        expect(context.messageHandler.send).toHaveBeenCalledWith(expect.anything(), expect.any(String));
     });
 });
