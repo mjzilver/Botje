@@ -8,7 +8,7 @@ export interface IterableMessage {
         bot?: boolean;
     };
     content?: string;
-    delete(): Promise<unknown>;
+    delete(): Promise<IterableMessage>;
 }
 
 interface FetchableChannel {

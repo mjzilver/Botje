@@ -15,7 +15,7 @@ function makeLogger(): ILogger {
 }
 
 function makeMessage(id: string, content = ""): IterableMessage {
-    return { id, content, author: { id: "u1", bot: false }, delete: vi.fn().mockResolvedValue(undefined) };
+    return { id, content, author: { id: "u1", bot: false }, delete: vi.fn().mockResolvedValue({ id, content }) };
 }
 
 function makeChannel(batches: IterableMessage[][], lastMessageId = "start") {
