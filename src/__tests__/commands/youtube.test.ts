@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import youtubeCommand from "./youtube";
+import youtubeCommand from "../../commands/youtube";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 vi.mock("axios", () => ({ default: { get: vi.fn() } }));

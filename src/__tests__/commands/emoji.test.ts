@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import emojiCommand from "./emoji";
+import emojiCommand from "../../commands/emoji";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("emoji", () => {

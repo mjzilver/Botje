@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import hangmanCommand from "./hangman";
+import hangmanCommand from "../../commands/hangman";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("hangman", () => {

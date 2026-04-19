@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import weatherCommand from "./weather";
+import weatherCommand from "../../commands/weather";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("weather", () => {

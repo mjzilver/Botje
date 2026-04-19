@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import dmHelpCommand from "./help";
+import dmHelpCommand from "../../../commands/dmcommands/help";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("dmcommands/help", () => {

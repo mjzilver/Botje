@@ -73,16 +73,6 @@ describe("loadCommands – basic loading", () => {
         expect(result.commands["?"]).toBeDefined();
         expect(result.commands["h"]).toBe(result.commands["help"]);
     });
-    it("skips test files", () => {
-        writeCommand(path.join(baseDir, "commands"), "foo.test.js", {
-            name: "foo",
-            description: "foo",
-            format: "foo",
-            function: "function() {}",
-        });
-        const result = loadCommands(baseDir, logger);
-        expect(result.commands["foo"]).toBeUndefined();
-    });
     it("skips non-js/ts files", () => {
         fs.writeFileSync(path.join(baseDir, "commands", "readme.md"), "# readme");
         const result = loadCommands(baseDir, logger);
