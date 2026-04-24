@@ -30,6 +30,7 @@ function formatHour(hour: number): string {
 
 async function fetchStats(userId: string, serverId: string, context: IBotContext): Promise<StatsData> {
     return queryCache(CacheKey.statsUser(serverId, userId), async () => {
+        context.logger.debug(`Fetching stats for user ${userId} in server ${serverId}`);
         const [msgRows, reactGivenRows, reactReceivedRows, peakHourRows] = await Promise.all([
             context.database.query<{ count: string; first_seen: string }>(
                 `SELECT COUNT(*) AS count, MIN(datetime) AS first_seen
@@ -61,13 +62,18 @@ async function fetchStats(userId: string, serverId: string, context: IBotContext
             ),
         ]);
 
-        return {
+        const data = {
             messageCount: parseInt(msgRows[0]?.count ?? "0", 10),
             reactionsGiven: parseInt(reactGivenRows[0]?.count ?? "0", 10),
             reactionsReceived: parseInt(reactReceivedRows[0]?.count ?? "0", 10),
             firstSeen: msgRows[0]?.first_seen ? parseInt(msgRows[0].first_seen, 10) : null,
             peakHour: peakHourRows[0]?.hour != null ? parseInt(peakHourRows[0].hour, 10) : null,
         };
+        context.logger.debug(
+            `Stats for ${userId}: ${data.messageCount} msgs, ${data.reactionsGiven} given, ${data.reactionsReceived} received`,
+        );
+
+        return data;
     });
 }
 
