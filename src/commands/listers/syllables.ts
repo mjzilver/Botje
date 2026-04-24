@@ -3,6 +3,9 @@ import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
 import { countVowelGroups } from "../../systems/stringHelpers";
+import { queryCache, CacheKey } from "../../systems/queryCache";
+
+type MessageRow = { user_id: string; message: string };
 
 class SyllableLister extends Lister {
     override async mention(
@@ -12,12 +15,13 @@ class SyllableLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `SELECT user_id, message FROM messages WHERE server_id = $1 AND user_id = $2`;
         const userdata = { syllables: 0, total: 0, average: 0 };
-        const rows = await context.database.query<{
-            user_id: string;
-            message: string;
-        }>(selectSQL, [message.guild.id, mentioned.id]);
+        const rows = await queryCache(CacheKey.msgRowsUser(message.guild.id, mentioned.id), () =>
+            context.database.query<MessageRow>(
+                `SELECT user_id, message FROM messages WHERE server_id = $1 AND user_id = $2`,
+                [message.guild.id, mentioned.id],
+            ),
+        );
         for (let i = 0; i < rows.length; i++) {
             const syllables = this.calculateSyllables(rows[i].message);
             if (syllables >= 1) {
@@ -35,19 +39,12 @@ class SyllableLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, message FROM messages WHERE server_id = $1`;
-        const userdata: Record<
-            string,
-            {
-                syllables: number;
-                total: number;
-                average: number;
-            }
-        > = {};
-        const rows = await context.database.query<{
-            user_id: string;
-            message: string;
-        }>(selectSQL, [message.guild.id]);
+        const userdata: Record<string, { syllables: number; total: number; average: number }> = {};
+        const rows = await queryCache(CacheKey.msgRowsServer(message.guild.id), () =>
+            context.database.query<MessageRow>(`SELECT user_id, message FROM messages WHERE server_id = $1`, [
+                message.guild.id,
+            ]),
+        );
         for (let i = 0; i < rows.length; i++) {
             const userId = rows[i].user_id;
             if (!userdata[userId]) userdata[userId] = { syllables: 0, total: 0, average: 0 };

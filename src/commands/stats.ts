@@ -3,6 +3,7 @@ import type { BotMessage } from "../interfaces/discord";
 import { EmbedBuilder } from "../interfaces/discord";
 import { toError } from "../systems/utils";
 import { isGuildMessage } from "../interfaces/discord";
+import { queryCache, CacheKey } from "../systems/queryCache";
 
 interface StatsData {
     messageCount: number;
@@ -11,14 +12,6 @@ interface StatsData {
     firstSeen: number | null;
     peakHour: number | null;
 }
-
-interface CacheEntry {
-    data: StatsData;
-    expiry: number;
-}
-
-const CACHE_TTL_MS = 5 * 60 * 1000;
-const statsCache = new Map<string, CacheEntry>();
 
 function formatDate(timestamp: number): string {
     return new Date(timestamp).toLocaleDateString("en-GB", {
@@ -36,52 +29,46 @@ function formatHour(hour: number): string {
 }
 
 async function fetchStats(userId: string, serverId: string, context: IBotContext): Promise<StatsData> {
-    const cacheKey = `${serverId}:${userId}`;
-    const cached = statsCache.get(cacheKey);
-    if (cached && cached.expiry > Date.now()) return cached.data;
-
-    const [msgRows, reactGivenRows, reactReceivedRows, peakHourRows] = await Promise.all([
-        context.database.query<{ count: string; first_seen: string }>(
-            `SELECT COUNT(*) AS count, MIN(datetime) AS first_seen
+    return queryCache(CacheKey.statsUser(serverId, userId), async () => {
+        const [msgRows, reactGivenRows, reactReceivedRows, peakHourRows] = await Promise.all([
+            context.database.query<{ count: string; first_seen: string }>(
+                `SELECT COUNT(*) AS count, MIN(datetime) AS first_seen
              FROM messages
              WHERE server_id = $1 AND user_id = $2`,
-            [serverId, userId],
-        ),
-        context.database.query<{ count: string }>(
-            `SELECT COUNT(*) AS count
+                [serverId, userId],
+            ),
+            context.database.query<{ count: string }>(
+                `SELECT COUNT(*) AS count
              FROM reactions
              WHERE user_id = $1`,
-            [userId],
-        ),
-        context.database.query<{ count: string }>(
-            `SELECT COUNT(*) AS count
+                [userId],
+            ),
+            context.database.query<{ count: string }>(
+                `SELECT COUNT(*) AS count
              FROM reactions r
              JOIN messages m ON m.id = r.message_id
              WHERE m.user_id = $1 AND m.server_id = $2`,
-            [userId, serverId],
-        ),
-        context.database.query<{ hour: string; count: string }>(
-            `SELECT EXTRACT(HOUR FROM to_timestamp(datetime / 1000)) AS hour, COUNT(*) AS count
+                [userId, serverId],
+            ),
+            context.database.query<{ hour: string; count: string }>(
+                `SELECT EXTRACT(HOUR FROM to_timestamp(datetime / 1000)) AS hour, COUNT(*) AS count
              FROM messages
              WHERE server_id = $1 AND user_id = $2
              GROUP BY hour
              ORDER BY count DESC
              LIMIT 1`,
-            [serverId, userId],
-        ),
-    ]);
+                [serverId, userId],
+            ),
+        ]);
 
-    const data: StatsData = {
-        messageCount: parseInt(msgRows[0]?.count ?? "0", 10),
-        reactionsGiven: parseInt(reactGivenRows[0]?.count ?? "0", 10),
-        reactionsReceived: parseInt(reactReceivedRows[0]?.count ?? "0", 10),
-        firstSeen: msgRows[0]?.first_seen ? parseInt(msgRows[0].first_seen, 10) : null,
-        peakHour: peakHourRows[0]?.hour != null ? parseInt(peakHourRows[0].hour, 10) : null,
-    };
-
-    statsCache.set(cacheKey, { data, expiry: Date.now() + CACHE_TTL_MS });
-
-    return data;
+        return {
+            messageCount: parseInt(msgRows[0]?.count ?? "0", 10),
+            reactionsGiven: parseInt(reactGivenRows[0]?.count ?? "0", 10),
+            reactionsReceived: parseInt(reactReceivedRows[0]?.count ?? "0", 10),
+            firstSeen: msgRows[0]?.first_seen ? parseInt(msgRows[0].first_seen, 10) : null,
+            peakHour: peakHourRows[0]?.hour != null ? parseInt(peakHourRows[0].hour, 10) : null,
+        };
+    });
 }
 
 async function sendStats(

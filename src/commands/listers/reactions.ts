@@ -2,17 +2,22 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+import { queryCache, CacheKey } from "../../systems/queryCache";
 
 class ReactionsLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT r.emoji as emoji, COUNT(*) as count
+        const rows = await queryCache(CacheKey.reactionsServer(message.guild.id), () =>
+            context.database.query<{ emoji: string; count: string }>(
+                `SELECT r.emoji as emoji, COUNT(*) as count
             FROM reactions r
             JOIN messages m ON r.message_id = m.id
             WHERE m.server_id = $1
             GROUP BY r.emoji
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC`;
-        const rows = await context.database.query<{ emoji: string; count: string }>(selectSQL, [message.guild.id]);
+            ORDER BY COUNT(*) DESC`,
+                [message.guild.id],
+            ),
+        );
         if (!rows || rows.length === 0)
             return void context.messageHandler.send(message, `No reactions found in ${message.guild?.name}`);
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
@@ -37,17 +42,18 @@ class ReactionsLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `SELECT r.emoji as emoji, COUNT(*) as count
+        const rows = await queryCache(CacheKey.reactionsMentionUser(message.guild.id, mentioned.id), () =>
+            context.database.query<{ emoji: string; count: string }>(
+                `SELECT r.emoji as emoji, COUNT(*) as count
             FROM reactions r
             JOIN messages m ON r.message_id = m.id
             WHERE m.server_id = $1 AND r.user_id = $2
             GROUP BY r.emoji
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC`;
-        const rows = await context.database.query<{ emoji: string; count: string }>(selectSQL, [
-            message.guild.id,
-            mentioned.id,
-        ]);
+            ORDER BY COUNT(*) DESC`,
+                [message.guild.id, mentioned.id],
+            ),
+        );
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         if (!rows || rows.length === 0)
             return void context.messageHandler.send(message, `No reactions found for ${userName}`);
@@ -67,16 +73,18 @@ class ReactionsLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT r.user_id, m.server_id, COUNT(*) as count
+        const rows = await queryCache(CacheKey.reactionsPerPerson(message.guild.id), () =>
+            context.database.query<{ user_id: string; server_id: string; count: string }>(
+                `SELECT r.user_id, m.server_id, COUNT(*) as count
             FROM reactions r
             JOIN messages m ON r.message_id = m.id
             WHERE m.server_id = $1
             GROUP BY r.user_id, m.server_id
             HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC`;
-        const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
-            message.guild.id,
-        ]);
+            ORDER BY COUNT(*) DESC`,
+                [message.guild.id],
+            ),
+        );
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {

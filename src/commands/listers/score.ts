@@ -3,6 +3,9 @@ import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
 import letterValues from "../../json/letter_values.json";
+import { queryCache, CacheKey } from "../../systems/queryCache";
+
+type MessageRow = { user_id: string; message: string };
 
 class ScoreLister extends Lister {
     override async mention(
@@ -12,12 +15,13 @@ class ScoreLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `SELECT user_id, message FROM messages WHERE server_id = $1 AND user_id = $2`;
         const userdata = { points: 0, total: 0, quality: 0, score: 0 };
-        const rows = await context.database.query<{
-            user_id: string;
-            message: string;
-        }>(selectSQL, [message.guild.id, mentioned.id]);
+        const rows = await queryCache(CacheKey.msgRowsUser(message.guild.id, mentioned.id), () =>
+            context.database.query<MessageRow>(
+                `SELECT user_id, message FROM messages WHERE server_id = $1 AND user_id = $2`,
+                [message.guild.id, mentioned.id],
+            ),
+        );
         for (let i = 0; i < rows.length; i++) {
             userdata.points += this.calculateScore(rows[i].message);
             userdata.total += rows[i].message.length;
@@ -30,20 +34,12 @@ class ScoreLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, message FROM messages WHERE server_id = $1`;
-        const userdata: Record<
-            string,
-            {
-                points: number;
-                total: number;
-                quality: number;
-                score: number;
-            }
-        > = {};
-        const rows = await context.database.query<{
-            user_id: string;
-            message: string;
-        }>(selectSQL, [message.guild.id]);
+        const userdata: Record<string, { points: number; total: number; quality: number; score: number }> = {};
+        const rows = await queryCache(CacheKey.msgRowsServer(message.guild.id), () =>
+            context.database.query<MessageRow>(`SELECT user_id, message FROM messages WHERE server_id = $1`, [
+                message.guild.id,
+            ]),
+        );
         for (let i = 0; i < rows.length; i++) {
             const userId = rows[i].user_id;
             if (!userdata[userId]) userdata[userId] = { points: 0, total: 0, quality: 0, score: 0 };

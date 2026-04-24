@@ -2,6 +2,7 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+import { queryCache, CacheKey } from "../../systems/queryCache";
 
 class QualityLister extends Lister {
     override async mention(
@@ -11,7 +12,9 @@ class QualityLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `SELECT user_id,
+        const rows = await queryCache(CacheKey.qualityUser(message.guild.id, mentioned.id), () =>
+            context.database.query<{ user_id: string; percentage_unique: string }>(
+                `SELECT user_id,
                 COUNT(*) AS total_messages,
                 COUNT(DISTINCT message) AS unique_messages,
                 (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
@@ -19,11 +22,10 @@ class QualityLister extends Lister {
             WHERE server_id = $1 AND user_id = $2
             GROUP BY user_id
             HAVING COUNT(*) > 1000
-            ORDER BY percentage_unique DESC, user_id`;
-        const rows = await context.database.query<{
-            user_id: string;
-            percentage_unique: string;
-        }>(selectSQL, [message.guild.id, mentioned.id]);
+            ORDER BY percentage_unique DESC, user_id`,
+                [message.guild.id, mentioned.id],
+            ),
+        );
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         if (rows.length === 0)
             return void context.messageHandler.send(
@@ -35,7 +37,9 @@ class QualityLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id,
+        const rows = await queryCache(CacheKey.qualityServer(message.guild.id), () =>
+            context.database.query<{ user_id: string; percentage_unique: string }>(
+                `SELECT user_id,
             COUNT(*) AS total_messages,
             COUNT(DISTINCT message) AS unique_messages,
             (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
@@ -43,10 +47,10 @@ class QualityLister extends Lister {
         WHERE server_id = $1
         GROUP BY user_id
         HAVING COUNT(*) > 1000
-        ORDER BY percentage_unique DESC, user_id`;
-        const rows = await context.database.query<{ user_id: string; percentage_unique: string }>(selectSQL, [
-            message.guild.id,
-        ]);
+        ORDER BY percentage_unique DESC, user_id`,
+                [message.guild.id],
+            ),
+        );
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
