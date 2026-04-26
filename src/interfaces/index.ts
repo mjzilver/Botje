@@ -11,6 +11,7 @@ import type { IBackupHandler } from "../systems/backupHandler";
 import type { IHangman } from "../systems/hangman";
 import type { ILlmService } from "../systems/llm";
 import type { IDictionary } from "../systems/dictionary";
+import type { Settings } from "../systems/settings";
 
 export type { SqlParam, IDatabase };
 
@@ -79,4 +80,5 @@ export interface IBotContext {
     dictionary: IDictionary;
     client: Client;
     disallowed: Record<string, boolean>;
+    settings: Settings;
 }

@@ -19,6 +19,7 @@ import { Pagination } from "./pagination";
 import { loadCommands, type LoadedCommands } from "./commandLoader";
 import { LlmService } from "./llm";
 import { ReactionHandler } from "./reactionHandler";
+import { Settings } from "./settings";
 import replyPatterns from "../json/reply.json";
 
 export class SystemRegistry implements IBotContext {
@@ -42,8 +43,10 @@ export class SystemRegistry implements IBotContext {
     readonly config: BotConfig;
     readonly logger: ILogger;
     readonly client: discord.Client;
-    constructor(config: BotConfig, logger: ILogger, client: discord.Client) {
-        this.config = config;
+    settings!: Settings;
+    constructor(settings: Settings, logger: ILogger, client: discord.Client) {
+        this.config = settings.config;
+        this.settings = settings;
         this.logger = logger;
         this.client = client;
     }

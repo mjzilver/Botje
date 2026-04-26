@@ -6,6 +6,7 @@ import type { ILogger } from "../interfaces";
 import { toBotMessage } from "./messageAdapter";
 import { setBotContext } from "./botContext";
 import { SystemRegistry } from "./systemRegistry";
+import { Settings } from "./settings";
 import { toError, ONE_DAY_MS } from "./utils";
 
 const DISALLOWED_PATH = path.resolve(__dirname, "../json/disallowed.json");
@@ -14,10 +15,12 @@ export class Bot {
     readonly client: discord.Client;
     registry!: SystemRegistry;
     private readonly config: BotConfig;
+    private readonly settings: Settings;
     private readonly logger: ILogger;
     private readonly version: string;
-    constructor(config: BotConfig, logger: ILogger, version = "3.0.0") {
-        this.config = config;
+    constructor(settings: Settings, logger: ILogger, version = "3.0.0") {
+        this.settings = settings;
+        this.config = settings.config;
         this.logger = logger;
         this.version = version;
         this.client = new discord.Client({
@@ -63,7 +66,7 @@ export class Bot {
 
     private async loadSystems(): Promise<void> {
         const disallowed = this.loadDisallowed();
-        this.registry = new SystemRegistry(this.config, this.logger, this.client);
+        this.registry = new SystemRegistry(this.settings, this.logger, this.client);
         await this.registry.initialize(disallowed);
         setBotContext(this.registry);
         if (this.config.scan_on_startup === true || this.config.scan_on_startup === "1") this.scanOnStartup();

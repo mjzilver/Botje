@@ -37,11 +37,12 @@ export class MessageHandler implements IMessageHandler {
         this.removeFromCommandList = fn;
     }
 
-    private normalizeContent(content: MessageContent): discord.MessageCreateOptions | string {
+    private normalizeContent(content: MessageContent): Exclude<MessageContent, discord.EmbedBuilder> {
         if (content instanceof discord.EmbedBuilder) {
             return { embeds: [content] };
         }
-        return content as discord.MessageCreateOptions | string;
+
+        return content;
     }
 
     private async sendMessage(

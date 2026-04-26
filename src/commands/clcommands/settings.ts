@@ -1,5 +1,4 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
-import { Settings } from "../../systems/settings";
 
 export default {
     name: "settings",
@@ -12,8 +11,7 @@ export default {
             context.logger.console("Current settings:");
             for (const [key, val] of Object.entries(context.config)) context.logger.console(`${key}: ${val}`);
         } else {
-            const settings = new Settings(context.logger);
-            settings.updateVariable(setting, value);
+            context.settings.updateVariable(setting, value);
             context.logger.console(`Updated ${setting} to ${value}`);
         }
     },

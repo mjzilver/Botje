@@ -10,7 +10,7 @@ import { toError } from "./systems/utils";
 import pkg from "../package.json";
 
 const settings = new Settings(logger);
-const bot = new Bot(settings.config, logger, pkg.version);
+const bot = new Bot(settings, logger, pkg.version);
 registerProcessHandlers(
     () => bot.registry?.commandHandler,
     () => bot.registry?.messageHandler,
