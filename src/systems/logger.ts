@@ -136,4 +136,13 @@ export function queryLogs(
     });
 }
 
+export function queryLogsAsync(options: Winston.QueryOptions): Promise<{ file?: LogEntry[] }> {
+    return new Promise((resolve, reject) => {
+        activeWinstonLogger.query(options, (err, results) => {
+            if (err) reject(err);
+            else resolve(results as { file?: LogEntry[] });
+        });
+    });
+}
+
 export default logger;
