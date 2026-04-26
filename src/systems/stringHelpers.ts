@@ -52,3 +52,16 @@ export function getAttachmentUrl(message: BotMessage): string {
 
     return "";
 }
+export function formatDate(timestamp: number): string {
+    return new Date(timestamp).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+export function formatHour(hour: number): string {
+    const suffix = hour < 12 ? "AM" : "PM";
+    const h = hour % 12 === 0 ? 12 : hour % 12;
+
+    return `${h}:00 ${suffix}`;
+}

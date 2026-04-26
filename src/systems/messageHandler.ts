@@ -37,6 +37,13 @@ export class MessageHandler implements IMessageHandler {
         this.removeFromCommandList = fn;
     }
 
+    private normalizeContent(content: MessageContent): discord.MessageCreateOptions | string {
+        if (content instanceof discord.EmbedBuilder) {
+            return { embeds: [content] };
+        }
+        return content as discord.MessageCreateOptions | string;
+    }
+
     private async sendMessage(
         call: BotMessage,
         content: MessageContent,
@@ -50,29 +57,32 @@ export class MessageHandler implements IMessageHandler {
         }
 
         let reply: BotMessage;
+        const normalized = this.normalizeContent(content);
         try {
             if (call.isSlashCommand && call.slashInteraction) {
                 const interaction = call.slashInteraction;
                 if (interaction.deferred || interaction.replied) {
                     reply = toBotMessage(
-                        (await interaction.followUp(content as discord.InteractionReplyOptions)) as discord.Message,
+                        (await interaction.followUp(normalized as discord.InteractionReplyOptions)) as discord.Message,
                     );
                 } else {
-                    await interaction.reply(content as discord.InteractionReplyOptions);
+                    await interaction.reply(normalized as discord.InteractionReplyOptions);
                     reply = call;
                 }
             } else if (useReply) {
                 try {
-                    reply = await call.reply(content);
+                    reply = await call.reply(normalized);
                 } catch (err) {
                     this.logger.error(`Failed to reply (likely deleted): ${toError(err).message}`);
 
                     return undefined;
                 }
             } else {
-                reply = await call.channel.send(content);
+                reply = await call.channel.send(normalized);
             }
-        } catch {
+        } catch (err) {
+            this.logger.error(`Failed to send message: ${toError(err).message}`);
+
             return undefined;
         }
 

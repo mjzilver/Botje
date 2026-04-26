@@ -6,6 +6,7 @@ import { Settings } from "./systems/settings";
 import { Bot } from "./systems/bot";
 import { CommandLine } from "./systems/commandline";
 import { registerProcessHandlers } from "./systems/processHandler";
+import { toError } from "./systems/utils";
 import pkg from "../package.json";
 
 const settings = new Settings(logger);
@@ -19,5 +20,7 @@ setTimeout(() => {
     try {
         const { clcommands } = bot.registry.loadedCommands;
         new CommandLine(clcommands, logger, bot.registry);
-    } catch {}
+    } catch (err) {
+        logger.error(toError(err));
+    }
 }, 0);

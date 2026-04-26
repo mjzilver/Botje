@@ -142,7 +142,9 @@ export class SlashHandler {
         if (!found) return;
         try {
             await interaction.deferReply();
-        } catch {}
+        } catch (err) {
+            this.logger.debug(`Failed to defer reply: ${toError(err).message}`);
+        }
 
         const pseudoMessage = this.interactionToMessage(interaction, commandName);
         found.command.function(pseudoMessage, this.context);

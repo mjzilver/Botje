@@ -4,6 +4,7 @@ import { EmbedBuilder } from "../interfaces/discord";
 import { toError } from "../systems/utils";
 import { isGuildMessage } from "../interfaces/discord";
 import { queryCache, CacheKey } from "../systems/queryCache";
+import { formatDate, formatHour } from "../systems/stringHelpers";
 
 interface StatsData {
     messageCount: number;
@@ -11,21 +12,6 @@ interface StatsData {
     reactionsReceived: number;
     firstSeen: number | null;
     peakHour: number | null;
-}
-
-function formatDate(timestamp: number): string {
-    return new Date(timestamp).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-}
-
-function formatHour(hour: number): string {
-    const suffix = hour < 12 ? "AM" : "PM";
-    const h = hour % 12 === 0 ? 12 : hour % 12;
-
-    return `${h}:00 ${suffix}`;
 }
 
 async function fetchStats(userId: string, serverId: string, context: IBotContext): Promise<StatsData> {
