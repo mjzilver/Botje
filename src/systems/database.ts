@@ -25,7 +25,7 @@ export interface IDatabase {
     getCurrentUsername(userId: string, serverId: string): Promise<string | null>;
 }
 
-const DEBUG_SQL = true;
+const DEBUG_SQL = process.env.DEBUG_SQL === "1";
 
 export class Database implements IDatabase {
     private pool: Pool;
