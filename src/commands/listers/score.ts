@@ -2,10 +2,9 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
-import letterValues from "../../json/letter_values.json";
 import { queryCache, CacheKey } from "../../systems/queryCache";
 
-type MessageRow = { user_id: string; message: string };
+type ScoreRow = { user_id: string; total_chars: string };
 
 class ScoreLister extends Lister {
     override async mention(
@@ -15,55 +14,39 @@ class ScoreLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const userdata = { points: 0, total: 0, quality: 0, score: 0 };
-        const rows = await queryCache(CacheKey.msgRowsUser(message.guild.id, mentioned.id), () =>
-            context.database.query<MessageRow>(
-                `SELECT user_id, message FROM messages WHERE server_id = $1 AND user_id = $2`,
+        const rows = await queryCache(CacheKey.scoreUser(message.guild.id, mentioned.id), () =>
+            context.database.query<ScoreRow>(
+                `SELECT user_id, SUM(LENGTH(message)) AS total_chars
+                 FROM messages WHERE server_id = $1 AND user_id = $2
+                 GROUP BY user_id`,
                 [message.guild.id, mentioned.id],
             ),
         );
-        for (let i = 0; i < rows.length; i++) {
-            userdata.points += this.calculateScore(rows[i].message);
-            userdata.total += rows[i].message.length;
-        }
-
-        userdata.quality = userdata.points / userdata.total / 2;
-        userdata.score = Math.round(userdata.total * userdata.quality);
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        context.messageHandler.send(message, `\`${userName}\`'s post score is ${userdata.score}`);
+        const score = rows.length > 0 ? parseInt(rows[0].total_chars, 10) : 0;
+        context.messageHandler.send(message, `\`${userName}\`'s post score is ${score}`);
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const userdata: Record<string, { points: number; total: number; quality: number; score: number }> = {};
-        const rows = await queryCache(CacheKey.msgRowsServer(message.guild.id), () =>
-            context.database.query<MessageRow>(`SELECT user_id, message FROM messages WHERE server_id = $1`, [
-                message.guild.id,
-            ]),
+        const rows = await queryCache(CacheKey.scoreServer(message.guild.id), () =>
+            context.database.query<ScoreRow>(
+                `SELECT user_id, SUM(LENGTH(message)) AS total_chars
+                 FROM messages WHERE server_id = $1
+                 GROUP BY user_id
+                 ORDER BY total_chars DESC`,
+                [message.guild.id],
+            ),
         );
-        for (let i = 0; i < rows.length; i++) {
-            const userId = rows[i].user_id;
-            if (!userdata[userId]) userdata[userId] = { points: 0, total: 0, quality: 0, score: 0 };
-            userdata[userId].points += this.calculateScore(rows[i].message);
-            userdata[userId].total += rows[i].message.length;
-        }
-
-        const sorted: [string, number][] = [];
-        for (const userId in userdata) {
-            userdata[userId].quality = userdata[userId].points / userdata[userId].total / 2;
-            userdata[userId].score = Math.round(userdata[userId].total * userdata[userId].quality);
-            sorted.push([userId, userdata[userId].score]);
-        }
-
-        sorted.sort((a, b) => b[1] - a[1]);
         const userNames: Record<string, string> = {};
-        for (const [userId] of sorted)
-            userNames[userId] = await context.userHandler.getDisplayName(userId, message.guild.id);
+        for (const row of rows)
+            userNames[row.user_id] = await context.userHandler.getDisplayName(row.user_id, message.guild.id);
         const pages = await context.pagination.createPages(
-            sorted,
+            rows,
             10,
-            (pageRows: [string, number][], pageNum: number, totalPages: number) => {
+            (pageRows: ScoreRow[], pageNum: number, totalPages: number) => {
                 let result = "";
-                for (const row of pageRows) result += `\`${userNames[row[0]]}\`'s post score is ${row[1]} \n`;
+                for (const row of pageRows)
+                    result += `\`${userNames[row.user_id]}\`'s post score is ${parseInt(row.total_chars, 10)} \n`;
 
                 return this.buildPageEmbed(
                     context.config.color_hex,
@@ -75,16 +58,6 @@ class ScoreLister extends Lister {
             },
         );
         context.pagination.sendPaginatedEmbed(message, pages);
-    }
-
-    calculateScore(message: string): number {
-        let score = 0;
-        for (let i = 0; i < message.length; i++) {
-            const val = (letterValues as Record<string, number>)[message.charAt(i)];
-            score += val === undefined ? 0 : val;
-        }
-
-        return score;
     }
 }
 

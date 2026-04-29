@@ -24,4 +24,6 @@ export const CacheKey = {
     reactionsMentionUser: (serverId: string, userId: string) => `reactions-mention:${serverId}:${userId}`,
     reactionsPerPerson: (serverId: string) => `reactions-per-person:${serverId}`,
     statsUser: (serverId: string, userId: string) => `stats-user:${serverId}:${userId}`,
+    scoreUser: (serverId: string, userId: string) => `score-user:${serverId}:${userId}`,
+    scoreServer: (serverId: string) => `score-server:${serverId}`,
 };

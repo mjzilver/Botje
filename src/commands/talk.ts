@@ -11,8 +11,8 @@ export default {
         const mention = message.mentions?.users?.first?.();
         const chain: Record<string, string[]> = {};
         const selectSQL = mention
-            ? `SELECT message FROM messages WHERE message NOT LIKE '%<%' AND user_id = $1`
-            : `SELECT message FROM messages WHERE message NOT LIKE '%<%'`;
+            ? `SELECT message FROM messages WHERE message NOT LIKE '%<%' AND user_id = $1 ORDER BY RANDOM() LIMIT 5000`
+            : `SELECT message FROM messages WHERE message NOT LIKE '%<%' ORDER BY RANDOM() LIMIT 5000`;
         const rows = await context.database.query<{
             message: string;
         }>(selectSQL, mention ? [mention.id] : []);
