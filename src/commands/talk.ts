@@ -8,11 +8,7 @@ export default {
     format: "talk (@user)",
     options: [{ type: "user", name: "user", description: "The user to mimic (optional)", required: false }],
     async function(message, context) {
-        const mention = message.mentions?.users?.first?.() as
-            | {
-                  id: string;
-              }
-            | undefined;
+        const mention = message.mentions?.users?.first?.();
         const chain: Record<string, string[]> = {};
         const selectSQL = mention
             ? `SELECT message FROM messages WHERE message NOT LIKE '%<%' AND user_id = $1`

@@ -63,7 +63,7 @@ export default {
                 .replace("{cardName}", card.name)
                 .replace("{orientation}", isReversed ? "reversed" : "upright")
                 .replace("{meaning}", meaning);
-            const interpretMsg = await message.channel.send!("🔮 Divining your fortune...");
+            const interpretMsg = await message.channel.send("🔮 Divining your fortune...");
             try {
                 await context.llm.streamToMessage(interpretMsg, prompt);
                 await context.messageHandler.react(interpretMsg, "🔮");

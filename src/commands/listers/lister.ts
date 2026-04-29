@@ -30,12 +30,7 @@ export abstract class Lister {
             ? (message.content.match(/([^" ]+)|"([^"]+)"/gi) ?? [])
             : message.content.split(" ");
         const args = rawArgs.slice(1);
-        const mention = message.mentions?.users?.first?.() as
-            | {
-                  id: string;
-                  username?: string;
-              }
-            | undefined;
+        const mention = message.mentions?.users?.first?.();
         const hasLeaderboard = args.some((a) => a && LEADERBOARD_TRIGGERS.includes(a.toLowerCase()));
         const hasPercent = args.some((a) => a && PERCENT_TRIGGERS.includes(a.toLowerCase()));
         const filteredArgs = args.filter((a) => a && !ALL_FLAG_TRIGGERS.has(a.toLowerCase()) && !a.startsWith("<@"));

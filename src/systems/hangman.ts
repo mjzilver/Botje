@@ -1,4 +1,4 @@
-import { AttachmentBuilder, EmbedBuilder } from "discord.js";
+import { AttachmentBuilder, EmbedBuilder } from "../interfaces/discord";
 import path from "path";
 import type { IMessageHandler } from "./messageHandler";
 import type { ILogger } from "./logger";
