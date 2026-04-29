@@ -114,3 +114,21 @@ export type MessageContent =
 export { EmbedBuilder, AttachmentBuilder, ChannelType } from "discord.js";
 
 export type { TextChannel } from "discord.js";
+
+export interface BotWebhook {
+    delete(): Promise<unknown>;
+}
+
+export interface BotGuildTextChannel {
+    id: string;
+    name: string;
+    lastMessageId?: string | null;
+    guild: {
+        id: string;
+        name: string;
+    };
+    messages: {
+        fetch(options: { limit: number; before: string }): Promise<Map<string, BotMessage>>;
+    };
+    fetchWebhooks(): Promise<{ forEach(fn: (webhook: BotWebhook) => void): void }>;
+}

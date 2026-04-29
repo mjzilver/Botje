@@ -1,30 +1,25 @@
-import { ChannelType, type TextChannel } from "../../interfaces/discord";
 import type { ICommand, IBotContext } from "../../interfaces";
-import type { BotMessage } from "../../interfaces/discord";
+import type { BotMessage, BotGuildTextChannel } from "../../interfaces/discord";
 import { MessageIterator } from "../../systems/messageIterator";
+import { getTextChannels } from "../../systems/messageAdapter";
 import type { IterableMessage, IteratorStats } from "../../systems/messageIterator";
 
-async function nukechannel(channel: TextChannel, context: IBotContext): Promise<void> {
-    if (channel && channel.type === ChannelType.GuildText) {
-        context.logger.warn(`NUKING channel: ${channel.name}`);
-        const iterator = new MessageIterator(context.logger, {
-            async onMessage(msg: IterableMessage) {
-                await msg.delete();
-            },
-            onComplete(stats: IteratorStats) {
-                context.logger.warn(
-                    `${stats.totalProcessed} messages nuked from ${channel.name} in ${channel.guild.name}`,
-                );
-            },
-        });
-        await iterator.iterate(channel);
-    }
+async function nukechannel(channel: BotGuildTextChannel, context: IBotContext): Promise<void> {
+    context.logger.warn(`NUKING channel: ${channel.name}`);
+    const iterator = new MessageIterator(context.logger, {
+        async onMessage(msg: IterableMessage) {
+            await msg.delete();
+        },
+        onComplete(stats: IteratorStats) {
+            context.logger.warn(`${stats.totalProcessed} messages nuked from ${channel.name} in ${channel.guild.name}`);
+        },
+    });
+    await iterator.iterate(channel);
 }
 
 async function nukeguild(message: BotMessage, context: IBotContext): Promise<void> {
-    for (const [, channel] of context.client.channels.cache.entries())
-        if (channel.type === ChannelType.GuildText && (channel as TextChannel).guild?.id === message.guild?.id)
-            await nukechannel(channel as TextChannel, context);
+    for (const channel of getTextChannels(context.client))
+        if (channel.guild.id === message.guild?.id) await nukechannel(channel, context);
 }
 
 export default {
