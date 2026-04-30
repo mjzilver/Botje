@@ -2,7 +2,7 @@ import type { BotMessage } from "./discord";
 import type { Client, SlashCommandBuilder } from "discord.js";
 import type { BotConfig } from "./config";
 import type { LoadedCommands } from "../systems/commandLoader";
-import type { SqlParam, IDatabase } from "../systems/database";
+import type { SqlParam, IDatabase, ReminderRow } from "../systems/database";
 import type { IMessageHandler } from "../systems/messageHandler";
 import type { LogEntry, ILogger } from "../systems/logger";
 import type { IUserHandler } from "../systems/userHandler";
@@ -12,8 +12,9 @@ import type { IHangman } from "../systems/hangman";
 import type { ILlmService } from "../systems/llm";
 import type { IDictionary } from "../systems/dictionary";
 import type { Settings } from "../systems/settings";
+import type { ReminderScheduler } from "../systems/reminderScheduler";
 
-export type { SqlParam, IDatabase };
+export type { SqlParam, IDatabase, ReminderRow };
 
 export type { IMessageHandler };
 
@@ -81,4 +82,5 @@ export interface IBotContext {
     client: Client;
     disallowed: Record<string, boolean>;
     settings: Settings;
+    reminderScheduler: ReminderScheduler;
 }

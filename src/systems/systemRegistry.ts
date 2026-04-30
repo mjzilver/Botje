@@ -20,6 +20,7 @@ import { loadCommands, type LoadedCommands } from "./commandLoader";
 import { LlmService } from "./llm";
 import { ReactionHandler } from "./reactionHandler";
 import { Settings } from "./settings";
+import { ReminderScheduler } from "./reminderScheduler";
 import replyPatterns from "../json/reply.json";
 
 export class SystemRegistry implements IBotContext {
@@ -39,6 +40,7 @@ export class SystemRegistry implements IBotContext {
     eventListener!: EventListener;
     reactionHandler!: ReactionHandler;
     loadedCommands!: LoadedCommands;
+    reminderScheduler!: ReminderScheduler;
     disallowed!: Record<string, boolean>;
     readonly config: BotConfig;
     readonly logger: ILogger;
@@ -107,5 +109,7 @@ export class SystemRegistry implements IBotContext {
             this.disallowed,
             this.reactionHandler,
         );
+        this.reminderScheduler = new ReminderScheduler(this.client, this.database, this.logger);
+        await this.reminderScheduler.loadPending();
     }
 }

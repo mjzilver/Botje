@@ -9,6 +9,14 @@ import { toError } from "./utils";
 
 export type SqlParam = string | number | boolean | null | Date | Buffer;
 
+export interface ReminderRow {
+    id: number;
+    user_id: string;
+    channel_id: string;
+    reminder_message: string;
+    trigger_at: number;
+}
+
 export interface IDatabase {
     query<T extends QueryResultRow = QueryResultRow>(sql: string, params?: SqlParam[]): Promise<T[]>;
     insert(sql: string, params?: SqlParam[]): Promise<void>;
@@ -23,6 +31,9 @@ export interface IDatabase {
     insertMessage(message: GuildBotMessage): Promise<void>;
     insertReaction(reaction: BotReaction): Promise<void>;
     getCurrentUsername(userId: string, serverId: string): Promise<string | null>;
+    insertReminder(userId: string, channelId: string, reminderMessage: string, triggerAt: number): Promise<number>;
+    deleteReminder(id: number): Promise<void>;
+    getPendingReminders(): Promise<ReminderRow[]>;
 }
 
 const DEBUG_SQL = process.env.DEBUG_SQL === "1";
@@ -108,6 +119,15 @@ export class Database implements IDatabase {
                 user_name text,
                 timestamp bigint,
                 PRIMARY KEY(user_id, server_id, user_name)
+            )
+        `);
+        await this.query(`
+            CREATE TABLE IF NOT EXISTS reminders (
+                id serial PRIMARY KEY,
+                user_id bigint NOT NULL,
+                channel_id bigint NOT NULL,
+                reminder_message text NOT NULL,
+                trigger_at bigint NOT NULL
             )
         `);
     }
@@ -274,6 +294,35 @@ export class Database implements IDatabase {
         );
         if (message.reactions.cache.size > 0)
             for (const reaction of message.reactions.cache.values()) await this.insertReaction(reaction);
+    }
+
+    async insertReminder(
+        userId: string,
+        channelId: string,
+        reminderMessage: string,
+        triggerAt: number,
+    ): Promise<number> {
+        const rows = await this.query<{ id: number }>(
+            `INSERT INTO reminders (user_id, channel_id, reminder_message, trigger_at)
+             VALUES ($1::bigint, $2::bigint, $3, $4::bigint)
+             RETURNING id`,
+            [userId, channelId, reminderMessage, triggerAt],
+        );
+
+        return rows[0].id;
+    }
+
+    async deleteReminder(id: number): Promise<void> {
+        await this.query(`DELETE FROM reminders WHERE id = $1`, [id]);
+    }
+
+    async getPendingReminders(): Promise<ReminderRow[]> {
+        return this.query<ReminderRow>(
+            `SELECT id, user_id::text, channel_id::text, reminder_message, trigger_at
+             FROM reminders
+             WHERE trigger_at > $1`,
+            [Date.now()],
+        );
     }
 
     static fromConfig(config: BotConfig, logger: ILogger): Database {
