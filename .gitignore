@@ -7,6 +7,9 @@ dist/
 # Test coverage
 coverage/
 
+# Scripts for local usage
+scripts/
+
 # Secrets & local config — use config.example.json as template
 config.json
 
