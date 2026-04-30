@@ -41,10 +41,7 @@ describe("talk command – execution", () => {
     });
 
     it("sends a sentence when chain can be built", async () => {
-        const context = mockDbWithRows([
-            { message: "the cat sat on the mat" },
-            { message: "the dog ran in the park" },
-        ]);
+        const context = mockDbWithRows([{ message: "the cat sat on the mat" }, { message: "the dog ran in the park" }]);
         await talkCommand.function(makeMessage("!talk"), context);
 
         expect(context.messageHandler.send).toHaveBeenCalledOnce();

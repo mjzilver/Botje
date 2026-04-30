@@ -31,6 +31,7 @@ function makeLogger(): ILogger {
 function makeClient(memberName: string | null = null, userName: string | null = null): Client {
     const member = memberName ? { displayName: memberName, user: { id: "uid" } } : null;
     const user = userName ? { id: "uid", username: userName } : null;
+
     return {
         guilds: {
             fetch: member
@@ -40,9 +41,7 @@ function makeClient(memberName: string | null = null, userName: string | null = 
                 : vi.fn().mockRejectedValue(new Error("guild not found")),
         },
         users: {
-            fetch: user
-                ? vi.fn().mockResolvedValue(user)
-                : vi.fn().mockRejectedValue(new Error("user not found")),
+            fetch: user ? vi.fn().mockResolvedValue(user) : vi.fn().mockRejectedValue(new Error("user not found")),
         },
     } as unknown as Client;
 }

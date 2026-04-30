@@ -20,10 +20,7 @@ describe("youtube command – execution", () => {
         const context = makeMockContext();
         await youtubeCommand.function(makeMessage("!youtube cats"), context);
 
-        expect(context.messageHandler.reply).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.stringContaining("abc123"),
-        );
+        expect(context.messageHandler.reply).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("abc123"));
     });
 
     it("replies with 'Nothing found' when items array is empty", async () => {

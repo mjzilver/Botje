@@ -18,9 +18,7 @@ const CONFIG: LlmConfig = {
 function makeMessageHandler(editResolves = true): IMessageHandler {
     return {
         reply: vi.fn().mockResolvedValue({ id: "reply-id", edit: vi.fn() } as unknown as BotMessage),
-        edit: editResolves
-            ? vi.fn().mockResolvedValue(undefined)
-            : vi.fn().mockRejectedValue(new Error("deleted")),
+        edit: editResolves ? vi.fn().mockResolvedValue(undefined) : vi.fn().mockRejectedValue(new Error("deleted")),
         send: vi.fn(),
         delete: vi.fn(),
         react: vi.fn(),
@@ -49,6 +47,7 @@ function makeMessage(): BotMessage {
 function makeStream(chunks: string[]): ReadableStream<Uint8Array> {
     const encoder = new TextEncoder();
     let i = 0;
+
     return new ReadableStream({
         pull(controller) {
             if (i < chunks.length) {
@@ -70,10 +69,7 @@ describe("LlmService.streamToMessage", () => {
     beforeEach(() => vi.clearAllMocks());
 
     it("accumulates text from streamed JSON chunks and returns it", async () => {
-        mockFetch([
-            JSON.stringify({ response: "Hello" }),
-            "\n" + JSON.stringify({ response: " world" }),
-        ]);
+        mockFetch([JSON.stringify({ response: "Hello" }), "\n" + JSON.stringify({ response: " world" })]);
         const handler = makeMessageHandler();
         const service = new LlmService(CONFIG, makeLogger(), handler);
 
@@ -84,9 +80,9 @@ describe("LlmService.streamToMessage", () => {
     });
 
     it("releases the slot so a queued second request can proceed", async () => {
-        global.fetch = vi.fn().mockImplementation(() =>
-            Promise.resolve({ body: makeStream([JSON.stringify({ response: "ok" })]) }),
-        );
+        global.fetch = vi
+            .fn()
+            .mockImplementation(() => Promise.resolve({ body: makeStream([JSON.stringify({ response: "ok" })]) }));
         const handler = makeMessageHandler();
         const service = new LlmService(CONFIG, makeLogger(), handler);
 
@@ -99,9 +95,11 @@ describe("LlmService.streamToMessage", () => {
     });
 
     it("logs warning and resolves when LLM returns an error payload, then releases slot", async () => {
-        global.fetch = vi.fn().mockImplementation(() =>
-            Promise.resolve({ body: makeStream([JSON.stringify({ error: "out of memory" })]) }),
-        );
+        global.fetch = vi
+            .fn()
+            .mockImplementation(() =>
+                Promise.resolve({ body: makeStream([JSON.stringify({ error: "out of memory" })]) }),
+            );
         const handler = makeMessageHandler();
         const logger = makeLogger();
         const service = new LlmService(CONFIG, logger, handler);
@@ -115,9 +113,9 @@ describe("LlmService.streamToMessage", () => {
     });
 
     it("stops streaming when message edit fails and still releases slot", async () => {
-        global.fetch = vi.fn().mockImplementation(() =>
-            Promise.resolve({ body: makeStream([JSON.stringify({ response: "hi" })]) }),
-        );
+        global.fetch = vi
+            .fn()
+            .mockImplementation(() => Promise.resolve({ body: makeStream([JSON.stringify({ response: "hi" })]) }));
         const handler = makeMessageHandler(false);
         const logger = makeLogger();
         const service = new LlmService(CONFIG, logger, handler);
