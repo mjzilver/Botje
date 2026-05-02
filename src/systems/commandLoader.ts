@@ -16,6 +16,7 @@ function loadCommandsFromDir<T extends ICommand | IClCommand>(dirPath: string, t
     const load = createRequire(dirPath + path.sep);
     const files = fs.readdirSync(dirPath);
     for (const file of files) {
+        if (file.endsWith(".d.ts")) continue;
         if (!file.endsWith(".ts") && !file.endsWith(".js")) continue;
 
         const filePath = path.join(dirPath, file);
