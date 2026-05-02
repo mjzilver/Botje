@@ -16,11 +16,13 @@ registerProcessHandlers(
     () => bot.registry?.messageHandler,
     logger,
 );
-setTimeout(() => {
+const clInterval = setInterval(() => {
+    if (!bot.registry) return;
+    clearInterval(clInterval);
     try {
         const { clcommands } = bot.registry.loadedCommands;
         new CommandLine(clcommands, logger, bot.registry);
     } catch (err) {
         logger.error(toError(err));
     }
-}, 0);
+}, 100);
