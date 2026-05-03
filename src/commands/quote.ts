@@ -50,7 +50,7 @@ export default {
         }
 
         try {
-            const rows = await context.database.queryRandomMessage<QuoteRow>(sql, params);
+            const rows = await context.database.query<QuoteRow>(sql, params);
             if (rows.length === 0) {
                 context.messageHandler.reply(
                     message,
