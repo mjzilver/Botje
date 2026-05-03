@@ -109,13 +109,20 @@ function generate(chain: Chain, starts: [string, string][], targetLen: number, s
     return normalizeSpaces(result);
 }
 
-const MIN_MESSAGES = 50;
+const MIN_MESSAGES = 150;
 
 export default {
     name: "mimic",
     description: "generates a message that sounds like the mentioned user based on their message history",
     format: "mimic @user",
-    options: [{ type: "user", name: "user", description: "The user whose style to mimic", required: true }],
+    options: [
+        {
+            type: "user",
+            name: "user",
+            description: "The user whose style to mimic (optional — picks random if omitted)",
+            required: false,
+        },
+    ],
     async function(message, context) {
         if (!isGuildMessage(message)) {
             context.messageHandler.reply(message, "This command can only be used in a server.");
@@ -123,12 +130,31 @@ export default {
             return;
         }
 
-        const target = message.mentions.users.first();
-        if (!target) {
-            context.messageHandler.reply(message, "Usage: `!mimic @user`");
+        let targetId: string;
+        const mentioned = message.mentions.users.first();
 
-            return;
+        if (mentioned) {
+            targetId = mentioned.id;
+        } else {
+            const candidates = await context.database.query<{ user_id: string }>(
+                `SELECT DISTINCT user_id FROM messages
+                 WHERE server_id = $1
+                 AND LENGTH(message) > 15
+                 ORDER BY RANDOM()
+                 LIMIT 20`,
+                [message.guild.id],
+            );
+
+            if (candidates.length === 0) {
+                context.messageHandler.reply(message, "No message history found for this server.");
+
+                return;
+            }
+
+            targetId = pickRandomItem(candidates).user_id;
         }
+
+        const target = { id: targetId };
 
         if (target.id === context.client.user?.id) {
             context.messageHandler.reply(message, "I refuse to mimic myself.");
@@ -140,7 +166,7 @@ export default {
             const rows = await context.database.query<{ message: string }>(
                 `SELECT message FROM messages
                  WHERE user_id = $1 AND server_id = $2
-                 AND LENGTH(message) > 5
+                 AND LENGTH(message) > 15
                  ORDER BY RANDOM()
                  LIMIT 5000`,
                 [target.id, message.guild.id],
