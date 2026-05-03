@@ -23,6 +23,7 @@ function loadCommandsFromDir<T extends ICommand | IClCommand>(dirPath: string, t
         const raw = load(filePath) as { default?: T } | T;
         const command =
             typeof raw === "object" && raw !== null && "default" in raw ? (raw as { default: T }).default : (raw as T);
+        if (!command.name) continue;
         if (command.disabled === true) continue;
         target[command.name] = command;
         if (command.aliases)
