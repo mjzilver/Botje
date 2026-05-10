@@ -83,4 +83,29 @@ describe("reactions lister", () => {
             expect.arrayContaining(["guild-id", "user-77"]),
         );
     });
+
+    it("queries per-person reaction breakdown for leaderboard flag", async () => {
+        const context = makeMockContext();
+
+        vi.mocked(context.database.query).mockResolvedValueOnce([{ user_id: "u1", server_id: "guild-id", count: "9" }]);
+        vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Dan");
+        vi.mocked(context.pagination.createPages).mockResolvedValueOnce([]);
+
+        reactionsCommand.function(makeMessage("!reactions top"), context);
+
+        await vi.waitFor(() => expect(context.pagination.sendPaginatedEmbed).toHaveBeenCalled());
+    });
+
+    it("replies 'does not work with %' for the percent flag", async () => {
+        const context = makeMockContext();
+
+        reactionsCommand.function(makeMessage("!reactions percent"), context);
+
+        await vi.waitFor(() =>
+            expect(context.messageHandler.reply).toHaveBeenCalledWith(
+                expect.anything(),
+                "This command does not work with %",
+            ),
+        );
+    });
 });

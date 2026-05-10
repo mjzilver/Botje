@@ -74,4 +74,24 @@ describe("count lister", () => {
             ),
         );
     });
+
+    it("queries percentage breakdown when percent flag is used", async () => {
+        const context = makeMockContext();
+
+        vi.mocked(context.database.query).mockResolvedValueOnce([
+            { user_id: "u1", server_id: "guild-id", count: "80", total: "100" },
+            { user_id: "u2", server_id: "guild-id", count: "20", total: "100" },
+        ]);
+        vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("User");
+        vi.mocked(context.pagination.createPages).mockResolvedValueOnce([]);
+
+        countCommand.function(makeMessage("!count percent"), context);
+
+        await vi.waitFor(() =>
+            expect(context.database.query).toHaveBeenCalledWith(
+                expect.stringContaining("totals"),
+                expect.arrayContaining(["guild-id"]),
+            ),
+        );
+    });
 });

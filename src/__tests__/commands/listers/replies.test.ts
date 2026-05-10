@@ -70,4 +70,33 @@ describe("replies lister", () => {
             expect.arrayContaining(["guild-id", "user-55"]),
         );
     });
+
+    it("queries per-person reply breakdown for leaderboard flag", async () => {
+        const context = makeMockContext();
+
+        vi.mocked(context.database.query).mockResolvedValueOnce([{ user_id: "u1", server_id: "guild-id", count: "7" }]);
+        vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Eve");
+        vi.mocked(context.pagination.createPages).mockResolvedValueOnce([]);
+
+        repliesCommand.function(makeMessage("!replies top"), context);
+
+        await vi.waitFor(() => expect(context.pagination.sendPaginatedEmbed).toHaveBeenCalled());
+        expect(context.database.query).toHaveBeenCalledWith(
+            expect.stringContaining("reply_to IS NOT NULL"),
+            expect.arrayContaining(["guild-id"]),
+        );
+    });
+
+    it("replies 'does not work with %' for the percent flag", async () => {
+        const context = makeMockContext();
+
+        repliesCommand.function(makeMessage("!replies percent"), context);
+
+        await vi.waitFor(() =>
+            expect(context.messageHandler.reply).toHaveBeenCalledWith(
+                expect.anything(),
+                "This command does not work with %",
+            ),
+        );
+    });
 });

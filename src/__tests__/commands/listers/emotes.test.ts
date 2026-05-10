@@ -73,4 +73,35 @@ describe("emotes lister", () => {
             expect.arrayContaining(["guild-id", "user-33"]),
         );
     });
+
+    it("queries per-person emote breakdown for leaderboard flag", async () => {
+        const context = makeMockContext();
+
+        vi.mocked(context.database.query).mockResolvedValueOnce([
+            { user_id: "u1", server_id: "guild-id", count: "12" },
+        ]);
+        vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Hank");
+        vi.mocked(context.pagination.createPages).mockResolvedValueOnce([]);
+
+        emotesCommand.function(makeMessage("!emotes top"), context);
+
+        await vi.waitFor(() => expect(context.pagination.sendPaginatedEmbed).toHaveBeenCalled());
+        expect(context.database.query).toHaveBeenCalledWith(
+            expect.stringContaining("GROUP BY"),
+            expect.arrayContaining(["guild-id"]),
+        );
+    });
+
+    it("replies 'does not work with %' for the percent flag", async () => {
+        const context = makeMockContext();
+
+        emotesCommand.function(makeMessage("!emotes percent"), context);
+
+        await vi.waitFor(() =>
+            expect(context.messageHandler.reply).toHaveBeenCalledWith(
+                expect.anything(),
+                "This command does not work with %",
+            ),
+        );
+    });
 });
