@@ -252,6 +252,18 @@ describe("CommandHandler", () => {
     });
 
     describe("redo", () => {
+        it("does not delete when redo command is not in the registry", async () => {
+            const { handler, mh } = makeHandler({ commands: {} });
+
+            vi.mocked(mh.findFromReply).mockReturnValue("call-1");
+
+            const fetchMessage = vi.fn().mockResolvedValue(makeMessage("!ghost"));
+
+            await handler.redo(makeMessage("..."), fetchMessage);
+
+            expect(mh.delete).not.toHaveBeenCalled();
+        });
+
         it("re-runs the original command when a matching call is found", async () => {
             const cmd = makeCommand();
             const { handler, mh } = makeHandler({ commands: { test: cmd } });
