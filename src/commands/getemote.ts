@@ -5,7 +5,7 @@ import { findClosestMatchInList } from "../systems/utils";
 
 export default {
     name: "getemote",
-    description: "gets the emote, or lists all emotes if no name provided",
+    description: "fetches a server emote by name, or lists all if omitted",
     format: "getemote (emote name)",
     options: [{ type: "string", name: "emote", description: "The name of the emote to retrieve", required: false }],
     async function(message, context) {

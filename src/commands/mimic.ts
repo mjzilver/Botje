@@ -113,8 +113,8 @@ const MIN_MESSAGES = 150;
 
 export default {
     name: "mimic",
-    description: "generates a message that sounds like the mentioned user based on their message history",
-    format: "mimic @user",
+    description: "generates a message in a user's style based on their message history",
+    format: "mimic (@user)",
     options: [
         {
             type: "user",

@@ -8,8 +8,8 @@ type CountRow = { user_id: string; times: string; sample: string; last_seen: str
 
 export default {
     name: "who",
-    description: "find who originally said a message — reply to a bot message or use !who <text>",
-    format: "who | who <text>",
+    description: "traces the origin of a message by reply or keyword search",
+    format: "who | who [text]",
     async function(message, context) {
         if (!isGuildMessage(message)) {
             context.messageHandler.reply(message, "This command can only be used in a server.");

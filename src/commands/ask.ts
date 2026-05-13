@@ -34,7 +34,7 @@ async function buildChain(
 
 export default {
     name: "ask",
-    description: "asks via an LLM",
+    description: "asks the LLM a question",
     format: "ask (text)",
     options: [{ type: "string", name: "question", description: "Your question", required: true }],
     async function(message, context) {

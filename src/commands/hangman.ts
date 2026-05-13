@@ -3,7 +3,7 @@ import type { ICommand } from "../interfaces";
 export default {
     name: "hangman",
     description: "play a hangman minigame",
-    format: "hangman",
+    format: "hangman start | hangman guess [letter] | hangman help",
     subcommands: [
         { name: "start", description: "Start a new hangman game" },
         {

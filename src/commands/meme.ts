@@ -45,8 +45,8 @@ async function processPicture(
 
 export default {
     name: "meme",
-    description: "turn an image into a meme, include picture by uploading, replying or URL",
-    format: "meme (link to image) (top text) | (bottom text)",
+    description: "adds captions to an image to create a meme",
+    format: "meme (url) (top text) (bottom text)",
     options: [
         { type: "string", name: "image", description: "The image URL to use for the meme", required: false },
         { type: "string", name: "top", description: "Top text for the meme", required: false },

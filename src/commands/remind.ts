@@ -27,8 +27,8 @@ function formatDuration(ms: number): string {
 
 export default {
     name: "remind",
-    description: "schedules a reminder (e.g. 30m, 2h, 90s — max 24h)",
-    format: "remind <duration> <message>",
+    description: "schedules a reminder for a given duration",
+    format: "remind [duration] [message]",
     async function(message) {
         const context = getBotContext();
         const args = message.content.split(/\s+/).slice(1);

@@ -32,7 +32,7 @@ export function guessFilename(card: TarotCard): string | null {
 export default {
     name: "tarot",
     description: "draws a tarot card specially for you",
-    format: "tarot [optional question]",
+    format: "tarot (question)",
     options: [{ type: "string", name: "question", description: "An optional question to ask the spirits" }],
     async function(message, context) {
         const { removeCommand } = makeStringHelpers(context.config);

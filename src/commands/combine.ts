@@ -30,7 +30,7 @@ async function processCombination(
 export default {
     name: "combine",
     description: "combines two emotes into one",
-    format: "combine [emote name] [emote name]",
+    format: "combine (emote1) (emote2)",
     options: [
         { type: "string", name: "emote1", description: "The first emote to combine", required: false },
         { type: "string", name: "emote2", description: "The second emote to combine", required: false },

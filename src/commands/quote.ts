@@ -8,8 +8,8 @@ type QuoteRow = { id: string; user_id: string; message: string; datetime: string
 
 export default {
     name: "quote",
-    description: "surfaces a verbatim archived message from server history",
-    format: "quote | quote @user | quote <keyword>",
+    description: "fetches a random archived message from server history",
+    format: "quote | quote (@user) | quote (keyword)",
     options: [
         { type: "user", name: "user", description: "Quote a specific user (optional)", required: false },
         { type: "string", name: "keyword", description: "Search for a keyword (optional)", required: false },

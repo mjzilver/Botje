@@ -6,7 +6,7 @@ const DISALLOWED_PATH = "json/disallowed.json";
 export default {
     name: "disallow",
     description: "disallows or re-allows a user from using the bot",
-    format: "disallow @user (remove)",
+    format: "disallow [@user] (remove)",
     function(message, context) {
         const mention = message.mentions?.users?.first?.() as
             | {

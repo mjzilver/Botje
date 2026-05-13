@@ -4,7 +4,7 @@ import { randomBetween } from "../systems/utils";
 export default {
     name: "roll",
     description: "rolls a random number",
-    format: "roll",
+    format: "roll (max) (min)",
     options: [
         { type: "integer", name: "max", description: "Maximum value (default: current timestamp)", required: false },
         { type: "integer", name: "min", description: "Minimum value (default: 0)", required: false },

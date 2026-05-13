@@ -139,7 +139,7 @@ class PhraseLister extends Lister {
 export default {
     name: "phrase",
     description: "shows how many times a word/phrase has been used in the server",
-    format: 'phrase hello | phrase "hello world" | phrase @user hello | phrase top hello | phrase percent hello',
+    format: "phrase [word] | phrase (@user) [word] | phrase top [word] | phrase percent [word]",
     aliases: "word",
     subcommands: [
         {

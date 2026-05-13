@@ -9,7 +9,7 @@ const MAX_OPTIONS = 5;
 export default {
     name: "poll",
     description: "creates a reaction-based poll",
-    format: 'poll "Question?" option1 option2 ...',
+    format: 'poll "[question]" [option] [option] (option) ...',
     async function(message) {
         const context = getBotContext();
         const raw = message.content.slice(message.content.indexOf(" ") + 1).trim();
