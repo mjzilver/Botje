@@ -5,7 +5,8 @@ import type { BotMessage } from "../interfaces/discord";
 import type { ReplyHandler } from "./replyHandler";
 import type { LoadedCommands } from "./commandLoader";
 import { LimitedList } from "./types/limitedList";
-import { normalizeSpaces, makeStringHelpers, capitalize, textOnly, countVowelGroups } from "./stringHelpers";
+import { normalizeSpaces, makeStringHelpers, capitalize } from "./stringHelpers";
+import { extractTopics } from "./topicExtractor";
 import { randomBetween, toError } from "./utils";
 import { CooldownTracker } from "./cooldownTracker";
 
@@ -150,14 +151,9 @@ export class CommandHandler {
             this.logger.error(toError(err));
         }
 
-        const words = recent
-            .flatMap((m) => textOnly(m.cleanContent).split(" "))
-            .filter((w) => w.length > 3)
-            .sort((a, b) => countVowelGroups(b) - countVowelGroups(a));
-
-        const topic = words[0];
-        const syntheticContent = topic
-            ? `${this.config.prefix}speak ${topic}`
+        const topics = await extractTopics(recent, this.context.database, this.context.dictionary, this.config.prefix);
+        const syntheticContent = topics[0]
+            ? `${this.config.prefix}speak ${topics[0]}`
             : `${this.config.prefix}speak`;
         const topicMessage = { ...message, content: syntheticContent };
 
