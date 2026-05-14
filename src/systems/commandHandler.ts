@@ -5,13 +5,15 @@ import type { BotMessage } from "../interfaces/discord";
 import type { ReplyHandler } from "./replyHandler";
 import type { LoadedCommands } from "./commandLoader";
 import { LimitedList } from "./types/limitedList";
-import { normalizeSpaces, makeStringHelpers, capitalize } from "./stringHelpers";
+import { normalizeSpaces, makeStringHelpers, capitalize, textOnly, countVowelGroups } from "./stringHelpers";
 import { randomBetween, toError } from "./utils";
 import { CooldownTracker } from "./cooldownTracker";
 
 const SPEAK_MIN_TIMEOUT_MINUTES = 20;
 const SPEAK_MAX_TIMEOUT_MINUTES = 60;
 const SPEAK_RANDOM_CHANCE = 20;
+const SPEAK_CONTEXT_WINDOW_MS = 10 * 60 * 60 * 1000;
+const SPEAK_CONTEXT_LIMIT = 20;
 
 export class CommandHandler {
     private commands: Record<string, ICommand>;
@@ -115,7 +117,7 @@ export class CommandHandler {
             const now = new Date();
             const timePassed = (now.getTime() - this.lastMessageSent.getTime()) / 60000;
             if (this.shouldSpeakSpontaneously(timePassed)) {
-                this.commands["speak"]?.function(message, this.context);
+                void this.speakOnContext(message);
                 this.lastMessageSent = now;
                 this.messageCounter = 0;
             } else {
@@ -132,6 +134,34 @@ export class CommandHandler {
         const timeGate = timePassed >= randomBetween(SPEAK_MIN_TIMEOUT_MINUTES, SPEAK_MAX_TIMEOUT_MINUTES);
 
         return speakThreshold && timeGate;
+    }
+
+    private async speakOnContext(message: BotMessage): Promise<void> {
+        let recent: BotMessage[] = [];
+
+        try {
+            const fetched = await message.channel.messages.fetch({ limit: SPEAK_CONTEXT_LIMIT });
+            const cutoff = Date.now() - SPEAK_CONTEXT_WINDOW_MS;
+
+            recent = [...fetched.values()].filter(
+                (m) => !m.author.bot && m.createdTimestamp > cutoff,
+            );
+        } catch (err) {
+            this.logger.error(toError(err));
+        }
+
+        const words = recent
+            .flatMap((m) => textOnly(m.cleanContent).split(" "))
+            .filter((w) => w.length > 3)
+            .sort((a, b) => countVowelGroups(b) - countVowelGroups(a));
+
+        const topic = words[0];
+        const syntheticContent = topic
+            ? `${this.config.prefix}speak ${topic}`
+            : `${this.config.prefix}speak`;
+        const topicMessage = { ...message, content: syntheticContent };
+
+        this.commands["speak"]?.function(topicMessage, this.context);
     }
 
     private maybeSpeakOnMention(message: BotMessage): void {
