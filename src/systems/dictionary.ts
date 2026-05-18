@@ -6,7 +6,7 @@ import { textOnly } from "./stringHelpers";
 import { toError } from "./utils";
 
 export interface IDictionary {
-    getNonSelectorsRegex(): RegExp;
+    getStopWordsRegex(): RegExp;
 }
 
 type WordEntry = [word: string, frequency: number];
@@ -18,6 +18,7 @@ export class Dictionary {
     private wordsPath: string;
     private db: IDatabase;
     private logger: ILogger;
+    private stopWordsCache: RegExp | null = null;
     constructor(db: IDatabase, logger: ILogger, wordsPath = path.resolve(__dirname, "../json/words.json")) {
         this.db = db;
         this.logger = logger;
@@ -37,6 +38,7 @@ export class Dictionary {
         });
         stream.on("end", () => {
             this.words = JSON.parse(rawData) as WordEntry[];
+            this.stopWordsCache = null;
         });
         stream.on("error", (err) => {
             this.logger.error(toError(err));
@@ -58,6 +60,7 @@ export class Dictionary {
                 for (const word of row.message.split(/\s+/)) wordHolder[word] = (wordHolder[word] ?? 0) + 1;
             this.words = Object.entries(wordHolder);
             this.words.sort(([, a], [, b]) => b - a);
+            this.stopWordsCache = null;
             const shortList = this.words.slice(0, DICTIONARY_TOP_WORDS);
             fs.writeFile(this.wordsPath, JSON.stringify(shortList), (err) => {
                 if (err) this.logger.error(toError(err));
@@ -77,13 +80,14 @@ export class Dictionary {
             .map(([word]) => textOnly(word));
     }
 
-    getNonSelectorsRegex(amount = 100): RegExp {
-        const max = Math.min(this.words.length, amount);
+    getStopWordsRegex(): RegExp {
+        if (this.stopWordsCache) return this.stopWordsCache;
+        const max = Math.min(this.words.length, 100);
         const terms = this.words
             .slice(0, max)
             .map(([w]) => w)
             .join("|");
-
-        return new RegExp(`\\b((${terms})\\s)\\b`, "gmi");
+        this.stopWordsCache = new RegExp(`\\b((${terms})\\s)\\b`, "gmi");
+        return this.stopWordsCache;
     }
 }

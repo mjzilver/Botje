@@ -11,7 +11,7 @@ function makeMockDb(docFreq = 5): IDatabase {
 
 function makeMockDictionary(): IDictionary {
     return {
-        getNonSelectorsRegex: vi
+        getStopWordsRegex: vi
             .fn()
             .mockReturnValue(/^(the|and|for|that|this|with|from|have|will|been)$/i),
     };

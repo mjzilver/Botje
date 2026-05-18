@@ -1,9 +1,20 @@
+import type { BotMessage } from "../interfaces/discord";
 import type { IDatabase } from "./database";
 import type { IDictionary } from "./dictionary";
 import { textOnly, normalizeSpaces, countVowelGroups } from "./stringHelpers";
 
 const MIN_WORD_LENGTH = 4;
 const CANDIDATE_LIMIT = 10;
+
+export const CONTEXT_WINDOW_MS = 10 * 60 * 60 * 1000;
+export const CONTEXT_LIMIT = 20;
+
+export async function fetchContextMessages(channel: BotMessage["channel"]): Promise<BotMessage[]> {
+    const fetched = await channel.messages.fetch({ limit: CONTEXT_LIMIT });
+    const cutoff = Date.now() - CONTEXT_WINDOW_MS;
+
+    return [...fetched.values()].filter((m) => !m.author.bot && m.createdTimestamp > cutoff);
+}
 
 export async function extractTopics(
     messages: { cleanContent: string }[],
@@ -42,7 +53,7 @@ function computeTf(
     dictionary: IDictionary,
 ): Map<string, number> {
     const freq = new Map<string, number>();
-    const stopRegex = dictionary.getNonSelectorsRegex();
+    const stopRegex = dictionary.getStopWordsRegex();
 
     for (const m of messages) {
         const words = normalizeSpaces(textOnly(m.cleanContent))

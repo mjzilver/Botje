@@ -6,15 +6,13 @@ import type { ReplyHandler } from "./replyHandler";
 import type { LoadedCommands } from "./commandLoader";
 import { LimitedList } from "./types/limitedList";
 import { normalizeSpaces, makeStringHelpers, capitalize } from "./stringHelpers";
-import { extractTopics } from "./topicExtractor";
+import { extractTopics, fetchContextMessages } from "./topicExtractor";
 import { randomBetween, toError } from "./utils";
 import { CooldownTracker } from "./cooldownTracker";
 
 const SPEAK_MIN_TIMEOUT_MINUTES = 20;
 const SPEAK_MAX_TIMEOUT_MINUTES = 60;
 const SPEAK_RANDOM_CHANCE = 20;
-const SPEAK_CONTEXT_WINDOW_MS = 10 * 60 * 60 * 1000;
-const SPEAK_CONTEXT_LIMIT = 20;
 
 export class CommandHandler {
     private commands: Record<string, ICommand>;
@@ -141,12 +139,7 @@ export class CommandHandler {
         let recent: BotMessage[] = [];
 
         try {
-            const fetched = await message.channel.messages.fetch({ limit: SPEAK_CONTEXT_LIMIT });
-            const cutoff = Date.now() - SPEAK_CONTEXT_WINDOW_MS;
-
-            recent = [...fetched.values()].filter(
-                (m) => !m.author.bot && m.createdTimestamp > cutoff,
-            );
+            recent = await fetchContextMessages(message.channel);
         } catch (err) {
             this.logger.error(toError(err));
         }

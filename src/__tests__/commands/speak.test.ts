@@ -8,7 +8,7 @@ describe("speak command – findTopic path", () => {
     it("falls back to findByWord when fewer than 3 topic rows are returned", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.dictionary.getNonSelectorsRegex).mockReturnValue(/$/g);
+        vi.mocked(context.dictionary.getStopWordsRegex).mockReturnValue(/$/g);
         vi.mocked(context.database.query).mockResolvedValueOnce([{ message: "cats is cool" }]);
         vi.mocked(context.database.queryRandomMessage).mockResolvedValueOnce([
             { message: "cats are everywhere in this city" },
@@ -45,7 +45,7 @@ describe("speak command – findTopic path", () => {
     it("uses findByWord directly when content has no topic trigger", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.dictionary.getNonSelectorsRegex).mockReturnValue(/$/g);
+        vi.mocked(context.dictionary.getStopWordsRegex).mockReturnValue(/$/g);
         vi.mocked(context.database.queryRandomMessage).mockResolvedValueOnce([
             { message: "just a random sentence from the database" },
         ]);

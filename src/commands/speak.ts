@@ -12,7 +12,7 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
         "",
     );
     filtered = textOnly(filtered);
-    filtered = filtered.replace(context.dictionary.getNonSelectorsRegex(), "").trim();
+    filtered = filtered.replace(context.dictionary.getStopWordsRegex(), "").trim();
     const words = filtered.split(" ");
     if (words[0]) {
         if (words.length > 1) {

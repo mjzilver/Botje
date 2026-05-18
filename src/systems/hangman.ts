@@ -66,7 +66,7 @@ export class HangmanGame {
         this.tries = 0;
         this.alreadyGuessed = [];
         const words = wordsJson as [string, number][];
-        const nonSelectors = this.dictionary.getNonSelectorsRegex();
+        const nonSelectors = this.dictionary.getStopWordsRegex();
         while (this.word === "") {
             const candidate = pickRandomItem(words);
             let w = textOnlyHelper(candidate[0]);

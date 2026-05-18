@@ -1,10 +1,7 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { extractTopics } from "../systems/topicExtractor";
+import { extractTopics, fetchContextMessages } from "../systems/topicExtractor";
 import { toError } from "../systems/utils";
-
-const TOPIC_CONTEXT_WINDOW_MS = 10 * 60 * 60 * 1000;
-const TOPIC_CONTEXT_LIMIT = 20;
 
 export default {
     name: "topic",
@@ -14,12 +11,7 @@ export default {
         let recent: BotMessage[] = [];
 
         try {
-            const fetched = await message.channel.messages.fetch({ limit: TOPIC_CONTEXT_LIMIT });
-            const cutoff = Date.now() - TOPIC_CONTEXT_WINDOW_MS;
-
-            recent = [...fetched.values()].filter(
-                (m) => !m.author.bot && m.createdTimestamp > cutoff,
-            );
+            recent = await fetchContextMessages(message.channel);
         } catch (err) {
             context.logger.error(toError(err));
             context.messageHandler.send(message, "Could not fetch recent messages.");
