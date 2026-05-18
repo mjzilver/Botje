@@ -22,8 +22,9 @@ export async function extractTopics(
     dictionary: IDictionary,
     prefix?: string,
 ): Promise<string[]> {
-    const filtered = prefix
-        ? messages.filter((m) => !m.cleanContent.startsWith(prefix))
+    const prefixRe = prefix ? new RegExp(`^(?:${prefix})`, "i") : null;
+    const filtered = prefixRe
+        ? messages.filter((m) => !prefixRe.test(m.cleanContent))
         : messages;
     const tf = computeTf(filtered, dictionary);
     if (tf.size === 0) return [];
@@ -53,13 +54,13 @@ function computeTf(
     dictionary: IDictionary,
 ): Map<string, number> {
     const freq = new Map<string, number>();
-    const stopRegex = dictionary.getStopWordsRegex();
+    const stopWords = dictionary.getStopWords();
 
     for (const m of messages) {
         const words = normalizeSpaces(textOnly(m.cleanContent))
             .toLowerCase()
             .split(" ")
-            .filter((w) => w.length >= MIN_WORD_LENGTH && !stopRegex.test(w));
+            .filter((w) => w.length >= MIN_WORD_LENGTH && !stopWords.has(w));
 
         for (const w of words) freq.set(w, (freq.get(w) ?? 0) + 1);
     }

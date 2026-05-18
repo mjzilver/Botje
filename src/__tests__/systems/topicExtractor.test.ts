@@ -11,9 +11,10 @@ function makeMockDb(docFreq = 5): IDatabase {
 
 function makeMockDictionary(): IDictionary {
     return {
-        getStopWordsRegex: vi
+        getStopWordsRegex: vi.fn().mockReturnValue(/^$/),
+        getStopWords: vi
             .fn()
-            .mockReturnValue(/^(the|and|for|that|this|with|from|have|will|been)$/i),
+            .mockReturnValue(new Set(["the", "and", "for", "that", "this", "with", "from", "have", "will", "been"])),
     };
 }
 
@@ -70,7 +71,7 @@ describe("extractTopics", () => {
         expect(queryMock).toHaveBeenCalledTimes(3);
     });
 
-    it("excludes messages that start with the bot prefix", async () => {
+    it("excludes messages that start with a plain prefix", async () => {
         const messages = [
             { cleanContent: "b!topic" },
             { cleanContent: "b!help" },
@@ -79,6 +80,18 @@ describe("extractTopics", () => {
         const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary(), "b!");
         expect(topics).not.toContain("btopic");
         expect(topics).not.toContain("bhelp");
+        expect(topics.length).toBeGreaterThan(0);
+    });
+
+    it("excludes messages matching a regex-pattern prefix like the production config", async () => {
+        const messages = [
+            { cleanContent: "b!topic" },
+            { cleanContent: "b! weather" },
+            { cleanContent: "beautiful sunshine today" },
+        ];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary(), "^(b! ?)");
+        expect(topics).not.toContain("btopic");
+        expect(topics).not.toContain("bweather");
         expect(topics.length).toBeGreaterThan(0);
     });
 

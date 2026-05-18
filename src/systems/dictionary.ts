@@ -7,6 +7,7 @@ import { toError } from "./utils";
 
 export interface IDictionary {
     getStopWordsRegex(): RegExp;
+    getStopWords(): Set<string>;
 }
 
 type WordEntry = [word: string, frequency: number];
@@ -19,6 +20,7 @@ export class Dictionary {
     private db: IDatabase;
     private logger: ILogger;
     private stopWordsCache: RegExp | null = null;
+    private stopWordsSet: Set<string> | null = null;
     constructor(db: IDatabase, logger: ILogger, wordsPath = path.resolve(__dirname, "../json/words.json")) {
         this.db = db;
         this.logger = logger;
@@ -39,6 +41,7 @@ export class Dictionary {
         stream.on("end", () => {
             this.words = JSON.parse(rawData) as WordEntry[];
             this.stopWordsCache = null;
+            this.stopWordsSet = null;
         });
         stream.on("error", (err) => {
             this.logger.error(toError(err));
@@ -61,6 +64,7 @@ export class Dictionary {
             this.words = Object.entries(wordHolder);
             this.words.sort(([, a], [, b]) => b - a);
             this.stopWordsCache = null;
+            this.stopWordsSet = null;
             const shortList = this.words.slice(0, DICTIONARY_TOP_WORDS);
             fs.writeFile(this.wordsPath, JSON.stringify(shortList), (err) => {
                 if (err) this.logger.error(toError(err));
@@ -89,5 +93,12 @@ export class Dictionary {
             .join("|");
         this.stopWordsCache = new RegExp(`\\b((${terms})\\s)\\b`, "gmi");
         return this.stopWordsCache;
+    }
+
+    getStopWords(): Set<string> {
+        if (this.stopWordsSet) return this.stopWordsSet;
+        const max = Math.min(this.words.length, 100);
+        this.stopWordsSet = new Set(this.words.slice(0, max).map(([w]) => w.toLowerCase()));
+        return this.stopWordsSet;
     }
 }
