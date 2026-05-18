@@ -66,8 +66,9 @@ export class Bot {
 
     private async loadSystems(): Promise<void> {
         const disallowed = this.loadDisallowed();
-        this.registry = new SystemRegistry(this.settings, this.logger, this.client);
-        await this.registry.initialize(disallowed);
+        const registry = new SystemRegistry(this.settings, this.logger, this.client);
+        await registry.initialize(disallowed);
+        this.registry = registry;
         setBotContext(this.registry);
         if (this.config.scan_on_startup === true || this.config.scan_on_startup === "1") this.scanOnStartup();
     }
