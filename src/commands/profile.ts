@@ -3,32 +3,15 @@ import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
 import type { BotMessage } from "../interfaces/discord";
 import { extractTopics } from "../systems/topicExtractor";
 
-const PROFILE_MESSAGE_LIMIT = 500;
+const PROFILE_MESSAGE_LIMIT = 2000;
 const MIN_MESSAGES = 10;
 
 const NEGATIVE_RE =
     /\b(hate|hates|suck|sucks|dislike|dislikes|awful|terrible|worst|boring|annoying|stupid|dumb)\b/i;
 
-type MessageRow = { message: string; datetime: string };
+export type MessageRow = { message: string; datetime: string };
 
-function derivePersonality(rows: MessageRow[]): string[] {
-    const traits: string[] = [];
-    const avgLen = rows.reduce((acc, r) => acc + r.message.length, 0) / rows.length;
-
-    if (avgLen > 80) traits.push("verbose");
-    else if (avgLen < 25) traits.push("concise");
-
-    if (rows.filter((r) => r.message.includes("?")).length / rows.length > 0.2) traits.push("inquisitive");
-    if (rows.filter((r) => r.message.includes("!")).length / rows.length > 0.2) traits.push("enthusiastic");
-
-    const hours = rows.map((r) => new Date(parseInt(r.datetime, 10)).getHours());
-    if (hours.filter((h) => h >= 22 || h < 5).length / hours.length > 0.3) traits.push("night owl");
-    else if (hours.filter((h) => h >= 6 && h < 12).length / hours.length > 0.3) traits.push("early bird");
-
-    return traits;
-}
-
-function deriveNegativeTopics(rows: MessageRow[], stopWords: Set<string>): string[] {
+export function deriveNegativeTopics(rows: MessageRow[], stopWords: Set<string>): string[] {
     const negativeRows = rows.filter((r) => NEGATIVE_RE.test(r.message));
     if (negativeRows.length === 0) return [];
 
@@ -50,7 +33,7 @@ function deriveNegativeTopics(rows: MessageRow[], stopWords: Set<string>): strin
 
 export default {
     name: "profile",
-    description: "Shows a personality analysis and interests for you or a mentioned user",
+    description: "Shows interests and dislikes for you or a mentioned user",
     format: "profile (@user)",
     async function(message: BotMessage, context: IBotContext): Promise<void> {
         if (!isGuildMessage(message)) {
@@ -86,12 +69,10 @@ export default {
             context.config.prefix,
         );
 
-        const traits = derivePersonality(rows);
         const dislikes = deriveNegativeTopics(rows, context.dictionary.getStopWords());
 
         const fields: { name: string; value: string }[] = [
             { name: "Interests", value: topics.slice(0, 3).join(", ") || "None detected" },
-            { name: "Personality", value: traits.join(", ") || "Unknown" },
         ];
         if (dislikes.length > 0) fields.push({ name: "Possible dislikes", value: dislikes.join(", ") });
 

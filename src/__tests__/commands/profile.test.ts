@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EmbedBuilder } from "discord.js";
-import profileCommand from "../../commands/profile";
+import profileCommand, { deriveNegativeTopics } from "../../commands/profile";
+import type { MessageRow } from "../../commands/profile";
 import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 import type { BotUser } from "../../interfaces/discord";
-
-type MessageRow = { message: string; datetime: string };
 
 function makeRows(n: number, overrides?: Partial<MessageRow>): MessageRow[] {
     return Array(n)
@@ -14,6 +13,41 @@ function makeRows(n: number, overrides?: Partial<MessageRow>): MessageRow[] {
             datetime: overrides?.datetime ?? "1700000000000",
         }));
 }
+
+describe("deriveNegativeTopics", () => {
+    it("returns empty array when no messages contain negative words", () => {
+        const rows = makeRows(5, { message: "everything is great today and i love it" });
+        expect(deriveNegativeTopics(rows, new Set())).toEqual([]);
+    });
+
+    it("returns the most frequent noun-like word from negative messages", () => {
+        const rows = makeRows(5, { message: "I hate mornings every single morning" });
+        const result = deriveNegativeTopics(rows, new Set(["every", "single"]));
+        expect(result[0]).toBe("mornings");
+    });
+
+    it("filters out stop words from results", () => {
+        const rows = makeRows(5, { message: "this weather sucks horribly today" });
+        const result = deriveNegativeTopics(rows, new Set(["this", "today", "horribly"]));
+        expect(result).not.toContain("this");
+        expect(result).not.toContain("today");
+        expect(result).not.toContain("horribly");
+    });
+
+    it("filters out sentiment trigger words themselves", () => {
+        const rows = makeRows(5, { message: "everything is terrible awful today morning" });
+        const result = deriveNegativeTopics(rows, new Set());
+        expect(result).not.toContain("terrible");
+        expect(result).not.toContain("awful");
+    });
+
+    it("returns at most 3 results", () => {
+        const rows = makeRows(3, {
+            message: "hate those monday tuesday wednesday thursday people place thing",
+        });
+        expect(deriveNegativeTopics(rows, new Set()).length).toBeLessThanOrEqual(3);
+    });
+});
 
 describe("profile command", () => {
     beforeEach(() => vi.clearAllMocks());
@@ -88,7 +122,35 @@ describe("profile command", () => {
         expect(params).toContain("other-user-id");
     });
 
-    it("embed includes Interests and Personality fields", async () => {
+    it("falls back to the message author when no mention is given", async () => {
+        const context = makeMockContext();
+        const msg = makeMessage("!profile", { authorId: "self-id" });
+
+        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Self");
+        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
+
+        await profileCommand.function(msg, context);
+
+        const [, params] = vi.mocked(context.database.query).mock.calls[0];
+        expect(params).toContain("self-id");
+    });
+
+    it("passes the server id to the database query", async () => {
+        const context = makeMockContext();
+        const msg = makeMessage("!profile", { guildId: "srv-123" });
+
+        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
+        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
+
+        await profileCommand.function(msg, context);
+
+        const [, params] = vi.mocked(context.database.query).mock.calls[0];
+        expect(params).toContain("srv-123");
+    });
+
+    it("embed includes Interests field", async () => {
         const context = makeMockContext();
 
         vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
@@ -101,15 +163,12 @@ describe("profile command", () => {
         const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
         const fieldNames = embed.data.fields?.map((f) => f.name) ?? [];
         expect(fieldNames).toContain("Interests");
-        expect(fieldNames).toContain("Personality");
     });
 
-    it("marks personality as inquisitive when most messages are questions", async () => {
+    it("footer shows the message count", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.database.query)
-            .mockResolvedValueOnce(makeRows(20, { message: "why is this happening today?" }))
-            .mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(15)).mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -117,8 +176,7 @@ describe("profile command", () => {
 
         const [, payload] = vi.mocked(context.messageHandler.send).mock.calls[0];
         const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
-        const personalityField = embed.data.fields?.find((f) => f.name === "Personality");
-        expect(personalityField?.value).toContain("inquisitive");
+        expect(embed.data.footer?.text).toContain("15");
     });
 
     it("includes Possible dislikes field when negative messages exist", async () => {
@@ -136,4 +194,20 @@ describe("profile command", () => {
         const fieldNames = embed.data.fields?.map((f) => f.name) ?? [];
         expect(fieldNames).toContain("Possible dislikes");
     });
+
+    it("omits Possible dislikes field when no negative messages exist", async () => {
+        const context = makeMockContext();
+
+        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
+        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
+
+        await profileCommand.function(makeMessage("!profile"), context);
+
+        const [, payload] = vi.mocked(context.messageHandler.send).mock.calls[0];
+        const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
+        const fieldNames = embed.data.fields?.map((f) => f.name) ?? [];
+        expect(fieldNames).not.toContain("Possible dislikes");
+    });
 });
+
