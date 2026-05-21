@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import aboutCommand from "../../commands/about";
 import { makeMockContext, makeMessage } from "@test/helpers";
 import type { ICommand } from "../../interfaces";
+import type { BotMessage } from "../../interfaces/discord";
 
 function stubSpeak(context: ReturnType<typeof makeMockContext>): ReturnType<typeof vi.fn> {
     const speakFn = vi.fn().mockResolvedValue(undefined);
@@ -17,10 +18,31 @@ function stubSpeak(context: ReturnType<typeof makeMockContext>): ReturnType<type
 describe("about command", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("replies when no topic phrase is given", async () => {
+    it("falls back to the channel topic when no phrase is given", async () => {
         const context = makeMockContext();
+        const speakFn = stubSpeak(context);
+        vi.mocked(context.messageHandler.reply);
 
-        await aboutCommand.function(makeMessage("!about"), context);
+        const msg = makeMessage("!about");
+        (msg.channel.messages.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+            new Map([["1", { ...msg, cleanContent: "the weather forecast today", author: { bot: false }, createdTimestamp: Date.now() }]]),
+        );
+        vi.mocked(context.database.query).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
+
+        await aboutCommand.function(msg, context);
+
+        expect(speakFn).toHaveBeenCalledOnce();
+    });
+
+    it("replies when no phrase and no context topic can be found", async () => {
+        const context = makeMockContext();
+        const msg = makeMessage("!about");
+        (msg.channel.messages.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(new Map());
+        vi.mocked(context.database.query).mockResolvedValue([{ cnt: "9999" }]);
+        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
+
+        await aboutCommand.function(msg, context);
 
         expect(context.messageHandler.reply).toHaveBeenCalledWith(
             expect.anything(),
@@ -64,7 +86,6 @@ describe("about command", () => {
 
     it("passes the original message channel and guild through to speak", async () => {
         const context = makeMockContext();
-        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
         const speakFn = stubSpeak(context);
         const msg = makeMessage("!about football", { guildId: "srv-1", channelId: "ch-1" });
 
@@ -74,4 +95,17 @@ describe("about command", () => {
         expect(syntheticMsg.channel.id).toBe("ch-1");
         expect(syntheticMsg.guild?.id).toBe("srv-1");
     });
+
+    it("preserves prototype methods on the synthetic message passed to speak", async () => {
+        const context = makeMockContext();
+        const speakFn = stubSpeak(context);
+        const msg = makeMessage("!about football");
+
+        await aboutCommand.function(msg, context);
+
+        const [syntheticMsg] = speakFn.mock.calls[0] as [BotMessage];
+        expect(typeof syntheticMsg.reply).toBe("function");
+        expect(typeof syntheticMsg.react).toBe("function");
+    });
 });
+
