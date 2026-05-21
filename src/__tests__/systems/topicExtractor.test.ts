@@ -243,4 +243,32 @@ describe("extractNounTokens", () => {
         const words = extractNounTokens("wonderful wonderful wonderful");
         expect(words).toEqual([]);
     });
+
+    it("filters indefinite pronouns: something, everything, anything, nothing", () => {
+        const words = extractNounTokens("something everything anything nothing happened");
+        expect(words).not.toContain("something");
+        expect(words).not.toContain("everything");
+        expect(words).not.toContain("anything");
+        expect(words).not.toContain("nothing");
+    });
+
+    it("filters indefinite person pronouns: someone, everyone, anyone, nobody", () => {
+        const words = extractNounTokens("someone everyone anyone nobody likes this");
+        expect(words).not.toContain("someone");
+        expect(words).not.toContain("everyone");
+        expect(words).not.toContain("anyone");
+        expect(words).not.toContain("nobody");
+    });
+
+    it("filters reflexive pronouns: myself, himself, themselves", () => {
+        const words = extractNounTokens("myself himself themselves did it");
+        expect(words).not.toContain("myself");
+        expect(words).not.toContain("himself");
+        expect(words).not.toContain("themselves");
+    });
+
+    it("does not filter genuine nouns that look similar", () => {
+        const words = extractNounTokens("weather music gaming");
+        expect(words.length).toBeGreaterThan(0);
+    });
 });

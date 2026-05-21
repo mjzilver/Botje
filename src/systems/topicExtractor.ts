@@ -7,6 +7,16 @@ import { countVowelGroups } from "./stringHelpers";
 const MIN_WORD_LENGTH = 4;
 const CANDIDATE_LIMIT = 10;
 
+const INDEFINITE_PRONOUNS = new Set([
+    "everything", "something", "anything", "nothing",
+    "everyone", "someone", "anyone", "noone",
+    "everybody", "somebody", "anybody", "nobody",
+    "everywhere", "somewhere", "anywhere", "nowhere",
+    "whatever", "whoever", "whenever", "wherever", "whichever", "whomever", "however",
+    "himself", "herself", "itself", "themselves", "yourself", "yourselves", "ourselves", "myself",
+    "another", "other", "others",
+]);
+
 const URL_TOKEN_RE = /(https?:\/\/|www\.)/i;
 const DISCORD_EMOTE_TOKEN_RE = /^<a?:[a-zA-Z0-9_]+:\d+>$|^:[a-zA-Z0-9_]+:$/;
 const DISCORD_MENTION_TOKEN_RE = /^<[@#][!&]?\d+>$|^[@#]/;
@@ -58,7 +68,7 @@ export function extractNounTokens(text: string): string[] {
     return (nlp(text).nouns().not("#Pronoun").out("array") as string[])
         .flatMap((phrase) => phrase.split(" "))
         .map((w) => w.toLowerCase().replace(/[^a-z]/g, ""))
-        .filter((w) => w.length >= MIN_WORD_LENGTH);
+        .filter((w) => w.length >= MIN_WORD_LENGTH && !INDEFINITE_PRONOUNS.has(w));
 }
 
 function isNoiseToken(token: string, prefixRe: RegExp | null): boolean {
