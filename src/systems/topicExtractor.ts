@@ -1,3 +1,4 @@
+import nlp from "compromise";
 import type { BotMessage } from "../interfaces/discord";
 import type { IDatabase } from "./database";
 import type { IDictionary } from "./dictionary";
@@ -53,6 +54,13 @@ export async function extractTopics(
     return scored.sort((a, b) => b.score - a.score).map((s) => s.word);
 }
 
+export function extractNounTokens(text: string): string[] {
+    return (nlp(text).nouns().not("#Pronoun").out("array") as string[])
+        .flatMap((phrase) => phrase.split(" "))
+        .map((w) => w.toLowerCase().replace(/[^a-z]/g, ""))
+        .filter((w) => w.length >= MIN_WORD_LENGTH);
+}
+
 function isNoiseToken(token: string, prefixRe: RegExp | null): boolean {
     return (
         URL_TOKEN_RE.test(token) ||
@@ -71,11 +79,12 @@ function computeTf(
     const stopWords = dictionary.getStopWords();
 
     for (const m of messages) {
-        const words = m.cleanContent
+        const cleaned = m.cleanContent
             .split(/\s+/)
             .filter((t) => t.length > 0 && !isNoiseToken(t, prefixRe))
-            .map((t) => t.replace(/[^a-zA-Z]/g, "").toLowerCase())
-            .filter((w) => w.length >= MIN_WORD_LENGTH && !stopWords.has(w));
+            .join(" ");
+
+        const words = extractNounTokens(cleaned).filter((w) => !stopWords.has(w));
 
         for (const w of words) freq.set(w, (freq.get(w) ?? 0) + 1);
     }

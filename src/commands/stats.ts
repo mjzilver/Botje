@@ -107,9 +107,7 @@ async function sendStats(
                     value: stats.peakHour != null ? formatHour(stats.peakHour) : "Unknown",
                     inline: true,
                 },
-            )
-            .setFooter({ text: "Stats are cached for 5 minutes" });
-
+            );
         context.messageHandler.send(message, embed);
     } catch (err) {
         context.logger.error(toError(err));

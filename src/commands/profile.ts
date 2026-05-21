@@ -1,7 +1,7 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
 import type { BotMessage } from "../interfaces/discord";
-import { extractTopics } from "../systems/topicExtractor";
+import { extractTopics, extractNounTokens } from "../systems/topicExtractor";
 
 const PROFILE_FETCH_LIMIT = 5000;
 const PROFILE_SAMPLE_SIZE = 500;
@@ -31,11 +31,9 @@ export function deriveNegativeTopics(rows: MessageRow[], stopWords: Set<string>)
 
     const freq = new Map<string, number>();
     for (const r of negativeRows) {
-        const words = r.message
-            .toLowerCase()
-            .replace(/[^a-z ]/g, " ")
-            .split(/\s+/)
-            .filter((w) => w.length >= 4 && !stopWords.has(w) && !NEGATIVE_RE.test(w));
+        const words = extractNounTokens(r.message).filter(
+            (w) => !stopWords.has(w) && !NEGATIVE_RE.test(w),
+        );
         for (const w of words) freq.set(w, (freq.get(w) ?? 0) + 1);
     }
 
@@ -91,14 +89,13 @@ export default {
         const fields: { name: string; value: string }[] = [
             { name: "Interests", value: topics.slice(0, 3).join(", ") || "None detected" },
         ];
-        if (dislikes.length > 0) fields.push({ name: "Possible dislikes", value: dislikes.join(", ") });
+        if (dislikes.length > 0) fields.push({ name: "Dislikes", value: dislikes.join(", ") });
 
         const color = parseInt(context.config.color_hex.replace("#", ""), 16);
         const embed = new EmbedBuilder()
             .setColor(color)
             .setTitle(`Profile: ${displayName}`)
-            .addFields(...fields)
-            .setFooter({ text: `Based on ${rows.length} of ${allRows.length} messages` });
+            .addFields(...fields);
 
         context.messageHandler.send(message, { embeds: [embed] });
     },

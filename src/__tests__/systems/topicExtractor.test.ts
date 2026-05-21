@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { extractTopics } from "../../systems/topicExtractor";
+import { extractTopics, extractNounTokens } from "../../systems/topicExtractor";
 import type { IDatabase } from "../../systems/database";
 import type { IDictionary } from "../../systems/dictionary";
 
@@ -96,9 +96,9 @@ describe("extractTopics", () => {
     });
 
     it("includes command messages when no prefix is provided", async () => {
-        const messages = [{ cleanContent: "wonderful wonderful wonderful" }];
+        const messages = [{ cleanContent: "weather weather weather" }];
         const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
-        expect(topics[0]).toBe("wonderful");
+        expect(topics[0]).toBe("weather");
     });
 
     it("does not produce mangled URL words as topics", async () => {
@@ -201,5 +201,46 @@ describe("noise filtering", () => {
         const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
         expect(topics.length).toBeGreaterThan(0);
         expect(topics).toContain("weather");
+    });
+});
+
+describe("extractNounTokens", () => {
+    it("returns only noun tokens from a sentence", () => {
+        const words = extractNounTokens("the weather forecast is beautiful today");
+        expect(words).toContain("weather");
+        expect(words).toContain("forecast");
+    });
+
+    it("filters out adverbs like maybe and always", () => {
+        const words = extractNounTokens("maybe something happens always");
+        expect(words).not.toContain("maybe");
+        expect(words).not.toContain("always");
+    });
+
+    it("filters out personal pronouns", () => {
+        const words = extractNounTokens("i hate that we always do this");
+        expect(words).not.toContain("i");
+        expect(words).not.toContain("we");
+    });
+
+    it("splits multi-word noun phrases into individual tokens", () => {
+        const words = extractNounTokens("playing video games is fun");
+        const hasGameToken = words.includes("video") || words.includes("games");
+        expect(hasGameToken).toBe(true);
+    });
+
+    it("lowercases and strips non-letter characters", () => {
+        const words = extractNounTokens("Hello-World Testing123");
+        expect(words.every((w) => /^[a-z]+$/.test(w))).toBe(true);
+    });
+
+    it("filters tokens shorter than four characters", () => {
+        const words = extractNounTokens("big dog ran far");
+        expect(words.every((w) => w.length >= 4)).toBe(true);
+    });
+
+    it("returns empty array for adjective-only input", () => {
+        const words = extractNounTokens("wonderful wonderful wonderful");
+        expect(words).toEqual([]);
     });
 });

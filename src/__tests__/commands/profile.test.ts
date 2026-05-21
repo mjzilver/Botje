@@ -165,20 +165,6 @@ describe("profile command", () => {
         expect(fieldNames).toContain("Interests");
     });
 
-    it("footer shows the sample count and total count", async () => {
-        const context = makeMockContext();
-
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(15)).mockResolvedValue([{ cnt: "5" }]);
-        vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
-        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
-
-        await profileCommand.function(makeMessage("!profile"), context);
-
-        const [, payload] = vi.mocked(context.messageHandler.send).mock.calls[0];
-        const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
-        expect(embed.data.footer?.text).toContain("15");
-    });
-
     it("passes a datetime lookback parameter to the database query", async () => {
         const context = makeMockContext();
         const before = Date.now() - PROFILE_LOOKBACK_MS;
@@ -196,7 +182,7 @@ describe("profile command", () => {
         expect(lookback).toBeLessThanOrEqual(after + 50);
     });
 
-    it("includes Possible dislikes field when negative messages exist", async () => {
+    it("includes dislikes field when negative messages exist", async () => {
         const context = makeMockContext();
         const rows = makeRows(20, { message: "I hate mornings every single time" });
 
@@ -209,10 +195,10 @@ describe("profile command", () => {
         const [, payload] = vi.mocked(context.messageHandler.send).mock.calls[0];
         const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
         const fieldNames = embed.data.fields?.map((f) => f.name) ?? [];
-        expect(fieldNames).toContain("Possible dislikes");
+        expect(fieldNames).toContain("Dislikes");
     });
 
-    it("omits Possible dislikes field when no negative messages exist", async () => {
+    it("omits dislikes field when no negative messages exist", async () => {
         const context = makeMockContext();
 
         vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
@@ -224,7 +210,7 @@ describe("profile command", () => {
         const [, payload] = vi.mocked(context.messageHandler.send).mock.calls[0];
         const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
         const fieldNames = embed.data.fields?.map((f) => f.name) ?? [];
-        expect(fieldNames).not.toContain("Possible dislikes");
+        expect(fieldNames).not.toContain("Dislikes");
     });
 });
 
