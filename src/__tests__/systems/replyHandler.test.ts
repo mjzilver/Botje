@@ -141,5 +141,39 @@ describe("ReplyHandler", () => {
 
             expect(vi.mocked(logger.debug)).toHaveBeenCalled();
         });
+
+        it("matches a lowercase pattern against an uppercase message", () => {
+            const handler = new ReplyHandler(mh, logger, [basePattern]);
+
+            expect(handler.process(makeMessage("HELLO world"))).toBe(true);
+        });
+
+        it("matches a lowercase pattern against a mixed-case message", () => {
+            const handler = new ReplyHandler(mh, logger, [basePattern]);
+
+            expect(handler.process(makeMessage("Hello There"))).toBe(true);
+        });
+
+        it("matches a lowercase pattern when the message contains punctuation", () => {
+            const handler = new ReplyHandler(mh, logger, [basePattern]);
+
+            expect(handler.process(makeMessage("hello!!!"))).toBe(true);
+        });
+
+        it("does not include punctuation characters in the matched text", () => {
+            const punctPattern = { ...basePattern, regex: "hello world" };
+            const handler = new ReplyHandler(mh, logger, [punctPattern]);
+
+            expect(handler.process(makeMessage("hello, world!"))).toBe(true);
+        });
+
+        it("does not pass normalized text to the reply — original message is used by caller", () => {
+            const handler = new ReplyHandler(mh, logger, [basePattern]);
+
+            handler.process(makeMessage("HELLO!!!"));
+
+            const [msg] = vi.mocked(mh.reply).mock.calls[0];
+            expect((msg as BotMessage).content).toBe("HELLO!!!");
+        });
     });
 });

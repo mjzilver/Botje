@@ -19,7 +19,6 @@ describe("about command", () => {
 
     it("replies when no topic phrase is given", async () => {
         const context = makeMockContext();
-        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
         await aboutCommand.function(makeMessage("!about"), context);
 
@@ -31,7 +30,6 @@ describe("about command", () => {
 
     it("calls speak with a synthetic about message containing the picked topic word", async () => {
         const context = makeMockContext();
-        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
         const speakFn = stubSpeak(context);
 
         await aboutCommand.function(makeMessage("!about the weather"), context);
@@ -42,27 +40,26 @@ describe("about command", () => {
         expect(syntheticMsg.content).toContain("speak");
     });
 
-    it("filters stop words when picking the topic", async () => {
+    it("picks a noun from the phrase, ignoring adjectives and adverbs", async () => {
         const context = makeMockContext();
-        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set(["the", "this"]));
         const speakFn = stubSpeak(context);
 
-        await aboutCommand.function(makeMessage("!about the sunshine"), context);
+        await aboutCommand.function(makeMessage("!about the weather forecast"), context);
 
         const [syntheticMsg] = speakFn.mock.calls[0];
-        expect(syntheticMsg.content).toContain("sunshine");
-        expect(syntheticMsg.content).not.toContain("the");
+        const picked = (syntheticMsg.content as string).split(" ").pop();
+        expect(["weather", "forecast"]).toContain(picked);
     });
 
-    it("picks the content-richest word (highest vowel groups) when multiple words given", async () => {
+    it("picks a noun even when the phrase contains multiple words", async () => {
         const context = makeMockContext();
-        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
         const speakFn = stubSpeak(context);
 
         await aboutCommand.function(makeMessage("!about cat education"), context);
 
         const [syntheticMsg] = speakFn.mock.calls[0];
-        expect(syntheticMsg.content).toContain("education");
+        const picked = (syntheticMsg.content as string).split(" ").pop();
+        expect(["cat", "education"]).toContain(picked);
     });
 
     it("passes the original message channel and guild through to speak", async () => {

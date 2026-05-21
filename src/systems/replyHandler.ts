@@ -12,6 +12,10 @@ interface ReplyPattern {
     timeout: number;
 }
 
+function normalizeForMatching(text: string): string {
+    return text.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+}
+
 export class ReplyHandler {
     private replyPatterns: ReplyPattern[];
     private compiledPatterns: Map<string, RegExp>;
@@ -27,9 +31,10 @@ export class ReplyHandler {
 
     process(message: BotMessage): boolean {
         let matched = false;
+        const normalized = normalizeForMatching(message.content);
         for (const pattern of this.replyPatterns) {
             const regex = this.compiledPatterns.get(pattern.name)!;
-            if (message.content.match(regex) && this.cooldown.isAllowed(pattern.name, pattern.timeout * 60 * 1000)) {
+            if (normalized.match(regex) && this.cooldown.isAllowed(pattern.name, pattern.timeout * 60 * 1000)) {
                 this.logger.debug(`Replying to '${message.content}' matching pattern '${pattern.name}'`);
                 const text = pickRandomItem(pattern.replies) + (pattern.mention ? `, ${message.author.username}` : "");
                 if (pattern.reply) this.messageHandler.reply(message, text);

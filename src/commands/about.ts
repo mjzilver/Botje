@@ -1,17 +1,7 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { textOnly, normalizeSpaces, countVowelGroups, makeStringHelpers } from "../systems/stringHelpers";
-
-function pickTopic(phrase: string, stopWords: Set<string>): string {
-    const words = normalizeSpaces(textOnly(phrase))
-        .toLowerCase()
-        .split(" ")
-        .filter((w) => w.length >= 3 && !stopWords.has(w));
-
-    if (words.length === 0) return textOnly(phrase).split(" ").filter((w) => w.length >= 3)[0] ?? "";
-
-    return words.sort((a, b) => countVowelGroups(b) - countVowelGroups(a))[0];
-}
+import { normalizeSpaces, makeStringHelpers } from "../systems/stringHelpers";
+import { extractNounTokens } from "../systems/topicExtractor";
 
 export default {
     name: "about",
@@ -26,7 +16,8 @@ export default {
             return;
         }
 
-        const topic = pickTopic(phrase, context.dictionary.getStopWords());
+        const nouns = extractNounTokens(phrase);
+        const topic = nouns[0] ?? "";
 
         if (!topic) {
             context.messageHandler.reply(message, "Can't find a topic in that.");

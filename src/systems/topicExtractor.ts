@@ -2,7 +2,6 @@ import nlp from "compromise";
 import type { BotMessage } from "../interfaces/discord";
 import type { IDatabase } from "./database";
 import type { IDictionary } from "./dictionary";
-import { countVowelGroups } from "./stringHelpers";
 
 const MIN_WORD_LENGTH = 4;
 const CANDIDATE_LIMIT = 10;
@@ -57,7 +56,7 @@ export async function extractTopics(
             );
             const df = parseInt(rows[0]?.cnt ?? "1", 10);
             const idf = 1 / Math.log(df + 2);
-            return { word, score: (tf.get(word) ?? 0) * idf * countVowelGroups(word) };
+            return { word, score: (tf.get(word) ?? 0) * idf };
         }),
     );
 
