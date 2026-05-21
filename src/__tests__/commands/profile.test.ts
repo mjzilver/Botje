@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EmbedBuilder } from "discord.js";
-import profileCommand, { deriveNegativeTopics } from "../../commands/profile";
+import profileCommand, { deriveNegativeTopics, sampleMessages, PROFILE_LOOKBACK_MS } from "../../commands/profile";
 import type { MessageRow } from "../../commands/profile";
 import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 import type { BotUser } from "../../interfaces/discord";
@@ -165,7 +165,7 @@ describe("profile command", () => {
         expect(fieldNames).toContain("Interests");
     });
 
-    it("footer shows the message count", async () => {
+    it("footer shows the sample count and total count", async () => {
         const context = makeMockContext();
 
         vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(15)).mockResolvedValue([{ cnt: "5" }]);
@@ -177,6 +177,23 @@ describe("profile command", () => {
         const [, payload] = vi.mocked(context.messageHandler.send).mock.calls[0];
         const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
         expect(embed.data.footer?.text).toContain("15");
+    });
+
+    it("passes a datetime lookback parameter to the database query", async () => {
+        const context = makeMockContext();
+        const before = Date.now() - PROFILE_LOOKBACK_MS;
+
+        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
+        vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
+
+        await profileCommand.function(makeMessage("!profile"), context);
+
+        const after = Date.now() - PROFILE_LOOKBACK_MS;
+        const [, params] = vi.mocked(context.database.query).mock.calls[0];
+        const lookback = (params as unknown[])[2] as number;
+        expect(lookback).toBeGreaterThanOrEqual(before - 50);
+        expect(lookback).toBeLessThanOrEqual(after + 50);
     });
 
     it("includes Possible dislikes field when negative messages exist", async () => {
@@ -208,6 +225,42 @@ describe("profile command", () => {
         const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
         const fieldNames = embed.data.fields?.map((f) => f.name) ?? [];
         expect(fieldNames).not.toContain("Possible dislikes");
+    });
+});
+
+describe("sampleMessages", () => {
+    function makeRows(n: number): MessageRow[] {
+        return Array.from({ length: n }, (_, i) => ({ message: `msg${i}`, datetime: "0" }));
+    }
+
+    it("returns the original array when rows <= size", () => {
+        const rows = makeRows(10);
+        expect(sampleMessages(rows, 50)).toBe(rows);
+    });
+
+    it("returns exactly size elements when rows > size", () => {
+        const rows = makeRows(1000);
+        expect(sampleMessages(rows, 100)).toHaveLength(100);
+    });
+
+    it("all returned rows are from the original input", () => {
+        const rows = makeRows(200);
+        const sample = sampleMessages(rows, 50);
+        for (const r of sample) expect(rows).toContain(r);
+    });
+
+    it("does not return duplicate rows", () => {
+        const rows = makeRows(200);
+        const sample = sampleMessages(rows, 50);
+        const seen = new Set(sample);
+        expect(seen.size).toBe(50);
+    });
+
+    it("returns different orderings on repeated calls", () => {
+        const rows = makeRows(1000);
+        const firstIds = sampleMessages(rows, 100).map((r) => r.message);
+        const secondIds = sampleMessages(rows, 100).map((r) => r.message);
+        expect(firstIds).not.toEqual(secondIds);
     });
 });
 
