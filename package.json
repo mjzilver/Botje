@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && cp -r src/json dist/json",
     "start": "node dist/start.js",
-    "dev": "ts-node src/start.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/start.ts",
     "beta": "ts-node-dev --respawn --transpile-only src/start.ts --beta",
     "test": "vitest run",
     "test:watch": "vitest",
