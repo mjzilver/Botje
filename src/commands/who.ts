@@ -50,7 +50,7 @@ async function handleReplyLookup(
         repliedContent = replied.content.trim();
     } catch (err) {
         context.logger.error(toError(err));
-        context.messageHandler.reply(message, "Couldn't fetch the message you replied to.");
+        context.messageHandler.reply(message, "Couldn't read the message you replied to.");
 
         return;
     }
@@ -163,7 +163,7 @@ async function handleTextSearch(
             .setTitle(`🔍 Who said "${shortQuery}"?`)
             .setDescription(lines.join("\n"))
             .setFooter({
-                text: `${totalTimes} occurrence${totalTimes === 1 ? "" : "s"} across ${countRows.length} user${countRows.length === 1 ? "" : "s"}`,
+                text: `Said ${totalTimes} time${totalTimes === 1 ? "" : "s"} by ${countRows.length === 1 ? "1 person" : `${countRows.length} people`}`,  
             });
 
         context.messageHandler.send(message, embed);

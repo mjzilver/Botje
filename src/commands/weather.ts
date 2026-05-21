@@ -51,7 +51,7 @@ export default {
             }
         } catch (err) {
             context.logger.error(toError(err));
-            context.messageHandler.send(message, "Failed to fetch weather data");
+            context.messageHandler.send(message, "Couldn't get the weather.");
         }
     },
 } satisfies ICommand;

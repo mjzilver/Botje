@@ -14,14 +14,14 @@ export default {
             recent = await fetchContextMessages(message.channel);
         } catch (err) {
             context.logger.error(toError(err));
-            context.messageHandler.send(message, "Could not fetch recent messages.");
+            context.messageHandler.send(message, "Couldn't read recent messages.");
             return;
         }
 
         const topics = await extractTopics(recent, context.database, context.dictionary, context.config.prefix);
 
         if (topics.length === 0) {
-            context.messageHandler.send(message, "No clear topic detected from recent messages.");
+            context.messageHandler.send(message, "No clear topic in recent messages.");
             return;
         }
 

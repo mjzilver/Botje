@@ -122,7 +122,7 @@ describe("stats command", () => {
         expect(context.logger.error).toHaveBeenCalledWith(expect.objectContaining({ message: "DB down" }));
         expect(context.messageHandler.reply).toHaveBeenCalledWith(
             expect.anything(),
-            "Failed to fetch stats, please try again later.",
+            "Something went wrong, please try again.",
         );
     });
 });

@@ -70,7 +70,7 @@ export default {
             context.messageHandler.send(message, embed);
         } catch (err) {
             context.logger.error(toError(err));
-            context.messageHandler.reply(message, "Failed to fetch a quote.");
+            context.messageHandler.reply(message, "Couldn't find a quote.");
         }
     },
 } satisfies ICommand;

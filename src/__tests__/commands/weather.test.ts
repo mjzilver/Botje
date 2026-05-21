@@ -69,7 +69,7 @@ describe("weather command – execution", () => {
         expect(context.logger.error).toHaveBeenCalled();
         expect(context.messageHandler.send).toHaveBeenCalledWith(
             expect.anything(),
-            expect.stringContaining("Failed to fetch"),
+            expect.stringContaining("Couldn't get"),
         );
     });
 });

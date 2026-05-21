@@ -111,7 +111,7 @@ async function sendStats(
         context.messageHandler.send(message, embed);
     } catch (err) {
         context.logger.error(toError(err));
-        context.messageHandler.reply(message, "Failed to fetch stats, please try again later.");
+        context.messageHandler.reply(message, "Something went wrong, please try again.");
     }
 }
 

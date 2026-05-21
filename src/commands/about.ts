@@ -29,7 +29,7 @@ export default {
         const topic = pickTopic(phrase, context.dictionary.getStopWords());
 
         if (!topic) {
-            context.messageHandler.reply(message, "Could not identify a topic from that phrase.");
+            context.messageHandler.reply(message, "Can't find a topic in that.");
             return;
         }
 

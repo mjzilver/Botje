@@ -87,7 +87,7 @@ export default {
         const dislikes = deriveNegativeTopics(rows, context.dictionary.getStopWords());
 
         const fields: { name: string; value: string }[] = [
-            { name: "Interests", value: topics.slice(0, 3).join(", ") || "None detected" },
+            { name: "Interests", value: topics.slice(0, 3).join(", ") || "Nothing found" },
         ];
         if (dislikes.length > 0) fields.push({ name: "Dislikes", value: dislikes.join(", ") });
 

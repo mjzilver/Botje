@@ -34,7 +34,7 @@ describe("who command", () => {
 
             expect(context.messageHandler.reply).toHaveBeenCalledWith(
                 expect.anything(),
-                expect.stringContaining("Couldn't fetch"),
+                expect.stringContaining("Couldn't read"),
             );
         });
 
