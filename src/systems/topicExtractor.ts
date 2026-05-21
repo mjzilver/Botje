@@ -1,10 +1,14 @@
 import type { BotMessage } from "../interfaces/discord";
 import type { IDatabase } from "./database";
 import type { IDictionary } from "./dictionary";
-import { textOnly, normalizeSpaces, countVowelGroups } from "./stringHelpers";
+import { countVowelGroups } from "./stringHelpers";
 
 const MIN_WORD_LENGTH = 4;
 const CANDIDATE_LIMIT = 10;
+
+const URL_TOKEN_RE = /(https?:\/\/|www\.)/i;
+const DISCORD_EMOTE_TOKEN_RE = /^<a?:[a-zA-Z0-9_]+:\d+>$|^:[a-zA-Z0-9_]+:$/;
+const DISCORD_MENTION_TOKEN_RE = /^<[@#][!&]?\d+>$|^[@#]/;
 
 export const CONTEXT_WINDOW_MS = 10 * 60 * 60 * 1000;
 export const CONTEXT_LIMIT = 20;
@@ -49,6 +53,15 @@ export async function extractTopics(
     return scored.sort((a, b) => b.score - a.score).map((s) => s.word);
 }
 
+function isNoiseToken(token: string, prefixRe: RegExp | null): boolean {
+    return (
+        URL_TOKEN_RE.test(token) ||
+        DISCORD_EMOTE_TOKEN_RE.test(token) ||
+        DISCORD_MENTION_TOKEN_RE.test(token) ||
+        (prefixRe !== null && prefixRe.test(token))
+    );
+}
+
 function computeTf(
     messages: { cleanContent: string }[],
     dictionary: IDictionary,
@@ -58,15 +71,10 @@ function computeTf(
     const stopWords = dictionary.getStopWords();
 
     for (const m of messages) {
-        const cleaned = m.cleanContent
+        const words = m.cleanContent
             .split(/\s+/)
-            .filter((t) => !/(https?:\/\/|www\.)/i.test(t))
-            .filter((t) => !prefixRe?.test(t))
-            .join(" ");
-
-        const words = normalizeSpaces(textOnly(cleaned))
-            .toLowerCase()
-            .split(" ")
+            .filter((t) => t.length > 0 && !isNoiseToken(t, prefixRe))
+            .map((t) => t.replace(/[^a-zA-Z]/g, "").toLowerCase())
             .filter((w) => w.length >= MIN_WORD_LENGTH && !stopWords.has(w));
 
         for (const w of words) freq.set(w, (freq.get(w) ?? 0) + 1);

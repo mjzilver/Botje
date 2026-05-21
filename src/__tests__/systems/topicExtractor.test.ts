@@ -120,3 +120,86 @@ describe("extractTopics", () => {
         expect(topics).not.toContain("btopic");
     });
 });
+
+describe("noise filtering", () => {
+    it("drops URL tokens and prevents letter-mangling into nonsense words", async () => {
+        const messages = [
+            { cleanContent: "https://en.wikipedia.org/wiki/somethinggreat interesting" },
+            { cleanContent: "beautiful weather today" },
+        ];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics.every((t) => !/https|wikipedia|somethinggreat/.test(t))).toBe(true);
+        expect(topics).toContain("weather");
+    });
+
+    it("drops Discord custom emote tokens without leaking the emote name", async () => {
+        const messages = [{ cleanContent: "<:smile:123456789> beautiful weather" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics.some((t) => t.includes("smile"))).toBe(false);
+        expect(topics).toContain("weather");
+    });
+
+    it("drops Discord animated emote tokens without leaking the emote name", async () => {
+        const messages = [{ cleanContent: "<a:dance:123456789> sunshine beautiful outside" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics.some((t) => t.includes("dance"))).toBe(false);
+        expect(topics).toContain("sunshine");
+    });
+
+    it("drops Discord text emote tokens", async () => {
+        const messages = [{ cleanContent: "great :thumbsup: beautiful weather" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics).not.toContain("thumbsup");
+        expect(topics).toContain("weather");
+    });
+
+    it("drops raw Discord user mention tokens", async () => {
+        const messages = [{ cleanContent: "<@123456789> sunshine beautiful outside" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics.every((t) => !/\d{6,}/.test(t))).toBe(true);
+        expect(topics).toContain("sunshine");
+    });
+
+    it("drops raw Discord role mention tokens", async () => {
+        const messages = [{ cleanContent: "<@&987654321> sunshine beautiful outside" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics.every((t) => !/\d{6,}/.test(t))).toBe(true);
+    });
+
+    it("drops raw Discord channel mention tokens", async () => {
+        const messages = [{ cleanContent: "<#555555555> sunshine beautiful outside" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics.every((t) => !/\d{6,}/.test(t))).toBe(true);
+    });
+
+    it("drops resolved Discord user mentions starting with @", async () => {
+        const messages = [{ cleanContent: "@Username sunshine beautiful outside" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics).not.toContain("username");
+        expect(topics).toContain("sunshine");
+    });
+
+    it("drops resolved Discord channel mentions starting with #", async () => {
+        const messages = [{ cleanContent: "posted in #general sunshine beautiful outside" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics).not.toContain("general");
+        expect(topics).toContain("sunshine");
+    });
+
+    it("drops bot command tokens appearing mid-message", async () => {
+        const messages = [
+            { cleanContent: "lol b!weather is broken" },
+            { cleanContent: "beautiful sunshine outside" },
+        ];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary(), "b!");
+        expect(topics).not.toContain("bweather");
+        expect(topics).toContain("sunshine");
+    });
+
+    it("does not filter ordinary words that happen to resemble noise patterns", async () => {
+        const messages = [{ cleanContent: "sunshine weather beautiful rainbow" }];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics.length).toBeGreaterThan(0);
+        expect(topics).toContain("weather");
+    });
+});
