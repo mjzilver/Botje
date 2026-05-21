@@ -100,4 +100,23 @@ describe("extractTopics", () => {
         const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
         expect(topics[0]).toBe("wonderful");
     });
+
+    it("does not produce mangled URL words as topics", async () => {
+        const messages = [
+            { cleanContent: "https://en.wikipedia.org/wiki/something interesting" },
+            { cleanContent: "beautiful weather today" },
+        ];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary());
+        expect(topics.every((t) => !/https?/.test(t))).toBe(true);
+        expect(topics.every((t) => !/wikipedia/.test(t))).toBe(true);
+    });
+
+    it("drops command tokens appearing mid-message when prefix is provided", async () => {
+        const messages = [
+            { cleanContent: "lol b!topic is funny" },
+            { cleanContent: "beautiful sunshine outside" },
+        ];
+        const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary(), "b!");
+        expect(topics).not.toContain("btopic");
+    });
 });

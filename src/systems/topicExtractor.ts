@@ -26,7 +26,7 @@ export async function extractTopics(
     const filtered = prefixRe
         ? messages.filter((m) => !prefixRe.test(m.cleanContent))
         : messages;
-    const tf = computeTf(filtered, dictionary);
+    const tf = computeTf(filtered, dictionary, prefixRe);
     if (tf.size === 0) return [];
 
     const candidates = [...tf.entries()]
@@ -52,12 +52,19 @@ export async function extractTopics(
 function computeTf(
     messages: { cleanContent: string }[],
     dictionary: IDictionary,
+    prefixRe: RegExp | null,
 ): Map<string, number> {
     const freq = new Map<string, number>();
     const stopWords = dictionary.getStopWords();
 
     for (const m of messages) {
-        const words = normalizeSpaces(textOnly(m.cleanContent))
+        const cleaned = m.cleanContent
+            .split(/\s+/)
+            .filter((t) => !/(https?:\/\/|www\.)/i.test(t))
+            .filter((t) => !prefixRe?.test(t))
+            .join(" ");
+
+        const words = normalizeSpaces(textOnly(cleaned))
             .toLowerCase()
             .split(" ")
             .filter((w) => w.length >= MIN_WORD_LENGTH && !stopWords.has(w));
