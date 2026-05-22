@@ -63,7 +63,7 @@ export default {
         }
 
         try {
-            const cached = mimicCache.get(targetId, message.guild.id);
+            const cached = mimicCache.get(targetId);
 
             if (cached !== null && !mimicCache.isExpired(cached)) {
                 replyFromProfile(cached);
@@ -75,7 +75,6 @@ export default {
                 replyFromProfile(cached);
                 mimicCache.enqueue(
                     targetId,
-                    message.guild.id,
                     context.database,
                     context.logger,
                     context.config.prefix,
@@ -86,11 +85,11 @@ export default {
 
             const rows = await context.database.query<{ message: string }>(
                 `SELECT message FROM messages
-                 WHERE user_id = $1 AND server_id = $2
+                 WHERE user_id = $1
                  AND LENGTH(message) > 15
                  ORDER BY RANDOM()
                  LIMIT 5000`,
-                [targetId, message.guild.id],
+                [targetId],
             );
 
             const cleaned = rows
@@ -124,7 +123,7 @@ export default {
             context.messageHandler.send(message, generated);
 
             const profile: CachedProfile = { chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length };
-            await mimicCache.enqueueWithProfile(targetId, message.guild.id, profile, context.database, context.logger, context.config.prefix);
+            await mimicCache.enqueueWithProfile(targetId, profile, context.database, context.logger, context.config.prefix);
         } catch (err) {
             context.logger.error(toError(err));
         }

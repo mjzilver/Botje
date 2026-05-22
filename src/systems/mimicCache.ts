@@ -11,7 +11,6 @@ const BUILD_MESSAGE_LIMIT = 50_000;
 
 interface QueueItem {
     userId: string;
-    serverId: string;
     db: IDatabase;
     logger: ILogger;
     prefix: string;
@@ -28,9 +27,9 @@ export class MimicCache {
         fs.mkdirSync(cacheDir, { recursive: true });
     }
 
-    get(userId: string, serverId: string): CachedProfile | null {
+    get(userId: string): CachedProfile | null {
         try {
-            const raw = fs.readFileSync(this.cachePath(userId, serverId), "utf8");
+            const raw = fs.readFileSync(this.cachePath(userId), "utf8");
             return JSON.parse(raw) as CachedProfile;
         } catch {
             return null;
@@ -41,37 +40,36 @@ export class MimicCache {
         return Date.now() - profile.builtAt > EXPIRY_MS;
     }
 
-    private async save(userId: string, serverId: string, profile: CachedProfile): Promise<void> {
-        await fs.promises.writeFile(this.cachePath(userId, serverId), JSON.stringify(profile), "utf8");
+    private async save(userId: string, profile: CachedProfile): Promise<void> {
+        await fs.promises.writeFile(this.cachePath(userId), JSON.stringify(profile), "utf8");
     }
 
     async enqueueWithProfile(
         userId: string,
-        serverId: string,
         profile: CachedProfile,
         db: IDatabase,
         logger: ILogger,
         prefix: string,
     ): Promise<void> {
-        await this.save(userId, serverId, profile);
-        this.enqueue(userId, serverId, db, logger, prefix);
+        await this.save(userId, profile);
+        this.enqueue(userId, db, logger, prefix);
     }
 
-    enqueue(userId: string, serverId: string, db: IDatabase, logger: ILogger, prefix: string): void {
-        const key = this.itemKey(userId, serverId);
+    enqueue(userId: string, db: IDatabase, logger: ILogger, prefix: string): void {
+        const key = userId;
         if (this.pendingOrQueued.has(key)) return;
         this.pendingOrQueued.add(key);
-        const item: QueueItem = { userId, serverId, db, logger, prefix };
+        const item: QueueItem = { userId, db, logger, prefix };
         this.queue.push(item);
         if (!this.processing) void this.processQueue();
     }
 
-    private itemKey(userId: string, serverId: string): string {
-        return `${userId}|${serverId}`;
+    private itemKey(userId: string): string {
+        return userId;
     }
 
-    private cachePath(userId: string, serverId: string): string {
-        return path.join(this.cacheDir, `${serverId}_${userId}.json`);
+    private cachePath(userId: string): string {
+        return path.join(this.cacheDir, `${userId}.json`);
     }
 
     private async processQueue(): Promise<void> {
@@ -79,7 +77,7 @@ export class MimicCache {
         while (this.queue.length > 0) {
             const item = this.queue.shift()!;
             await this.buildAndSave(item);
-            this.pendingOrQueued.delete(this.itemKey(item.userId, item.serverId));
+            this.pendingOrQueued.delete(this.itemKey(item.userId));
             if (this.queue.length > 0) {
                 await new Promise<void>((resolve) => setTimeout(resolve, QUEUE_DELAY_MS));
             }
@@ -87,21 +85,20 @@ export class MimicCache {
         this.processing = false;
     }
 
-    private async buildAndSave({ userId, serverId, db, logger, prefix }: QueueItem): Promise<void> {
-        if (serverId === "0") return;
+    private async buildAndSave({ userId, db, logger, prefix }: QueueItem): Promise<void> {
         try {
             const nameRows = await db.query<{ user_name: string }>(
-                `SELECT user_name FROM usernames WHERE user_id = $1 AND server_id = $2 ORDER BY timestamp DESC LIMIT 1`,
-                [userId, serverId],
+                `SELECT user_name FROM usernames WHERE user_id = $1 ORDER BY timestamp DESC LIMIT 1`,
+                [userId],
             );
             const displayName = nameRows[0]?.user_name ?? userId;
             const rows = await db.query<{ message: string }>(
                 `SELECT message FROM messages
-                 WHERE user_id = $1 AND server_id = $2
+                 WHERE user_id = $1
                  AND LENGTH(message) > 15
                  ORDER BY datetime DESC
-                 LIMIT $3`,
-                [userId, serverId, BUILD_MESSAGE_LIMIT],
+                 LIMIT $2`,
+                [userId, BUILD_MESSAGE_LIMIT],
             );
             const cleaned = rows
                 .map((r) => cleanMessage(r.message, prefix))
@@ -113,7 +110,7 @@ export class MimicCache {
             const style = buildStyleProfile(cleaned);
             const { chain, starts } = buildChain(cleaned);
             const profile: CachedProfile = { chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length };
-            await fs.promises.writeFile(this.cachePath(userId, serverId), JSON.stringify(profile), "utf8");
+            await fs.promises.writeFile(this.cachePath(userId), JSON.stringify(profile), "utf8");
             logger.debug(`Mimic cache built for ${displayName} (${cleaned.length} messages)`);
         } catch (err) {
             logger.error(toError(err));

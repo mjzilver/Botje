@@ -17,7 +17,12 @@ export class CommandLine {
     }
 
     private start(): void {
-        const rl = readline.createInterface({ input: process.stdin });
+        const names = Object.keys(this.commands);
+        const completer = (line: string): [string[], string] => {
+            const matches = names.filter((n) => n.startsWith(line.toLowerCase()));
+            return [matches.length > 0 ? matches : names, line];
+        };
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout, completer });
         rl.on("line", async (line: string) => {
             const parts = line.trim().split(/\s+/);
             const name = parts[0].toLowerCase();
