@@ -1,7 +1,27 @@
+import nlp from "compromise";
 import type { ICommand, IBotContext } from "../interfaces";
 import { textOnly, normalizeSpaces, countVowelGroups, makeStringHelpers } from "../systems/stringHelpers";
 import { randomBetween, levenshtein, pickRandomItem } from "../systems/utils";
 import type { BotMessage } from "../interfaces/discord";
+
+const TOPIC_QUERY_LIMIT = 15;
+const TOPIC_SENTENCE_MIN_WORDS = 4;
+const TOPIC_SENTENCE_MAX_WORDS = 25;
+
+export function extractTopicSentences(rawMessages: string[], topic: string): string[] {
+    const topicLower = topic.toLowerCase();
+    return rawMessages
+        .flatMap((msg) => nlp(msg).sentences().out("array") as string[])
+        .filter((s) => s.toLowerCase().includes(topicLower))
+        .map((s) => {
+            const clean = s.trim().replace(/\s+/g, " ");
+            return clean.charAt(0).toUpperCase() + clean.slice(1);
+        })
+        .filter((s) => {
+            const wordCount = s.split(/\s+/).length;
+            return wordCount >= TOPIC_SENTENCE_MIN_WORDS && wordCount <= TOPIC_SENTENCE_MAX_WORDS;
+        });
+}
 
 async function findByWord(message: BotMessage, context: IBotContext): Promise<void> {
     const { removePrefix } = makeStringHelpers(context.config);
@@ -80,48 +100,28 @@ async function findRandom(message: BotMessage, context: IBotContext): Promise<vo
 }
 
 async function findTopic(message: BotMessage, topic: string, context: IBotContext): Promise<void> {
-    const selectSQL = `SELECT LOWER(message) as message
+    const rows = await context.database.query<{ message: string }>(
+        `SELECT LOWER(message) as message
         FROM messages
         WHERE (message LIKE $1 OR message LIKE $2)
-        AND message NOT LIKE '%<%' AND LENGTH(message) > 10`;
-    const rows = await context.database.query<{
-        message: string;
-    }>(selectSQL, [`%${topic} is%`, `%${topic} are%`]);
-    if (rows.length < 3) {
-        context.logger.debug("Not enough info about topic -- redirecting to the regular method");
-        message.content = message.content.replace(/(about|think|of)/gi, "");
+        AND message NOT LIKE '%<%' AND LENGTH(message) > 10
+        LIMIT ${TOPIC_QUERY_LIMIT}`,
+        [`%${topic} is%`, `%${topic} are%`],
+    );
 
+    const sentences = extractTopicSentences(rows.map((r) => r.message), topic);
+
+    if (sentences.length === 0) {
+        context.logger.debug("No usable sentences about topic — redirecting to the regular method");
+        message.content = message.content.replace(/(about|think|of)/gi, "");
         return findByWord(message, context);
     }
 
-    const IS_ARE_REGEX = /\b(?:is|are)\b/gi;
-    let first = rows[0].message;
-    let second = rows[1].message;
-    let third = rows[2].message;
-    context.logger.debug(`Picked terms related to '${topic}', first '${first}', second '${second}', third '${third}'`);
-
-    function extractTopicPhrase(msg: string, topicStr: string, removeTopic = false, regex?: RegExp): string {
-        const topicLower = topicStr.toLowerCase();
-        const idx = msg.indexOf(topicLower);
-        if (idx === -1) return msg;
-        const result = removeTopic ? msg.substring(idx + topicLower.length) : msg.substring(idx);
-
-        return regex ? result.replace(regex, "").trim() : result.trim();
-    }
-
-    first = extractTopicPhrase(first, topic);
-    second = extractTopicPhrase(second, topic, true, IS_ARE_REGEX);
-    third = extractTopicPhrase(third, topic, true, IS_ARE_REGEX);
-    const linkerwords = ["and", "or", "but", "also"];
-    const picker = randomBetween(0, 2);
-    if (picker === 0) context.messageHandler.reply(message, normalizeSpaces(`${first}`));
-    else if (picker === 1)
-        context.messageHandler.reply(message, normalizeSpaces(`${first} ${pickRandomItem(linkerwords)} ${second}`));
-    else
-        context.messageHandler.reply(
-            message,
-            normalizeSpaces(`${first}, ${second} ${pickRandomItem(linkerwords)} ${third}`),
-        );
+    const s1 = pickRandomItem(sentences);
+    const remaining = sentences.filter((s) => s !== s1);
+    const reply =
+        remaining.length > 0 && randomBetween(0, 1) === 1 ? `${s1} ${pickRandomItem(remaining)}` : s1;
+    context.messageHandler.reply(message, normalizeSpaces(reply));
 }
 
 export default {
