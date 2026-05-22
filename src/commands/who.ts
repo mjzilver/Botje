@@ -65,10 +65,10 @@ async function handleReplyLookup(
         const rows = await context.database.query<SourceRow>(
             `SELECT user_id::text, message, datetime::text
              FROM messages
-             WHERE server_id = $1 AND message = $2
+             WHERE message = $1
              ORDER BY datetime ASC
              LIMIT 10`,
-            [message.guild.id, repliedContent],
+            [repliedContent],
         );
 
         if (rows.length === 0) {
@@ -117,11 +117,11 @@ async function handleTextSearch(
         const countRows = await context.database.query<CountRow>(
             `SELECT user_id::text, COUNT(*) AS times, MAX(message) AS sample, MAX(datetime)::text AS last_seen
              FROM messages
-             WHERE server_id = $1 AND message ILIKE $2
+             WHERE message ILIKE $1
              GROUP BY user_id
              ORDER BY times DESC
              LIMIT 20`,
-            [message.guild.id, `%${searchText}%`],
+            [`%${searchText}%`],
         );
 
         if (countRows.length === 0) {
