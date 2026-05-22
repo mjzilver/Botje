@@ -20,6 +20,7 @@ bot.log
 # Transient JSON files
 src/json/disallowed.json
 src/json/words.json
+data/
 
 # Generated meme output
 assets/meme.png

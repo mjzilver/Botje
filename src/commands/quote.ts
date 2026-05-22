@@ -32,6 +32,7 @@ export default {
             sql = `SELECT id, user_id, message, datetime FROM messages
                    WHERE server_id = $1 AND user_id = $2
                    AND LENGTH(message) > 10
+                   AND regexp_replace(message, '<[^>]+>|https?://\\S+|www\\.\\S+', '', 'g') ~ '\\w{4,}'
                    ORDER BY RANDOM() LIMIT 1`;
             params = [message.guild.id, mention.id];
         } else if (keyword) {
@@ -39,12 +40,14 @@ export default {
                    WHERE server_id = $1
                    AND message ILIKE $2
                    AND LENGTH(message) > 10
+                   AND regexp_replace(message, '<[^>]+>|https?://\\S+|www\\.\\S+', '', 'g') ~ '\\w{4,}'
                    ORDER BY RANDOM() LIMIT 1`;
             params = [message.guild.id, `%${keyword}%`];
         } else {
             sql = `SELECT id, user_id, message, datetime FROM messages
                    WHERE server_id = $1
                    AND LENGTH(message) > 10
+                   AND regexp_replace(message, '<[^>]+>|https?://\\S+|www\\.\\S+', '', 'g') ~ '\\w{4,}'
                    ORDER BY RANDOM() LIMIT 1`;
             params = [message.guild.id];
         }
