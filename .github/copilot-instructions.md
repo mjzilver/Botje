@@ -168,7 +168,7 @@ override async mention(message: BotMessage, mention: { id: string }): Promise<vo
 All class fields that are not part of the public API must be `private`. Never leave fields untyped or public by default.
 
 ### Constructor injection
-Services receive dependencies through the constructor, not by calling singletons inside methods. `getBotContext()` is the current exception (a known technical debt item — see todo.md).
+Services receive dependencies through the constructor, not by calling singletons inside methods. 
 
 ---
 

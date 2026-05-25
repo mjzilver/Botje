@@ -92,6 +92,7 @@ export class Dictionary {
             .map(([w]) => w)
             .join("|");
         this.stopWordsCache = new RegExp(`\\b((${terms})\\s)\\b`, "gmi");
+
         return this.stopWordsCache;
     }
 
@@ -99,6 +100,7 @@ export class Dictionary {
         if (this.stopWordsSet) return this.stopWordsSet;
         const max = Math.min(this.words.length, 100);
         this.stopWordsSet = new Set(this.words.slice(0, max).map(([w]) => w.toLowerCase()));
+
         return this.stopWordsSet;
     }
 }

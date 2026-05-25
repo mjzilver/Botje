@@ -12,6 +12,7 @@ function stubSpeak(context: ReturnType<typeof makeMockContext>): ReturnType<type
         format: "",
         function: speakFn,
     };
+
     return speakFn;
 }
 
@@ -25,7 +26,17 @@ describe("about command", () => {
 
         const msg = makeMessage("!about");
         (msg.channel.messages.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-            new Map([["1", { ...msg, cleanContent: "the weather forecast today", author: { bot: false }, createdTimestamp: Date.now() }]]),
+            new Map([
+                [
+                    "1",
+                    {
+                        ...msg,
+                        cleanContent: "the weather forecast today",
+                        author: { bot: false },
+                        createdTimestamp: Date.now(),
+                    },
+                ],
+            ]),
         );
         vi.mocked(context.database.query).mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
@@ -44,10 +55,7 @@ describe("about command", () => {
 
         await aboutCommand.function(msg, context);
 
-        expect(context.messageHandler.reply).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.stringContaining("topic"),
-        );
+        expect(context.messageHandler.reply).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("topic"));
     });
 
     it("calls speak with a synthetic about message containing the picked topic word", async () => {
@@ -108,4 +116,3 @@ describe("about command", () => {
         expect(typeof syntheticMsg.react).toBe("function");
     });
 });
-

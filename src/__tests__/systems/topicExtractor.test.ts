@@ -37,10 +37,7 @@ describe("extractTopics", () => {
     });
 
     it("returns the most-mentioned word first when document frequencies are equal", async () => {
-        const messages = [
-            { cleanContent: "weather forecast weather" },
-            { cleanContent: "beautiful weather today" },
-        ];
+        const messages = [{ cleanContent: "weather forecast weather" }, { cleanContent: "beautiful weather today" }];
         const topics = await extractTopics(messages, makeMockDb(5), makeMockDictionary());
         expect(topics[0]).toBe("weather");
     });
@@ -61,10 +58,7 @@ describe("extractTopics", () => {
     });
 
     it("queries the database once per candidate word", async () => {
-        const messages = [
-            { cleanContent: "rainbow sunshine beautiful" },
-            { cleanContent: "rainbow sunshine" },
-        ];
+        const messages = [{ cleanContent: "rainbow sunshine beautiful" }, { cleanContent: "rainbow sunshine" }];
         const db = makeMockDb(2);
         await extractTopics(messages, db, makeMockDictionary());
         const queryMock = vi.mocked(db.query);
@@ -112,10 +106,7 @@ describe("extractTopics", () => {
     });
 
     it("drops command tokens appearing mid-message when prefix is provided", async () => {
-        const messages = [
-            { cleanContent: "lol b!topic is funny" },
-            { cleanContent: "beautiful sunshine outside" },
-        ];
+        const messages = [{ cleanContent: "lol b!topic is funny" }, { cleanContent: "beautiful sunshine outside" }];
         const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary(), "b!");
         expect(topics).not.toContain("btopic");
     });
@@ -187,10 +178,7 @@ describe("noise filtering", () => {
     });
 
     it("drops bot command tokens appearing mid-message", async () => {
-        const messages = [
-            { cleanContent: "lol b!weather is broken" },
-            { cleanContent: "beautiful sunshine outside" },
-        ];
+        const messages = [{ cleanContent: "lol b!weather is broken" }, { cleanContent: "beautiful sunshine outside" }];
         const topics = await extractTopics(messages, makeMockDb(), makeMockDictionary(), "b!");
         expect(topics).not.toContain("bweather");
         expect(topics).toContain("sunshine");

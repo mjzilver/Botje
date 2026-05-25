@@ -163,7 +163,7 @@ async function handleTextSearch(
             .setTitle(`🔍 Who said "${shortQuery}"?`)
             .setDescription(lines.join("\n"))
             .setFooter({
-                text: `Said ${totalTimes} time${totalTimes === 1 ? "" : "s"} by ${countRows.length === 1 ? "1 person" : `${countRows.length} people`}`,  
+                text: `Said ${totalTimes} time${totalTimes === 1 ? "" : "s"} by ${countRows.length === 1 ? "1 person" : `${countRows.length} people`}`,
             });
 
         context.messageHandler.send(message, embed);

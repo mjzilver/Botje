@@ -7,13 +7,40 @@ const MIN_WORD_LENGTH = 4;
 const CANDIDATE_LIMIT = 10;
 
 const INDEFINITE_PRONOUNS = new Set([
-    "everything", "something", "anything", "nothing",
-    "everyone", "someone", "anyone", "noone",
-    "everybody", "somebody", "anybody", "nobody",
-    "everywhere", "somewhere", "anywhere", "nowhere",
-    "whatever", "whoever", "whenever", "wherever", "whichever", "whomever", "however",
-    "himself", "herself", "itself", "themselves", "yourself", "yourselves", "ourselves", "myself",
-    "another", "other", "others",
+    "everything",
+    "something",
+    "anything",
+    "nothing",
+    "everyone",
+    "someone",
+    "anyone",
+    "noone",
+    "everybody",
+    "somebody",
+    "anybody",
+    "nobody",
+    "everywhere",
+    "somewhere",
+    "anywhere",
+    "nowhere",
+    "whatever",
+    "whoever",
+    "whenever",
+    "wherever",
+    "whichever",
+    "whomever",
+    "however",
+    "himself",
+    "herself",
+    "itself",
+    "themselves",
+    "yourself",
+    "yourselves",
+    "ourselves",
+    "myself",
+    "another",
+    "other",
+    "others",
 ]);
 
 const URL_TOKEN_RE = /(https?:\/\/|www\.)/i;
@@ -21,6 +48,7 @@ const DISCORD_EMOTE_TOKEN_RE = /^<a?:[a-zA-Z0-9_]+:\d+>$|^:[a-zA-Z0-9_]+:$/;
 const DISCORD_MENTION_TOKEN_RE = /^<[@#][!&]?\d+>$|^[@#]/;
 
 export const CONTEXT_WINDOW_MS = 10 * 60 * 60 * 1000;
+
 export const CONTEXT_LIMIT = 20;
 
 export async function fetchContextMessages(channel: BotMessage["channel"]): Promise<BotMessage[]> {
@@ -30,6 +58,17 @@ export async function fetchContextMessages(channel: BotMessage["channel"]): Prom
     return [...fetched.values()].filter((m) => !m.author.bot && m.createdTimestamp > cutoff);
 }
 
+export async function fetchTopicsFromContext(
+    channel: BotMessage["channel"],
+    db: IDatabase,
+    dictionary: IDictionary,
+    prefix?: string,
+): Promise<string[]> {
+    const recent = await fetchContextMessages(channel);
+
+    return extractTopics(recent, db, dictionary, prefix);
+}
+
 export async function extractTopics(
     messages: { cleanContent: string }[],
     db: IDatabase,
@@ -37,9 +76,7 @@ export async function extractTopics(
     prefix?: string,
 ): Promise<string[]> {
     const prefixRe = prefix ? new RegExp(`^(?:${prefix})`, "i") : null;
-    const filtered = prefixRe
-        ? messages.filter((m) => !prefixRe.test(m.cleanContent))
-        : messages;
+    const filtered = prefixRe ? messages.filter((m) => !prefixRe.test(m.cleanContent)) : messages;
     const tf = computeTf(filtered, dictionary, prefixRe);
     if (tf.size === 0) return [];
 
@@ -56,6 +93,7 @@ export async function extractTopics(
             );
             const df = parseInt(rows[0]?.cnt ?? "1", 10);
             const idf = 1 / Math.log(df + 2);
+
             return { word, score: (tf.get(word) ?? 0) * idf };
         }),
     );

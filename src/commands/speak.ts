@@ -10,15 +10,18 @@ const TOPIC_SENTENCE_MAX_WORDS = 25;
 
 export function extractTopicSentences(rawMessages: string[], topic: string): string[] {
     const topicLower = topic.toLowerCase();
+
     return rawMessages
         .flatMap((msg) => nlp(msg).sentences().out("array") as string[])
         .filter((s) => s.toLowerCase().includes(topicLower))
         .map((s) => {
             const clean = s.trim().replace(/\s+/g, " ");
+
             return clean.charAt(0).toUpperCase() + clean.slice(1);
         })
         .filter((s) => {
             const wordCount = s.split(/\s+/).length;
+
             return wordCount >= TOPIC_SENTENCE_MIN_WORDS && wordCount <= TOPIC_SENTENCE_MAX_WORDS;
         });
 }
@@ -109,18 +112,21 @@ async function findTopic(message: BotMessage, topic: string, context: IBotContex
         [`%${topic} is%`, `%${topic} are%`],
     );
 
-    const sentences = extractTopicSentences(rows.map((r) => r.message), topic);
+    const sentences = extractTopicSentences(
+        rows.map((r) => r.message),
+        topic,
+    );
 
     if (sentences.length === 0) {
         context.logger.debug("No usable sentences about topic — redirecting to the regular method");
         message.content = message.content.replace(/(about|think|of)/gi, "");
+
         return findByWord(message, context);
     }
 
     const s1 = pickRandomItem(sentences);
     const remaining = sentences.filter((s) => s !== s1);
-    const reply =
-        remaining.length > 0 && randomBetween(0, 1) === 1 ? `${s1} ${pickRandomItem(remaining)}` : s1;
+    const reply = remaining.length > 0 && randomBetween(0, 1) === 1 ? `${s1} ${pickRandomItem(remaining)}` : s1;
     context.messageHandler.reply(message, normalizeSpaces(reply));
 }
 

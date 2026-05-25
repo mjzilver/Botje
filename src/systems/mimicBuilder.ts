@@ -18,7 +18,25 @@ export interface CachedProfile {
 }
 
 export const MIN_MESSAGES = 150;
+
 export const MAX_RETRIES = 5;
+
+export const DELETED_USER_RE = /^deleted.?user/i;
+
+export function isEligibleMimicTarget(
+    userId: string,
+    botUserId: string | undefined,
+    getUser: (id: string) => { bot?: boolean; username: string } | undefined,
+    isInAnyGuild: (id: string) => boolean,
+): boolean {
+    if (userId === botUserId) return false;
+    const user = getUser(userId);
+    if (user?.bot) return false;
+    if (user && DELETED_USER_RE.test(user.username)) return false;
+    if (!isInAnyGuild(userId)) return false;
+
+    return true;
+}
 
 export function cleanMessage(raw: string, prefix: string): string | null {
     if (new RegExp(`^${prefix}`, "i").test(raw.trim())) return null;

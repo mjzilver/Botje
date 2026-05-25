@@ -7,6 +7,7 @@ import {
     buildChain,
     generate,
     isVerbatimRepeat,
+    isEligibleMimicTarget,
     MIN_MESSAGES,
     MAX_RETRIES,
 } from "../systems/mimicBuilder";
@@ -49,17 +50,18 @@ export default {
                 [message.guild.id],
             );
 
-            const eligible = candidates.filter((c) => {
-                if (c.user_id === context.client.user?.id) return false;
-                const u = context.client.users.cache.get(c.user_id);
-                if (u?.bot) return false;
-                if (u && /^deleted.?user/i.test(u.username)) return false;
-                if (!context.client.guilds.cache.some((g) => g.members.cache.has(c.user_id))) return false;
-                return true;
-            });
+            const eligible = candidates.filter((c) =>
+                isEligibleMimicTarget(
+                    c.user_id,
+                    context.client.user?.id,
+                    (id) => context.client.users.cache.get(id),
+                    (id) => context.client.guilds.cache.some((g) => g.members.cache.has(id)),
+                ),
+            );
 
             if (eligible.length === 0) {
                 context.messageHandler.reply(message, "No eligible users found to mimic in this server.");
+
                 return;
             }
 
@@ -91,12 +93,7 @@ export default {
 
             if (cached !== null) {
                 replyFromProfile(cached, displayName);
-                mimicCache.enqueue(
-                    targetId,
-                    context.database,
-                    context.logger,
-                    context.config.prefix,
-                );
+                mimicCache.enqueue(targetId, context.database, context.logger, context.config.prefix);
 
                 return;
             }
@@ -137,16 +134,28 @@ export default {
                 context.logger.debug(`Mimic verbatim repeat detected (attempt ${attempt}), regenerating`);
                 generated = generate(chain, starts, style.targetWordCount, style);
             }
-            replyFromProfile({ chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length }, displayName, generated);
+
+            replyFromProfile(
+                { chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length },
+                displayName,
+                generated,
+            );
 
             const profile: CachedProfile = { chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length };
-            await mimicCache.enqueueWithProfile(targetId, profile, context.database, context.logger, context.config.prefix);
+            await mimicCache.enqueueWithProfile(
+                targetId,
+                profile,
+                context.database,
+                context.logger,
+                context.config.prefix,
+            );
         } catch (err) {
             context.logger.error(toError(err));
         }
 
         function replyFromProfile(profile: CachedProfile, displayName: string, pregenerated?: string): void {
-            const result = pregenerated ?? generate(profile.chain, profile.starts, profile.style.targetWordCount, profile.style);
+            const result =
+                pregenerated ?? generate(profile.chain, profile.starts, profile.style.targetWordCount, profile.style);
             context.messageHandler.send(message, `*mimicking **${displayName}***\n${result}`);
         }
     },

@@ -145,9 +145,7 @@ export class CommandHandler {
         }
 
         const topics = await extractTopics(recent, this.context.database, this.context.dictionary, this.config.prefix);
-        const syntheticContent = topics[0]
-            ? `${this.config.prefix}speak ${topics[0]}`
-            : `${this.config.prefix}speak`;
+        const syntheticContent = topics[0] ? `${this.config.prefix}speak ${topics[0]}` : `${this.config.prefix}speak`;
         const topicMessage = { ...message, content: syntheticContent };
 
         this.commands["speak"]?.function(topicMessage, this.context);

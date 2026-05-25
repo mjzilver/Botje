@@ -3,7 +3,7 @@ import { pipeline } from "stream/promises";
 import axios from "axios";
 import type { ICommand } from "../../interfaces";
 import { toError } from "../../systems/utils";
-import { getAttachmentUrl } from "../../systems/stringHelpers";
+import { resolveImageUrl } from "../../systems/stringHelpers";
 
 export default {
     name: "addmeme",
@@ -12,15 +12,7 @@ export default {
     async function(message, context) {
         const args = message.content.split(" ");
         args.shift();
-        let url: string;
-        if (message.reference?.messageId) {
-            const fetched = await message.channel.messages.fetch(message.reference.messageId);
-            url = getAttachmentUrl(fetched);
-        } else {
-            url = getAttachmentUrl(message);
-        }
-
-        if (args[0]?.indexOf("http") === 0) url = args.shift() ?? "";
+        const url = await resolveImageUrl(message, args);
         const filename = args[0] ? `${args[0]}.png` : `${new Date().getTime()}.png`;
         if (url) {
             const path = "assets/meme_templates";

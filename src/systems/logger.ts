@@ -90,6 +90,7 @@ function createLogger(consoleLevel = "startup", fileLevel: string | null = "debu
             const rowCount = arrays[0].length;
             const colWidths = arrays.map((col, i) => {
                 const headerLen = headers[i]?.length ?? 0;
+
                 return Math.min(maxColWidth, Math.max(headerLen, ...col.map((val) => String(val).length)));
             });
             if (headers.length) {
@@ -97,7 +98,9 @@ function createLogger(consoleLevel = "startup", fileLevel: string | null = "debu
                 ilogger.console(colWidths.map((w) => "=".repeat(w)).join(" | "));
             }
             for (let row = 0; row < rowCount; row++) {
-                const line = arrays.map((col, i) => truncate(String(col[row]), colWidths[i]).padEnd(colWidths[i])).join(" | ");
+                const line = arrays
+                    .map((col, i) => truncate(String(col[row]), colWidths[i]).padEnd(colWidths[i]))
+                    .join(" | ");
                 ilogger.console(line);
             }
         },

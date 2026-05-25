@@ -15,7 +15,7 @@ export default tseslint.config(
                 { blankLine: "always", prev: "import", next: "*" },
                 { blankLine: "any", prev: "import", next: "import" },
                 { blankLine: "always", prev: "*", next: "export" },
-                { blankLine: "any", prev: "export", next: "export" },
+                { blankLine: "always", prev: "export", next: "export" },
                 { blankLine: "always", prev: "export", next: "*" },
                 { blankLine: "always", prev: "block-like", next: "*" },
                 { blankLine: "always", prev: "*", next: "return" },

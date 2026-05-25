@@ -30,6 +30,7 @@ export class MimicCache {
     get(userId: string): CachedProfile | null {
         try {
             const raw = fs.readFileSync(this.cachePath(userId), "utf8");
+
             return JSON.parse(raw) as CachedProfile;
         } catch {
             return null;
@@ -82,6 +83,7 @@ export class MimicCache {
                 await new Promise<void>((resolve) => setTimeout(resolve, QUEUE_DELAY_MS));
             }
         }
+
         this.processing = false;
     }
 
@@ -95,8 +97,10 @@ export class MimicCache {
             const displayName = nameRows[0]?.user_name ?? userId;
             if (/^deleted.?user/i.test(displayName)) {
                 logger.debug(`Mimic cache skipped for ${displayName} — deleted account`);
+
                 return;
             }
+
             const rows = await db.query<{ message: string }>(
                 `SELECT message FROM messages
                  WHERE user_id = $1
@@ -105,13 +109,13 @@ export class MimicCache {
                  LIMIT $2`,
                 [userId, BUILD_MESSAGE_LIMIT],
             );
-            const cleaned = rows
-                .map((r) => cleanMessage(r.message, prefix))
-                .filter((m): m is string => m !== null);
+            const cleaned = rows.map((r) => cleanMessage(r.message, prefix)).filter((m): m is string => m !== null);
             if (cleaned.length < MIN_MESSAGES) {
                 logger.debug(`Mimic cache skipped for ${displayName} — only ${cleaned.length} usable messages`);
+
                 return;
             }
+
             const style = buildStyleProfile(cleaned);
             const { chain, starts } = buildChain(cleaned);
             const profile: CachedProfile = { chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length };

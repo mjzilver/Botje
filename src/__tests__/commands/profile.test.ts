@@ -57,10 +57,7 @@ describe("profile command", () => {
 
         await profileCommand.function(makeNoGuildMessage("!profile"), context);
 
-        expect(context.messageHandler.reply).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.stringContaining("server"),
-        );
+        expect(context.messageHandler.reply).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("server"));
     });
 
     it("replies when there are fewer than 10 messages stored", async () => {
@@ -71,16 +68,15 @@ describe("profile command", () => {
 
         await profileCommand.function(makeMessage("!profile"), context);
 
-        expect(context.messageHandler.reply).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.stringContaining("enough"),
-        );
+        expect(context.messageHandler.reply).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("enough"));
     });
 
     it("sends an embed when enough messages exist", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(makeRows(20))
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -95,7 +91,9 @@ describe("profile command", () => {
     it("embed title contains the display name", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(makeRows(20))
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -112,7 +110,9 @@ describe("profile command", () => {
         const mentioned = { id: "other-user-id", username: "Other" } as BotUser;
 
         Object.assign(msg.mentions.users, { first: () => mentioned });
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(makeRows(20))
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Other");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -126,7 +126,9 @@ describe("profile command", () => {
         const context = makeMockContext();
         const msg = makeMessage("!profile", { authorId: "self-id" });
 
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(makeRows(20))
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Self");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -140,7 +142,9 @@ describe("profile command", () => {
         const context = makeMockContext();
         const msg = makeMessage("!profile", { guildId: "srv-123" });
 
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(makeRows(20))
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -153,7 +157,9 @@ describe("profile command", () => {
     it("embed includes Interests field", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(makeRows(20))
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -169,7 +175,9 @@ describe("profile command", () => {
         const context = makeMockContext();
         const before = Date.now() - PROFILE_LOOKBACK_MS;
 
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(makeRows(20))
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -186,7 +194,9 @@ describe("profile command", () => {
         const context = makeMockContext();
         const rows = makeRows(20, { message: "I hate mornings every single time" });
 
-        vi.mocked(context.database.query).mockResolvedValueOnce(rows).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(rows)
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set(["every", "single", "time"]));
 
@@ -201,7 +211,9 @@ describe("profile command", () => {
     it("omits dislikes field when no negative messages exist", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.database.query).mockResolvedValueOnce(makeRows(20)).mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query)
+            .mockResolvedValueOnce(makeRows(20))
+            .mockResolvedValue([{ cnt: "5" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set());
 
@@ -249,4 +261,3 @@ describe("sampleMessages", () => {
         expect(firstIds).not.toEqual(secondIds);
     });
 });
-

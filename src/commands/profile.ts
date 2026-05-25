@@ -10,8 +10,7 @@ const MIN_MESSAGES = 10;
 
 export const PROFILE_LOOKBACK_MS = PROFILE_MONTHS * 30 * 24 * 60 * 60 * 1000;
 
-const NEGATIVE_RE =
-    /\b(hate|hates|suck|sucks|dislike|dislikes|awful|terrible|worst|boring|annoying|stupid|dumb)\b/i;
+const NEGATIVE_RE = /\b(hate|hates|suck|sucks|dislike|dislikes|awful|terrible|worst|boring|annoying|stupid|dumb)\b/i;
 
 export type MessageRow = { message: string; datetime: string };
 
@@ -22,6 +21,7 @@ export function sampleMessages(rows: MessageRow[], size: number): MessageRow[] {
         const j = i + Math.floor(Math.random() * (copy.length - i));
         [copy[i], copy[j]] = [copy[j], copy[i]];
     }
+
     return copy.slice(0, size);
 }
 
@@ -31,9 +31,7 @@ export function deriveNegativeTopics(rows: MessageRow[], stopWords: Set<string>)
 
     const freq = new Map<string, number>();
     for (const r of negativeRows) {
-        const words = extractNounTokens(r.message).filter(
-            (w) => !stopWords.has(w) && !NEGATIVE_RE.test(w),
-        );
+        const words = extractNounTokens(r.message).filter((w) => !stopWords.has(w) && !NEGATIVE_RE.test(w));
         for (const w of words) freq.set(w, (freq.get(w) ?? 0) + 1);
     }
 
@@ -50,6 +48,7 @@ export default {
     async function(message: BotMessage, context: IBotContext): Promise<void> {
         if (!isGuildMessage(message)) {
             context.messageHandler.reply(message, "This command can only be used in a server.");
+
             return;
         }
 
@@ -72,6 +71,7 @@ export default {
                 message,
                 `Not enough messages found for \`${displayName}\` to build a profile.`,
             );
+
             return;
         }
 

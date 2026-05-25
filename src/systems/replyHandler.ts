@@ -13,7 +13,11 @@ interface ReplyPattern {
 }
 
 function normalizeForMatching(text: string): string {
-    return text.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
 }
 
 export class ReplyHandler {

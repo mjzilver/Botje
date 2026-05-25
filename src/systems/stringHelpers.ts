@@ -52,6 +52,21 @@ export function getAttachmentUrl(message: BotMessage): string {
 
     return "";
 }
+
+export async function resolveImageUrl(message: BotMessage, args: string[]): Promise<string> {
+    let url: string;
+    if (message.reference?.messageId) {
+        const fetched = await message.channel.messages.fetch(message.reference.messageId);
+        url = getAttachmentUrl(fetched);
+    } else {
+        url = getAttachmentUrl(message);
+    }
+
+    if (args[0]?.startsWith("http")) url = args.shift() ?? url;
+
+    return url;
+}
+
 export function formatDate(timestamp: number): string {
     return new Date(timestamp).toLocaleDateString("en-GB", {
         day: "numeric",

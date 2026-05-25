@@ -12,19 +12,18 @@ export function registerProcessHandlers(
         | undefined,
     logger: ILogger,
 ): void {
-    process.on("uncaughtException", (error: Error) => {
+    function handleError(error: unknown, replyText: string): void {
         const commandHandler = getCommandHandler();
         const messageHandler = getMessageHandler();
         const last = commandHandler?.commandList.get();
-        if (last && messageHandler) messageHandler.reply(last, "An error occured, this is probably your fault!");
+        if (last && messageHandler) messageHandler.reply(last, replyText);
         logger.error(toError(error));
+    }
+
+    process.on("uncaughtException", (error: Error) => {
+        handleError(error, "An error occured, this is probably your fault!");
     });
     process.on("unhandledRejection", (error: unknown) => {
-        const commandHandler = getCommandHandler();
-        const messageHandler = getMessageHandler();
-        const last = commandHandler?.commandList.get();
-        if (last && messageHandler)
-            messageHandler.reply(last, "An error occured, this is probably your fault, do not @me!");
-        logger.error(toError(error));
+        handleError(error, "An error occured, this is probably your fault, do not @me!");
     });
 }

@@ -1,5 +1,6 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
 import { mimicCache } from "../../systems/mimicCache";
+import { DELETED_USER_RE } from "../../systems/mimicBuilder";
 
 export default {
     name: "buildmimiccache",
@@ -30,7 +31,7 @@ export default {
                 continue;
             }
 
-            if (discordUser && /^deleted.?user/i.test(discordUser.username)) {
+            if (discordUser && DELETED_USER_RE.test(discordUser.username)) {
                 context.logger.console(`  Skipping deleted account: ${userName}`);
                 continue;
             }
