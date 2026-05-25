@@ -39,21 +39,31 @@ export default {
             targetId = mentioned.id;
         } else {
             const candidates = await context.database.query<{ user_id: string }>(
-                `SELECT DISTINCT user_id FROM messages
-                 WHERE server_id = $1
-                 AND LENGTH(message) > 15
+                `SELECT user_id FROM (
+                     SELECT DISTINCT user_id FROM messages
+                     WHERE server_id = $1
+                     AND LENGTH(message) > 15
+                 ) t
                  ORDER BY RANDOM()
                  LIMIT 20`,
                 [message.guild.id],
             );
 
-            if (candidates.length === 0) {
-                context.messageHandler.reply(message, "No message history found for this server.");
+            const eligible = candidates.filter((c) => {
+                if (c.user_id === context.client.user?.id) return false;
+                const u = context.client.users.cache.get(c.user_id);
+                if (u?.bot) return false;
+                if (u && /^deleted.?user/i.test(u.username)) return false;
+                if (!context.client.guilds.cache.some((g) => g.members.cache.has(c.user_id))) return false;
+                return true;
+            });
 
+            if (eligible.length === 0) {
+                context.messageHandler.reply(message, "No eligible users found to mimic in this server.");
                 return;
             }
 
-            targetId = pickRandomItem(candidates).user_id;
+            targetId = pickRandomItem(eligible).user_id;
         }
 
         if (targetId === context.client.user?.id) {
@@ -70,16 +80,17 @@ export default {
         }
 
         try {
+            const displayName = await context.userHandler.getDisplayName(targetId, message.guild.id);
             const cached = mimicCache.get(targetId);
 
             if (cached !== null && !mimicCache.isExpired(cached)) {
-                replyFromProfile(cached);
+                replyFromProfile(cached, displayName);
 
                 return;
             }
 
             if (cached !== null) {
-                replyFromProfile(cached);
+                replyFromProfile(cached, displayName);
                 mimicCache.enqueue(
                     targetId,
                     context.database,
@@ -104,7 +115,6 @@ export default {
                 .filter((m): m is string => m !== null);
 
             if (cleaned.length < MIN_MESSAGES) {
-                const displayName = await context.userHandler.getDisplayName(targetId, message.guild.id);
                 context.messageHandler.reply(
                     message,
                     `Not enough saved messages to mimic **${displayName}** — they need to chat more.`,
@@ -127,7 +137,7 @@ export default {
                 context.logger.debug(`Mimic verbatim repeat detected (attempt ${attempt}), regenerating`);
                 generated = generate(chain, starts, style.targetWordCount, style);
             }
-            context.messageHandler.send(message, generated);
+            replyFromProfile({ chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length }, displayName, generated);
 
             const profile: CachedProfile = { chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length };
             await mimicCache.enqueueWithProfile(targetId, profile, context.database, context.logger, context.config.prefix);
@@ -135,9 +145,9 @@ export default {
             context.logger.error(toError(err));
         }
 
-        function replyFromProfile(profile: CachedProfile): void {
-            const result = generate(profile.chain, profile.starts, profile.style.targetWordCount, profile.style);
-            context.messageHandler.send(message, result);
+        function replyFromProfile(profile: CachedProfile, displayName: string, pregenerated?: string): void {
+            const result = pregenerated ?? generate(profile.chain, profile.starts, profile.style.targetWordCount, profile.style);
+            context.messageHandler.send(message, `*mimicking **${displayName}***\n${result}`);
         }
     },
 } satisfies ICommand;
