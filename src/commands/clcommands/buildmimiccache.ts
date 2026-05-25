@@ -22,7 +22,25 @@ export default {
         context.logger.console(`Queueing mimic cache builds for ${rows.length} users...`);
 
         for (const row of rows) {
-            const userName = context.client.users.cache.get(row.user_id)?.username ?? row.user_id;
+            const discordUser = context.client.users.cache.get(row.user_id);
+            const userName = discordUser?.username ?? row.user_id;
+
+            if (discordUser?.bot) {
+                context.logger.console(`  Skipping bot: ${userName}`);
+                continue;
+            }
+
+            if (discordUser && /^deleted.?user/i.test(discordUser.username)) {
+                context.logger.console(`  Skipping deleted account: ${userName}`);
+                continue;
+            }
+
+            const inAnyGuild = context.client.guilds.cache.some((g) => g.members.cache.has(row.user_id));
+            if (!inAnyGuild) {
+                context.logger.console(`  Skipping ${userName} — not in any server`);
+                continue;
+            }
+
             context.logger.console(`  Queuing ${userName}`);
             mimicCache.enqueue(row.user_id, context.database, context.logger, context.config.prefix);
         }

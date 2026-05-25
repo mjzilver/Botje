@@ -62,6 +62,13 @@ export default {
             return;
         }
 
+        const targetUser = context.client.users.cache.get(targetId);
+        if (targetUser?.bot) {
+            context.messageHandler.reply(message, "Bots don't have a writing style worth mimicking.");
+
+            return;
+        }
+
         try {
             const cached = mimicCache.get(targetId);
 

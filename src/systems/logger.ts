@@ -14,7 +14,7 @@ export interface ILogger {
     startup(msg: string): void;
     console(msg: string): void;
     repeat(msg: string): void;
-    printColumns(arrays: string[][], headers?: string[]): void;
+    printColumns(arrays: string[][], headers?: string[], maxColWidth?: number): void;
     printRows(rows: Array<[string, string | number]>, logFn?: (msg: string) => void): void;
 }
 
@@ -84,16 +84,20 @@ function createLogger(consoleLevel = "startup", fileLevel: string | null = "debu
         repeat: (msg: string) => {
             activeWinstonLogger.log("repeat", msg);
         },
-        printColumns: (arrays: string[][], headers: string[] = []) => {
+        printColumns: (arrays: string[][], headers: string[] = [], maxColWidth = 40) => {
             if (!arrays.length) return;
+            const truncate = (s: string, max: number) => (s.length > max ? `${s.slice(0, max - 1)}…` : s);
             const rowCount = arrays[0].length;
-            const colWidths = arrays.map((col) => Math.max(...col.map((val) => String(val).length)));
+            const colWidths = arrays.map((col, i) => {
+                const headerLen = headers[i]?.length ?? 0;
+                return Math.min(maxColWidth, Math.max(headerLen, ...col.map((val) => String(val).length)));
+            });
             if (headers.length) {
                 ilogger.console(headers.map((val, i) => String(val).padEnd(colWidths[i])).join(" | "));
                 ilogger.console(colWidths.map((w) => "=".repeat(w)).join(" | "));
             }
             for (let row = 0; row < rowCount; row++) {
-                const line = arrays.map((col, i) => String(col[row]).padEnd(colWidths[i])).join(" | ");
+                const line = arrays.map((col, i) => truncate(String(col[row]), colWidths[i]).padEnd(colWidths[i])).join(" | ");
                 ilogger.console(line);
             }
         },

@@ -86,12 +86,17 @@ export class MimicCache {
     }
 
     private async buildAndSave({ userId, db, logger, prefix }: QueueItem): Promise<void> {
+        if (userId === "0") return;
         try {
             const nameRows = await db.query<{ user_name: string }>(
                 `SELECT user_name FROM usernames WHERE user_id = $1 ORDER BY timestamp DESC LIMIT 1`,
                 [userId],
             );
             const displayName = nameRows[0]?.user_name ?? userId;
+            if (/^deleted.?user/i.test(displayName)) {
+                logger.debug(`Mimic cache skipped for ${displayName} — deleted account`);
+                return;
+            }
             const rows = await db.query<{ message: string }>(
                 `SELECT message FROM messages
                  WHERE user_id = $1
