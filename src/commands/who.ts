@@ -1,7 +1,7 @@
 import type { ICommand } from "../interfaces";
 import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
 import { toError } from "../systems/utils";
-import { formatDate } from "../systems/stringHelpers";
+import { colorHex, formatDate } from "../systems/stringHelpers";
 
 type SourceRow = { user_id: string; message: string; datetime: string };
 type CountRow = { user_id: string; times: string; sample: string; last_seen: string };
@@ -18,7 +18,7 @@ export default {
         }
 
         const args = message.content.split(/\s+/).slice(1);
-        const color = parseInt(context.config.color_hex.replace("#", ""), 16);
+        const color = colorHex(context.config.color_hex);
 
         if (args.length === 0 && message.reference?.messageId) {
             await handleReplyLookup(message, context, color);

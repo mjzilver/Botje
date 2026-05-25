@@ -69,7 +69,7 @@ export class SystemRegistry implements IBotContext {
         this.replyHandler = new ReplyHandler(this.messageHandler, this.logger, replyPatterns);
         this.dictionary = new Dictionary(this.database, this.logger);
         this.hangman = new HangmanGame(this.messageHandler, this.dictionary, this.config, this.logger);
-        this.pagination = new Pagination(this.messageHandler);
+        this.pagination = new Pagination(this.messageHandler, this.logger);
         this.llm = new LlmService(this.config.llm, this.logger, this.messageHandler);
         const loadedCommands = loadCommands(path.resolve(__dirname, ".."), this.logger);
         this.loadedCommands = loadedCommands;

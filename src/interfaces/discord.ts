@@ -111,7 +111,7 @@ export type MessageContent =
           ephemeral?: boolean;
       };
 
-export { EmbedBuilder, AttachmentBuilder, ChannelType } from "discord.js";
+export { EmbedBuilder, AttachmentBuilder, ChannelType, PermissionFlagsBits } from "discord.js";
 
 export type { TextChannel } from "discord.js";
 

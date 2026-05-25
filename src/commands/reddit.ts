@@ -2,7 +2,7 @@ import axios from "axios";
 import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand, IBotContext } from "../interfaces";
 import { toError, pickRandomItem } from "../systems/utils";
-import { isLink, isImage } from "../systems/stringHelpers";
+import { colorHex, isLink, isImage } from "../systems/stringHelpers";
 import type { BotMessage } from "../interfaces/discord";
 
 interface RedditPost {
@@ -95,7 +95,7 @@ async function handleRedditImages(
 function embedImage(message: BotMessage, post: RedditPost, sub: string, context: IBotContext): void {
     if (isImage(post.url)) {
         const image = new EmbedBuilder()
-            .setColor(parseInt(context.config.color_hex.replace("#", ""), 16))
+            .setColor(colorHex(context.config.color_hex))
             .setTitle(post.title)
             .addFields(
                 { name: "Updoots", value: `${post.score}`, inline: true },

@@ -1,7 +1,7 @@
 import type { ICommand } from "../interfaces";
 import { EmbedBuilder } from "../interfaces/discord";
 import { toError } from "../systems/utils";
-import { formatDate } from "../systems/stringHelpers";
+import { colorHex, formatDate } from "../systems/stringHelpers";
 import { isGuildMessage } from "../interfaces/discord";
 
 type QuoteRow = { id: string; user_id: string; message: string; datetime: string };
@@ -66,7 +66,7 @@ export default {
             const row = rows[0];
             const authorName = await context.userHandler.getDisplayName(row.user_id, message.guild.id);
             const embed = new EmbedBuilder()
-                .setColor(parseInt(context.config.color_hex.replace("#", ""), 16))
+                .setColor(colorHex(context.config.color_hex))
                 .setDescription(`"${row.message}"`)
                 .setFooter({ text: `— ${authorName} · ${formatDate(parseInt(row.datetime, 10))}` });
 

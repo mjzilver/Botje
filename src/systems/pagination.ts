@@ -1,5 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder } from "discord.js";
 import type { IMessageHandler } from "./messageHandler";
+import type { ILogger } from "./logger";
+import { toError } from "./utils";
 import type { BotMessage, MessageContent } from "../interfaces/discord";
 
 export interface IPagination {
@@ -16,8 +18,10 @@ type Page = MessageContent;
 
 export class Pagination {
     private messageHandler: IMessageHandler;
-    constructor(messageHandler: IMessageHandler) {
+    private logger: Pick<ILogger, "error">;
+    constructor(messageHandler: IMessageHandler, logger: Pick<ILogger, "error">) {
         this.messageHandler = messageHandler;
+        this.logger = logger;
     }
 
     async sendPaginatedEmbed(message: BotMessage, pages: Page[], timeout = 300000): Promise<BotMessage | undefined> {
@@ -75,7 +79,7 @@ export class Pagination {
                 .edit(sentMessage, {
                     components: [getButtons(true)],
                 } as MessageContent)
-                .catch(() => {});
+                .catch((err: unknown) => this.logger.error(toError(err)));
         });
 
         return sentMessage;

@@ -80,3 +80,7 @@ export function formatHour(hour: number): string {
 
     return `${h}:00 ${suffix}`;
 }
+
+export function colorHex(hex: `#${string}`): number {
+    return parseInt(hex.replace("#", ""), 16);
+}

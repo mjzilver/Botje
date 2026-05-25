@@ -70,7 +70,11 @@ export class ReminderScheduler {
         } catch (err) {
             this.logger.error(toError(err));
         } finally {
-            await this.db.deleteReminder(row.id).catch((err: unknown) => this.logger.error(toError(err)));
+            try {
+                await this.db.deleteReminder(row.id);
+            } catch (err) {
+                this.logger.error(toError(err));
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 import type { ICommand } from "../interfaces";
 import { EmbedBuilder } from "../interfaces/discord";
+import { colorHex } from "../systems/stringHelpers";
 import { toError } from "../systems/utils";
 import { getBotContext } from "../systems/botContext";
 
@@ -45,7 +46,7 @@ export default {
         const description = optionTokens.map((opt, i) => `${POLL_EMOJIS[i]} ${opt}`).join("\n");
 
         const embed = new EmbedBuilder()
-            .setColor(parseInt(context.config.color_hex.replace("#", ""), 16))
+            .setColor(colorHex(context.config.color_hex))
             .setTitle(question)
             .setDescription(description)
             .setFooter({ text: `Poll by ${message.author.username}` });

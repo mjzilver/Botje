@@ -1,4 +1,4 @@
-import { PermissionFlagsBits } from "discord.js";
+import { PermissionFlagsBits } from "../interfaces/discord";
 import type { IMessageHandler, ILogger, ICommand, IBotContext } from "../interfaces";
 import type { BotConfig } from "../interfaces/config";
 import type { BotMessage } from "../interfaces/discord";

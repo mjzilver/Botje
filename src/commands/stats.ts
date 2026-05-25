@@ -4,7 +4,7 @@ import { EmbedBuilder } from "../interfaces/discord";
 import { toError } from "../systems/utils";
 import { isGuildMessage } from "../interfaces/discord";
 import { queryCache, CacheKey } from "../systems/queryCache";
-import { formatDate, formatHour } from "../systems/stringHelpers";
+import { colorHex, formatDate, formatHour } from "../systems/stringHelpers";
 
 interface StatsData {
     messageCount: number;
@@ -79,7 +79,7 @@ async function sendStats(
         const stats = await fetchStats(targetId, message.guild.id, context);
 
         const embed = new EmbedBuilder()
-            .setColor(parseInt(context.config.color_hex.replace("#", ""), 16))
+            .setColor(colorHex(context.config.color_hex))
             .setTitle(`📊 Stats for ${targetName}`)
             .addFields(
                 {

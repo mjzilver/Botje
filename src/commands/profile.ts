@@ -2,6 +2,7 @@ import type { ICommand, IBotContext } from "../interfaces";
 import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
 import type { BotMessage } from "../interfaces/discord";
 import { extractTopics, extractNounTokens } from "../systems/topicExtractor";
+import { colorHex } from "../systems/stringHelpers";
 
 const PROFILE_FETCH_LIMIT = 5000;
 const PROFILE_SAMPLE_SIZE = 500;
@@ -91,7 +92,7 @@ export default {
         ];
         if (dislikes.length > 0) fields.push({ name: "Dislikes", value: dislikes.join(", ") });
 
-        const color = parseInt(context.config.color_hex.replace("#", ""), 16);
+        const color = colorHex(context.config.color_hex);
         const embed = new EmbedBuilder()
             .setColor(color)
             .setTitle(`Profile: ${displayName}`)

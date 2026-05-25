@@ -15,12 +15,12 @@ export default {
             if (args[2] && !isNaN(Number(args[2])))
                 context.messageHandler.reply(
                     message,
-                    `You rolled ${randomBetween(parseInt(args[1]), parseInt(args[2]))} between ${args[1]} and ${args[2]}`,
+                    `You rolled ${randomBetween(parseInt(args[1], 10), parseInt(args[2], 10))} between ${args[1]} and ${args[2]}`,
                 );
             else
                 context.messageHandler.reply(
                     message,
-                    `You rolled ${randomBetween(0, parseInt(args[1]))} out of ${args[1]}`,
+                    `You rolled ${randomBetween(0, parseInt(args[1], 10))} out of ${args[1]}`,
                 );
         } else {
             const date = Date.now();
