@@ -125,15 +125,19 @@ export const logger = createLogger();
 export function createSilentLogger(): ILogger {
     return createLogger("error", null);
 }
+
 export function setLogLevel(level: string): void {
     if (level in loggerLevels) activeTransports[0].level = level;
 }
+
 export function getAvailableLevels(): string[] {
     return Object.keys(loggerLevels);
 }
+
 export function getCurrentLogLevel(): string {
     return activeTransports[0]?.level ?? "startup";
 }
+
 export function queryLogs(
     options: Winston.QueryOptions,
     callback: (err: Error | null, results: { file?: LogEntry[] }) => void,

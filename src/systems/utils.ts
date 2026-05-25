@@ -12,6 +12,7 @@ export function levenshtein(a: string, b: string): number {
 
     return matrix[b.length][a.length];
 }
+
 export function findClosestMatchInList(word: string, wordList: string[] | Record<string, number>): string {
     if (!word) return "";
     let list: Record<string, number>;
@@ -41,6 +42,7 @@ export function findClosestMatchInList(word: string, wordList: string[] | Record
 
     return closestMatch;
 }
+
 export function formatUptime(ms: number): string {
     const days = Math.floor(ms / 86400000);
     const hours = Math.floor((ms / 3600000) % 24);
@@ -54,9 +56,11 @@ export function formatUptime(ms: number): string {
         `${seconds} seconds`,
     ].join("");
 }
+
 export function randomBetween(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
+
 export function pickRandomItem<T>(array: T[]): T {
     if (!Array.isArray(array) || array.length === 0) throw new Error("Array must be non-empty to pick a random item");
 

@@ -30,6 +30,7 @@ const axiosInstance = axios.create({ headers: botHeader, maxRedirects: 10 });
 export function buildRedditUrl(sub: string, sort: string, time: string, last = ""): string {
     return `https://www.reddit.com/r/${sub}/${sort}.json?sort=${sort}&t=${time}&limit=100&after=${last}`;
 }
+
 export function parseRedditArgs(content: string): { sub: string; sort: string; time: string } {
     const args = content.split(" ");
     const sub = args[1] ?? "";
