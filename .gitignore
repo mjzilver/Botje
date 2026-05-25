@@ -25,6 +25,9 @@ data/
 # Generated meme output
 assets/meme.png
 
+# Backups
+backups/
+
 # OS / editor noise
 .DS_Store
 Thumbs.db

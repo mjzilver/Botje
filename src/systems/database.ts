@@ -274,7 +274,7 @@ export class Database implements IDatabase {
                 const repliedMessage = await message.channel.messages.fetch(message.reference.messageId);
                 replyTo = repliedMessage?.id ?? null;
             } catch {
-                this.logger.error("Failed to fetch replied message");
+                this.logger.error(`Failed to fetch replied message ${message.reference.messageId} (in message ${message.id} by ${message.author.username})`);
             }
 
         await this.query(
