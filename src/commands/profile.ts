@@ -1,17 +1,15 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
 import type { BotMessage } from "../interfaces/discord";
-import { extractTopics, extractNounTokens } from "../systems/topicExtractor";
 import { colorHex } from "../systems/stringHelpers";
+import { scoreMessages } from "../systems/sentimentAnalyser";
 
-const PROFILE_FETCH_LIMIT = 5000;
-const PROFILE_SAMPLE_SIZE = 500;
+const PROFILE_FETCH_LIMIT = 10000;
+const PROFILE_SAMPLE_SIZE = 2000;
 const PROFILE_MONTHS = 6;
 const MIN_MESSAGES = 10;
 
 export const PROFILE_LOOKBACK_MS = PROFILE_MONTHS * 30 * 24 * 60 * 60 * 1000;
-
-const NEGATIVE_RE = /\b(hate|hates|suck|sucks|dislike|dislikes|awful|terrible|worst|boring|annoying|stupid|dumb)\b/i;
 
 export type MessageRow = { message: string; datetime: string };
 
@@ -24,22 +22,6 @@ export function sampleMessages(rows: MessageRow[], size: number): MessageRow[] {
     }
 
     return copy.slice(0, size);
-}
-
-export function deriveNegativeTopics(rows: MessageRow[], stopWords: Set<string>): string[] {
-    const negativeRows = rows.filter((r) => NEGATIVE_RE.test(r.message));
-    if (negativeRows.length === 0) return [];
-
-    const freq = new Map<string, number>();
-    for (const r of negativeRows) {
-        const words = extractNounTokens(r.message).filter((w) => !stopWords.has(w) && !NEGATIVE_RE.test(w));
-        for (const w of words) freq.set(w, (freq.get(w) ?? 0) + 1);
-    }
-
-    return [...freq.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([w]) => w);
 }
 
 export default {
@@ -77,20 +59,14 @@ export default {
         }
 
         const rows = sampleMessages(allRows, PROFILE_SAMPLE_SIZE);
-
-        const topics = await extractTopics(
-            rows.map((r) => ({ cleanContent: r.message })),
-            context.database,
-            context.dictionary,
-            context.config.prefix,
-        );
-
-        const dislikes = deriveNegativeTopics(rows, context.dictionary.getStopWords());
+        const stopWords = context.dictionary.getStopWords();
+        const { likes, dislikes } = scoreMessages(rows.map((r) => r.message), stopWords);
 
         const fields: { name: string; value: string }[] = [
-            { name: "Interests", value: topics.slice(0, 3).join(", ") || "Nothing found" },
+            { name: "Likes", value: likes.slice(0, 3).join(", ") || "Nothing found" },
         ];
-        if (dislikes.length > 0) fields.push({ name: "Dislikes", value: dislikes.join(", ") });
+
+        if (dislikes.length > 0) fields.push({ name: "Dislikes", value: dislikes.slice(0, 3).join(", ") });
 
         const color = colorHex(context.config.color_hex);
         const embed = new EmbedBuilder()

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EmbedBuilder } from "discord.js";
-import profileCommand, { deriveNegativeTopics, sampleMessages, PROFILE_LOOKBACK_MS } from "../../commands/profile";
+import profileCommand, { sampleMessages, PROFILE_LOOKBACK_MS } from "../../commands/profile";
 import type { MessageRow } from "../../commands/profile";
+import { scoreMessages } from "../../systems/sentimentAnalyser";
 import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 import type { BotUser } from "../../interfaces/discord";
 
@@ -14,38 +15,36 @@ function makeRows(n: number, overrides?: Partial<MessageRow>): MessageRow[] {
         }));
 }
 
-describe("deriveNegativeTopics", () => {
-    it("returns empty array when no messages contain negative words", () => {
-        const rows = makeRows(5, { message: "everything is great today and i love it" });
-        expect(deriveNegativeTopics(rows, new Set())).toEqual([]);
+describe("scoreMessages", () => {
+    it("returns a like when a message contains an opinion verb with a noun object", () => {
+        const { likes } = scoreMessages(["I love cats"], new Set());
+        expect(likes).toContain("cats");
     });
 
-    it("returns the most frequent noun-like word from negative messages", () => {
-        const rows = makeRows(5, { message: "I hate mornings every single morning" });
-        const result = deriveNegativeTopics(rows, new Set(["every", "single"]));
-        expect(result[0]).toBe("mornings");
+    it("returns a dislike when a message contains a negative opinion verb", () => {
+        const { dislikes } = scoreMessages(["I hate mornings"], new Set());
+        expect(dislikes).toContain("mornings");
     });
 
-    it("filters out stop words from results", () => {
-        const rows = makeRows(5, { message: "this weather sucks horribly today" });
-        const result = deriveNegativeTopics(rows, new Set(["this", "today", "horribly"]));
-        expect(result).not.toContain("this");
-        expect(result).not.toContain("today");
-        expect(result).not.toContain("horribly");
+    it("filters stop words from results", () => {
+        const { likes } = scoreMessages(["I love everything every time"], new Set(["everything", "every", "time"]));
+        expect(likes).not.toContain("everything");
     });
 
-    it("filters out sentiment trigger words themselves", () => {
-        const rows = makeRows(5, { message: "everything is terrible awful today morning" });
-        const result = deriveNegativeTopics(rows, new Set());
-        expect(result).not.toContain("terrible");
-        expect(result).not.toContain("awful");
+    it("returns empty likes and dislikes when messages carry no sentiment", () => {
+        const { likes, dislikes } = scoreMessages(["the the the"], new Set());
+        expect(likes).toHaveLength(0);
+        expect(dislikes).toHaveLength(0);
     });
 
-    it("returns at most 3 results", () => {
-        const rows = makeRows(3, {
-            message: "hate those monday tuesday wednesday thursday people place thing",
-        });
-        expect(deriveNegativeTopics(rows, new Set()).length).toBeLessThanOrEqual(3);
+    it("returns at most 5 likes and 5 dislikes", () => {
+        const msgs = [
+            "I love cats dogs birds fish frogs lizards snakes horses cows pigs",
+            "I hate mondays tuesdays wednesdays thursdays fridays saturdays sundays",
+        ];
+        const { likes, dislikes } = scoreMessages(msgs, new Set());
+        expect(likes.length).toBeLessThanOrEqual(5);
+        expect(dislikes.length).toBeLessThanOrEqual(5);
     });
 });
 
@@ -168,7 +167,7 @@ describe("profile command", () => {
         const [, payload] = vi.mocked(context.messageHandler.send).mock.calls[0];
         const embed = (payload as { embeds: EmbedBuilder[] }).embeds[0];
         const fieldNames = embed.data.fields?.map((f) => f.name) ?? [];
-        expect(fieldNames).toContain("Interests");
+        expect(fieldNames).toContain("Likes");
     });
 
     it("passes a datetime lookback parameter to the database query", async () => {
@@ -194,9 +193,7 @@ describe("profile command", () => {
         const context = makeMockContext();
         const rows = makeRows(20, { message: "I hate mornings every single time" });
 
-        vi.mocked(context.database.query)
-            .mockResolvedValueOnce(rows)
-            .mockResolvedValue([{ cnt: "5" }]);
+        vi.mocked(context.database.query).mockResolvedValueOnce(rows);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Mick");
         vi.mocked(context.dictionary.getStopWords).mockReturnValue(new Set(["every", "single", "time"]));
 
