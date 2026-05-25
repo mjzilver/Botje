@@ -7,13 +7,13 @@ import { toError } from "./utils";
 const DEFAULT_CONFIG_PATH = path.resolve(process.cwd(), "config.json");
 
 export class Settings {
-    private _config: BotConfig;
+    private data: BotConfig;
     private configPath: string;
     private logger: Pick<ILogger, "error">;
     constructor(logger: Pick<ILogger, "error">, configPath = DEFAULT_CONFIG_PATH) {
         this.logger = logger;
         this.configPath = configPath;
-        this._config = this.loadFromFile(configPath);
+        this.data = this.loadFromFile(configPath);
     }
 
     private loadFromFile(filePath: string): BotConfig {
@@ -29,17 +29,22 @@ export class Settings {
     }
 
     get config(): BotConfig {
-        return this._config;
+        return this.data;
     }
 
-    updateVariable(key: string, value: string | number | boolean): void {
-        Reflect.set(this._config, key, value);
+    set config(value: BotConfig) {
+        this.data = value;
+        this.saveToFile();
+    }
+
+    updateVariable(key: string, value: BotConfig[keyof BotConfig]): void {
+        Object.assign(this.data, { [key]: value });
         this.saveToFile();
     }
 
     private saveToFile(): void {
         try {
-            fs.writeFileSync(this.configPath, JSON.stringify(this._config, null, 2), "utf8");
+            fs.writeFileSync(this.configPath, JSON.stringify(this.data, null, 2), "utf8");
         } catch (err) {
             this.logger.error(`Error saving config file: ${toError(err).message}`);
         }
