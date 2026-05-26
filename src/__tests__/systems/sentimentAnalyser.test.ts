@@ -145,6 +145,13 @@ describe("scoreMessages", () => {
             expect(dislikes).toContain("swimming");
         });
 
+        it("excludes short light-verb gerunds like doing, going, being", () => {
+            const { likes } = scoreMessages(["I love doing", "I love going", "I love being"], new Set());
+            expect(likes).not.toContain("doing");
+            expect(likes).not.toContain("going");
+            expect(likes).not.toContain("being");
+        });
+
         it("keeps unknown words that compromise cannot classify", () => {
             const { likes } = scoreMessages(["I love zorbfest"], new Set());
             expect(likes).toContain("zorbfest");

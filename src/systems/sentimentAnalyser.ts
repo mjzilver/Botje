@@ -51,7 +51,7 @@ function isValidTopic(word: string): boolean {
     const terms = nlp(word).json() as { terms: { tags: string[]; dirty?: boolean }[] }[];
     const term = terms[0]?.terms?.[0];
     if (!term?.dirty) return true;
-    return term.tags.includes("Noun") || term.tags.includes("Gerund");
+    return term.tags.includes("Noun") || (term.tags.includes("Gerund") && word.length >= 6);
 }
 
 export function scoreMessages(messages: string[], stopWords: Set<string>): TopicScores {
