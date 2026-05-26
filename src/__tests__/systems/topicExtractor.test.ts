@@ -58,7 +58,7 @@ describe("extractTopics", () => {
     });
 
     it("queries the database once per candidate word", async () => {
-        const messages = [{ cleanContent: "rainbow sunshine beautiful" }, { cleanContent: "rainbow sunshine" }];
+        const messages = [{ cleanContent: "pizza burger sushi" }, { cleanContent: "pizza burger" }];
         const db = makeMockDb(2);
         await extractTopics(messages, db, makeMockDictionary());
         const queryMock = vi.mocked(db.query);

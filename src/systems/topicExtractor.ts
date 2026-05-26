@@ -46,7 +46,6 @@ const INDEFINITE_PRONOUNS = new Set([
 const URL_TOKEN_RE = /(https?:\/\/|www\.)/i;
 const DISCORD_EMOTE_TOKEN_RE = /^<a?:[a-zA-Z0-9_]+:\d+>$|^:[a-zA-Z0-9_]+:$/;
 const DISCORD_MENTION_TOKEN_RE = /^<[@#][!&]?\d+>$|^[@#]/;
-const BARE_PRONOUN_RE = /^(youre|theyre|shes|hes|its|were|weve|theyve|youve|ive|im|youll|shell|hell|theyll|youd|theyd|shed|hed|id|whos|thats|whats|heres|theres|wheres|wasnt|isnt|arent|werent|wouldnt|couldnt|shouldnt|didnt|doesnt|dont|wont|cant|havent|hasnt|hadnt)$/;
 
 export const CONTEXT_WINDOW_MS = 10 * 60 * 60 * 1000;
 
@@ -103,10 +102,10 @@ export async function extractTopics(
 }
 
 export function extractNounTokens(text: string): string[] {
-    return (nlp(text).nouns().not("#Pronoun").out("array") as string[])
+    return (nlp(text).nouns().not("#Pronoun").not("#Adjective").out("array") as string[])
         .flatMap((phrase) => phrase.split(" "))
         .map((w) => w.toLowerCase().replace(/[^a-z]/g, ""))
-        .filter((w) => w.length >= MIN_WORD_LENGTH && !INDEFINITE_PRONOUNS.has(w) && !BARE_PRONOUN_RE.test(w));
+        .filter((w) => w.length >= MIN_WORD_LENGTH && !INDEFINITE_PRONOUNS.has(w));
 }
 
 function isNoiseToken(token: string, prefixRe: RegExp | null): boolean {

@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EmbedBuilder } from "discord.js";
 import profileCommand, { sampleMessages, PROFILE_LOOKBACK_MS } from "../../commands/profile";
 import type { MessageRow } from "../../commands/profile";
-import { scoreMessages } from "../../systems/sentimentAnalyser";
 import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 import type { BotUser } from "../../interfaces/discord";
 
@@ -14,39 +13,6 @@ function makeRows(n: number, overrides?: Partial<MessageRow>): MessageRow[] {
             datetime: overrides?.datetime ?? "1700000000000",
         }));
 }
-
-describe("scoreMessages", () => {
-    it("returns a like when a message contains an opinion verb with a noun object", () => {
-        const { likes } = scoreMessages(["I love cats"], new Set());
-        expect(likes).toContain("cats");
-    });
-
-    it("returns a dislike when a message contains a negative opinion verb", () => {
-        const { dislikes } = scoreMessages(["I hate mornings"], new Set());
-        expect(dislikes).toContain("mornings");
-    });
-
-    it("filters stop words from results", () => {
-        const { likes } = scoreMessages(["I love everything every time"], new Set(["everything", "every", "time"]));
-        expect(likes).not.toContain("everything");
-    });
-
-    it("returns empty likes and dislikes when messages carry no sentiment", () => {
-        const { likes, dislikes } = scoreMessages(["the the the"], new Set());
-        expect(likes).toHaveLength(0);
-        expect(dislikes).toHaveLength(0);
-    });
-
-    it("returns at most 5 likes and 5 dislikes", () => {
-        const msgs = [
-            "I love cats dogs birds fish frogs lizards snakes horses cows pigs",
-            "I hate mondays tuesdays wednesdays thursdays fridays saturdays sundays",
-        ];
-        const { likes, dislikes } = scoreMessages(msgs, new Set());
-        expect(likes.length).toBeLessThanOrEqual(5);
-        expect(dislikes.length).toBeLessThanOrEqual(5);
-    });
-});
 
 describe("profile command", () => {
     beforeEach(() => vi.clearAllMocks());

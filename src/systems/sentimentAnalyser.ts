@@ -3,52 +3,60 @@ import nlp from "compromise";
 
 const analyser = new Sentiment();
 
+const INDEFINITE_PRONOUN_RE = /^(some|any|every|no)(thing|body|one|where|time)$/;
+const CONTRACTION_ARTIFACT_RE = /^(i|you|they|that|its)(ve|re|ll|s|d)$/;;
+
 export interface TopicScores {
     likes: string[];
     dislikes: string[];
 }
 
-function extractScoredWordObjects(text: string): { topic: string; score: number }[] {
-    const result = analyser.analyze(text);
-    const results: { topic: string; score: number }[] = [];
+function escapeRegex(word: string): string {
+    return word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
-    const calculation = result.calculation as unknown as Record<string, number>;
+function flattenCalculation(raw: unknown): Record<string, number> {
+    if (!Array.isArray(raw)) return raw as Record<string, number>;
+    const result: Record<string, number> = {};
+    for (const entry of raw as Record<string, number>[]) {
+        for (const [k, v] of Object.entries(entry)) result[k] = v;
+    }
+
+    return result;
+}
+
+function extractScoredWordObjects(
+    text: string,
+    calculation: Record<string, number>,
+): { topic: string; score: number }[] {
+    const results: { topic: string; score: number }[] = [];
+    const lower = text.toLowerCase();
 
     for (const [word, wordScore] of Object.entries(calculation)) {
         if (wordScore === 0) continue;
-        const matches = (
-            nlp(text).match(`${word} [#Noun+]`).out("array") as string[]
-        ).concat(
-            nlp(text).match(`${word} [#Gerund]`).out("array") as string[],
-        );
-
-        for (const match of matches) {
-            const topic = match
-                .toLowerCase()
-                .replace(new RegExp(`^${word}\\s*`, "i"), "")
-                .replace(/[^a-z ]/g, "")
-                .trim();
-
-            if (topic.length >= 3) results.push({ topic, score: wordScore * 2 });
+        const re = new RegExp(`\\b${escapeRegex(word)}\\s+([a-z]{3,})`, "g");
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(lower)) !== null) {
+            const topic = m[1];
+            if (!INDEFINITE_PRONOUN_RE.test(topic) && !CONTRACTION_ARTIFACT_RE.test(topic)) {
+                results.push({ topic, score: wordScore * 2 });
+            }
         }
     }
 
     return results;
 }
 
-function extractSentimentNouns(text: string, comparative: number): { topic: string; score: number }[] {
-    if (comparative === 0) return [];
-
-    const nouns = (nlp(text).nouns().not("#Pronoun").out("array") as string[])
-        .flatMap((p: string) => p.split(" "))
-        .map((w: string) => w.toLowerCase().replace(/[^a-z]/g, ""))
-        .filter((w: string) => w.length >= 4);
-
-    return nouns.map((topic) => ({ topic, score: comparative }));
+function isValidTopic(word: string): boolean {
+    const terms = nlp(word).json() as { terms: { tags: string[]; dirty?: boolean }[] }[];
+    const term = terms[0]?.terms?.[0];
+    if (!term?.dirty) return true;
+    return term.tags.includes("Noun") || term.tags.includes("Gerund");
 }
 
 export function scoreMessages(messages: string[], stopWords: Set<string>): TopicScores {
     const scores = new Map<string, number>();
+    const sentimentWords = new Set<string>();
 
     const addScore = (topic: string, value: number): void => {
         if (stopWords.has(topic)) return;
@@ -57,14 +65,19 @@ export function scoreMessages(messages: string[], stopWords: Set<string>): Topic
 
     for (const text of messages) {
         const result = analyser.analyze(text);
+        const calculation = flattenCalculation(result.calculation);
 
-        for (const { topic, score } of extractScoredWordObjects(text)) {
+        for (const word of Object.keys(calculation)) sentimentWords.add(word);
+
+        for (const { topic, score } of extractScoredWordObjects(text, calculation)) {
             addScore(topic, score);
         }
+    }
 
-        for (const { topic, score } of extractSentimentNouns(text, result.comparative)) {
-            addScore(topic, score);
-        }
+    for (const word of sentimentWords) scores.delete(word);
+
+    for (const word of scores.keys()) {
+        if (!isValidTopic(word)) scores.delete(word);
     }
 
     const ranked = [...scores.entries()].sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));

@@ -4,8 +4,8 @@ import type { BotMessage } from "../interfaces/discord";
 import { colorHex } from "../systems/stringHelpers";
 import { scoreMessages } from "../systems/sentimentAnalyser";
 
-const PROFILE_FETCH_LIMIT = 10000;
-const PROFILE_SAMPLE_SIZE = 2000;
+const PROFILE_FETCH_LIMIT = 100000;
+const PROFILE_SAMPLE_SIZE = 25000;
 const PROFILE_MONTHS = 6;
 const MIN_MESSAGES = 10;
 
@@ -60,7 +60,10 @@ export default {
 
         const rows = sampleMessages(allRows, PROFILE_SAMPLE_SIZE);
         const stopWords = context.dictionary.getStopWords();
-        const { likes, dislikes } = scoreMessages(rows.map((r) => r.message), stopWords);
+        const { likes, dislikes } = scoreMessages(
+            rows.map((r) => r.message),
+            stopWords,
+        );
 
         const fields: { name: string; value: string }[] = [
             { name: "Likes", value: likes.slice(0, 3).join(", ") || "Nothing found" },
