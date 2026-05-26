@@ -35,9 +35,11 @@ Description of the approach, or a numbered list of concrete steps.
 
 1. Read todo.md to see the current highest N.
 2. Audit the codebase for the category of issue being tracked:
-   - Type safety violations (`as string`, `as Error`, untyped generics)
+   - Type safety violations (`as string`, `as number`, `as Error`, untyped generics, inline primitive casts)
+   - Unsafe type escapes — `any`, `unknown` used outside catch blocks, `undefined` in public types or DB params; prefer `null` for optional DB values and narrow `unknown` immediately with `toError` or type guards
+   - Unnecessary casts — every `as X` that can be replaced with a typed generic or a type guard should be; `as unknown as X` is only permitted in `messageAdapter.ts` and test mock factories
    - Architecture boundary violations (discord.js leaking into commands)
-   - Async rule violations (`.then()/.catch()` chains)
+   - Async rule violations (`.then()/.catch()` chains, callback-style fs/db operations)
    - Missing test coverage for observable command behaviour
 3. Write one item per distinct problem. Do not batch unrelated issues.
 4. Append the new item at the bottom of the "Next Up" section.

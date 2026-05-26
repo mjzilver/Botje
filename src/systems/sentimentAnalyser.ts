@@ -4,7 +4,7 @@ import nlp from "compromise";
 const analyser = new Sentiment();
 
 const INDEFINITE_PRONOUN_RE = /^(some|any|every|no)(thing|body|one|where|time)$/;
-const CONTRACTION_ARTIFACT_RE = /^(i|you|they|that|its)(ve|re|ll|s|d)$/;;
+const CONTRACTION_ARTIFACT_RE = /^(i|you|they|that|its)(ve|re|ll|s|d)$/;
 
 export interface TopicScores {
     likes: string[];
@@ -51,6 +51,7 @@ function isValidTopic(word: string): boolean {
     const terms = nlp(word).json() as { terms: { tags: string[]; dirty?: boolean }[] }[];
     const term = terms[0]?.terms?.[0];
     if (!term?.dirty) return true;
+
     return term.tags.includes("Noun") || (term.tags.includes("Gerund") && word.length >= 6);
 }
 

@@ -1,14 +1,18 @@
 import fs from "fs";
 import type { IClCommand, IBotContext } from "../../interfaces";
+import { toError } from "../../systems/utils";
 
 export default {
     name: "erase",
     description: "erases the log",
     format: "erase",
-    function(_input: string[], context: IBotContext) {
-        fs.truncate("bot.log", 0, (err) => {
-            if (err) context.logger.error(err);
-            context.logger.warn(" === Log was cleared before this === ");
-        });
+    async function(_input: string[], context: IBotContext) {
+        try {
+            await fs.promises.truncate("bot.log", 0);
+        } catch (err) {
+            context.logger.error(toError(err));
+        }
+
+        context.logger.warn(" === Log was cleared before this === ");
     },
 } satisfies IClCommand;
