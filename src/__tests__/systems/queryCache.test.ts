@@ -46,10 +46,7 @@ describe("queryCache", () => {
         });
 
         it("allows a successful retry after the factory previously rejected", async () => {
-            const factory = vi
-                .fn()
-                .mockRejectedValueOnce(new Error("first fail"))
-                .mockResolvedValueOnce("recovered");
+            const factory = vi.fn().mockRejectedValueOnce(new Error("first fail")).mockResolvedValueOnce("recovered");
             await expect(queryCache("evict-2", factory)).rejects.toThrow("first fail");
             const result = await queryCache("evict-2", factory);
             expect(result).toBe("recovered");

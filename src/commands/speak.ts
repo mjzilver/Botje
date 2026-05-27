@@ -8,11 +8,15 @@ const TOPIC_QUERY_LIMIT = 15;
 const TOPIC_SENTENCE_MIN_WORDS = 4;
 const TOPIC_SENTENCE_MAX_WORDS = 25;
 
+function nlpSentences(text: string): string[] {
+    return nlp(text).sentences().out("array") as unknown as string[];
+}
+
 export function extractTopicSentences(rawMessages: string[], topic: string): string[] {
     const topicLower = topic.toLowerCase();
 
     return rawMessages
-        .flatMap((msg) => nlp(msg).sentences().out("array") as string[])
+        .flatMap((msg) => nlpSentences(msg))
         .filter((s) => s.toLowerCase().includes(topicLower))
         .map((s) => {
             const clean = s.trim().replace(/\s+/g, " ");
