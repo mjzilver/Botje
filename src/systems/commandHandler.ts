@@ -93,8 +93,17 @@ export class CommandHandler {
         return { command, args };
     }
 
+    private async runCommand(fn: () => void | Promise<void | BotMessage | undefined>): Promise<void> {
+        try {
+            await fn();
+        } catch (err) {
+            this.logger.error(toError(err));
+        }
+    }
+
     private handleCommandType(command: string, readback: boolean, message: BotMessage, isAdmin: boolean): void {
-        if (command in this.commands) this.commands[command].function(message, this.context);
+        if (command in this.commands)
+            void this.runCommand(() => this.commands[command].function(message, this.context));
         else if (command in this.admincommands) this.handleAdminCommand(command, message, isAdmin);
         else if (!readback)
             this.messageHandler.reply(message, `${capitalize(command)} is not a command, please try again.`);
@@ -103,7 +112,7 @@ export class CommandHandler {
 
     private handleAdminCommand(command: string, message: BotMessage, isAdmin: boolean): void {
         const isOwner = message.author.id === this.config.owner;
-        if (isOwner || isAdmin) this.admincommands[command].function(message, this.context);
+        if (isOwner || isAdmin) void this.runCommand(() => this.admincommands[command].function(message, this.context));
         else
             this.messageHandler.reply(
                 message,
@@ -144,17 +153,28 @@ export class CommandHandler {
             this.logger.error(toError(err));
         }
 
-        const topics = await extractTopics(recent, this.context.database, this.context.dictionary, this.config.prefix);
-        const syntheticContent = topics[0] ? `${this.config.prefix}speak ${topics[0]}` : `${this.config.prefix}speak`;
-        const topicMessage = { ...message, content: syntheticContent };
-
-        this.commands["speak"]?.function(topicMessage, this.context);
+        try {
+            const topics = await extractTopics(
+                recent,
+                this.context.database,
+                this.context.dictionary,
+                this.config.prefix,
+            );
+            const syntheticContent = topics[0]
+                ? `${this.config.prefix}speak ${topics[0]}`
+                : `${this.config.prefix}speak`;
+            const topicMessage = { ...message, content: syntheticContent };
+            await this.runCommand(() => this.commands["speak"]?.function(topicMessage, this.context));
+        } catch (err) {
+            this.logger.error(toError(err));
+        }
     }
 
     private maybeSpeakOnMention(message: BotMessage): void {
         if (!message.content.match(/\bbot(je)?\b/gi)) return;
         const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
-        if (isAdmin || this.isUserAllowed(message, false)) this.commands["speak"]?.function(message, this.context);
+        if (isAdmin || this.isUserAllowed(message, false))
+            void this.runCommand(() => this.commands["speak"]?.function(message, this.context));
     }
 
     async redo(message: BotMessage, fetchMessage: (id: string) => Promise<BotMessage>): Promise<void> {
@@ -165,7 +185,7 @@ export class CommandHandler {
             const { command } = this.parseMessageArguments(callMessage);
             this.logger.debug(`Redoing '${callMessage.author.username}' command '${command}'`);
             if (command in this.commands) {
-                this.commands[command].function(callMessage, this.context);
+                await this.runCommand(() => this.commands[command].function(callMessage, this.context));
                 this.messageHandler.delete(message);
             }
         } catch (err) {
@@ -195,7 +215,8 @@ export class CommandHandler {
     handleDM(message: BotMessage): void {
         if (message.author.bot) return;
         const { command } = this.parseMessageArguments(message);
-        if (command in this.dmcommands) this.dmcommands[command].function(message, this.context);
+        if (command in this.dmcommands)
+            void this.runCommand(() => this.dmcommands[command].function(message, this.context));
         else if (message.content.match(this.prefixRegex))
             this.messageHandler.reply(message, `Use the command ${this.config.prefix}help for more information`);
     }
