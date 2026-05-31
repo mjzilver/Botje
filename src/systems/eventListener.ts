@@ -7,6 +7,7 @@ import type { SlashHandler } from "./slashHandler";
 import type { BackupHandler } from "./backupHandler";
 import type { ReactionHandler } from "./reactionHandler";
 import { toBotMessage, toBotReaction } from "./messageAdapter";
+import { toError } from "./utils";
 
 type EmojiLike = {
     id: string;
@@ -27,8 +28,8 @@ export class EventListener {
         reactionHandler: ReactionHandler,
     ) {
         this.attachErrorHandlers(client, logger);
-        this.attachMessageHandlers(client, db, commandHandler, emoteInjector, disallowed);
-        this.attachReactionHandlers(client, reactionHandler);
+        this.attachMessageHandlers(client, db, commandHandler, emoteInjector, disallowed, logger);
+        this.attachReactionHandlers(client, reactionHandler, logger);
         this.attachEmojiHandlers(client, backupHandler);
         this.attachInteractionHandler(client, slashHandler);
     }
@@ -54,16 +55,21 @@ export class EventListener {
         commandHandler: CommandHandler,
         emoteInjector: EmoteInjector,
         disallowed: Record<string, boolean>,
+        logger: ILogger,
     ): void {
         client.on(Events.MessageCreate, async (message: discord.Message) => {
-            const botMessage = toBotMessage(message);
-            if (botMessage.author.id in disallowed) return;
-            if (message.channel.type === ChannelType.DM) {
-                commandHandler.handleDM(botMessage);
-            } else {
-                await db.storeMessage(botMessage);
-                commandHandler.handleCommand(botMessage);
-                emoteInjector.handleMessage(botMessage);
+            try {
+                const botMessage = toBotMessage(message);
+                if (botMessage.author.id in disallowed) return;
+                if (message.channel.type === ChannelType.DM) {
+                    commandHandler.handleDM(botMessage);
+                } else {
+                    await db.storeMessage(botMessage);
+                    commandHandler.handleCommand(botMessage);
+                    emoteInjector.handleMessage(botMessage);
+                }
+            } catch (err) {
+                logger.error(toError(err));
             }
         });
         client.on(
@@ -72,23 +78,31 @@ export class EventListener {
                 _old: discord.Message | discord.PartialMessage,
                 newMessage: discord.Message | discord.PartialMessage,
             ) => {
-                if (!newMessage.author || newMessage.author.id in disallowed) return;
-                if (newMessage.channel.type !== ChannelType.DM && newMessage.content !== null) {
-                    const botMsg = toBotMessage(newMessage as discord.Message);
-                    await db.updateMessage(botMsg);
-                    emoteInjector.handleMessage(botMsg);
+                try {
+                    if (!newMessage.author || newMessage.author.id in disallowed) return;
+                    if (newMessage.channel.type !== ChannelType.DM && newMessage.content !== null) {
+                        const botMsg = toBotMessage(newMessage as discord.Message);
+                        await db.updateMessage(botMsg);
+                        emoteInjector.handleMessage(botMsg);
+                    }
+                } catch (err) {
+                    logger.error(toError(err));
                 }
             },
         );
     }
 
-    private attachReactionHandlers(client: discord.Client, reactionHandler: ReactionHandler): void {
+    private attachReactionHandlers(client: discord.Client, reactionHandler: ReactionHandler, logger: ILogger): void {
         client.on(
             Events.MessageReactionAdd,
             async (reaction: discord.MessageReaction | discord.PartialMessageReaction) => {
-                const botReaction = toBotReaction(reaction);
-                const botMessage = toBotMessage(reaction.message as discord.Message);
-                await reactionHandler.process(botReaction, false, botMessage);
+                try {
+                    const botReaction = toBotReaction(reaction);
+                    const botMessage = toBotMessage(reaction.message as discord.Message);
+                    await reactionHandler.process(botReaction, false, botMessage);
+                } catch (err) {
+                    logger.error(toError(err));
+                }
             },
         );
     }
