@@ -103,6 +103,6 @@ export default {
         },
     ],
     function(message, context) {
-        new CountLister().process(message, context);
+        return new CountLister().process(message, context);
     },
 } satisfies ICommand;

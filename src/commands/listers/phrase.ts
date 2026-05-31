@@ -3,6 +3,7 @@ import { Lister } from "./lister";
 import { isGuildMessage } from "../../interfaces/discord";
 import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
 import { removeQuotes } from "../../systems/stringHelpers";
+import { toError } from "../../systems/utils";
 
 const phraseHelperMessage = `Please specify a word or phrase to search for!
 
@@ -14,7 +15,7 @@ const phraseHelperMessage = `Please specify a word or phrase to search for!
 • \`phrase percent hello\` - percentage of each user's messages containing it`;
 
 class PhraseLister extends Lister {
-    override process(message: BotMessage, context: IBotContext): void {
+    override async process(message: BotMessage, context: IBotContext): Promise<void> {
         if (!isGuildMessage(message)) {
             context.messageHandler.reply(message, "This command only works in a server.");
 
@@ -24,10 +25,14 @@ class PhraseLister extends Lister {
         const { mention, leaderboard, percent, args } = this.parseArgs(message, { preserveQuotes: true });
         const word = args[0] ? removeQuotes(args[0]).toLowerCase() : undefined;
         if (!word) return void context.messageHandler.send(message, phraseHelperMessage);
-        if (mention) this.phraseWithMention(message, mention, word, context);
-        else if (leaderboard) this.phraseLeaderboard(message, word, context);
-        else if (percent) this.phrasePercentage(message, word, context);
-        else this.phraseTotal(message, word, context);
+        try {
+            if (mention) await this.phraseWithMention(message, mention, word, context);
+            else if (leaderboard) await this.phraseLeaderboard(message, word, context);
+            else if (percent) await this.phrasePercentage(message, word, context);
+            else await this.phraseTotal(message, word, context);
+        } catch (err) {
+            context.logger.error(toError(err));
+        }
     }
 
     private async phraseLeaderboard(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
@@ -173,6 +178,6 @@ export default {
         },
     ],
     function(message, context) {
-        new PhraseLister().process(message, context);
+        return new PhraseLister().process(message, context);
     },
 } satisfies ICommand;

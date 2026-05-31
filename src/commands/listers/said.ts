@@ -87,6 +87,6 @@ export default {
         },
     ],
     function(message, context) {
-        new SaidLister().process(message, context);
+        return new SaidLister().process(message, context);
     },
 } satisfies ICommand;

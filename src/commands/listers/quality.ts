@@ -83,6 +83,6 @@ export default {
         },
     ],
     function(message, context) {
-        new QualityLister().process(message, context);
+        return new QualityLister().process(message, context);
     },
 } satisfies ICommand;

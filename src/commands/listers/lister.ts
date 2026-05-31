@@ -1,6 +1,7 @@
 import { EmbedBuilder, isGuildMessage } from "../../interfaces/discord";
 import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+import { toError } from "../../systems/utils";
 
 const LEADERBOARD_TRIGGERS = ["leaderboard", "top", "?"];
 const PERCENT_TRIGGERS = ["percent", "percentage", "%"];
@@ -38,7 +39,7 @@ export abstract class Lister {
         return { mention, leaderboard: hasLeaderboard, percent: hasPercent, args: filteredArgs };
     }
 
-    process(message: BotMessage, context: IBotContext): void {
+    async process(message: BotMessage, context: IBotContext): Promise<void> {
         if (!isGuildMessage(message)) {
             context.messageHandler.reply(message, "This command only works in a server.");
 
@@ -46,31 +47,35 @@ export abstract class Lister {
         }
 
         const { mention, leaderboard, percent } = this.parseArgs(message);
-        if (mention) this.mention(message, mention, context);
-        else if (leaderboard) this.perPerson(message, context);
-        else if (percent) this.percentage(message, context);
-        else this.total(message, context);
+        try {
+            if (mention) await this.mention(message, mention, context);
+            else if (leaderboard) await this.perPerson(message, context);
+            else if (percent) await this.percentage(message, context);
+            else await this.total(message, context);
+        } catch (err) {
+            context.logger.error(toError(err));
+        }
     }
 
-    total(message: GuildBotMessage, context: IBotContext): void {
+    async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
         context.messageHandler.reply(message, "This command does not work without further commands");
     }
 
-    mention(
+    async mention(
         message: GuildBotMessage,
         _mention: {
             id: string;
         },
         context: IBotContext,
-    ): void {
+    ): Promise<void> {
         context.messageHandler.reply(message, "This command does not work with @");
     }
 
-    perPerson(message: GuildBotMessage, context: IBotContext): void {
+    async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         context.messageHandler.reply(message, "This command does not work with ?");
     }
 
-    percentage(message: GuildBotMessage, context: IBotContext): void {
+    async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
         context.messageHandler.reply(message, "This command does not work with %");
     }
 

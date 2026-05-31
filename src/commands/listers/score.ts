@@ -74,6 +74,6 @@ export default {
         },
     ],
     function(message, context) {
-        new ScoreLister().process(message, context);
+        return new ScoreLister().process(message, context);
     },
 } satisfies ICommand;

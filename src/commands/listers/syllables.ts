@@ -106,6 +106,6 @@ export default {
         },
     ],
     function(message, context) {
-        new SyllableLister().process(message, context);
+        return new SyllableLister().process(message, context);
     },
 } satisfies ICommand;

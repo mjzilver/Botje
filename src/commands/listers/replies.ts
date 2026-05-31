@@ -104,7 +104,7 @@ class RepliesLister extends Lister {
         context.pagination.sendPaginatedEmbed(message, pages);
     }
 
-    override percentage(message: GuildBotMessage, context: IBotContext): void {
+    override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
         context.messageHandler.reply(message, "This command does not work with %");
     }
 }
@@ -123,6 +123,6 @@ export default {
         },
     ],
     function(message, context) {
-        new RepliesLister().process(message, context);
+        return new RepliesLister().process(message, context);
     },
 } satisfies ICommand;
