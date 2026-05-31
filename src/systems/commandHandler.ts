@@ -93,10 +93,7 @@ export class CommandHandler {
         return { command, args };
     }
 
-    private async runCommand(
-        fn: () => void | Promise<void | BotMessage | undefined>,
-        message: BotMessage,
-    ): Promise<void> {
+    private async runCommand(fn: () => unknown, message: BotMessage): Promise<void> {
         try {
             await fn();
         } catch (err) {

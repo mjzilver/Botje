@@ -20,9 +20,22 @@ function process<T extends QueryResultRow>(data: T) {}
 ```
 
 ### No `unknown` in business logic
-`unknown` is only permitted in two specific places:
+`unknown` is only permitted in three specific places:
 1. **`catch` variables** — always narrow immediately with `toError(err)` from `src/systems/utils.ts`
 2. **`src/systems/messageAdapter.ts`** — the single boundary file that casts discord.js types to project abstractions using `as unknown as X`
+3. **Discarded return types** — callback parameters whose return value is intentionally ignored should be typed `() => unknown` rather than spelling out the callee's full return union
+
+```ts
+// ✗ Wrong — leaks the callee's return type into the caller
+private async run(fn: () => void | Promise<void | Result | undefined>): Promise<void> {
+    await fn();
+}
+
+// ✓ Correct — return value is discarded, unknown is honest
+private async run(fn: () => unknown): Promise<void> {
+    await fn();
+}
+```
 
 ```ts
 // ✗ Wrong — bare logger.error(err)
