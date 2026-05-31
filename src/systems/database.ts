@@ -334,6 +334,11 @@ export class Database implements IDatabase {
             database: config.db.database,
             password: config.db.password,
             port: config.db.port,
+            connectionTimeoutMillis: 5000,
+            idleTimeoutMillis: 30000,
+        });
+        pool.on("error", (err: Error) => {
+            logger.error(new Error(`Postgres pool error: ${err.message}`));
         });
 
         return new Database(pool, logger, config);

@@ -61,6 +61,11 @@ export class SystemRegistry implements IBotContext {
             database: this.config.db.database,
             password: this.config.db.password,
             port: this.config.db.port,
+            connectionTimeoutMillis: 5000,
+            idleTimeoutMillis: 30000,
+        });
+        pool.on("error", (err: Error) => {
+            this.logger.error(new Error(`Postgres pool error: ${err.message}`));
         });
         this.database = new Database(pool, this.logger, this.config);
         await this.database.initialize();
