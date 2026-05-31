@@ -93,17 +93,21 @@ export class CommandHandler {
         return { command, args };
     }
 
-    private async runCommand(fn: () => void | Promise<void | BotMessage | undefined>): Promise<void> {
+    private async runCommand(
+        fn: () => void | Promise<void | BotMessage | undefined>,
+        message: BotMessage,
+    ): Promise<void> {
         try {
             await fn();
         } catch (err) {
             this.logger.error(toError(err));
+            this.messageHandler.reply(message, "Something went wrong while running that command.");
         }
     }
 
     private handleCommandType(command: string, readback: boolean, message: BotMessage, isAdmin: boolean): void {
         if (command in this.commands)
-            void this.runCommand(() => this.commands[command].function(message, this.context));
+            void this.runCommand(() => this.commands[command].function(message, this.context), message);
         else if (command in this.admincommands) this.handleAdminCommand(command, message, isAdmin);
         else if (!readback)
             this.messageHandler.reply(message, `${capitalize(command)} is not a command, please try again.`);
@@ -112,7 +116,8 @@ export class CommandHandler {
 
     private handleAdminCommand(command: string, message: BotMessage, isAdmin: boolean): void {
         const isOwner = message.author.id === this.config.owner;
-        if (isOwner || isAdmin) void this.runCommand(() => this.admincommands[command].function(message, this.context));
+        if (isOwner || isAdmin)
+            void this.runCommand(() => this.admincommands[command].function(message, this.context), message);
         else
             this.messageHandler.reply(
                 message,
@@ -164,7 +169,7 @@ export class CommandHandler {
                 ? `${this.config.prefix}speak ${topics[0]}`
                 : `${this.config.prefix}speak`;
             const topicMessage = { ...message, content: syntheticContent };
-            await this.runCommand(() => this.commands["speak"]?.function(topicMessage, this.context));
+            await this.runCommand(() => this.commands["speak"]?.function(topicMessage, this.context), topicMessage);
         } catch (err) {
             this.logger.error(toError(err));
         }
@@ -174,7 +179,7 @@ export class CommandHandler {
         if (!message.content.match(/\bbot(je)?\b/gi)) return;
         const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
         if (isAdmin || this.isUserAllowed(message, false))
-            void this.runCommand(() => this.commands["speak"]?.function(message, this.context));
+            void this.runCommand(() => this.commands["speak"]?.function(message, this.context), message);
     }
 
     async redo(message: BotMessage, fetchMessage: (id: string) => Promise<BotMessage>): Promise<void> {
@@ -185,7 +190,7 @@ export class CommandHandler {
             const { command } = this.parseMessageArguments(callMessage);
             this.logger.debug(`Redoing '${callMessage.author.username}' command '${command}'`);
             if (command in this.commands) {
-                await this.runCommand(() => this.commands[command].function(callMessage, this.context));
+                await this.runCommand(() => this.commands[command].function(callMessage, this.context), callMessage);
                 this.messageHandler.delete(message);
             }
         } catch (err) {
@@ -216,7 +221,7 @@ export class CommandHandler {
         if (message.author.bot) return;
         const { command } = this.parseMessageArguments(message);
         if (command in this.dmcommands)
-            void this.runCommand(() => this.dmcommands[command].function(message, this.context));
+            void this.runCommand(() => this.dmcommands[command].function(message, this.context), message);
         else if (message.content.match(this.prefixRegex))
             this.messageHandler.reply(message, `Use the command ${this.config.prefix}help for more information`);
     }
