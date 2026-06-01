@@ -49,8 +49,12 @@ export class ReminderScheduler {
     }
 
     private scheduleTimer(row: ReminderRow, delayMs: number): void {
-        const timer = setTimeout(() => {
-            this.fire(row).catch((err: unknown) => this.logger.error(toError(err)));
+        const timer = setTimeout(async () => {
+            try {
+                await this.fire(row);
+            } catch (err) {
+                this.logger.error(toError(err));
+            }
         }, delayMs);
         this.timers.set(row.id, timer);
     }

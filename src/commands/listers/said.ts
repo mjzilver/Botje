@@ -22,8 +22,10 @@ class SaidLister extends Lister {
             ORDER BY COUNT(*) DESC
             LIMIT 100`;
         const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [message.guild.id]);
-        if (!rows || rows.length === 0)
-            return void context.messageHandler.send(message, `No repeated phrases found in ${message.guild?.name}`);
+        if (!rows || rows.length === 0) {
+            await context.messageHandler.send(message, `No repeated phrases found in ${message.guild?.name}`);
+            return;
+        }
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.message} was said ${row.count} times \n`;
@@ -36,7 +38,7 @@ class SaidLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async mention(
@@ -70,7 +72,7 @@ class SaidLister extends Lister {
             .setColor(context.config.color_hex)
             .setTitle(`Top 10 most used phrases in ${message.guild?.name} by \`${userName}\``)
             .setDescription(result);
-        context.messageHandler.send(message, { embeds: [top] });
+        await context.messageHandler.send(message, { embeds: [top] });
     }
 }
 

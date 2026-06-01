@@ -27,13 +27,12 @@ class QualityLister extends Lister {
             ),
         );
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        if (rows.length === 0)
-            return void context.messageHandler.send(
-                message,
-                `\`${userName}\` does not have enough qualifying messages.`,
-            );
+        if (rows.length === 0) {
+            await context.messageHandler.send(message, `\`${userName}\` does not have enough qualifying messages.`);
+            return;
+        }
         const userQuality = parseFloat(rows[0].percentage_unique).toFixed(2);
-        context.messageHandler.send(message, `\`${userName}\`'s post quality is ${userQuality}%`);
+        await context.messageHandler.send(message, `\`${userName}\`'s post quality is ${userQuality}%`);
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -66,7 +65,7 @@ class QualityLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 }
 

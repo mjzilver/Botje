@@ -15,8 +15,10 @@ class RepliesLister extends Lister {
         const rows = await context.database.query<{ from_user: string; to_user: string; count: string }>(selectSQL, [
             message.guild.id,
         ]);
-        if (!rows || rows.length === 0)
-            return void context.messageHandler.send(message, `No reply relationships found in ${message.guild?.name}`);
+        if (!rows || rows.length === 0) {
+            await context.messageHandler.send(message, `No reply relationships found in ${message.guild?.name}`);
+            return;
+        }
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
@@ -33,7 +35,7 @@ class RepliesLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async mention(
@@ -56,8 +58,10 @@ class RepliesLister extends Lister {
             mentioned.id,
         ]);
         const fromName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        if (!rows || rows.length === 0)
-            return void context.messageHandler.send(message, `No replies found for ${fromName}`);
+        if (!rows || rows.length === 0) {
+            await context.messageHandler.send(message, `No replies found for ${fromName}`);
+            return;
+        }
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
@@ -73,7 +77,7 @@ class RepliesLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -101,11 +105,11 @@ class RepliesLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        context.messageHandler.reply(message, "This command does not work with %");
+        await context.messageHandler.reply(message, "This command does not work with %");
     }
 }
 

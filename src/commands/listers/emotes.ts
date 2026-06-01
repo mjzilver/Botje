@@ -18,8 +18,10 @@ class EmotesLister extends Lister {
             ORDER BY COUNT(*) DESC
             LIMIT 100`;
         const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [message.guild.id]);
-        if (!rows || rows.length === 0)
-            return void context.messageHandler.send(message, `No emotes found in ${message.guild?.name}`);
+        if (!rows || rows.length === 0) {
+            await context.messageHandler.send(message, `No emotes found in ${message.guild?.name}`);
+            return;
+        }
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.message} was used ${row.count} times! \n`;
@@ -32,7 +34,7 @@ class EmotesLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async mention(
@@ -59,8 +61,10 @@ class EmotesLister extends Lister {
             mentioned.id,
         ]);
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        if (!rows || rows.length === 0)
-            return void context.messageHandler.send(message, `No emotes found for ${userName}`);
+        if (!rows || rows.length === 0) {
+            await context.messageHandler.send(message, `No emotes found for ${userName}`);
+            return;
+        }
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.message} said ${row.count} times! \n`;
@@ -73,7 +77,7 @@ class EmotesLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -102,11 +106,11 @@ class EmotesLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        context.messageHandler.reply(message, "This command does not work with %");
+        await context.messageHandler.reply(message, "This command does not work with %");
     }
 }
 

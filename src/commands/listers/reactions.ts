@@ -18,8 +18,10 @@ class ReactionsLister extends Lister {
                 [message.guild.id],
             ),
         );
-        if (!rows || rows.length === 0)
-            return void context.messageHandler.send(message, `No reactions found in ${message.guild?.name}`);
+        if (!rows || rows.length === 0) {
+            await context.messageHandler.send(message, `No reactions found in ${message.guild?.name}`);
+            return;
+        }
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.emoji} was used ${row.count} times! \n`;
@@ -32,7 +34,7 @@ class ReactionsLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async mention(
@@ -55,8 +57,10 @@ class ReactionsLister extends Lister {
             ),
         );
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        if (!rows || rows.length === 0)
-            return void context.messageHandler.send(message, `No reactions found for ${userName}`);
+        if (!rows || rows.length === 0) {
+            await context.messageHandler.send(message, `No reactions found for ${userName}`);
+            return;
+        }
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.emoji} was used ${row.count} times! \n`;
@@ -69,7 +73,7 @@ class ReactionsLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -100,11 +104,11 @@ class ReactionsLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        context.messageHandler.reply(message, "This command does not work with %");
+        await context.messageHandler.reply(message, "This command does not work with %");
     }
 }
 

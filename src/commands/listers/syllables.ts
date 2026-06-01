@@ -32,7 +32,7 @@ class SyllableLister extends Lister {
 
         userdata.average = Math.round(userdata.syllables / userdata.total);
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        context.messageHandler.send(
+        await context.messageHandler.send(
             message,
             `\`${userName}\` has an average of ${userdata.average} syllables per post`,
         );
@@ -83,7 +83,7 @@ class SyllableLister extends Lister {
                 );
             },
         );
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     calculateSyllables(message: string): number {

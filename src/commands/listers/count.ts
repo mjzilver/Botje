@@ -7,7 +7,7 @@ class CountLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1";
         const rows = await context.database.query<{ count: string }>(selectSQL, [message.guild.id]);
-        context.messageHandler.send(message, `Ive found ${rows[0].count} messages in ${message.guild?.name}`);
+        await context.messageHandler.send(message, `Ive found ${rows[0].count} messages in ${message.guild?.name}`);
     }
 
     override async mention(
@@ -20,7 +20,7 @@ class CountLister extends Lister {
         const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1 AND user_id = $2";
         const rows = await context.database.query<{ count: string }>(selectSQL, [message.guild.id, mentioned.id]);
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        context.messageHandler.send(message, `Ive found ${rows[0].count} messages by \`${userName}\` in this server`);
+        await context.messageHandler.send(message, `Ive found ${rows[0].count} messages by \`${userName}\` in this server`);
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -48,7 +48,7 @@ class CountLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -84,7 +84,7 @@ class CountLister extends Lister {
                 totalPages,
             );
         });
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 }
 

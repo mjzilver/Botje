@@ -74,12 +74,14 @@ export class Pagination {
             else if (interaction.customId === "next") currentPage = Math.min(pages.length - 1, currentPage + 1);
             await interaction.update(getPageContent(currentPage));
         });
-        collector.on("end", () => {
-            this.messageHandler
-                .edit(sentMessage, {
+        collector.on("end", async () => {
+            try {
+                await this.messageHandler.edit(sentMessage, {
                     components: [getButtons(true)],
-                } as MessageContent)
-                .catch((err: unknown) => this.logger.error(toError(err)));
+                } as MessageContent);
+            } catch (err) {
+                this.logger.error(toError(err));
+            }
         });
 
         return sentMessage;

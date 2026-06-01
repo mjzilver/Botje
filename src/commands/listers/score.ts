@@ -24,7 +24,7 @@ class ScoreLister extends Lister {
         );
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         const score = rows.length > 0 ? parseInt(rows[0].total_chars, 10) : 0;
-        context.messageHandler.send(message, `\`${userName}\`'s post score is ${score}`);
+        await context.messageHandler.send(message, `\`${userName}\`'s post score is ${score}`);
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -57,7 +57,7 @@ class ScoreLister extends Lister {
                 );
             },
         );
-        context.pagination.sendPaginatedEmbed(message, pages);
+        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 }
 

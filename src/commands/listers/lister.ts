@@ -41,7 +41,7 @@ export abstract class Lister {
 
     async process(message: BotMessage, context: IBotContext): Promise<void> {
         if (!isGuildMessage(message)) {
-            context.messageHandler.reply(message, "This command only works in a server.");
+            await context.messageHandler.reply(message, "This command only works in a server.");
 
             return;
         }
@@ -58,7 +58,7 @@ export abstract class Lister {
     }
 
     async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        context.messageHandler.reply(message, "This command does not work without further commands");
+        await context.messageHandler.reply(message, "This command does not work without further commands");
     }
 
     async mention(
@@ -68,15 +68,15 @@ export abstract class Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        context.messageHandler.reply(message, "This command does not work with @");
+        await context.messageHandler.reply(message, "This command does not work with @");
     }
 
     async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        context.messageHandler.reply(message, "This command does not work with ?");
+        await context.messageHandler.reply(message, "This command does not work with ?");
     }
 
     async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        context.messageHandler.reply(message, "This command does not work with %");
+        await context.messageHandler.reply(message, "This command does not work with %");
     }
 
     protected buildPageEmbed(
