@@ -3,6 +3,17 @@ import { CommandHandler } from "../../systems/commandHandler";
 import { ReplyHandler } from "../../systems/replyHandler";
 import type { ICommand } from "../../interfaces";
 import { makeMockContext, TEST_CONFIG, makeMessage } from "@test/helpers";
+import { randomBetween } from "../../systems/utils";
+
+vi.mock("../../systems/topicExtractor", () => ({
+    fetchContextMessages: vi.fn().mockResolvedValue([]),
+    extractTopics: vi.fn().mockResolvedValue(["cats"]),
+}));
+
+vi.mock("../../systems/utils", async (importOriginal) => {
+    const mod = await importOriginal<typeof import("../../systems/utils")>();
+    return { ...mod, randomBetween: vi.fn() };
+});
 
 function stubCommand(name: string): ICommand {
     return {
@@ -166,6 +177,29 @@ describe("CommandHandler integration", () => {
 
             expect(ping.function).not.toHaveBeenCalled();
             expect(context.messageHandler.delete).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("speakOnContext", () => {
+        it("passes a synthetic message with a defined createdAt to the speak command", async () => {
+            const receivedMessages: unknown[] = [];
+            const speak = stubCommand("speak");
+            vi.mocked(speak.function).mockImplementation(async (msg) => {
+                receivedMessages.push(msg);
+            });
+            vi.mocked(randomBetween)
+                .mockReturnValueOnce(1)
+                .mockReturnValue(0);
+            const { handler } = makeHandler({ speak });
+
+            handler.handleNonCommandMessage(makeMessage("hello world"));
+            await new Promise<void>(resolve => setImmediate(resolve));
+            await new Promise<void>(resolve => setImmediate(resolve));
+
+            expect(receivedMessages.length).toBeGreaterThan(0);
+            for (const msg of receivedMessages) {
+                expect((msg as { createdAt: unknown }).createdAt).toBeInstanceOf(Date);
+            }
         });
     });
 });
