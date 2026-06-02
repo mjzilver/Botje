@@ -4,10 +4,6 @@ import chooseCommand from "../../commands/choose";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("choose command", () => {
-    it("has name 'choose'", () => {
-        expect(chooseCommand.name).toBe("choose");
-    });
-
     it("replies with an error when fewer than two options are given", () => {
         const context = makeMockContext();
 

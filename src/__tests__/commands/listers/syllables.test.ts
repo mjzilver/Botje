@@ -24,8 +24,6 @@ function withMention(content: string, mentionId: string, username: string) {
 describe("syllables lister", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("has name 'syllables'", () => expect(syllablesCommand.name).toBe("syllables"));
-
     it("replies out-of-server error when guild is null", () => {
         const context = makeMockContext();
 

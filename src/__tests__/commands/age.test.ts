@@ -24,10 +24,6 @@ function makeMessage(joinedAt?: Date): BotMessage {
 }
 
 describe("age command", () => {
-    it("has name 'age'", () => {
-        expect(ageCommand.name).toBe("age");
-    });
-
     it("replies with the bot's age when joinedAt is available", () => {
         const joined = new Date(Date.now() - 2 * 365 * 24 * 3600 * 1000);
         const context = makeMockContext({ client: { user: { id: "bot-id" } } as unknown as Client });

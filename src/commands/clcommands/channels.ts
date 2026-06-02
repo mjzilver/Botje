@@ -3,9 +3,9 @@ import type { BotGuildTextChannel } from "../../interfaces/discord";
 import { getTextChannels } from "../../systems/messageAdapter";
 
 export default {
-    name: "list",
+    name: "channels",
     description: "lists all channels in all guilds",
-    format: "list",
+    format: "channels",
     function(_input: string[], context: IBotContext) {
         const channels: {
             channelId: string;

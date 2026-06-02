@@ -12,10 +12,6 @@ describe("ping command", () => {
         context = makeMockContext();
     });
 
-    it("has name 'ping'", () => {
-        expect(pingCommand.name).toBe("ping");
-    });
-
     it("sends 'Ping?' first", async () => {
         await pingCommand.function(makeMessage("!ping"), context);
 

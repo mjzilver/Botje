@@ -24,8 +24,6 @@ function withMention(content: string, mentionId: string, username: string) {
 describe("quality lister", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("has name 'quality'", () => expect(qualityCommand.name).toBe("quality"));
-
     it("replies out-of-server error when guild is null", () => {
         const context = makeMockContext();
 

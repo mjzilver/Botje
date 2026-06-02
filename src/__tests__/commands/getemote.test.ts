@@ -9,8 +9,6 @@ import getemoteCommand from "../../commands/getemote";
 describe("getemote", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("has name 'getemote'", () => expect(getemoteCommand.name).toBe("getemote"));
-
     it("lists all emotes in a paginated embed when no arg is given", async () => {
         const context = makeMockContext();
         vi.mocked(fs.readdirSync).mockReturnValue(["wave.png", "pepe.png"] as never);

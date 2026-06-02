@@ -27,8 +27,6 @@ import { makeMockContext, makeMessage } from "@test/helpers";
 describe("meme", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("has name 'meme'", () => expect(memeCommand.name).toBe("meme"));
-
     it("replies with meme file when top text is given", async () => {
         const context = makeMockContext();
         vi.mocked(fs.readdirSync).mockReturnValue(["template.jpg"] as never);

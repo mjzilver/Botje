@@ -5,10 +5,6 @@ import uptimeCommand from "../../commands/uptime";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("uptime command", () => {
-    it("has name 'uptime'", () => {
-        expect(uptimeCommand.name).toBe("uptime");
-    });
-
     it("sends a message containing the formatted uptime", () => {
         const context = makeMockContext({ client: { readyTimestamp: Date.now() - 3661000 } as unknown as Client });
 

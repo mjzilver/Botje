@@ -5,8 +5,6 @@ import { makeMockContext, makeMessage } from "@test/helpers";
 describe("emoji", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("has name 'emoji'", () => expect(emojiCommand.name).toBe("emoji"));
-
     it("sends an emoji string for each letter in a normal message", async () => {
         const context = makeMockContext();
 

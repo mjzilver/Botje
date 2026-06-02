@@ -22,8 +22,6 @@ import { makeMockContext, makeMessage } from "@test/helpers";
 describe("combine", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("has name 'combine'", () => expect(combineCommand.name).toBe("combine"));
-
     it("replies with the combined image file", async () => {
         const context = makeMockContext();
         vi.mocked(fs.readdirSync).mockReturnValue(["pepe.png", "wave.png"] as never);

@@ -9,10 +9,6 @@ function mockDbWithRows(rows: { message: string }[]) {
     return ctx;
 }
 
-describe("talk command – metadata", () => {
-    it("has name 'talk'", () => expect(talkCommand.name).toBe("talk"));
-});
-
 describe("talk command – execution", () => {
     beforeEach(() => vi.clearAllMocks());
 

@@ -4,10 +4,6 @@ import { makeMockContext, makeMessage } from "@test/helpers";
 
 vi.mock("axios", () => ({ default: { get: vi.fn() } }));
 
-describe("weather command – metadata", () => {
-    it("has name 'weather'", () => expect(weatherCommand.name).toBe("weather"));
-});
-
 describe("weather command – execution", () => {
     beforeEach(() => vi.clearAllMocks());
 

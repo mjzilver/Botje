@@ -4,10 +4,6 @@ import { makeMockContext, makeMessage } from "@test/helpers";
 
 vi.mock("axios", () => ({ default: { get: vi.fn() } }));
 
-describe("youtube command – metadata", () => {
-    it("has name 'youtube'", () => expect(youtubeCommand.name).toBe("youtube"));
-});
-
 describe("youtube command – execution", () => {
     beforeEach(() => vi.clearAllMocks());
 

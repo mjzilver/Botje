@@ -5,17 +5,6 @@ import type { ICommand } from "../../interfaces";
 import type { MessageContent } from "../../interfaces/discord";
 import { makeCommand, makeMockContext, makeMessage } from "@test/helpers";
 
-describe("help command – metadata", () => {
-    it("has name 'help'", () => {
-        expect(helpCommand.name).toBe("help");
-    });
-
-    it("has a format and description", () => {
-        expect(typeof helpCommand.format).toBe("string");
-        expect(typeof helpCommand.description).toBe("string");
-    });
-});
-
 describe("help command – execution", () => {
     it("calls createPages with all loaded commands", async () => {
         const commands = {

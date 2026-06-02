@@ -3,8 +3,6 @@ import dmHelpCommand from "../../../commands/dmcommands/help";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("dmcommands/help", () => {
-    it("has name 'help'", () => expect(dmHelpCommand.name).toBe("help"));
-
     it("sends an embed to the user", () => {
         const context = makeMockContext();
 

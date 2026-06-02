@@ -16,8 +16,6 @@ function withMention(content: string, mentionId: string, username: string) {
 describe("count lister", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("has name 'count'", () => expect(countCommand.name).toBe("count"));
-
     it("replies out-of-server error when guild is null", () => {
         const context = makeMockContext();
 

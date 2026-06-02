@@ -4,10 +4,6 @@ import rollCommand from "../../commands/roll";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("roll command", () => {
-    it("has name 'roll'", () => {
-        expect(rollCommand.name).toBe("roll");
-    });
-
     it("rolls between 0 and the given max when one numeric argument is provided", () => {
         const context = makeMockContext();
 

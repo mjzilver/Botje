@@ -32,6 +32,10 @@ export type { ILlmService };
 
 export type { IDictionary };
 
+export interface IWebhookService {
+    sendMessage(channelId: string, text: string, userId: string): Promise<boolean>;
+}
+
 export interface CommandOption {
     type: "user" | "string" | "integer";
     name: string;
@@ -65,6 +69,7 @@ export interface IClCommand {
     disabled?: boolean;
     aliases?: string;
     function(input: string[], context: IBotContext): void | Promise<void>;
+    completer?(argIndex: number, context: IBotContext): string[];
 }
 
 export interface IBotContext {
@@ -83,4 +88,5 @@ export interface IBotContext {
     disallowed: Record<string, boolean>;
     settings: Settings;
     reminderScheduler: ReminderScheduler;
+    webhook: IWebhookService;
 }
