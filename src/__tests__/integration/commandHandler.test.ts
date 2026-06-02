@@ -12,6 +12,7 @@ vi.mock("../../systems/topicExtractor", () => ({
 
 vi.mock("../../systems/utils", async (importOriginal) => {
     const mod = await importOriginal<typeof import("../../systems/utils")>();
+
     return { ...mod, randomBetween: vi.fn() };
 });
 
@@ -187,14 +188,12 @@ describe("CommandHandler integration", () => {
             vi.mocked(speak.function).mockImplementation(async (msg) => {
                 receivedMessages.push(msg);
             });
-            vi.mocked(randomBetween)
-                .mockReturnValueOnce(1)
-                .mockReturnValue(0);
+            vi.mocked(randomBetween).mockReturnValueOnce(1).mockReturnValue(0);
             const { handler } = makeHandler({ speak });
 
             handler.handleNonCommandMessage(makeMessage("hello world"));
-            await new Promise<void>(resolve => setImmediate(resolve));
-            await new Promise<void>(resolve => setImmediate(resolve));
+            await new Promise<void>((resolve) => setImmediate(resolve));
+            await new Promise<void>((resolve) => setImmediate(resolve));
 
             expect(receivedMessages.length).toBeGreaterThan(0);
             for (const msg of receivedMessages) {

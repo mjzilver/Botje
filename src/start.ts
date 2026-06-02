@@ -1,6 +1,4 @@
 import axios from "axios";
-
-axios.defaults.validateStatus = (status: number) => status >= 200 && status <= 500;
 import { logger } from "./systems/logger";
 import { Settings } from "./systems/settings";
 import { Bot } from "./systems/bot";
@@ -8,6 +6,8 @@ import { CommandLine } from "./systems/commandline";
 import { registerProcessHandlers } from "./systems/processHandler";
 import { toError } from "./systems/utils";
 import pkg from "../package.json";
+
+axios.defaults.validateStatus = (status: number) => status >= 200 && status <= 500;
 
 const settings = new Settings(logger);
 const bot = new Bot(settings, logger, pkg.version);

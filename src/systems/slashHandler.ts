@@ -4,12 +4,9 @@ import {
     SlashCommandUserOption,
     SlashCommandStringOption,
     SlashCommandIntegerOption,
-    ApplicationCommandOptionType,
-    Collection,
 } from "discord.js";
 import type { ICommand, ILogger, CommandOption, IBotContext } from "../interfaces";
-import type { BotMessage, BotUser, BotReaction, MessageContent, ComponentCollector } from "../interfaces/discord";
-import { toBotChannel } from "./messageAdapter";
+import { interactionToMessage } from "./messageAdapter";
 import { toError } from "./utils";
 
 export class SlashHandler {
@@ -76,78 +73,19 @@ export class SlashHandler {
         }
     }
 
-    interactionToMessage(interaction: discord.ChatInputCommandInteraction, commandName: string): BotMessage {
-        const args: string[] = [];
-        const subcommand = interaction.options.getSubcommand(false);
-        if (subcommand) args.push(subcommand);
-        const optionData = subcommand ? (interaction.options.data[0]?.options ?? []) : interaction.options.data;
-        const mentionMap = new Map<string, BotUser>();
-        for (const option of optionData) {
-            if (option.type === ApplicationCommandOptionType.User && option.user) {
-                args.push(`<@${option.user.id}>`);
-                mentionMap.set(option.user.id, option.user as BotUser);
-            } else if (
-                option.type === ApplicationCommandOptionType.String ||
-                option.type === ApplicationCommandOptionType.Integer
-            ) {
-                args.push(String(option.value));
-            }
-        }
-
-        const fullContent = args.length > 0 ? `${commandName} ${args.join(" ")}` : commandName;
-        const pseudoMessage: BotMessage = {
-            id: interaction.id,
-            content: fullContent,
-            cleanContent: fullContent,
-            author: interaction.user as BotUser,
-            channel: toBotChannel(interaction.channel),
-            guild: interaction.guild as BotMessage["guild"],
-            member: null,
-            mentions: {
-                users: new Collection<string, BotUser>(mentionMap) as Map<string, BotUser> & {
-                    first(): BotUser | undefined;
-                },
-            },
-            createdTimestamp: interaction.createdTimestamp,
-            createdAt: new Date(interaction.createdTimestamp),
-            reactions: { cache: new Map<string, BotReaction>(), resolve: () => null },
-            reference: null,
-            isSlashCommand: true,
-            slashInteraction: interaction,
-            reply: (_content: MessageContent) => Promise.resolve(pseudoMessage),
-            react: (_emoji: string) =>
-                Promise.resolve({
-                    count: 0,
-                    emoji: { name: null },
-                    message: { id: pseudoMessage.id },
-                    users: {
-                        cache: new Map<string, BotUser>(),
-                        fetch: () => Promise.resolve(new Map<string, BotUser>()),
-                    },
-                }),
-            edit: (_content: MessageContent) => Promise.resolve(pseudoMessage),
-            delete: () => Promise.resolve(pseudoMessage),
-            createMessageComponentCollector: (_options: {
-                componentType: number;
-                time: number;
-            }): ComponentCollector => ({ on: () => {} }),
-        };
-
-        return pseudoMessage;
-    }
-
     async handleInteraction(interaction: discord.ChatInputCommandInteraction): Promise<void> {
         const commandName = interaction.commandName;
         const found = this.slashCommands.find((sc) => sc.name === commandName);
         if (!found) return;
+
         try {
             await interaction.deferReply();
         } catch (err) {
             this.logger.debug(`Failed to defer reply: ${toError(err).message}`);
         }
 
-        const pseudoMessage = this.interactionToMessage(interaction, commandName);
-        found.command.function(pseudoMessage, this.context);
+        const pseudoMessage = interactionToMessage(interaction, commandName);
+        await found.command.function(pseudoMessage, this.context);
     }
 
     async registerCommands(commands: Record<string, ICommand>): Promise<void> {
@@ -161,7 +99,9 @@ export class SlashHandler {
                     .includes(name)
             )
                 continue;
+
             if (!command.function) continue;
+
             try {
                 const builder = this.buildSlashCommand(command);
                 builders.push(builder.toJSON());
@@ -173,6 +113,7 @@ export class SlashHandler {
         try {
             this.logger.startup("[SlashCommands] Clearing global commands...");
             await this.client.application?.commands.set([]);
+
             for (const [, guild] of this.client.guilds.cache) {
                 try {
                     await guild.commands.set(builders);
