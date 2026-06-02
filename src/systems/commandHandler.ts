@@ -165,7 +165,12 @@ export class CommandHandler {
             const syntheticContent = topics[0]
                 ? `${this.config.prefix}speak ${topics[0]}`
                 : `${this.config.prefix}speak`;
-            const topicMessage = { ...message, content: syntheticContent };
+            const topicMessage = {
+                ...message,
+                content: syntheticContent,
+                createdAt: message.createdAt,
+                createdTimestamp: message.createdTimestamp,
+            };
             await this.runCommand(() => this.commands["speak"]?.function(topicMessage, this.context), topicMessage);
         } catch (err) {
             this.logger.error(toError(err));

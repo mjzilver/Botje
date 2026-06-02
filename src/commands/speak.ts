@@ -10,6 +10,7 @@ const TOPIC_SENTENCE_MAX_WORDS = 25;
 
 function nlpSentences(text: string): string[] {
     const result: unknown = nlp(text).sentences().out("array");
+
     return Array.isArray(result) ? result.filter((s): s is string => typeof s === "string") : [];
 }
 

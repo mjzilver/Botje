@@ -20,8 +20,10 @@ class EmotesLister extends Lister {
         const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [message.guild.id]);
         if (!rows || rows.length === 0) {
             await context.messageHandler.send(message, `No emotes found in ${message.guild?.name}`);
+
             return;
         }
+
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.message} was used ${row.count} times! \n`;
@@ -63,8 +65,10 @@ class EmotesLister extends Lister {
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         if (!rows || rows.length === 0) {
             await context.messageHandler.send(message, `No emotes found for ${userName}`);
+
             return;
         }
+
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.message} said ${row.count} times! \n`;

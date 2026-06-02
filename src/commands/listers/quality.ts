@@ -29,8 +29,10 @@ class QualityLister extends Lister {
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         if (rows.length === 0) {
             await context.messageHandler.send(message, `\`${userName}\` does not have enough qualifying messages.`);
+
             return;
         }
+
         const userQuality = parseFloat(rows[0].percentage_unique).toFixed(2);
         await context.messageHandler.send(message, `\`${userName}\`'s post quality is ${userQuality}%`);
     }

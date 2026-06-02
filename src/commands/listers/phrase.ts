@@ -26,6 +26,7 @@ class PhraseLister extends Lister {
         const word = args[0] ? removeQuotes(args[0]).toLowerCase() : undefined;
         if (!word) {
             await context.messageHandler.send(message, phraseHelperMessage);
+
             return;
         }
         try {
@@ -51,8 +52,10 @@ class PhraseLister extends Lister {
         ]);
         if (!rows || rows.length === 0) {
             await context.messageHandler.send(message, `Nothing found for ${word} in ${message.guild?.name}`);
+
             return;
         }
+
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
@@ -74,7 +77,10 @@ class PhraseLister extends Lister {
     private async phraseTotal(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
         const selectSQL = `SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2`;
         const rows = await context.database.query<{ count: string }>(selectSQL, [`%${word}%`, message.guild.id]);
-        await context.messageHandler.send(message, `Ive found ${rows[0].count} messages in this server that contain ${word}`);
+        await context.messageHandler.send(
+            message,
+            `Ive found ${rows[0].count} messages in this server that contain ${word}`,
+        );
     }
 
     private async phraseWithMention(
@@ -121,8 +127,10 @@ class PhraseLister extends Lister {
         }>(selectSQL, [`%${word}%`, message.guild.id]);
         if (!rows || rows.length === 0) {
             await context.messageHandler.send(message, `Nothing found for ${word} in ${message.guild?.name}`);
+
             return;
         }
+
         const sortedRows = (
             await Promise.all(
                 rows.map(async (row) => ({

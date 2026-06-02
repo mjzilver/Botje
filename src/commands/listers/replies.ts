@@ -17,8 +17,10 @@ class RepliesLister extends Lister {
         ]);
         if (!rows || rows.length === 0) {
             await context.messageHandler.send(message, `No reply relationships found in ${message.guild?.name}`);
+
             return;
         }
+
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {
@@ -60,8 +62,10 @@ class RepliesLister extends Lister {
         const fromName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         if (!rows || rows.length === 0) {
             await context.messageHandler.send(message, `No replies found for ${fromName}`);
+
             return;
         }
+
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) {

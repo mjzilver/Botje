@@ -20,8 +20,10 @@ class ReactionsLister extends Lister {
         );
         if (!rows || rows.length === 0) {
             await context.messageHandler.send(message, `No reactions found in ${message.guild?.name}`);
+
             return;
         }
+
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.emoji} was used ${row.count} times! \n`;
@@ -59,8 +61,10 @@ class ReactionsLister extends Lister {
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         if (!rows || rows.length === 0) {
             await context.messageHandler.send(message, `No reactions found for ${userName}`);
+
             return;
         }
+
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
             for (const row of pageRows) result += `${row.emoji} was used ${row.count} times! \n`;
