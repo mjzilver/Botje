@@ -56,22 +56,17 @@ class PhraseLister extends Lister {
             return;
         }
 
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) {
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Top users for "${word}" in ${message.guild?.name}`,
+            async (row) => {
                 const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
-                result += `\`${userName}\` has said ${word} ${row.count} times! \n`;
-            }
 
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top users for "${word}" in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+                return `\`${userName}\` has said ${word} ${row.count} times! \n`;
+            },
+        );
     }
 
     private async phraseTotal(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {

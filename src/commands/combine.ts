@@ -1,8 +1,7 @@
-import fs from "fs";
 import Jimp from "jimp";
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { findClosestMatchInList, pickRandomItem } from "../systems/utils";
+import { findClosestMatchInList, pickRandomItem, readGuildEmoteDir } from "../systems/utils";
 
 const emoteParser = /:(.+?)(~.*)?:[0-9]*/;
 
@@ -38,8 +37,7 @@ export default {
     async function(message, context) {
         const args = message.content.split(" ");
         args.shift();
-        const path = `backups/emotes/${message.guild?.id}/`;
-        const files = fs.readdirSync(path);
+        const { path: _path, files } = readGuildEmoteDir(message.guild?.id);
         if (!args[0]) args[0] = pickRandomItem(files);
         if (!args[1]) args[1] = pickRandomItem(files);
         let image1 = `${args[0]}.png`;

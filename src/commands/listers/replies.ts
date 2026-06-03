@@ -21,23 +21,18 @@ class RepliesLister extends Lister {
             return;
         }
 
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) {
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Top reply relationships in ${message.guild?.name}`,
+            async (row) => {
                 const fromName = await context.userHandler.getDisplayName(row.from_user, message.guild.id);
                 const toName = await context.userHandler.getDisplayName(row.to_user, message.guild.id);
-                result += `\`${fromName}\` sent ${row.count} replies to \`${toName}\`\n`;
-            }
 
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top reply relationships in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+                return `\`${fromName}\` sent ${row.count} replies to \`${toName}\`\n`;
+            },
+        );
     }
 
     override async mention(
@@ -60,28 +55,18 @@ class RepliesLister extends Lister {
             mentioned.id,
         ]);
         const fromName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
-        if (!rows || rows.length === 0) {
-            await context.messageHandler.send(message, `No replies found for ${fromName}`);
-
-            return;
-        }
-
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) {
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Who ${fromName} replies to most in ${message.guild?.name}`,
+            async (row) => {
                 const toName = await context.userHandler.getDisplayName(row.to_user, message.guild.id);
-                result += `\`${fromName}\` sent ${row.count} replies to \`${toName}\`\n`;
-            }
 
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Who ${fromName} replies to most in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+                return `\`${fromName}\` sent ${row.count} replies to \`${toName}\`\n`;
+            },
+            `No replies found for ${fromName}`,
+        );
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -94,22 +79,11 @@ class RepliesLister extends Lister {
         const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
             message.guild.id,
         ]);
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) {
-                const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
-                result += `\`${userName}\` has sent ${row.count} replies! \n`;
-            }
+        await this.sendPaginatedRows(message, context, rows, `Top repliers in ${message.guild?.name}`, async (row) => {
+            const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
 
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top repliers in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
+            return `\`${userName}\` has sent ${row.count} replies! \n`;
         });
-        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {

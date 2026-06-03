@@ -1,7 +1,9 @@
 import nlp from "compromise";
 import type { BotMessage } from "../interfaces/discord";
+import type { IBotContext } from "../interfaces";
 import type { IDatabase } from "./database";
 import type { IDictionary } from "./dictionary";
+import { toError } from "./utils";
 
 const MIN_WORD_LENGTH = 4;
 const CANDIDATE_LIMIT = 10;
@@ -67,6 +69,21 @@ export async function fetchTopicsFromContext(
     const recent = await fetchContextMessages(channel);
 
     return extractTopics(recent, db, dictionary, prefix);
+}
+
+export async function tryFetchTopics(message: BotMessage, context: IBotContext): Promise<string[] | undefined> {
+    try {
+        return await fetchTopicsFromContext(
+            message.channel,
+            context.database,
+            context.dictionary,
+            context.config.prefix,
+        );
+    } catch (err) {
+        context.logger.error(toError(err));
+
+        return undefined;
+    }
 }
 
 export async function extractTopics(

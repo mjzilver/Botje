@@ -79,6 +79,30 @@ export abstract class Lister {
         await context.messageHandler.reply(message, "This command does not work with %");
     }
 
+    protected async sendPaginatedRows<T>(
+        message: GuildBotMessage,
+        context: IBotContext,
+        rows: T[],
+        title: string,
+        formatRow: (row: T) => string | Promise<string>,
+        emptyMessage?: string,
+    ): Promise<void> {
+        if (emptyMessage !== undefined && (!rows || rows.length === 0)) {
+            await context.messageHandler.send(message, emptyMessage);
+
+            return;
+        }
+
+        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
+            let result = "";
+            for (const row of pageRows) result += await formatRow(row);
+
+            return this.buildPageEmbed(context.config.color_hex, title, result, pageNum, totalPages);
+        });
+
+        await context.pagination.sendPaginatedEmbed(message, pages);
+    }
+
     protected buildPageEmbed(
         color: `#${string}`,
         title: string,

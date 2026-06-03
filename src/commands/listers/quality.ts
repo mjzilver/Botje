@@ -52,22 +52,17 @@ class QualityLister extends Lister {
                 [message.guild.id],
             ),
         );
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) {
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Top 10 quality posters in ${message.guild?.name}`,
+            async (row) => {
                 const userName = await context.userHandler.getDisplayName(row.user_id, message.guild.id);
-                result += `\`${userName}\`'s post quality is ${parseFloat(row.percentage_unique).toFixed(2)}% \n`;
-            }
 
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top 10 quality posters in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+                return `\`${userName}\`'s post quality is ${parseFloat(row.percentage_unique).toFixed(2)}% \n`;
+            },
+        );
     }
 }
 

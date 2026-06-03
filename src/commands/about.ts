@@ -1,8 +1,7 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { normalizeSpaces, makeStringHelpers } from "../systems/stringHelpers";
-import { extractNounTokens, fetchTopicsFromContext } from "../systems/topicExtractor";
-import { toError } from "../systems/utils";
+import { extractNounTokens, tryFetchTopics } from "../systems/topicExtractor";
 
 export default {
     name: "about",
@@ -22,16 +21,8 @@ export default {
                 return;
             }
         } else {
-            let topics: string[];
-            try {
-                topics = await fetchTopicsFromContext(
-                    message.channel,
-                    context.database,
-                    context.dictionary,
-                    context.config.prefix,
-                );
-            } catch (err) {
-                context.logger.error(toError(err));
+            const topics = await tryFetchTopics(message, context);
+            if (!topics) {
                 context.messageHandler.reply(message, "Couldn't read recent messages.");
 
                 return;

@@ -3,16 +3,16 @@ import topicCommand from "../../commands/topic";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
 vi.mock("../../systems/topicExtractor", () => ({
-    fetchTopicsFromContext: vi.fn(),
+    tryFetchTopics: vi.fn(),
 }));
 
-import { fetchTopicsFromContext } from "../../systems/topicExtractor";
+import { tryFetchTopics } from "../../systems/topicExtractor";
 
 describe("topic command", () => {
     beforeEach(() => vi.clearAllMocks());
 
     it("sends top topic with related topics when multiple found", async () => {
-        vi.mocked(fetchTopicsFromContext).mockResolvedValue(["cats", "dogs", "birds"]);
+        vi.mocked(tryFetchTopics).mockResolvedValue(["cats", "dogs", "birds"]);
         const context = makeMockContext();
         const message = makeMessage("!topic");
 
@@ -25,7 +25,7 @@ describe("topic command", () => {
     });
 
     it("omits related topics when only one topic found", async () => {
-        vi.mocked(fetchTopicsFromContext).mockResolvedValue(["cats"]);
+        vi.mocked(tryFetchTopics).mockResolvedValue(["cats"]);
         const context = makeMockContext();
         const message = makeMessage("!topic");
 
@@ -35,7 +35,7 @@ describe("topic command", () => {
     });
 
     it("sends no-topic fallback when topic list is empty", async () => {
-        vi.mocked(fetchTopicsFromContext).mockResolvedValue([]);
+        vi.mocked(tryFetchTopics).mockResolvedValue([]);
         const context = makeMockContext();
         const message = makeMessage("!topic");
 
@@ -47,15 +47,13 @@ describe("topic command", () => {
         );
     });
 
-    it("sends error fallback and logs when fetch throws", async () => {
-        const error = new Error("fetch failed");
-        vi.mocked(fetchTopicsFromContext).mockRejectedValue(error);
+    it("sends error fallback when fetch returns undefined", async () => {
+        vi.mocked(tryFetchTopics).mockResolvedValue(undefined);
         const context = makeMockContext();
         const message = makeMessage("!topic");
 
         await topicCommand.function(message, context);
 
         expect(vi.mocked(context.messageHandler.send)).toHaveBeenCalledWith(message, "Couldn't read recent messages.");
-        expect(vi.mocked(context.logger.error)).toHaveBeenCalledWith(error);
     });
 });

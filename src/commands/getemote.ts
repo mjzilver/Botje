@@ -1,7 +1,7 @@
 import fs from "fs";
 import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand } from "../interfaces";
-import { findClosestMatchInList } from "../systems/utils";
+import { findClosestMatchInList, readGuildEmoteDir } from "../systems/utils";
 
 export default {
     name: "getemote",
@@ -11,8 +11,7 @@ export default {
     async function(message, context) {
         const args = message.content.split(" ");
         args.shift();
-        const path = `backups/emotes/${message.guild?.id}/`;
-        const files = fs.readdirSync(path);
+        const { path, files } = readGuildEmoteDir(message.guild?.id);
         if (!args[0]) {
             const emoteNames = files.map((f) => f.replace(".png", ""));
             const pages = await context.pagination.createPages(

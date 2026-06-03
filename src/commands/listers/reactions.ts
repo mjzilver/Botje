@@ -24,19 +24,13 @@ class ReactionsLister extends Lister {
             return;
         }
 
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) result += `${row.emoji} was used ${row.count} times! \n`;
-
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top reactions in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Top reactions in ${message.guild?.name}`,
+            (row) => `${row.emoji} was used ${row.count} times! \n`,
+        );
     }
 
     override async mention(
@@ -65,19 +59,13 @@ class ReactionsLister extends Lister {
             return;
         }
 
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) result += `${row.emoji} was used ${row.count} times! \n`;
-
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Reactions used by ${userName} in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Reactions used by ${userName} in ${message.guild?.name}`,
+            (row) => `${row.emoji} was used ${row.count} times! \n`,
+        );
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -93,22 +81,11 @@ class ReactionsLister extends Lister {
                 [message.guild.id],
             ),
         );
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) {
-                const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
-                result += `\`${userName}\` has reacted ${row.count} times! \n`;
-            }
+        await this.sendPaginatedRows(message, context, rows, `Top reactors in ${message.guild?.name}`, async (row) => {
+            const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
 
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top reactors in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
+            return `\`${userName}\` has reacted ${row.count} times! \n`;
         });
-        await context.pagination.sendPaginatedEmbed(message, pages);
     }
 
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {

@@ -22,25 +22,14 @@ class SaidLister extends Lister {
             ORDER BY COUNT(*) DESC
             LIMIT 100`;
         const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [message.guild.id]);
-        if (!rows || rows.length === 0) {
-            await context.messageHandler.send(message, `No repeated phrases found in ${message.guild?.name}`);
-
-            return;
-        }
-
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) result += `${row.message} was said ${row.count} times \n`;
-
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top most used phrases in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Top most used phrases in ${message.guild?.name}`,
+            (row) => `${row.message} was said ${row.count} times \n`,
+            `No repeated phrases found in ${message.guild?.name}`,
+        );
     }
 
     override async mention(

@@ -1,24 +1,14 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { fetchTopicsFromContext } from "../systems/topicExtractor";
-import { toError } from "../systems/utils";
+import { tryFetchTopics } from "../systems/topicExtractor";
 
 export default {
     name: "topic",
     description: "Shows the current topic based on recent channel messages",
     format: "topic",
     async function(message: BotMessage, context: IBotContext): Promise<void> {
-        let topics: string[];
-
-        try {
-            topics = await fetchTopicsFromContext(
-                message.channel,
-                context.database,
-                context.dictionary,
-                context.config.prefix,
-            );
-        } catch (err) {
-            context.logger.error(toError(err));
+        const topics = await tryFetchTopics(message, context);
+        if (!topics) {
             context.messageHandler.send(message, "Couldn't read recent messages.");
 
             return;

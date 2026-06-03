@@ -36,22 +36,17 @@ class CountLister extends Lister {
         const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
             message.guild.id,
         ]);
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) {
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Top 10 posters in ${message.guild?.name}`,
+            async (row) => {
                 const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
-                result += `\`${userName}\` has posted ${row.count} messages! \n`;
-            }
 
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top 10 posters in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+                return `\`${userName}\` has posted ${row.count} messages! \n`;
+            },
+        );
     }
 
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -72,22 +67,17 @@ class CountLister extends Lister {
             selectSQL,
             [message.guild.id],
         );
-        const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
-            let result = "";
-            for (const row of pageRows) {
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Top 10 posters in ${message.guild?.name}`,
+            async (row) => {
                 const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
-                result += `\`${userName}\` has posted ${Math.round((parseInt(row.count) / parseInt(row.total)) * 100)}% of all messages! \n`;
-            }
 
-            return this.buildPageEmbed(
-                context.config.color_hex,
-                `Top 10 posters in ${message.guild?.name}`,
-                result,
-                pageNum,
-                totalPages,
-            );
-        });
-        await context.pagination.sendPaginatedEmbed(message, pages);
+                return `\`${userName}\` has posted ${Math.round((parseInt(row.count) / parseInt(row.total)) * 100)}% of all messages! \n`;
+            },
+        );
     }
 }
 
