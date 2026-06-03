@@ -37,7 +37,13 @@ export function makeMockContext(overrides?: Partial<IBotContext>): IBotContext {
     const ctx = mockDeep<IBotContext>();
 
     ctx.config = TEST_CONFIG;
-    ctx.loadedCommands = { commands: {}, admincommands: {}, dmcommands: {}, clcommands: {}, disabled: new Set<string>() as unknown as Set<string> & typeof ctx.loadedCommands.disabled };
+    ctx.loadedCommands = {
+        commands: {},
+        admincommands: {},
+        dmcommands: {},
+        clcommands: {},
+        disabled: new Set<string>() as unknown as Set<string> & typeof ctx.loadedCommands.disabled,
+    };
     ctx.disallowed = {};
 
     if (overrides) Object.assign(ctx, overrides);

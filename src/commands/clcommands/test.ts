@@ -1,6 +1,5 @@
 import type { IClCommand, ICommand, IBotContext, CommandOption } from "../../interfaces";
-import type { BotGuildTextChannel } from "../../interfaces/discord";
-import { getTextChannels, cliToMessage } from "../../systems/messageAdapter";
+import { findChannel, getTextChannels, cliToMessage } from "../../systems/messageAdapter";
 import { toError } from "../../systems/utils";
 
 const CALL_DELAY_MS = 800;
@@ -8,14 +7,6 @@ const SKIP_COMMANDS = new Set(["ask", "tarot", "hangman"]);
 
 function delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function findChannel(input: string, context: IBotContext): BotGuildTextChannel | undefined {
-    const channels = getTextChannels(context.client);
-
-    return (
-        channels.find((ch) => ch.id === input) ?? channels.find((ch) => ch.name.toLowerCase() === input.toLowerCase())
-    );
 }
 
 const STRING_VALUES: Record<string, string> = {
@@ -79,7 +70,7 @@ export default {
             return;
         }
 
-        const channel = findChannel(channelInput, context);
+        const channel = findChannel(channelInput, context.client);
         if (!channel) {
             context.logger.console(`Channel not found: ${channelInput}`);
 

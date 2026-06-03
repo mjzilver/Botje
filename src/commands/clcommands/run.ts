@@ -1,14 +1,5 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
-import type { BotGuildTextChannel } from "../../interfaces/discord";
-import { getTextChannels, cliToMessage } from "../../systems/messageAdapter";
-
-function findChannel(input: string, context: IBotContext): BotGuildTextChannel | undefined {
-    const channels = getTextChannels(context.client);
-
-    return (
-        channels.find((ch) => ch.id === input) ?? channels.find((ch) => ch.name.toLowerCase() === input.toLowerCase())
-    );
-}
+import { findChannel, getTextChannels, cliToMessage } from "../../systems/messageAdapter";
 
 export default {
     name: "run",
@@ -22,7 +13,7 @@ export default {
             return;
         }
 
-        const channel = findChannel(channelInput, context);
+        const channel = findChannel(channelInput, context.client);
         if (!channel) {
             context.logger.console(`Channel not found: ${channelInput}`);
 

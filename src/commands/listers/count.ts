@@ -36,17 +36,7 @@ class CountLister extends Lister {
         const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
             message.guild.id,
         ]);
-        await this.sendPaginatedRows(
-            message,
-            context,
-            rows,
-            `Top 10 posters in ${message.guild?.name}`,
-            async (row) => {
-                const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
-
-                return `\`${userName}\` has posted ${row.count} messages! \n`;
-            },
-        );
+        await this.sendUserCountLeaderboard(message, context, rows, "messages");
     }
 
     override async percentage(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -67,16 +57,12 @@ class CountLister extends Lister {
             selectSQL,
             [message.guild.id],
         );
-        await this.sendPaginatedRows(
+        await this.sendUserLeaderboard(
             message,
             context,
             rows,
-            `Top 10 posters in ${message.guild?.name}`,
-            async (row) => {
-                const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
-
-                return `\`${userName}\` has posted ${Math.round((parseInt(row.count) / parseInt(row.total)) * 100)}% of all messages! \n`;
-            },
+            (userName, row) =>
+                `\`${userName}\` has posted ${Math.round((parseInt(row.count) / parseInt(row.total)) * 100)}% of all messages! \n`,
         );
     }
 }

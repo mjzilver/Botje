@@ -79,6 +79,39 @@ export abstract class Lister {
         await context.messageHandler.reply(message, "This command does not work with %");
     }
 
+    protected async sendUserLeaderboard<R extends { user_id: string; server_id: string; count: string }>(
+        message: GuildBotMessage,
+        context: IBotContext,
+        rows: R[],
+        formatEntry: (userName: string, row: R) => string,
+    ): Promise<void> {
+        await this.sendPaginatedRows(
+            message,
+            context,
+            rows,
+            `Top 10 posters in ${message.guild?.name}`,
+            async (row) => {
+                const userName = await context.userHandler.getDisplayName(row.user_id, row.server_id);
+
+                return formatEntry(userName, row);
+            },
+        );
+    }
+
+    protected async sendUserCountLeaderboard(
+        message: GuildBotMessage,
+        context: IBotContext,
+        rows: Array<{ user_id: string; server_id: string; count: string }>,
+        noun: string,
+    ): Promise<void> {
+        await this.sendUserLeaderboard(
+            message,
+            context,
+            rows,
+            (userName, row) => `\`${userName}\` has posted ${row.count} ${noun}! \n`,
+        );
+    }
+
     protected async sendPaginatedRows<T>(
         message: GuildBotMessage,
         context: IBotContext,

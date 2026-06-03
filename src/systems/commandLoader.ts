@@ -35,6 +35,7 @@ function loadCommandsFromDir<T extends ICommand | IClCommand>(
                 for (const alias of command.aliases.split(",").map((a) => a.trim())) if (alias) disabled.add(alias);
             continue;
         }
+
         target[command.name] = command;
         if (command.aliases)
             for (const alias of command.aliases.split(",").map((a) => a.trim())) if (alias) target[alias] = command;

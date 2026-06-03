@@ -29,6 +29,24 @@ export function getTextChannels(client: discord.Client): BotGuildTextChannel[] {
     return result;
 }
 
+export function findChannel(input: string, client: discord.Client): BotGuildTextChannel | undefined {
+    const channels = getTextChannels(client);
+
+    return (
+        channels.find((ch) => ch.id === input) ?? channels.find((ch) => ch.name.toLowerCase() === input.toLowerCase())
+    );
+}
+
+function makePseudoStubs(): Pick<BotMessage, "reactions" | "react" | "createMessageComponentCollector"> {
+    return {
+        reactions: { cache: new Map<string, BotReaction>(), resolve: () => null },
+        react: (_emoji: string) => Promise.resolve({} as unknown as BotReaction),
+        createMessageComponentCollector: (_options: { componentType: number; time: number }): ComponentCollector => ({
+            on: () => {},
+        }),
+    };
+}
+
 function extractInteractionArgs(interaction: discord.ChatInputCommandInteraction): {
     content: string;
     mentionMap: Map<string, BotUser>;
@@ -72,15 +90,11 @@ export function cliToMessage(channel: BotGuildTextChannel, client: discord.Clien
         mentions: { users: Object.assign(new Map<string, BotUser>(), { first: (): BotUser | undefined => undefined }) },
         createdAt: new Date(),
         createdTimestamp: Date.now(),
-        reactions: { cache: new Map<string, BotReaction>(), resolve: () => null },
         reference: null,
         reply: (c: MessageContent) => botChannel.send(c),
-        react: (_emoji: string) => Promise.resolve({} as unknown as BotReaction),
         edit: (_c: MessageContent) => Promise.resolve(pseudoMessage),
         delete: () => Promise.resolve(pseudoMessage),
-        createMessageComponentCollector: (_options: { componentType: number; time: number }): ComponentCollector => ({
-            on: () => {},
-        }),
+        ...makePseudoStubs(),
     };
 
     return pseudoMessage;
@@ -107,17 +121,13 @@ export function interactionToMessage(
         mentions: { users: mentions },
         createdTimestamp: interaction.createdTimestamp,
         createdAt: new Date(interaction.createdTimestamp),
-        reactions: { cache: new Map<string, BotReaction>(), resolve: () => null },
         reference: null,
         isSlashCommand: true,
         slashInteraction: interaction,
         reply: (_content: MessageContent) => Promise.resolve(pseudoMessage),
-        react: (_emoji: string) => Promise.resolve({} as unknown as BotReaction),
         edit: (_content: MessageContent) => Promise.resolve(pseudoMessage),
         delete: () => Promise.resolve(pseudoMessage),
-        createMessageComponentCollector: (_options: { componentType: number; time: number }): ComponentCollector => ({
-            on: () => {},
-        }),
+        ...makePseudoStubs(),
     };
 
     return pseudoMessage;

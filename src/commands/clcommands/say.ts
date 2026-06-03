@@ -1,15 +1,6 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
-import type { BotGuildTextChannel } from "../../interfaces/discord";
-import { getTextChannels } from "../../systems/messageAdapter";
+import { findChannel, getTextChannels } from "../../systems/messageAdapter";
 import { generateMimicMessage } from "../../systems/textGenerationService";
-
-function findChannel(input: string, context: IBotContext): BotGuildTextChannel | undefined {
-    const channels = getTextChannels(context.client);
-
-    return (
-        channels.find((ch) => ch.id === input) ?? channels.find((ch) => ch.name.toLowerCase() === input.toLowerCase())
-    );
-}
 
 function findUserId(input: string, guildId: string, context: IBotContext): string | undefined {
     const guild = context.client.guilds.cache.get(guildId);
@@ -39,7 +30,7 @@ export default {
             return;
         }
 
-        const channel = findChannel(channelInput, context);
+        const channel = findChannel(channelInput, context.client);
         if (!channel) {
             context.logger.console(`Channel not found: ${channelInput}`);
 
@@ -85,7 +76,7 @@ export default {
         }
 
         if (argIndex === 1) {
-            const channel = input[0] ? findChannel(input[0], context) : undefined;
+            const channel = input[0] ? findChannel(input[0], context.client) : undefined;
             const guild = channel ? context.client.guilds.cache.get(channel.guild.id) : undefined;
             if (!guild) return [];
 
