@@ -30,7 +30,7 @@ export class CommandLine {
                 const argParts = rawParts.slice(1).filter((s) => s.length > 0);
                 const argIndex = line.endsWith(" ") ? argParts.length : argParts.length - 1;
                 const prefix = line.endsWith(" ") ? "" : (argParts[argParts.length - 1] ?? "");
-                const completions = cmd.completer(argIndex, this.context);
+                const completions = cmd.completer(argIndex, this.context, argParts);
                 const matches = completions.filter((c) => c.toLowerCase().startsWith(prefix.toLowerCase()));
 
                 return [matches.length > 0 ? matches : completions, prefix];

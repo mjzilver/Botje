@@ -69,7 +69,7 @@ export interface IClCommand {
     disabled?: boolean;
     aliases?: string;
     function(input: string[], context: IBotContext): void | Promise<void>;
-    completer?(argIndex: number, context: IBotContext): string[];
+    completer?(argIndex: number, context: IBotContext, input: string[]): string[];
 }
 
 export interface IBotContext {

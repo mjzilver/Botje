@@ -1,6 +1,7 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
 import type { BotGuildTextChannel } from "../../interfaces/discord";
 import { getTextChannels } from "../../systems/messageAdapter";
+import { generateMimicMessage } from "../../systems/textGenerationService";
 
 function findChannel(input: string, context: IBotContext): BotGuildTextChannel | undefined {
     const channels = getTextChannels(context.client);
@@ -26,27 +27,13 @@ function findUserId(input: string, guildId: string, context: IBotContext): strin
     return undefined;
 }
 
-async function randomMessage(context: IBotContext): Promise<string | null> {
-    const earliest = new Date();
-    earliest.setMonth(earliest.getMonth() - 5);
-    const rows = await context.database.queryRandomMessage<{ message: string }>(
-        `SELECT message FROM messages
-         WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
-         AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-         AND datetime < $1 AND LENGTH(message) > 10`,
-        [earliest.getTime()],
-    );
-
-    return rows[0]?.message ?? null;
-}
-
 export default {
     name: "say",
     description: "sends a message as a user via webhook",
     format: "say <channel> <user> [message]",
     async function(input: string[], context: IBotContext) {
-        const [channelInput, userInput, ...messageParts] = input;
-        if (!channelInput || !userInput) {
+        const [channelInput, ...rest] = input;
+        if (!channelInput || rest.length === 0) {
             context.logger.console("Usage: say <channel> <user> [message]");
 
             return;
@@ -59,34 +46,50 @@ export default {
             return;
         }
 
-        const userId = findUserId(userInput, channel.guild.id, context);
+        let userId: string | undefined;
+        let messageStartIndex = 0;
+        for (let i = rest.length; i >= 1; i--) {
+            const candidate = rest.slice(0, i).join(" ");
+            const found = findUserId(candidate, channel.guild.id, context);
+            if (found) {
+                userId = found;
+                messageStartIndex = i;
+                break;
+            }
+        }
+
         if (!userId) {
-            context.logger.console(`User not found in guild: ${userInput}`);
+            context.logger.console(`User not found in guild: ${rest.join(" ")}`);
 
             return;
         }
 
-        const message = messageParts.length > 0 ? messageParts.join(" ") : await randomMessage(context);
+        const messageParts = rest.slice(messageStartIndex);
+        const message = messageParts.length > 0 ? messageParts.join(" ") : await generateMimicMessage(userId, context);
         if (!message) {
-            context.logger.console("No message provided and no random message found");
+            context.logger.console("No message provided and could not generate a mimic");
 
             return;
         }
 
         const sent = await context.webhook.sendMessage(channel.id, message, userId);
-        context.logger.console(sent ? `Sent as ${userInput} in #${channel.name}` : "Failed to send message");
+        context.logger.console(
+            sent
+                ? `Sent as ${rest.slice(0, messageStartIndex).join(" ")} in #${channel.name}`
+                : "Failed to send message",
+        );
     },
-    completer(argIndex: number, context: IBotContext): string[] {
+    completer(argIndex: number, context: IBotContext, input: string[]): string[] {
         if (argIndex === 0) {
             return getTextChannels(context.client).map((ch) => ch.name);
         }
 
         if (argIndex === 1) {
-            const seen = new Set<string>();
-            for (const [, guild] of context.client.guilds.cache)
-                for (const [, member] of guild.members.cache) seen.add(member.displayName || member.user.username);
+            const channel = input[0] ? findChannel(input[0], context) : undefined;
+            const guild = channel ? context.client.guilds.cache.get(channel.guild.id) : undefined;
+            if (!guild) return [];
 
-            return [...seen];
+            return [...guild.members.cache.values()].map((m) => m.displayName || m.user.username);
         }
 
         return [];

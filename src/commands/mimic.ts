@@ -1,18 +1,8 @@
 import type { ICommand } from "../interfaces";
 import { isGuildMessage } from "../interfaces/discord";
 import { pickRandomItem, toError } from "../systems/utils";
-import {
-    cleanMessage,
-    buildStyleProfile,
-    buildChain,
-    generate,
-    isVerbatimRepeat,
-    isEligibleMimicTarget,
-    MIN_MESSAGES,
-    MAX_RETRIES,
-} from "../systems/mimicBuilder";
-import type { CachedProfile } from "../systems/mimicBuilder";
-import { mimicCache } from "../systems/mimicCache";
+import { isEligibleMimicTarget } from "../systems/mimicBuilder";
+import { generateMimicMessage } from "../systems/textGenerationService";
 
 export default {
     name: "mimic",
@@ -55,7 +45,7 @@ export default {
                     c.user_id,
                     context.client.user?.id,
                     (id) => context.client.users.cache.get(id),
-                    (id) => context.client.guilds.cache.some((g) => g.members.cache.has(id)),
+                    (id) => message.guild.members.cache.has(id),
                 ),
             );
 
@@ -82,81 +72,17 @@ export default {
         }
 
         try {
-            const displayName = await context.userHandler.getDisplayName(targetId, message.guild.id);
-            const cached = mimicCache.get(targetId);
-
-            if (cached !== null && !mimicCache.isExpired(cached)) {
-                replyFromProfile(cached, displayName);
+            const result = await generateMimicMessage(targetId, context);
+            if (!result) {
+                context.messageHandler.reply(message, "Not enough message history to generate a mimic.");
 
                 return;
             }
 
-            if (cached !== null) {
-                replyFromProfile(cached, displayName);
-                mimicCache.enqueue(targetId, context.database, context.logger, context.config.prefix);
-
-                return;
-            }
-
-            const rows = await context.database.query<{ message: string }>(
-                `SELECT message FROM messages
-                 WHERE user_id = $1
-                 AND LENGTH(message) > 15
-                 ORDER BY RANDOM()
-                 LIMIT 5000`,
-                [targetId],
-            );
-
-            const cleaned = rows
-                .map((r) => cleanMessage(r.message, context.config.prefix))
-                .filter((m): m is string => m !== null);
-
-            if (cleaned.length < MIN_MESSAGES) {
-                context.messageHandler.reply(
-                    message,
-                    `Not enough saved messages to mimic **${displayName}** — they need to chat more.`,
-                );
-
-                return;
-            }
-
-            const style = buildStyleProfile(cleaned);
-            const { chain, starts } = buildChain(cleaned);
-
-            if (starts.length === 0) {
-                context.messageHandler.reply(message, "Not enough varied messages to generate a mimic.");
-
-                return;
-            }
-
-            let generated = generate(chain, starts, style.targetWordCount, style);
-            for (let attempt = 1; attempt < MAX_RETRIES && isVerbatimRepeat(generated, cleaned); attempt++) {
-                context.logger.debug(`Mimic verbatim repeat detected (attempt ${attempt}), regenerating`);
-                generated = generate(chain, starts, style.targetWordCount, style);
-            }
-
-            replyFromProfile(
-                { chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length },
-                displayName,
-                generated,
-            );
-
-            const profile: CachedProfile = { chain, starts, style, builtAt: Date.now(), messageCount: cleaned.length };
-            await mimicCache.enqueueWithProfile(
-                targetId,
-                profile,
-                context.database,
-                context.logger,
-                context.config.prefix,
-            );
+            const sent = await context.webhook.sendMessage(message.channel.id, result, targetId);
+            if (!sent) context.messageHandler.send(message, result);
         } catch (err) {
             context.logger.error(toError(err));
-        }
-
-        function replyFromProfile(profile: CachedProfile, displayName: string, pregenerated?: string): void {
-            const result =
-                pregenerated ?? generate(profile.chain, profile.starts, profile.style.targetWordCount, profile.style);
-            context.messageHandler.send(message, `*mimicking **${displayName}***\n${result}`);
         }
     },
 } satisfies ICommand;

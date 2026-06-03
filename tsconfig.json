@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "@test/*": ["src/__tests__/*"]
+      "@test/*": ["./src/__tests__/*"]
     },
     "target": "ES2022",
     "module": "commonjs",
@@ -22,6 +21,6 @@
     "useUnknownInCatchVariables": true,
     "noImplicitOverride": true
   },
-  "include": ["src/**/*"],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

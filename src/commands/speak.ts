@@ -136,6 +136,10 @@ async function findTopic(message: BotMessage, topic: string, context: IBotContex
     context.messageHandler.reply(message, normalizeSpaces(reply));
 }
 
+export async function speakAbout(topic: string, message: BotMessage, context: IBotContext): Promise<void> {
+    await findTopic(message, topic, context);
+}
+
 export default {
     name: "speak",
     description: "makes the bot speak via recycled messages",

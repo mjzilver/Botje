@@ -1,13 +1,14 @@
-import type { ICommand, IBotContext } from "../interfaces";
+import type { ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { normalizeSpaces, makeStringHelpers } from "../systems/stringHelpers";
 import { extractNounTokens, tryFetchTopics } from "../systems/topicExtractor";
+import { speakAbout } from "./speak";
 
 export default {
     name: "about",
     description: "Makes the bot say something about a topic",
     format: "about [topic]",
-    async function(message: BotMessage, context: IBotContext): Promise<void> {
+    async function(message: BotMessage, context): Promise<void> {
         const { removeCommand } = makeStringHelpers(context.config);
         const phrase = normalizeSpaces(removeCommand(message.content));
 
@@ -36,10 +37,6 @@ export default {
             }
         }
 
-        const syntheticContent = `${context.config.prefix}speak about ${topic}`;
-        const topicMessage = Object.assign(Object.create(message as object) as BotMessage, {
-            content: syntheticContent,
-        });
-        await context.loadedCommands.commands["speak"]?.function(topicMessage, context);
+        await speakAbout(topic, message, context);
     },
 } satisfies ICommand;

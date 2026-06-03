@@ -49,6 +49,7 @@ function makeContextWithTarget(targetId = "target-id") {
     Object.defineProperty(context.client, "user", { value: { id: "bot-id", bot: true }, configurable: true });
 
     vi.mocked(context.database.query).mockResolvedValue([{ user_id: targetId }]);
+    vi.mocked(context.webhook.sendMessage).mockResolvedValue(true);
 
     return context;
 }
@@ -80,9 +81,10 @@ describe("mimic command", () => {
 
         await mimicCommand.function(message, context);
 
-        expect(vi.mocked(context.messageHandler.send)).toHaveBeenCalledWith(
-            message,
-            expect.stringContaining("mocked generated text"),
+        expect(vi.mocked(context.webhook.sendMessage)).toHaveBeenCalledWith(
+            message.channel.id,
+            "mocked generated text",
+            "target-id",
         );
         expect(vi.mocked(mimicCache.enqueue)).not.toHaveBeenCalled();
     });
@@ -99,9 +101,10 @@ describe("mimic command", () => {
 
         await mimicCommand.function(message, context);
 
-        expect(vi.mocked(context.messageHandler.send)).toHaveBeenCalledWith(
-            message,
-            expect.stringContaining("mocked generated text"),
+        expect(vi.mocked(context.webhook.sendMessage)).toHaveBeenCalledWith(
+            message.channel.id,
+            "mocked generated text",
+            "target-id",
         );
         expect(vi.mocked(mimicCache.enqueue)).toHaveBeenCalledWith(
             "target-id",
@@ -127,9 +130,10 @@ describe("mimic command", () => {
 
         await mimicCommand.function(message, context);
 
-        expect(vi.mocked(context.messageHandler.send)).toHaveBeenCalledWith(
-            message,
-            expect.stringContaining("mocked generated text"),
+        expect(vi.mocked(context.webhook.sendMessage)).toHaveBeenCalledWith(
+            message.channel.id,
+            "mocked generated text",
+            "target-id",
         );
         expect(vi.mocked(mimicCache.enqueueWithProfile)).toHaveBeenCalled();
     });
@@ -148,7 +152,7 @@ describe("mimic command", () => {
 
         expect(vi.mocked(context.messageHandler.reply)).toHaveBeenCalledWith(
             message,
-            expect.stringContaining("Not enough saved messages"),
+            "Not enough message history to generate a mimic.",
         );
     });
 
