@@ -76,7 +76,7 @@ export class CommandHandler {
             );
             if (!isReadback) this.commandList.push(message);
             const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
-            if (isAdmin || this.isUserAllowed(message, !isReadback))
+            if (isAdmin || isReadback || this.isUserAllowed(message, true))
                 this.handleCommandType(command, isReadback, message, isAdmin);
         } else if (!message.author.bot) {
             this.handleNonCommandMessage(message);

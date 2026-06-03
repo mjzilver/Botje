@@ -19,9 +19,10 @@ export default {
             });
             await iterator.iterate(message.channel, message.id);
             context.logger.warn(`Deleting up to 100 messages after "${message.content}"`);
+            context.messageHandler.markComplete(message);
             setTimeout(() => context.messageHandler.delete(message), 5000);
         } else {
-            message.reply("You need to reply to a message to delete after the replied-to message");
+            await context.messageHandler.reply(message, "You need to reply to a message to delete after the replied-to message");
         }
     },
 } satisfies ICommand;

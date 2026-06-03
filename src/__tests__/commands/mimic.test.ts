@@ -86,6 +86,7 @@ describe("mimic command", () => {
             "mocked generated text",
             "target-id",
         );
+        expect(vi.mocked(context.messageHandler.markComplete)).toHaveBeenCalledWith(message);
         expect(vi.mocked(mimicCache.enqueue)).not.toHaveBeenCalled();
     });
 
@@ -106,6 +107,7 @@ describe("mimic command", () => {
             "mocked generated text",
             "target-id",
         );
+        expect(vi.mocked(context.messageHandler.markComplete)).toHaveBeenCalledWith(message);
         expect(vi.mocked(mimicCache.enqueue)).toHaveBeenCalledWith(
             "target-id",
             context.database,
@@ -135,6 +137,7 @@ describe("mimic command", () => {
             "mocked generated text",
             "target-id",
         );
+        expect(vi.mocked(context.messageHandler.markComplete)).toHaveBeenCalledWith(message);
         expect(vi.mocked(mimicCache.enqueueWithProfile)).toHaveBeenCalled();
     });
 

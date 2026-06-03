@@ -1,5 +1,7 @@
-import { pickRandomItem, randomBetween } from "./utils";
+import { pickRandomItem } from "./utils";
 import { normalizeSpaces } from "./stringHelpers";
+
+export const END_TOKEN = "\n";
 
 export type Chain = Record<string, string[]>;
 
@@ -101,21 +103,33 @@ export function buildChain(messages: string[]): { chain: Chain; starts: [string,
             if (!chain[key]) chain[key] = [];
             chain[key].push(words[i + 2]);
         }
+
+        const endKey = `${words[words.length - 2].toLowerCase()} ${words[words.length - 1].toLowerCase()}`;
+        if (!chain[endKey]) chain[endKey] = [];
+        chain[endKey].push(END_TOKEN);
     }
 
     return { chain, starts };
 }
 
+const HARD_CAP_MULTIPLIER = 3;
+
 export function generate(chain: Chain, starts: [string, string][], targetLen: number, style: StyleProfile): string {
     const [w0, w1] = pickRandomItem(starts);
     const words: string[] = [w0, w1];
     let prev = `${w0.toLowerCase()} ${w1.toLowerCase()}`;
-    const maxLen = targetLen + randomBetween(0, 4);
+    const hardCap = targetLen * HARD_CAP_MULTIPLIER;
 
-    while (words.length < maxLen) {
-        const options = chain[prev];
+    while (words.length < hardCap) {
+        let options = chain[prev];
         if (!options || options.length === 0) break;
+        if (words.length < targetLen) {
+            options = options.filter((w) => w !== END_TOKEN);
+            if (options.length === 0) break;
+        }
+
         const next = pickRandomItem(options);
+        if (next === END_TOKEN) break;
         words.push(next);
         const last = words.slice(-2);
         prev = `${last[0].toLowerCase()} ${last[1].toLowerCase()}`;

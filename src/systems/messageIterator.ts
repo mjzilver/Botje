@@ -7,6 +7,7 @@ export interface IterableMessage {
         id: string;
         bot?: boolean;
     };
+    webhookId?: string | null;
     content?: string;
     delete(): Promise<IterableMessage>;
 }

@@ -80,7 +80,8 @@ export default {
             }
 
             const sent = await context.webhook.sendMessage(message.channel.id, result, targetId);
-            if (!sent) context.messageHandler.send(message, result);
+            if (sent) context.messageHandler.markComplete(message);
+            else context.messageHandler.send(message, result);
         } catch (err) {
             context.logger.error(toError(err));
         }

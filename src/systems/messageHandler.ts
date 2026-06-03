@@ -135,6 +135,7 @@ export class MessageHandler implements IMessageHandler {
     }
 
     markComplete(call: BotMessage): void {
+        this.commandCalls[call.id] = call.id;
         this.db.insert(COMMAND_CALL_SQL, [call.id, null, call.createdAt.getTime()]);
         this.removeFromCommandList?.(call);
     }
