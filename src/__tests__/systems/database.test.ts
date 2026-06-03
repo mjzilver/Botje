@@ -2,11 +2,27 @@ import { describe, it, expect, vi } from "vitest";
 import { Database } from "../../systems/database";
 import { createSilentLogger } from "../../systems/logger";
 import type { Pool } from "pg";
+import { DatabaseError } from "pg";
+import type { ILogger } from "../../systems/logger";
 
 function makeMockPool(rows: Record<string, unknown>[] = []): Pool {
     return {
         query: vi.fn().mockResolvedValue({ rows }),
     } as unknown as Pool;
+}
+
+function makeMockLogger(): ILogger {
+    return {
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+        startup: vi.fn(),
+        console: vi.fn(),
+        repeat: vi.fn(),
+        printColumns: vi.fn(),
+        printRows: vi.fn(),
+    };
 }
 
 const testConfig = { prefix: "^(b! ?)" };
@@ -115,5 +131,45 @@ describe("Database.getCurrentUsername", () => {
         const db = new Database(pool, logger, testConfig);
         const name = await db.getCurrentUsername("123", "456");
         expect(name).toBeNull();
+    });
+});
+
+describe("Database.query", () => {
+    it("logs SQL parameters and postgres metadata on failure", async () => {
+        const dbError = new DatabaseError("insert failed", 0, "error");
+        dbError.code = "23505";
+        dbError.detail = "Key already exists";
+        dbError.constraint = "reactions_pkey";
+        const pool = {
+            query: vi.fn().mockRejectedValue(dbError),
+        } as unknown as Pool;
+        const mockLogger = makeMockLogger();
+        const db = new Database(pool, mockLogger, testConfig);
+
+        await expect(db.query("SELECT $1", ["abc"])).rejects.toThrow("insert failed");
+        expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('params=["abc"]'));
+        expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("code=23505"));
+        expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("constraint=reactions_pkey"));
+    });
+});
+
+describe("Database.insertReaction", () => {
+    it("skips insert when emoji name is missing", async () => {
+        const pool = makeMockPool([]);
+        const mockLogger = makeMockLogger();
+        const db = new Database(pool, mockLogger, testConfig);
+        const reaction = {
+            emoji: { name: null },
+            message: { id: "123" },
+            users: {
+                cache: new Map([["111", { id: "111" }]]),
+                fetch: vi.fn().mockResolvedValue(new Map()),
+            },
+        };
+
+        await db.insertReaction(reaction as never);
+
+        expect(pool.query).not.toHaveBeenCalled();
+        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining("reason=missing emoji name"));
     });
 });

@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Pool, DatabaseError } from "pg";
 import type { QueryResultRow } from "pg";
 import format from "pg-format";
 import type { ILogger } from "./logger";
@@ -46,6 +46,30 @@ export class Database implements IDatabase {
         this.pool = pool;
         this.logger = logger;
         this.config = config;
+    }
+
+    private formatSqlParams(params: SqlParam[]): string {
+        const normalizedParams = params.map((param) => {
+            if (param instanceof Date) return param.toISOString();
+            if (Buffer.isBuffer(param)) return `<Buffer length=${param.length}>`;
+
+            return param;
+        });
+
+        return JSON.stringify(normalizedParams);
+    }
+
+    private formatQueryErrorDetails(err: Error, params: SqlParam[]): string {
+        const base = `${err.message}\nparams=${this.formatSqlParams(params)}`;
+        if (!(err instanceof DatabaseError)) return base;
+
+        const { code, detail, hint, where, table, column, constraint, routine } = err;
+        const pg = Object.entries({ code, detail, hint, where, table, column, constraint, routine })
+            .filter(([, v]) => v)
+            .map(([k, v]) => `${k}=${v}`)
+            .join("\n");
+
+        return pg ? `${base}\n${pg}` : base;
     }
 
     async initialize(): Promise<void> {
@@ -153,7 +177,7 @@ export class Database implements IDatabase {
 
             return result.rows as T[];
         } catch (err) {
-            this.logger.error(`SQL Error:\n${sql}\n${toError(err).message}`);
+            this.logger.error(`SQL Error:\n${sql}\n${this.formatQueryErrorDetails(toError(err), params)}`);
             throw err;
         }
     }
@@ -254,17 +278,28 @@ export class Database implements IDatabase {
 
                 return;
             }
-        for (const user of users.values())
+        for (const user of users.values()) {
+            const emojiName = reaction.emoji.name;
+            if (!emojiName) {
+                this.logger.warn(
+                    `Skipping reaction insert: message_id=${reaction.message.id} user_id=${user.id} reason=missing emoji name`,
+                );
+
+                continue;
+            }
             try {
                 await this.query(
                     `INSERT INTO reactions (message_id, user_id, emoji, timestamp)
                      VALUES ($1::bigint, $2::bigint, $3, $4::bigint)
                      ON CONFLICT DO NOTHING`,
-                    [reaction.message.id, user.id, reaction.emoji.name, Date.now()],
+                    [reaction.message.id, user.id, emojiName, Date.now()],
                 );
-            } catch {
-                this.logger.error("Failed to store reaction");
+            } catch (err) {
+                this.logger.error(
+                    `Failed to store reaction: message_id=${reaction.message.id} user_id=${user.id} emoji=${emojiName}\n${toError(err).message}`,
+                );
             }
+        }
     }
 
     async insertMessage(message: GuildBotMessage): Promise<void> {

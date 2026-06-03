@@ -26,14 +26,28 @@ function findUserId(input: string, guildId: string, context: IBotContext): strin
     return undefined;
 }
 
+async function randomMessage(context: IBotContext): Promise<string | null> {
+    const earliest = new Date();
+    earliest.setMonth(earliest.getMonth() - 5);
+    const rows = await context.database.queryRandomMessage<{ message: string }>(
+        `SELECT message FROM messages
+         WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
+         AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
+         AND datetime < $1 AND LENGTH(message) > 10`,
+        [earliest.getTime()],
+    );
+
+    return rows[0]?.message ?? null;
+}
+
 export default {
     name: "say",
     description: "sends a message as a user via webhook",
-    format: "say <channel> <user> <message>",
+    format: "say <channel> <user> [message]",
     async function(input: string[], context: IBotContext) {
         const [channelInput, userInput, ...messageParts] = input;
-        if (!channelInput || !userInput || messageParts.length === 0) {
-            context.logger.console("Usage: say <channel-id-or-name> <user-id-or-name> <message>");
+        if (!channelInput || !userInput) {
+            context.logger.console("Usage: say <channel> <user> [message]");
 
             return;
         }
@@ -52,24 +66,25 @@ export default {
             return;
         }
 
-        const message = messageParts.join(" ");
+        const message = messageParts.length > 0 ? messageParts.join(" ") : await randomMessage(context);
+        if (!message) {
+            context.logger.console("No message provided and no random message found");
+
+            return;
+        }
+
         const sent = await context.webhook.sendMessage(channel.id, message, userId);
-        context.logger.console(sent ? `Sent as user ${userId} in #${channel.name}` : "Failed to send message");
+        context.logger.console(sent ? `Sent as ${userInput} in #${channel.name}` : "Failed to send message");
     },
     completer(argIndex: number, context: IBotContext): string[] {
         if (argIndex === 0) {
-            return getTextChannels(context.client).flatMap((ch) => [ch.id, ch.name]);
+            return getTextChannels(context.client).map((ch) => ch.name);
         }
 
         if (argIndex === 1) {
             const seen = new Set<string>();
-            for (const [, guild] of context.client.guilds.cache) {
-                for (const [, member] of guild.members.cache) {
-                    seen.add(member.user.id);
-                    seen.add(member.displayName);
-                    seen.add(member.user.username);
-                }
-            }
+            for (const [, guild] of context.client.guilds.cache)
+                for (const [, member] of guild.members.cache) seen.add(member.displayName || member.user.username);
 
             return [...seen];
         }
