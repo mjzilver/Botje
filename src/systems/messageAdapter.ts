@@ -57,6 +57,35 @@ function extractInteractionArgs(interaction: discord.ChatInputCommandInteraction
     return { content, mentionMap };
 }
 
+export function cliToMessage(channel: BotGuildTextChannel, client: discord.Client, content: string): BotMessage | null {
+    if (!client.user) return null;
+    const botChannel = toBotChannel(channel as unknown as discord.TextChannel);
+    const botUser = client.user as BotUser;
+    const pseudoMessage: BotMessage = {
+        id: Date.now().toString(),
+        content,
+        cleanContent: content,
+        author: botUser,
+        channel: botChannel,
+        guild: (channel as unknown as discord.TextChannel).guild as BotMessage["guild"],
+        member: null,
+        mentions: { users: Object.assign(new Map<string, BotUser>(), { first: (): BotUser | undefined => undefined }) },
+        createdAt: new Date(),
+        createdTimestamp: Date.now(),
+        reactions: { cache: new Map<string, BotReaction>(), resolve: () => null },
+        reference: null,
+        reply: (c: MessageContent) => botChannel.send(c),
+        react: (_emoji: string) => Promise.resolve({} as unknown as BotReaction),
+        edit: (_c: MessageContent) => Promise.resolve(pseudoMessage),
+        delete: () => Promise.resolve(pseudoMessage),
+        createMessageComponentCollector: (_options: { componentType: number; time: number }): ComponentCollector => ({
+            on: () => {},
+        }),
+    };
+
+    return pseudoMessage;
+}
+
 export function interactionToMessage(
     interaction: discord.ChatInputCommandInteraction,
     commandName: string,

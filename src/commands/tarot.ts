@@ -64,14 +64,13 @@ export default {
                 .replace("{cardName}", card.name)
                 .replace("{orientation}", isReversed ? "reversed" : "upright")
                 .replace("{meaning}", meaning);
-            const interpretMsg = await message.channel.send("🔮 Divining your fortune...");
             try {
-                await context.llm.streamToMessage(interpretMsg, prompt);
-                await context.messageHandler.react(interpretMsg, "🔮");
+                await context.llm.streamToMessage(message, prompt);
+                await context.messageHandler.react(message, "🔮");
             } catch (err) {
                 context.logger.error(toError(err));
-                await context.messageHandler.edit(
-                    interpretMsg,
+                await context.messageHandler.reply(
+                    message,
                     "You are mentally blocking the spirits from revealing your fortune. Try asking again while being more open to the mystical energies of the universe.",
                 );
             }
