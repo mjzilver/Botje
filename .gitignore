@@ -24,6 +24,7 @@ data/
 
 # Generated meme output
 assets/meme.png
+assets/combined.png
 
 # Backups
 backups/

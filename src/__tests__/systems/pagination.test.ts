@@ -99,11 +99,11 @@ describe("Pagination.sendPaginatedEmbed – multiple pages", () => {
         expect(content.components).toHaveLength(1);
     });
 
-    it("throws when pages array is empty", async () => {
-        const pagination = new Pagination(makeMessageHandler(), makeLogger());
-        await expect(pagination.sendPaginatedEmbed(makeMessage("!test"), [])).rejects.toThrow(
-            "Pages array cannot be empty",
-        );
+    it("sends 'No results found.' when pages array is empty", async () => {
+        const sent: MessageContent[] = [];
+        const pagination = new Pagination(makeMessageHandler(sent), makeLogger());
+        await pagination.sendPaginatedEmbed(makeMessage("!test"), []);
+        expect(sent[0]).toBe("No results found.");
     });
 
     it("preserves string pages by wrapping with content property", async () => {

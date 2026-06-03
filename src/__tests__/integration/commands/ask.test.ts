@@ -7,6 +7,7 @@ describe("ask — integration", () => {
         const context = makeMockContext();
         const thinkingMsg = { id: "thinking-msg" };
         vi.mocked(context.messageHandler.reply).mockResolvedValue(thinkingMsg as never);
+        vi.mocked(context.llm.streamToMessage).mockResolvedValue("Hello!");
 
         await askCommand.function(makeMessage("!ask what is 2+2"), context);
 

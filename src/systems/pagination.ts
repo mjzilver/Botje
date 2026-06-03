@@ -25,7 +25,7 @@ export class Pagination {
     }
 
     async sendPaginatedEmbed(message: BotMessage, pages: Page[], timeout = 300000): Promise<BotMessage | undefined> {
-        if (!pages || pages.length === 0) throw new Error("Pages array cannot be empty");
+        if (!pages || pages.length === 0) return this.messageHandler.send(message, "No results found.");
         if (pages.length === 1) return this.messageHandler.send(message, pages[0]);
         let currentPage = 0;
         const getButtons = (disabled = false) =>

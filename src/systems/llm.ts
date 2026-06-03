@@ -6,7 +6,7 @@ import type { ILogger } from "./logger";
 
 export interface ILlmService {
     streamToMessage(
-        message: BotMessage,
+        placeholder: BotMessage,
         prompt: string,
         filterFn?: ((text: string) => string) | null,
     ): Promise<string | undefined>;
@@ -46,7 +46,7 @@ export class LlmService {
     }
 
     async streamToMessage(
-        message: BotMessage,
+        placeholder: BotMessage,
         prompt: string,
         filterFn: ((text: string) => string) | null = null,
     ): Promise<string | undefined> {
@@ -68,7 +68,6 @@ export class LlmService {
             let accumulated = "";
             let firstChunk = true;
             let shouldAbort = false;
-            const reply = await this.messageHandler.reply(message, "…");
             while (!shouldAbort) {
                 const { done, value } = await reader.read();
                 if (done) break;
@@ -85,13 +84,13 @@ export class LlmService {
                             this.logger.error(`LLM error: ${json.error}`);
                             throw new Error(json.error);
                         }
-                        if (json.response && reply) {
+                        if (json.response) {
                             accumulated += json.response;
                             const toDisplay = filterFn
                                 ? filterFn(firstChunk ? json.response : accumulated)
                                 : accumulated;
                             try {
-                                await this.messageHandler.edit(reply, toDisplay);
+                                await this.messageHandler.edit(placeholder, toDisplay);
                                 firstChunk = false;
                             } catch {
                                 this.logger.debug("Message edit failed (likely deleted), aborting stream");

@@ -17,7 +17,7 @@ const CONFIG: LlmConfig = {
 
 function makeMessageHandler(editResolves = true): IMessageHandler {
     return {
-        reply: vi.fn().mockResolvedValue({ id: "reply-id", edit: vi.fn() } as unknown as BotMessage),
+        reply: vi.fn(),
         edit: editResolves ? vi.fn().mockResolvedValue(undefined) : vi.fn().mockRejectedValue(new Error("deleted")),
         send: vi.fn(),
         delete: vi.fn(),

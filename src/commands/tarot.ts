@@ -64,15 +64,13 @@ export default {
                 .replace("{cardName}", card.name)
                 .replace("{orientation}", isReversed ? "reversed" : "upright")
                 .replace("{meaning}", meaning);
+            const fortuneMsg = await context.messageHandler.reply(message, "🔮 Divining your fortune...");
+            if (!fortuneMsg) return;
             try {
-                await context.llm.streamToMessage(message, prompt);
-                await context.messageHandler.react(message, "🔮");
+                const result = await context.llm.streamToMessage(fortuneMsg, prompt);
+                if (result) await context.messageHandler.react(fortuneMsg, "🔮");
             } catch (err) {
                 context.logger.error(toError(err));
-                await context.messageHandler.reply(
-                    message,
-                    "You are mentally blocking the spirits from revealing your fortune. Try asking again while being more open to the mystical energies of the universe.",
-                );
             }
         } else {
             await context.messageHandler.reply(message, { embeds: [tarotEmbed], files: [attachment] });

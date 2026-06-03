@@ -50,14 +50,14 @@ export default {
         }
 
         const prompt = promptTemplate.replace("{userQuestion}", userQuestion);
-        const discordMsg = await context.messageHandler.reply(message, "Thinking...");
-        if (!discordMsg) return;
+        const thinkingMsg = await context.messageHandler.reply(message, "Thinking...");
+        if (!thinkingMsg) return;
         try {
-            await context.llm.streamToMessage(discordMsg, prompt, filterBotReply);
-            await context.messageHandler.react(discordMsg, "🤖");
+            const result = await context.llm.streamToMessage(thinkingMsg, prompt, filterBotReply);
+            if (result) await context.messageHandler.react(thinkingMsg, "🤖");
         } catch (err) {
             context.logger.error(toError(err));
-            await context.messageHandler.edit(discordMsg, "Error contacting LLM.");
+            await context.messageHandler.edit(thinkingMsg, "Error contacting LLM.");
         }
     },
 } satisfies ICommand;
