@@ -1,74 +1,63 @@
-# Botje v3
+# Botje
 
-A Discord bot made for myself and friends — built entirely for fun, not intended for public use.
+A Discord bot made for myself and friends. Not intended for public use.
 
-A full rewrite of [Botje](https://github.com/mjzilver/Botje) in TypeScript with strict types, a PostgreSQL backend, comprehensive tests, and proper error handling so it can run unattended in the cloud.
+## Commands
 
-## Features
+### Stats
+- `stats` — activity overview for yourself or another user
+- `profile` — interests and dislikes derived from sentiment analysis of message history
+- `count` — message counts, totals, top posters, and per-user breakdowns
+- `emotes` — top emotes used server-wide, by percentage, or by user
+- `phrase` — how many times a word or phrase has been used, with per-user breakdown
+- `quality` — post uniqueness scores, top users, or per-user stats
+- `reactions` — top reactions used, totals, and per-user breakdowns
+- `replies` — who replies to whom and how often
+- `said` — most repeated phrases server-wide or per user
+- `score` — Scrabble-style letter value scores, top posters or per user
+- `syllables` — syllable counts in posts, top users or per user
 
-- **Message statistics** tracked in PostgreSQL:
-  - Message count per user and server-wide totals
-  - Custom emote usage frequency and rankings
-  - Repeated phrases and common expressions
-  - Message score based on letter values (Scrabble-like)
-  - Post quality metrics measuring uniqueness
-  - Syllable count analysis
-  - Word and phrase usage tracking
-  - `profile` — user interests and dislikes derived from sentiment analysis of message history
-  - `stats` — activity overview for yourself or another user
+### Text generation
+- `talk` — Markov chain message generation trained on server history
+- `mimic` — generates a message in a specific user's style
+- `speak` — picks a recycled message from the database matching a pattern
+- `about` — makes the bot say something about a given topic
+- `ask` — sends a question to the LLM and returns the response
 
-- **Text generation**:
-  - `talk` — Markov chain message generation trained on the whole server's history
-  - `mimic` — generates a message in a specific user's style based on their message history
-  - `speak` — pattern-matching message recycling from the database
-  - `about` — makes the bot say something about a given topic
-  - `reply` — regex-based auto-responses to keywords
-  - `ask` — LLM integration for conversational responses
+### Lookup
+- `youtube` — searches for a YouTube video
+- `weather` — shows current weather for a city
+- `quote` — fetches a random archived message, optionally filtered by user or keyword
+- `who` — traces the origin of a message by reply chain or keyword search
+- `getemote` — fetches a server emote by name, or lists all if omitted
+- `topic` — shows the current conversation topic based on recent channel messages
 
-- **Server backup utilities**:
-  - Custom emote backup and archival
-  - Database backup
-  - Message history scanning and preservation
+### Games
+- `hangman` — play a hangman minigame
+- `tarot` — draws a tarot card
 
-- **External API integrations**:
-  - YouTube video search
-  - Reddit posts by subreddit, timespan, and popularity
-  - Weather lookup by city name
+### Images
+- `meme` — adds captions to an image to create a meme
+- `combine` — combines two emotes into one image
+- `emoji` — converts text into emoji characters
 
-- **Interactive games**:
-  - Hangman word guessing
-  - Tarot card readings with optional LLM interpretation
+### Utility
+- `roll` — rolls a random number
+- `choose` — picks one of the given options
+- `poll` — creates a reaction-based poll with up to 9 options
+- `remind` — schedules a reminder for a given duration
+- `ping` — shows bot latency in milliseconds
+- `uptime` — shows how long the bot has been online this session
+- `age` — shows how long the bot has been in the server
+- `help` — lists available commands
 
-- **Image manipulation**:
-  - Meme generator with custom top/bottom text
-  - Emote image combining and fusion
-
-- **Moderation and admin tools**:
-  - Message purging and channel nuking
-  - Timed message deletion
-  - Keyword filtering
-  - Custom meme template management
-  - Activity logging
-
-- **Utility commands**:
-  - Dice rolling, random choice picker
-  - Emoji text converter
-  - `getemote` — fetches a server emote by name, or lists all if omitted
-  - `quote` — fetches a random archived message from server history, optionally filtered by user or keyword
-  - `who` — traces the origin of a message by reply chain or keyword search
-  - `topic` — shows the current conversation topic inferred from recent channel messages
-  - `poll` — creates a reaction-based poll with up to 9 options
-  - `remind` — schedules a reminder for a given duration
-  - Bot uptime and age tracking
-  - Ping and latency measurement
-
-## Stack
-
-- TypeScript (strict, CommonJS, ES2022)
-- discord.js v14
-- PostgreSQL via `pg`
-- Winston logging
-- Vitest for tests
+### Admin
+- `purge` — removes bot messages and messages with the bot prefix from the channel
+- `nuke` — deletes every message in the server (owner only)
+- `deleteafter` — deletes all messages after the replied-to message
+- `disallow` — blocks or unblocks a user from using the bot
+- `log` — shows recent error logs
+- `addmeme` — adds an image to the meme templates
 
 ## License
 
