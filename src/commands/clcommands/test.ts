@@ -4,7 +4,7 @@ import { getTextChannels, cliToMessage } from "../../systems/messageAdapter";
 import { toError } from "../../systems/utils";
 
 const CALL_DELAY_MS = 800;
-const SKIP_COMMANDS = new Set(["ask", "tarot"]);
+const SKIP_COMMANDS = new Set(["ask", "tarot", "hangman"]);
 
 function delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));

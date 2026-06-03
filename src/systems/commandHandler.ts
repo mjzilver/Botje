@@ -18,6 +18,7 @@ export class CommandHandler {
     private commands: Record<string, ICommand>;
     private admincommands: Record<string, ICommand>;
     private dmcommands: Record<string, ICommand>;
+    private disabledCommands: Set<string>;
     private messageHandler: IMessageHandler;
     private replyHandler: ReplyHandler;
     private logger: ILogger;
@@ -50,6 +51,7 @@ export class CommandHandler {
         this.commands = deps.commands.commands;
         this.admincommands = deps.commands.admincommands;
         this.dmcommands = deps.commands.dmcommands;
+        this.disabledCommands = deps.commands.disabled;
         this.messageHandler = deps.messageHandler;
         this.replyHandler = deps.replyHandler;
         this.logger = deps.logger;
@@ -106,6 +108,8 @@ export class CommandHandler {
         if (command in this.commands)
             void this.runCommand(() => this.commands[command].function(message, this.context), message);
         else if (command in this.admincommands) this.handleAdminCommand(command, message, isAdmin);
+        else if (this.disabledCommands.has(command))
+            this.messageHandler.reply(message, `${capitalize(command)} is currently disabled.`);
         else if (!readback)
             this.messageHandler.reply(message, `${capitalize(command)} is not a command, please try again.`);
         else this.messageHandler.markComplete(message);

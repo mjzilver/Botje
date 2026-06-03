@@ -13,7 +13,7 @@ describe("help command – execution", () => {
             speak: makeCommand("speak"),
         };
         const context = makeMockContext({
-            loadedCommands: { commands, admincommands: {}, dmcommands: {}, clcommands: {} },
+            loadedCommands: { commands, admincommands: {}, dmcommands: {}, clcommands: {}, disabled: new Set() },
         });
         await helpCommand.function(makeMessage("!help"), context);
 
@@ -30,6 +30,7 @@ describe("help command – execution", () => {
                 admincommands: {},
                 dmcommands: {},
                 clcommands: {},
+                disabled: new Set(),
             },
         });
         await helpCommand.function(makeMessage("!help"), context);
@@ -45,6 +46,7 @@ describe("help command – execution", () => {
                 admincommands: {},
                 dmcommands: {},
                 clcommands: {},
+                disabled: new Set(),
             },
         });
         (context.pagination.createPages as ReturnType<typeof vi.fn>).mockImplementation(
@@ -74,6 +76,7 @@ describe("help command – execution", () => {
                 admincommands: {},
                 dmcommands: {},
                 clcommands: {},
+                disabled: new Set(),
             },
         });
         (context.pagination.createPages as ReturnType<typeof vi.fn>).mockImplementation(

@@ -31,13 +31,13 @@ function makeHandler(
     dmcommands: Record<string, ICommand> = {},
 ) {
     const context = makeMockContext({
-        loadedCommands: { commands, admincommands, dmcommands, clcommands: {} },
+        loadedCommands: { commands, admincommands, dmcommands, clcommands: {}, disabled: new Set() },
     });
     const replyHandler = new ReplyHandler(context.messageHandler, context.logger, []);
 
     return {
         handler: new CommandHandler({
-            commands: { commands, admincommands, dmcommands, clcommands: {} },
+            commands: { commands, admincommands, dmcommands, clcommands: {}, disabled: new Set() },
             messageHandler: context.messageHandler,
             replyHandler,
             logger: context.logger,

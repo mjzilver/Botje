@@ -31,6 +31,7 @@ function makeHandler(opts?: {
         admincommands: opts?.admincommands ?? {},
         dmcommands: opts?.dmcommands ?? {},
         clcommands: {},
+        disabled: new Set(),
     };
     const handler = new CommandHandler({
         commands,
