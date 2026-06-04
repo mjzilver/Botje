@@ -373,6 +373,7 @@ export class Database implements IDatabase {
             database: config.db.database,
             password: config.db.password,
             port: config.db.port,
+            max: config.db.poolSize,
             connectionTimeoutMillis: 15000,
             idleTimeoutMillis: 60000,
             keepAlive: true,

@@ -71,9 +71,9 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
                     }
                 }
 
-                chosenMessage = chosenMessage.replace(/@.*/gi, "");
+                chosenMessage = chosenMessage.replace(/@.*/gi, "").trim();
                 context.logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`);
-                context.messageHandler.send(message, chosenMessage);
+                if (chosenMessage) context.messageHandler.send(message, chosenMessage);
             }
         } else {
             const selectSQL = `SELECT message FROM messages

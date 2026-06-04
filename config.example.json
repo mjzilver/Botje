@@ -28,7 +28,8 @@
 		"host": "localhost",
 		"database": "botdb",
 		"password": "put password here",
-		"port": 5432
+		"port": 5432,
+		"poolSize": 25
 	},
 	"llm": {
 		"model": "model",

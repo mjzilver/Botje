@@ -4,6 +4,7 @@ export interface DbConfig {
     database: string;
     password: string;
     port: number;
+    poolSize: number;
 }
 
 export interface ImageConfig {
