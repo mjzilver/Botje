@@ -5,7 +5,6 @@ import type { ILogger } from "./logger";
 import type { BotConfig } from "../interfaces/config";
 import type { CommandHandler } from "./commandHandler";
 
-const DOWNVOTE_THRESHOLD = 3;
 const DELETE_DELAY_MS = 5000;
 
 export interface IReactionHandler {
@@ -33,7 +32,10 @@ export class ReactionHandler implements IReactionHandler {
 
         if (emojiName === this.config.negative_emoji) {
             const positiveReaction = message.reactions.resolve(this.config.positive_emoji);
-            if ((reaction.count ?? 0) >= DOWNVOTE_THRESHOLD && (reaction.count ?? 0) > (positiveReaction?.count ?? 0)) {
+            if (
+                (reaction.count ?? 0) >= this.config.downvoteThreshold &&
+                (reaction.count ?? 0) > (positiveReaction?.count ?? 0)
+            ) {
                 setTimeout(() => this.messageHandler.delete(message), DELETE_DELAY_MS);
                 this.logger.warn(`Post deleted due to downvotes: ${message.content}`);
             }

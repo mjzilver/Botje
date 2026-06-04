@@ -10,10 +10,6 @@ import { extractTopics, fetchContextMessages } from "./topicExtractor";
 import { randomBetween, toError } from "./utils";
 import { CooldownTracker } from "./cooldownTracker";
 
-const SPEAK_MIN_TIMEOUT_MINUTES = 20;
-const SPEAK_MAX_TIMEOUT_MINUTES = 60;
-const SPEAK_RANDOM_CHANCE = 20;
-
 export class CommandHandler {
     private commands: Record<string, ICommand>;
     private admincommands: Record<string, ICommand>;
@@ -34,6 +30,8 @@ export class CommandHandler {
     public commandList: LimitedList<BotMessage>;
     private messageCounter = 0;
     private lastMessageSent = new Date();
+    private isSpeaking = false;
+    private pendingSpeakMessage: BotMessage | null = null;
     private cooldown = new CooldownTracker();
     private prefixRegex: RegExp;
     constructor(deps: {
@@ -144,13 +142,19 @@ export class CommandHandler {
 
     private shouldSpeakSpontaneously(timePassed: number): boolean {
         const speakThreshold =
-            this.messageCounter >= this.config.speakEvery || randomBetween(1, SPEAK_RANDOM_CHANCE) === 1;
-        const timeGate = timePassed >= randomBetween(SPEAK_MIN_TIMEOUT_MINUTES, SPEAK_MAX_TIMEOUT_MINUTES);
+            this.messageCounter >= this.config.speakEvery || randomBetween(1, this.config.speakRandomChance) === 1;
+        const timeGate =
+            timePassed >= randomBetween(this.config.speakMinTimeoutMinutes, this.config.speakMaxTimeoutMinutes);
 
         return speakThreshold && timeGate;
     }
 
     private async speakOnContext(message: BotMessage): Promise<void> {
+        if (this.isSpeaking) {
+            this.pendingSpeakMessage = message;
+            return;
+        }
+        this.isSpeaking = true;
         let recent: BotMessage[] = [];
 
         try {
@@ -169,15 +173,24 @@ export class CommandHandler {
             const syntheticContent = topics[0]
                 ? `${this.config.prefix}speak ${topics[0]}`
                 : `${this.config.prefix}speak`;
-            const topicMessage = {
+            const topicMessage: BotMessage = {
                 ...message,
                 content: syntheticContent,
+                channel: message.channel,
+                guild: message.guild,
+                author: message.author,
+                member: message.member,
                 createdAt: message.createdAt,
                 createdTimestamp: message.createdTimestamp,
             };
             await this.runCommand(() => this.commands["speak"]?.function(topicMessage, this.context), topicMessage);
         } catch (err) {
             this.logger.error(toError(err));
+        } finally {
+            this.isSpeaking = false;
+            const pending = this.pendingSpeakMessage;
+            this.pendingSpeakMessage = null;
+            if (pending) void this.speakOnContext(pending);
         }
     }
 

@@ -15,4 +15,9 @@ export default {
             context.logger.console(`Updated ${setting} to ${value}`);
         }
     },
+    completer(argIndex: number, context: IBotContext): string[] {
+        if (argIndex === 0) return Object.keys(context.config);
+
+        return [];
+    },
 } satisfies IClCommand;

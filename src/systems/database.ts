@@ -246,15 +246,19 @@ export class Database implements IDatabase {
             message.content.match(new RegExp(this.config.prefix, "i"))
         )
             return;
+        let member: { displayName: string };
         try {
-            const member = await message.guild.members.fetch(message.author.id);
-            await this.ensureUserExists(message.author, message.guild.id, member.displayName);
-            await this.insertMessage(message);
+            member = await message.guild.members.fetch(message.author.id);
         } catch {
             this.logger.info(
                 `Failed to store message: ${message.content} (likely left server) Author: ${message.author.tag}`,
             );
+
+            return;
         }
+
+        await this.ensureUserExists(message.author, message.guild.id, member.displayName);
+        await this.insertMessage(message);
     }
 
     async updateMessage(message: BotMessage): Promise<void> {
@@ -369,8 +373,10 @@ export class Database implements IDatabase {
             database: config.db.database,
             password: config.db.password,
             port: config.db.port,
-            connectionTimeoutMillis: 5000,
-            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 15000,
+            idleTimeoutMillis: 60000,
+            keepAlive: true,
+            keepAliveInitialDelayMillis: 10000,
         });
         pool.on("error", (err: Error) => {
             logger.error(new Error(`Postgres pool error: ${err.message}`));

@@ -102,18 +102,16 @@ export async function extractTopics(
         .slice(0, CANDIDATE_LIMIT)
         .map(([word]) => word);
 
-    const scored = await Promise.all(
-        candidates.map(async (word) => {
-            const rows = await db.query<{ cnt: string }>(
-                "SELECT COUNT(*) AS cnt FROM messages WHERE message ILIKE $1",
-                [`%${word}%`],
-            );
-            const df = parseInt(rows[0]?.cnt ?? "1", 10);
-            const idf = 1 / Math.log(df + 2);
-
-            return { word, score: (tf.get(word) ?? 0) * idf };
-        }),
-    );
+    const scored: { word: string; score: number }[] = [];
+    for (const word of candidates) {
+        const rows = await db.query<{ cnt: string }>(
+            "SELECT COUNT(*) AS cnt FROM messages WHERE message ILIKE $1",
+            [`%${word}%`],
+        );
+        const df = parseInt(rows[0]?.cnt ?? "1", 10);
+        const idf = 1 / Math.log(df + 2);
+        scored.push({ word, score: (tf.get(word) ?? 0) * idf });
+    }
 
     return scored.sort((a, b) => b.score - a.score).map((s) => s.word);
 }

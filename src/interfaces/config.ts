@@ -29,6 +29,10 @@ export interface BotConfig {
     youtube_api_key: string;
     owner: string;
     speakEvery: number;
+    speakMinTimeoutMinutes: number;
+    speakMaxTimeoutMinutes: number;
+    speakRandomChance: number;
+    downvoteThreshold: number;
     timeoutDuration: number;
     bot_avatar: string;
     color_hex: `#${string}`;
