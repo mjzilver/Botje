@@ -152,8 +152,10 @@ export class CommandHandler {
     private async speakOnContext(message: BotMessage): Promise<void> {
         if (this.isSpeaking) {
             this.pendingSpeakMessage = message;
+
             return;
         }
+
         this.isSpeaking = true;
         let recent: BotMessage[] = [];
 
@@ -170,9 +172,15 @@ export class CommandHandler {
                 this.context.dictionary,
                 this.config.prefix,
             );
-            const syntheticContent = topics[0]
-                ? `${this.config.prefix}speak ${topics[0]}`
-                : `${this.config.prefix}speak`;
+            const topic = topics[0];
+            if (!topic) {
+                this.logger.debug("Auto speak skipped: no topic found");
+
+                return;
+            }
+
+            this.logger.debug(`Auto speak topic selected: ${topic}`);
+            const syntheticContent = `${this.config.prefix}speak ${topic}`;
             const topicMessage: BotMessage = {
                 ...message,
                 content: syntheticContent,

@@ -104,10 +104,9 @@ export async function extractTopics(
 
     const scored: { word: string; score: number }[] = [];
     for (const word of candidates) {
-        const rows = await db.query<{ cnt: string }>(
-            "SELECT COUNT(*) AS cnt FROM messages WHERE message ILIKE $1",
-            [`%${word}%`],
-        );
+        const rows = await db.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM messages WHERE message ILIKE $1", [
+            `%${word}%`,
+        ]);
         const df = parseInt(rows[0]?.cnt ?? "1", 10);
         const idf = 1 / Math.log(df + 2);
         scored.push({ word, score: (tf.get(word) ?? 0) * idf });

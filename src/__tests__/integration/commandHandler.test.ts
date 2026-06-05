@@ -4,6 +4,7 @@ import { ReplyHandler } from "../../systems/replyHandler";
 import type { ICommand } from "../../interfaces";
 import { makeMockContext, TEST_CONFIG, makeMessage } from "@test/helpers";
 import { randomBetween } from "../../systems/utils";
+import { extractTopics } from "../../systems/topicExtractor";
 
 vi.mock("../../systems/topicExtractor", () => ({
     fetchContextMessages: vi.fn().mockResolvedValue([]),
@@ -199,6 +200,33 @@ describe("CommandHandler integration", () => {
             for (const msg of receivedMessages) {
                 expect((msg as { createdAt: unknown }).createdAt).toBeInstanceOf(Date);
             }
+        });
+
+        it("logs selected auto speak topic", async () => {
+            const speak = stubCommand("speak");
+            vi.mocked(extractTopics).mockResolvedValueOnce(["cats"]);
+            vi.mocked(randomBetween).mockReturnValueOnce(1).mockReturnValue(0);
+            const { handler, context } = makeHandler({ speak });
+
+            handler.handleNonCommandMessage(makeMessage("hello world"));
+            await new Promise<void>((resolve) => setImmediate(resolve));
+            await new Promise<void>((resolve) => setImmediate(resolve));
+
+            expect(context.logger.debug).toHaveBeenCalledWith("Auto speak topic selected: cats");
+        });
+
+        it("skips auto speak when no topic is found", async () => {
+            const speak = stubCommand("speak");
+            vi.mocked(extractTopics).mockResolvedValueOnce([]);
+            vi.mocked(randomBetween).mockReturnValueOnce(1).mockReturnValue(0);
+            const { handler, context } = makeHandler({ speak });
+
+            handler.handleNonCommandMessage(makeMessage("hello world"));
+            await new Promise<void>((resolve) => setImmediate(resolve));
+            await new Promise<void>((resolve) => setImmediate(resolve));
+
+            expect(speak.function).not.toHaveBeenCalled();
+            expect(context.logger.debug).toHaveBeenCalledWith("Auto speak skipped: no topic found");
         });
     });
 });
