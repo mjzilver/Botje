@@ -7,6 +7,7 @@ import { toError } from "./utils";
 
 const MIN_WORD_LENGTH = 4;
 const CANDIDATE_LIMIT = 10;
+const MIN_DOC_FREQUENCY = 5;
 
 const INDEFINITE_PRONOUNS = new Set([
     "everything",
@@ -108,6 +109,7 @@ export async function extractTopics(
             `%${word}%`,
         ]);
         const df = parseInt(rows[0]?.cnt ?? "1", 10);
+        if (df < MIN_DOC_FREQUENCY) continue;
         const idf = 1 / Math.log(df + 2);
         scored.push({ word, score: (tf.get(word) ?? 0) * idf });
     }

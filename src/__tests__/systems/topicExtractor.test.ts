@@ -44,7 +44,7 @@ describe("extractTopics", () => {
 
     it("ranks words from rarer corpus higher than identical words from common corpus", async () => {
         const messages = [{ cleanContent: "sunshine today beautiful sunshine" }];
-        const rareTopics = await extractTopics(messages, makeMockDb(1), makeMockDictionary());
+        const rareTopics = await extractTopics(messages, makeMockDb(5), makeMockDictionary());
         const commonTopics = await extractTopics(messages, makeMockDb(99999), makeMockDictionary());
         expect(rareTopics.length).toBeGreaterThan(0);
         expect(commonTopics.length).toBeGreaterThan(0);

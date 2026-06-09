@@ -58,22 +58,30 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
             }>(selectSQL, [message.createdAt.getTime(), earliest.getTime()]);
             if (rows.length > 0) {
                 context.logger.debug(`Sending message with '${words.join(",")}" in it`);
-                let highestAmount = 0;
-                let chosenMessage = "";
+                const scored: { message: string; score: number }[] = [];
                 const regexPatterns = words.map((w: string) => new RegExp(w, "gmi"));
                 for (const row of rows) {
                     let amount = 0;
                     for (const [j, pattern] of regexPatterns.entries())
                         if (row.message.match(pattern)) amount += 30 - j * j;
-                    if (amount > highestAmount && levenshtein(row.message, message.content) > 15) {
-                        chosenMessage = row.message;
-                        highestAmount = amount;
+                    if (amount > 0 && levenshtein(row.message, message.content) > 15) {
+                        scored.push({ message: row.message, score: amount });
                     }
                 }
 
-                chosenMessage = chosenMessage.replace(/@.*/gi, "").trim();
-                context.logger.debug(`Sending message '${chosenMessage}' with score '${highestAmount}'`);
-                if (chosenMessage) context.messageHandler.send(message, chosenMessage);
+                if (scored.length > 0) {
+                    const maxScore = scored.reduce((max, s) => (s.score > max ? s.score : max), 0);
+                    if (maxScore >= 30) {
+                        const topThreshold = maxScore * 0.8;
+                        const candidates = scored.filter((s) => s.score >= topThreshold);
+                        const selected = pickRandomItem(candidates);
+                        const chosenMessage = selected.message.replace(/@.*/gi, "").trim();
+                        context.logger.debug(`Sending message '${chosenMessage}' with score '${selected.score}'`);
+                        context.messageHandler.send(message, chosenMessage);
+                    } else {
+                        await findRandom(message, context);
+                    }
+                }
             }
         } else {
             const selectSQL = `SELECT message FROM messages
@@ -124,10 +132,9 @@ async function findTopic(message: BotMessage, topic: string, context: IBotContex
     );
 
     if (sentences.length === 0) {
-        context.logger.debug("No usable sentences about topic — redirecting to the regular method");
-        message.content = message.content.replace(/(about|think|of)/gi, "");
+        context.logger.debug("No usable sentences about topic — using random message");
 
-        return findByWord(message, context);
+        return findRandom(message, context);
     }
 
     const s1 = pickRandomItem(sentences);
