@@ -8,8 +8,14 @@ export default tseslint.config(
     {
         files: ["src/**/*.ts"],
         rules: {
-            "@typescript-eslint/no-unused-vars": "off",
-            "no-empty": ["error", { allowEmptyCatch: true }],
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    argsIgnorePattern: "^_",
+                    varsIgnorePattern: "^_",
+                    caughtErrorsIgnorePattern: "^_",
+                },
+            ],
             "padding-line-between-statements": [
                 "error",
                 { blankLine: "always", prev: "import", next: "*" },
