@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import mimicCommand from "../../commands/mimic";
 import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
-import type { CachedProfile } from "../../systems/mimicBuilder";
+import type { CachedProfile } from "../../features/mimic/mimicBuilder";
 
 vi.mock("../../systems/mimicCache", () => ({
     mimicCache: {
@@ -13,7 +13,7 @@ vi.mock("../../systems/mimicCache", () => ({
 }));
 
 vi.mock("../../systems/mimicBuilder", async (importOriginal) => {
-    const real = await importOriginal<typeof import("../../systems/mimicBuilder")>();
+    const real = await importOriginal<typeof import("../../NEWLOC/mimicBuilder")>();
 
     return {
         ...real,
@@ -28,7 +28,7 @@ vi.mock("../../systems/mimicBuilder", async (importOriginal) => {
     };
 });
 
-import { mimicCache } from "../../systems/mimicCache";
+import { mimicCache } from "../../features/mimic/mimicCache";
 
 const STALE_PROFILE: CachedProfile = {
     chain: {},

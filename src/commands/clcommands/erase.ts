@@ -1,6 +1,6 @@
 import fs from "fs";
 import type { IClCommand, IBotContext } from "../../interfaces";
-import { toError } from "../../systems/utils";
+import { toError } from "../../utils";
 
 export default {
     name: "erase",

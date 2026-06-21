@@ -3,10 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("../../systems/botContext");
 
 import remindCommand from "../../commands/remind";
-import { getBotContext } from "../../systems/botContext";
+import { getBotContext } from "../../infrastructure/botContext";
 import { makeMockContext, makeMessage } from "@test/helpers";
 import type { ICommand } from "../../interfaces";
-import type { SystemRegistry } from "../../systems/systemRegistry";
+import type { SystemRegistry } from "../../infrastructure/systemRegistry";
 
 const runRemind = (remindCommand as ICommand).function.bind(remindCommand);
 

@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { ICommand } from "../interfaces";
-import { toError } from "../systems/utils";
+import { toError } from "../utils";
 
 export default {
     name: "youtube",

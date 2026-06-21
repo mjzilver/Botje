@@ -1,5 +1,5 @@
 import type { ICommand } from "../interfaces";
-import { pickRandomItem } from "../systems/utils";
+import { pickRandomItem } from "../utils";
 
 export default {
     name: "choose",

@@ -1,5 +1,5 @@
 import type { ICommand } from "../interfaces";
-import { formatUptime } from "../systems/utils";
+import { formatUptime } from "../utils";
 
 export default {
     name: "uptime",

@@ -2,7 +2,7 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
-import { queryCache, CacheKey } from "../../systems/queryCache";
+import { queryCache, CacheKey } from "../../services/queryCache";
 
 type ScoreRow = { user_id: string; total_chars: string };
 

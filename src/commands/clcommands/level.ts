@@ -1,5 +1,5 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
-import { setLogLevel, getAvailableLevels, getCurrentLogLevel } from "../../systems/logger";
+import { setLogLevel, getAvailableLevels, getCurrentLogLevel } from "../../infrastructure/logger";
 
 export default {
     name: "level",

@@ -1,6 +1,6 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
-import { findChannel, getTextChannels } from "../../systems/messageAdapter";
-import { generateMimicMessage } from "../../systems/textGenerationService";
+import { findChannel, getTextChannels } from "../../adapters/messageAdapter";
+import { generateMimicMessage } from "../../features/mimic/textGenerationService";
 
 function findUserId(input: string, guildId: string, context: IBotContext): string | undefined {
     const guild = context.client.guilds.cache.get(guildId);

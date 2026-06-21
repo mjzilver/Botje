@@ -1,8 +1,8 @@
 import type { ICommand } from "../../interfaces";
-import { queryLogsAsync } from "../../systems/logger";
+import { queryLogsAsync } from "../../infrastructure/logger";
 import type { LogEntry } from "../../interfaces";
 import type { QueryOptions } from "winston";
-import { toError } from "../../systems/utils";
+import { toError } from "../../utils";
 
 const LOG_LEVEL = "error";
 const logOptions: QueryOptions = { limit: 5, order: "desc", fields: [] };

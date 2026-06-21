@@ -1,18 +1,18 @@
 import type { BotMessage } from "./discord";
 import type { Client, SlashCommandBuilder } from "discord.js";
 import type { BotConfig } from "./config";
-import type { LoadedCommands } from "../systems/commandLoader";
-import type { SqlParam, IDatabase, ReminderRow } from "../systems/database";
-import type { IMessageHandler } from "../systems/messageHandler";
-import type { LogEntry, ILogger } from "../systems/logger";
-import type { IUserHandler } from "../systems/userHandler";
-import type { IPagination } from "../systems/pagination";
-import type { IBackupHandler } from "../systems/backupHandler";
-import type { IHangman } from "../systems/hangman";
-import type { ILlmService } from "../systems/llm";
-import type { IDictionary } from "../systems/dictionary";
-import type { Settings } from "../systems/settings";
-import type { ReminderScheduler } from "../systems/reminderScheduler";
+import type { LoadedCommands } from "../handlers/commandLoader";
+import type { SqlParam, IDatabase, ReminderRow } from "../infrastructure/database";
+import type { IMessageHandler } from "../handlers/messageHandler";
+import type { LogEntry, ILogger } from "../infrastructure/logger";
+import type { IUserHandler } from "../handlers/userHandler";
+import type { IPagination } from "../utils/support/pagination";
+import type { IBackupHandler } from "../features/backup/backupHandler";
+import type { IHangman } from "../features/hangman/hangman";
+import type { ILlmService } from "../services/llm";
+import type { IDictionary } from "../features/nlp/dictionary";
+import type { Settings } from "../infrastructure/settings";
+import type { ReminderScheduler } from "../features/reminders/reminderScheduler";
 
 export type { SqlParam, IDatabase, ReminderRow };
 

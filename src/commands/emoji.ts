@@ -1,7 +1,7 @@
 import type { ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import emojiValues from "../json/emoji.json";
-import { toError } from "../systems/utils";
+import { toError } from "../utils";
 
 export default {
     name: "emoji",

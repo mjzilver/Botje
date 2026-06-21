@@ -1,5 +1,5 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
-import { findChannel, getTextChannels, cliToMessage } from "../../systems/messageAdapter";
+import { findChannel, getTextChannels, cliToMessage } from "../../adapters/messageAdapter";
 
 export default {
     name: "run",

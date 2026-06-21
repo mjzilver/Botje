@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import topicCommand from "../../commands/topic";
 import { makeMockContext, makeMessage } from "@test/helpers";
 
-vi.mock("../../systems/topicExtractor", () => ({
+vi.mock("../../features/nlp/topicExtractor", () => ({
     tryFetchTopics: vi.fn(),
 }));
 
-import { tryFetchTopics } from "../../systems/topicExtractor";
+import { tryFetchTopics } from "../../features/nlp/topicExtractor";
 
 describe("topic command", () => {
     beforeEach(() => vi.clearAllMocks());

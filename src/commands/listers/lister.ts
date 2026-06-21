@@ -1,7 +1,7 @@
 import { EmbedBuilder, isGuildMessage } from "../../interfaces/discord";
 import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
-import { toError } from "../../systems/utils";
+import { toError } from "../../utils";
 
 const LEADERBOARD_TRIGGERS = ["leaderboard", "top", "?"];
 const PERCENT_TRIGGERS = ["percent", "percentage", "%"];

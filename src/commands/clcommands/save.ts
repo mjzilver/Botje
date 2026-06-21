@@ -1,7 +1,7 @@
 import { ChannelType } from "../../interfaces/discord";
 import type { IClCommand, IBotContext } from "../../interfaces";
-import { MessageIterator } from "../../systems/messageIterator";
-import type { IterableMessage, IteratorStats } from "../../systems/messageIterator";
+import { MessageIterator } from "../../utils/support/messageIterator";
+import type { IterableMessage, IteratorStats } from "../../utils/support/messageIterator";
 
 export default {
     name: "save",
@@ -19,7 +19,7 @@ export default {
                 const iterator = new MessageIterator(context.logger, {
                     limit: amount,
                     async onMessage(message: IterableMessage) {
-                        context.database.storeMessage(message as never);
+                        await context.database.storeMessage(message as never);
                     },
                     onComplete(stats: IteratorStats) {
                         context.logger.console(

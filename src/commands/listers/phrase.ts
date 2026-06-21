@@ -2,8 +2,8 @@ import type { ICommand, IBotContext } from "../../interfaces";
 import { Lister } from "./lister";
 import { isGuildMessage } from "../../interfaces/discord";
 import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
-import { removeQuotes } from "../../systems/stringHelpers";
-import { toError } from "../../systems/utils";
+import { removeQuotes } from "../../utils/helpers/stringHelpers";
+import { toError } from "../../utils";
 
 const phraseHelperMessage = `Please specify a word or phrase to search for!
 

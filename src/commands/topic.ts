@@ -1,6 +1,6 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { tryFetchTopics } from "../systems/topicExtractor";
+import { tryFetchTopics } from "../features/nlp/topicExtractor";
 
 export default {
     name: "topic",

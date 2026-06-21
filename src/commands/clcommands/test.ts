@@ -1,6 +1,6 @@
 import type { IClCommand, ICommand, IBotContext, CommandOption } from "../../interfaces";
-import { findChannel, getTextChannels, cliToMessage } from "../../systems/messageAdapter";
-import { toError } from "../../systems/utils";
+import { findChannel, getTextChannels, cliToMessage } from "../../adapters/messageAdapter";
+import { toError } from "../../utils";
 
 const CALL_DELAY_MS = 800;
 const SKIP_COMMANDS = new Set(["ask", "tarot", "hangman"]);

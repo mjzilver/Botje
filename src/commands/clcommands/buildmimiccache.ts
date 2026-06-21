@@ -1,6 +1,6 @@
 import type { IClCommand, IBotContext } from "../../interfaces";
-import { mimicCache } from "../../systems/mimicCache";
-import { DELETED_USER_RE } from "../../systems/mimicBuilder";
+import { mimicCache } from "../../features/mimic/mimicCache";
+import { DELETED_USER_RE } from "../../features/mimic/mimicBuilder";
 
 export default {
     name: "buildmimiccache",

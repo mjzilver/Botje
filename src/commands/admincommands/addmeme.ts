@@ -2,8 +2,8 @@ import fs from "fs";
 import { pipeline } from "stream/promises";
 import axios from "axios";
 import type { ICommand } from "../../interfaces";
-import { toError } from "../../systems/utils";
-import { resolveImageUrl } from "../../systems/stringHelpers";
+import { toError } from "../../utils";
+import { resolveImageUrl } from "../../utils/helpers/stringHelpers";
 
 export default {
     name: "addmeme",

@@ -1,8 +1,8 @@
 import axios from "axios";
 import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand } from "../interfaces";
-import { capitalize } from "../systems/stringHelpers";
-import { toError } from "../systems/utils";
+import { capitalize } from "../utils/helpers/stringHelpers";
+import { toError } from "../utils";
 
 export default {
     name: "weather",

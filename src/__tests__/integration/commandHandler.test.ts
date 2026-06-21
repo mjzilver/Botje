@@ -1,18 +1,18 @@
 import { describe, it, expect, vi } from "vitest";
-import { CommandHandler } from "../../systems/commandHandler";
-import { ReplyHandler } from "../../systems/replyHandler";
+import { CommandHandler } from "../../handlers/commandHandler";
+import { ReplyHandler } from "../../handlers/replyHandler";
 import type { ICommand } from "../../interfaces";
 import { makeMockContext, TEST_CONFIG, makeMessage } from "@test/helpers";
-import { randomBetween } from "../../systems/utils";
-import { extractTopics } from "../../systems/topicExtractor";
+import { randomBetween } from "../../utils";
+import { extractTopics } from "../../features/nlp/topicExtractor";
 
-vi.mock("../../systems/topicExtractor", () => ({
+vi.mock("../../features/nlp/topicExtractor", () => ({
     fetchContextMessages: vi.fn().mockResolvedValue([]),
     extractTopics: vi.fn().mockResolvedValue(["cats"]),
 }));
 
-vi.mock("../../systems/utils", async (importOriginal) => {
-    const mod = await importOriginal<typeof import("../../systems/utils")>();
+vi.mock("../../utils", async (importOriginal) => {
+    const mod = await importOriginal<typeof import("../../utils")>();
 
     return { ...mod, randomBetween: vi.fn() };
 });

@@ -1,6 +1,6 @@
 import fs from "fs";
 import type { ICommand } from "../../interfaces";
-import { toError } from "../../systems/utils";
+import { toError } from "../../utils";
 
 const DISALLOWED_PATH = "json/disallowed.json";
 

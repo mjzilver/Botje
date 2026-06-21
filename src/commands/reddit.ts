@@ -1,8 +1,8 @@
 import axios from "axios";
 import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand, IBotContext } from "../interfaces";
-import { toError, pickRandomItem } from "../systems/utils";
-import { colorHex, isLink, isImage } from "../systems/stringHelpers";
+import { toError, pickRandomItem } from "../utils";
+import { colorHex, isLink, isImage } from "../utils/helpers/stringHelpers";
 import type { BotMessage } from "../interfaces/discord";
 
 interface RedditPost {

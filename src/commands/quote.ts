@@ -1,7 +1,7 @@
 import type { ICommand } from "../interfaces";
 import { EmbedBuilder } from "../interfaces/discord";
-import { toError } from "../systems/utils";
-import { colorHex, formatDate } from "../systems/stringHelpers";
+import { toError } from "../utils";
+import { colorHex, formatDate } from "../utils/helpers/stringHelpers";
 import { isGuildMessage } from "../interfaces/discord";
 
 type QuoteRow = { id: string; user_id: string; message: string; datetime: string };

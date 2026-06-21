@@ -2,8 +2,8 @@ import type { ICommand } from "../../interfaces";
 import { Lister } from "./lister";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
-import { countVowelGroups } from "../../systems/stringHelpers";
-import { queryCache, CacheKey } from "../../systems/queryCache";
+import { countVowelGroups } from "../../utils/helpers/stringHelpers";
+import { queryCache, CacheKey } from "../../services/queryCache";
 
 type MessageRow = { user_id: string; message: string };
 

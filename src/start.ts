@@ -1,10 +1,10 @@
 import axios from "axios";
-import { logger } from "./systems/logger";
-import { Settings } from "./systems/settings";
-import { Bot } from "./systems/bot";
-import { CommandLine } from "./systems/commandline";
-import { registerProcessHandlers } from "./systems/processHandler";
-import { toError } from "./systems/utils";
+import { logger } from "./infrastructure/logger";
+import { Settings } from "./infrastructure/settings";
+import { Bot } from "./infrastructure/bot";
+import { CommandLine } from "./cli/commandline";
+import { registerProcessHandlers } from "./handlers/processHandler";
+import { toError } from "./utils";
 import pkg from "../package.json";
 
 axios.defaults.validateStatus = (status: number) => status >= 200 && status <= 500;

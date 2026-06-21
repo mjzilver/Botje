@@ -1,6 +1,6 @@
 import type { ICommand, IBotContext } from "../interfaces";
-import { makeStringHelpers } from "../systems/stringHelpers";
-import { toError } from "../systems/utils";
+import { makeStringHelpers } from "../utils/helpers/stringHelpers";
+import { toError } from "../utils";
 import type { BotMessage } from "../interfaces/discord";
 
 const bannedPhrases = ["bot:", "user:", "[user]:", "[bot]:"];

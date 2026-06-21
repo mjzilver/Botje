@@ -1,5 +1,5 @@
 import type { ICommand } from "../interfaces";
-import { randomBetween } from "../systems/utils";
+import { randomBetween } from "../utils";
 
 export default {
     name: "roll",

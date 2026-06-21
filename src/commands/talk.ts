@@ -1,6 +1,6 @@
 import type { ICommand } from "../interfaces";
-import { generateTalkMessage } from "../systems/textGenerationService";
-import { toError } from "../systems/utils";
+import { generateTalkMessage } from "../features/mimic/textGenerationService";
+import { toError } from "../utils";
 
 export default {
     name: "talk",

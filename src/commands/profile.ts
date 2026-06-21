@@ -1,8 +1,8 @@
 import type { ICommand, IBotContext } from "../interfaces";
 import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
 import type { BotMessage } from "../interfaces/discord";
-import { colorHex } from "../systems/stringHelpers";
-import { scoreMessages } from "../systems/sentimentAnalyser";
+import { colorHex } from "../utils/helpers/stringHelpers";
+import { scoreMessages } from "../features/nlp/sentimentAnalyzer";
 
 const PROFILE_FETCH_LIMIT = 100000;
 const PROFILE_SAMPLE_SIZE = 25000;

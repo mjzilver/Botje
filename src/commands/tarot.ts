@@ -2,8 +2,8 @@ import path from "path";
 import { EmbedBuilder, AttachmentBuilder } from "../interfaces/discord";
 import Jimp from "jimp";
 import type { ICommand } from "../interfaces";
-import { makeStringHelpers } from "../systems/stringHelpers";
-import { toError } from "../systems/utils";
+import { makeStringHelpers } from "../utils/helpers/stringHelpers";
+import { toError } from "../utils";
 import cardData from "../json/card_data.json";
 
 interface TarotCard {

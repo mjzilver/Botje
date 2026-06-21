@@ -2,7 +2,7 @@ import fs from "fs";
 import Jimp from "jimp";
 import type { ICommand, IBotContext } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { replaceFancyQuotes, resolveImageUrl } from "../systems/stringHelpers";
+import { replaceFancyQuotes, resolveImageUrl } from "../utils/helpers/stringHelpers";
 
 async function processPicture(
     url: string | null,
