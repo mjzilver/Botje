@@ -80,8 +80,9 @@ export default {
             }
 
             const sent = await context.webhook.sendMessage(message.channel.id, result, targetId);
-            if (sent) context.messageHandler.markComplete(message);
-            else {
+            if (sent) {
+                context.messageHandler.markComplete(message);
+            } else {
                 const user = context.client.users.cache.get(targetId);
                 const displayName = user?.username ?? targetId;
                 context.messageHandler.send(message, `"${result}" — ${displayName}`);

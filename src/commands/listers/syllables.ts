@@ -18,7 +18,7 @@ class SyllableLister extends Lister {
         const userdata = { syllables: 0, total: 0, average: 0 };
         const rows = await queryCache(CacheKey.msgRowsUser(message.guild.id, mentioned.id), () =>
             context.database.query<MessageRow>(
-                `SELECT user_id, message FROM messages WHERE server_id = $1 AND user_id = $2 LIMIT 50000`,
+                "SELECT user_id, message FROM messages WHERE server_id = $1 AND user_id = $2 LIMIT 50000",
                 [message.guild.id, mentioned.id],
             ),
         );
@@ -42,13 +42,16 @@ class SyllableLister extends Lister {
         const userdata: Record<string, { syllables: number; total: number; average: number }> = {};
         const rows = await queryCache(CacheKey.msgRowsServer(message.guild.id), () =>
             context.database.query<MessageRow>(
-                `SELECT user_id, message FROM messages WHERE server_id = $1 LIMIT 50000`,
+                "SELECT user_id, message FROM messages WHERE server_id = $1 LIMIT 50000",
                 [message.guild.id],
             ),
         );
         for (let i = 0; i < rows.length; i++) {
             const userId = rows[i].user_id;
-            if (!userdata[userId]) userdata[userId] = { syllables: 0, total: 0, average: 0 };
+            if (!userdata[userId]) {
+                userdata[userId] = { syllables: 0, total: 0, average: 0 };
+            }
+
             const syllables = this.calculateSyllables(rows[i].message);
             if (syllables >= 1) {
                 userdata[userId].syllables += syllables;
@@ -64,15 +67,18 @@ class SyllableLister extends Lister {
 
         sorted.sort((a, b) => b[1] - a[1]);
         const userNames: Record<string, string> = {};
-        for (const [userId] of sorted)
+        for (const [userId] of sorted) {
             userNames[userId] = await context.userHandler.getDisplayName(userId, message.guild.id);
+        }
+
         const pages = await context.pagination.createPages(
             sorted,
             10,
             (pageRows: [string, number][], pageNum: number, totalPages: number) => {
                 let result = "";
-                for (const row of pageRows)
+                for (const row of pageRows) {
                     result += `\`${userNames[row[0]]}\` has an average of ${row[1]} syllables per post \n`;
+                }
 
                 return this.buildPageEmbed(
                     context.config.color_hex,

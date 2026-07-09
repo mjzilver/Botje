@@ -23,12 +23,12 @@ function makeInteraction(opts: {
 
     const optionData = subcommand
         ? [
-              {
-                  name: subcommand,
-                  type: ApplicationCommandOptionType.Subcommand,
-                  options,
-              } as discord.CommandInteractionOption,
-          ]
+            {
+                name: subcommand,
+                type: ApplicationCommandOptionType.Subcommand,
+                options,
+            } as discord.CommandInteractionOption,
+        ]
         : options;
 
     return {

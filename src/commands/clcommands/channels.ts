@@ -11,12 +11,19 @@ export default {
             channelId: string;
             channel: BotGuildTextChannel;
         }[] = [];
-        for (const channel of getTextChannels(context.client)) channels.push({ channelId: channel.id, channel });
+        for (const channel of getTextChannels(context.client)) {
+            channels.push({ channelId: channel.id, channel });
+        }
+
         channels.sort((a, b) => {
             const nameA = a.channel.guild.name.toLowerCase();
             const nameB = b.channel.guild.name.toLowerCase();
-            if (nameA < nameB) return -1;
-            if (nameA > nameB) return 1;
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
 
             return 0;
         });

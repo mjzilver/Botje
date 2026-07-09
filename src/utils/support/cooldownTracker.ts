@@ -14,7 +14,10 @@ export class CooldownTracker {
 
     remainingMs(key: string, cooldownMs: number): number {
         const last = this.lastAttempt.get(key);
-        if (!last) return 0;
+        if (!last) {
+            return 0;
+        }
+
         const elapsed = Date.now() - last.getTime();
 
         return Math.max(0, cooldownMs - elapsed);

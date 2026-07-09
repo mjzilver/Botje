@@ -11,7 +11,9 @@ export default {
         const mention = message.mentions?.users?.first?.();
         try {
             const result = await generateTalkMessage(context, mention?.id);
-            if (result) context.messageHandler.send(message, result);
+            if (result) {
+                context.messageHandler.send(message, result);
+            }
         } catch (err) {
             context.logger.error(toError(err));
         }

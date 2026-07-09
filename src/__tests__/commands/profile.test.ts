@@ -207,7 +207,9 @@ describe("sampleMessages", () => {
     it("all returned rows are from the original input", () => {
         const rows = makeRows(200);
         const sample = sampleMessages(rows, 50);
-        for (const r of sample) expect(rows).toContain(r);
+        for (const r of sample) {
+            expect(rows).toContain(r);
+        }
     });
 
     it("does not return duplicate rows", () => {

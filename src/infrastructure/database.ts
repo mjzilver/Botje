@@ -76,8 +76,12 @@ export class Database implements IDatabase {
 
     private formatSqlParams(params: SqlParam[]): string {
         const normalizedParams = params.map((param) => {
-            if (param instanceof Date) return param.toISOString();
-            if (Buffer.isBuffer(param)) return `<Buffer length=${param.length}>`;
+            if (param instanceof Date) {
+                return param.toISOString();
+            }
+            if (Buffer.isBuffer(param)) {
+                return `<Buffer length=${param.length}>`;
+            }
 
             return param;
         });
@@ -87,7 +91,9 @@ export class Database implements IDatabase {
 
     private formatQueryErrorDetails(err: Error, params: SqlParam[]): string {
         const base = `${err.message}\nparams=${this.formatSqlParams(params)}`;
-        if (!(err instanceof DatabaseError)) return base;
+        if (!(err instanceof DatabaseError)) {
+            return base;
+        }
 
         const { code, detail, hint, where, table, column, constraint, routine } = err;
         const pg = Object.entries({ code, detail, hint, where, table, column, constraint, routine })
@@ -108,7 +114,9 @@ export class Database implements IDatabase {
         const normalizedMessage = err.message.toLowerCase();
         const dbErr = err as DatabaseError;
         const code = dbErr.code;
-        if (code && TRANSIENT_ERROR_CODES.has(code)) return true;
+        if (code && TRANSIENT_ERROR_CODES.has(code)) {
+            return true;
+        }
 
         return TRANSIENT_ERROR_MESSAGES.some((fragment) => normalizedMessage.includes(fragment));
     }
@@ -199,7 +207,9 @@ export class Database implements IDatabase {
 
     async query<T extends QueryResultRow = QueryResultRow>(sql: string, params: SqlParam[] = []): Promise<T[]> {
         let start: number | undefined;
-        if (DEBUG_SQL) start = Date.now();
+        if (DEBUG_SQL) {
+            start = Date.now();
+        }
         for (let attempt = 0; attempt <= QUERY_RETRY_DELAYS_MS.length; attempt++) {
             try {
                 const result = await this.pool.query(sql, params);
@@ -251,13 +261,14 @@ export class Database implements IDatabase {
         displayName: string | null = null,
     ): Promise<void> {
         await this.query("INSERT INTO users (user_id) VALUES ($1::bigint) ON CONFLICT DO NOTHING", [user.id]);
-        if (serverId && displayName)
+        if (serverId && displayName) {
             await this.query(
                 `INSERT INTO usernames (user_id, server_id, user_name, timestamp)
                  VALUES ($1::bigint, $2::bigint, $3, $4::bigint)
                  ON CONFLICT DO NOTHING`,
                 [user.id, serverId, displayName, Date.now()],
             );
+        }
     }
 
     async getCurrentUsername(userId: string, serverId: string): Promise<string | null> {
@@ -288,7 +299,10 @@ export class Database implements IDatabase {
         parameters: SqlParam[] = [],
     ): Promise<T[]> {
         const count = await this.getCount(selectQuery, parameters);
-        if (count === 0) return [];
+        if (count === 0) {
+            return [];
+        }
+
         const offset = Math.floor(Math.random() * count);
         const queryWithOffset = `${selectQuery} LIMIT 1 OFFSET $${parameters.length + 1}`;
 
@@ -301,8 +315,10 @@ export class Database implements IDatabase {
             !isGuildMessage(message) ||
             message.author.bot ||
             message.content.match(new RegExp(this.config.prefix, "i"))
-        )
+        ) {
             return;
+        }
+
         let member: { displayName: string };
         try {
             member = await message.guild.members.fetch(message.author.id);
@@ -331,7 +347,7 @@ export class Database implements IDatabase {
 
     async insertReaction(reaction: BotReaction): Promise<void> {
         let users = reaction.users.cache;
-        if (users.size === 0)
+        if (users.size === 0) {
             try {
                 users = await reaction.users.fetch();
             } catch {
@@ -339,6 +355,7 @@ export class Database implements IDatabase {
 
                 return;
             }
+        }
         for (const user of users.values()) {
             const emojiName = reaction.emoji.name;
             if (!emojiName) {
@@ -365,7 +382,7 @@ export class Database implements IDatabase {
 
     async insertMessage(message: GuildBotMessage): Promise<void> {
         let replyTo: string | null = null;
-        if (message.reference?.messageId)
+        if (message.reference?.messageId) {
             try {
                 const repliedMessage = await message.channel.messages.fetch(message.reference.messageId);
                 replyTo = repliedMessage?.id ?? null;
@@ -374,6 +391,7 @@ export class Database implements IDatabase {
                     `Failed to fetch replied message ${message.reference.messageId} (in message ${message.id} by ${message.author.username})`,
                 );
             }
+        }
 
         await this.query(
             `INSERT INTO messages
@@ -390,8 +408,11 @@ export class Database implements IDatabase {
                 replyTo,
             ],
         );
-        if (message.reactions.cache.size > 0)
-            for (const reaction of message.reactions.cache.values()) await this.insertReaction(reaction);
+        if (message.reactions.cache.size > 0) {
+            for (const reaction of message.reactions.cache.values()) {
+                await this.insertReaction(reaction);
+            }
+        }
     }
 
     async insertReminder(
@@ -411,7 +432,7 @@ export class Database implements IDatabase {
     }
 
     async deleteReminder(id: number): Promise<void> {
-        await this.query(`DELETE FROM reminders WHERE id = $1`, [id]);
+        await this.query("DELETE FROM reminders WHERE id = $1", [id]);
     }
 
     async getPendingReminders(): Promise<ReminderRow[]> {

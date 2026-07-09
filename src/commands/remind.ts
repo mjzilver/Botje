@@ -7,20 +7,30 @@ const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
 function parseDuration(input: string): number | null {
     const match = /^(\d+)(s|m|h)$/.exec(input.toLowerCase());
 
-    if (!match) return null;
+    if (!match) {
+        return null;
+    }
 
     const value = parseInt(match[1], 10);
     const unit = match[2];
 
-    if (unit === "s") return value * 1000;
-    if (unit === "m") return value * 60 * 1000;
+    if (unit === "s") {
+        return value * 1000;
+    }
+    if (unit === "m") {
+        return value * 60 * 1000;
+    }
 
     return value * 60 * 60 * 1000;
 }
 
 function formatDuration(ms: number): string {
-    if (ms < 60_000) return `${Math.round(ms / 1000)} second(s)`;
-    if (ms < 3_600_000) return `${Math.round(ms / 60_000)} minute(s)`;
+    if (ms < 60_000) {
+        return `${Math.round(ms / 1000)} second(s)`;
+    }
+    if (ms < 3_600_000) {
+        return `${Math.round(ms / 60_000)} minute(s)`;
+    }
 
     return `${Math.round(ms / 3_600_000)} hour(s)`;
 }

@@ -66,6 +66,7 @@ export class CommandHandler {
         const botUser = this.getBotUser();
         const isBotMessage = botUser && message.author.id === botUser.id;
         const isCommand = !isBotMessage && message.content.match(this.prefixRegex);
+
         if (isCommand) {
             const { command, args } = this.parseMessageArguments(message);
             this.logger.debug(
@@ -74,10 +75,14 @@ export class CommandHandler {
                     ` in channel '${message.channel.name ?? message.channel.id}'` +
                     (isReadback ? " is a readback command" : ""),
             );
-            if (!isReadback) this.commandList.push(message);
+            if (!isReadback) {
+                this.commandList.push(message);
+            }
+
             const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
-            if (isAdmin || isReadback || this.isUserAllowed(message, true))
+            if (isAdmin || isReadback || this.isUserAllowed(message, true)) {
                 this.handleCommandType(command, isReadback, message, isAdmin);
+            }
         } else if (!message.author.bot) {
             this.handleNonCommandMessage(message);
         }
@@ -103,25 +108,29 @@ export class CommandHandler {
     }
 
     private handleCommandType(command: string, readback: boolean, message: BotMessage, isAdmin: boolean): void {
-        if (command in this.commands)
+        if (command in this.commands) {
             void this.runCommand(() => this.commands[command].function(message, this.context), message);
-        else if (command in this.admincommands) this.handleAdminCommand(command, message, isAdmin);
-        else if (this.disabledCommands.has(command))
+        } else if (command in this.admincommands) {
+            this.handleAdminCommand(command, message, isAdmin);
+        } else if (this.disabledCommands.has(command)) {
             this.messageHandler.reply(message, `${capitalize(command)} is currently disabled.`);
-        else if (!readback)
+        } else if (!readback) {
             this.messageHandler.reply(message, `${capitalize(command)} is not a command, please try again.`);
-        else this.messageHandler.markComplete(message);
+        } else {
+            this.messageHandler.markComplete(message);
+        }
     }
 
     private handleAdminCommand(command: string, message: BotMessage, isAdmin: boolean): void {
         const isOwner = message.author.id === this.config.owner;
-        if (isOwner || isAdmin)
+        if (isOwner || isAdmin) {
             void this.runCommand(() => this.admincommands[command].function(message, this.context), message);
-        else
+        } else {
             this.messageHandler.reply(
                 message,
                 `${capitalize(command)} is an admin command, and you are not allowed to use it.`,
             );
+        }
     }
 
     handleNonCommandMessage(message: BotMessage): void {
@@ -198,20 +207,29 @@ export class CommandHandler {
             this.isSpeaking = false;
             const pending = this.pendingSpeakMessage;
             this.pendingSpeakMessage = null;
-            if (pending) void this.speakOnContext(pending);
+            if (pending) {
+                void this.speakOnContext(pending);
+            }
         }
     }
 
     private maybeSpeakOnMention(message: BotMessage): void {
-        if (!message.content.match(/\bbot(je)?\b/gi)) return;
+        if (!message.content.match(/\bbot(je)?\b/gi)) {
+            return;
+        }
+
         const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
-        if (isAdmin || this.isUserAllowed(message, false))
+        if (isAdmin || this.isUserAllowed(message, false)) {
             void this.runCommand(() => this.commands["speak"]?.function(message, this.context), message);
+        }
     }
 
     async redo(message: BotMessage, fetchMessage: (id: string) => Promise<BotMessage>): Promise<void> {
         const callId = this.messageHandler.findFromReply(message);
-        if (!callId) return;
+        if (!callId) {
+            return;
+        }
+
         try {
             const callMessage = await fetchMessage(callId);
             const { command } = this.parseMessageArguments(callMessage);
@@ -230,9 +248,14 @@ export class CommandHandler {
     }
 
     isUserAllowed(message: BotMessage, canSendMessage = false): boolean {
-        if (this.isUserBanned(message)) return false;
+        if (this.isUserBanned(message)) {
+            return false;
+        }
+
         const timeoutMs = this.config.timeoutDuration * 1000;
-        if (this.cooldown.isAllowed(message.author.id, timeoutMs)) return true;
+        if (this.cooldown.isAllowed(message.author.id, timeoutMs)) {
+            return true;
+        }
         if (canSendMessage) {
             const remaining = Math.ceil(this.cooldown.remainingMs(message.author.id, timeoutMs) / 1000);
             this.messageHandler.send(
@@ -245,11 +268,15 @@ export class CommandHandler {
     }
 
     handleDM(message: BotMessage): void {
-        if (message.author.bot) return;
+        if (message.author.bot) {
+            return;
+        }
+
         const { command } = this.parseMessageArguments(message);
-        if (command in this.dmcommands)
+        if (command in this.dmcommands) {
             void this.runCommand(() => this.dmcommands[command].function(message, this.context), message);
-        else if (message.content.match(this.prefixRegex))
+        } else if (message.content.match(this.prefixRegex)) {
             this.messageHandler.reply(message, `Use the command ${this.config.prefix}help for more information`);
+        }
     }
 }

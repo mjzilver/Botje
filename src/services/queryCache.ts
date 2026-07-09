@@ -4,7 +4,9 @@ const cache = new Map<string, { promise: Promise<unknown>; expiry: number }>();
 
 export function queryCache<T>(key: string, factory: () => Promise<T>, ttl = CACHE_TTL_MS): Promise<T> {
     const entry = cache.get(key);
-    if (entry && entry.expiry > Date.now()) return entry.promise as Promise<T>;
+    if (entry && entry.expiry > Date.now()) {
+        return entry.promise as Promise<T>;
+    }
 
     const promise = factory().catch((err: unknown) => {
         cache.delete(key);

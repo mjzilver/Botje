@@ -44,8 +44,11 @@ export class CommandLine {
             const parts = line.trim().split(/\s+/);
             const name = parts[0].toLowerCase();
             const args = parts.slice(1);
-            if (name in this.commands) await this.commands[name].function(args, this.context);
-            else this.logger.info(`"${name}" is not a command`);
+            if (name in this.commands) {
+                await this.commands[name].function(args, this.context);
+            } else {
+                this.logger.info(`"${name}" is not a command`);
+            }
         });
     }
 }

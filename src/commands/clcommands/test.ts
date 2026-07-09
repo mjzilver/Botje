@@ -17,8 +17,12 @@ const STRING_VALUES: Record<string, string> = {
 };
 
 function generateValue(opt: CommandOption): string {
-    if (opt.choices && opt.choices.length > 0) return opt.choices[0].value;
-    if (opt.type === "integer") return "5";
+    if (opt.choices && opt.choices.length > 0) {
+        return opt.choices[0].value;
+    }
+    if (opt.type === "integer") {
+        return "5";
+    }
 
     return STRING_VALUES[opt.name] ?? "test";
 }
@@ -28,7 +32,9 @@ function buildCalls(command: ICommand): string[][] {
         return command.subcommands.map((sub) => {
             const call = [command.name, sub.name];
             for (const opt of sub.options ?? []) {
-                if (opt.type !== "user" && opt.required) call.push(generateValue(opt));
+                if (opt.type !== "user" && opt.required) {
+                    call.push(generateValue(opt));
+                }
             }
 
             return call;
@@ -52,8 +58,12 @@ function buildCalls(command: ICommand): string[][] {
         calls.push([command.name, ...allArgs]);
     }
 
-    if (/\btop\b/.test(command.format)) calls.push([command.name, "top"]);
-    if (/\bpercent\b/.test(command.format)) calls.push([command.name, "percent"]);
+    if (/\btop\b/.test(command.format)) {
+        calls.push([command.name, "top"]);
+    }
+    if (/\bpercent\b/.test(command.format)) {
+        calls.push([command.name, "percent"]);
+    }
 
     return calls;
 }
@@ -93,7 +103,9 @@ export default {
             for (const callArgs of calls) {
                 const content = callArgs.join(" ");
                 const message = cliToMessage(channel, context.client, content);
-                if (!message) continue;
+                if (!message) {
+                    continue;
+                }
 
                 total++;
                 try {
@@ -111,7 +123,9 @@ export default {
         context.logger.console(`Done: ${succeeded}/${total} invocations succeeded`);
     },
     completer(argIndex: number, context: IBotContext, _input: string[]): string[] {
-        if (argIndex === 0) return getTextChannels(context.client).map((ch) => ch.name);
+        if (argIndex === 0) {
+            return getTextChannels(context.client).map((ch) => ch.name);
+        }
 
         return [];
     },

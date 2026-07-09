@@ -20,10 +20,16 @@ export class UserHandler implements IUserHandler {
     }
 
     async getDisplayName(userId: string, serverId: string): Promise<string> {
-        if (!userId || !serverId) return UserHandler.UNKNOWN_USER;
+        if (!userId || !serverId) {
+            return UserHandler.UNKNOWN_USER;
+        }
+
         this.userCache[serverId] ??= {};
         const serverCache = this.userCache[serverId];
-        if (serverCache[userId]) return serverCache[userId];
+        if (serverCache[userId]) {
+            return serverCache[userId];
+        }
+
         const fromDb = await this.db.getCurrentUsername(userId, serverId);
         if (fromDb) {
             serverCache[userId] = fromDb;

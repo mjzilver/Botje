@@ -45,7 +45,9 @@ export class EventListener {
 
     private attachInteractionHandler(client: discord.Client, slashHandler: SlashHandler): void {
         client.on(Events.InteractionCreate, (interaction: discord.Interaction) => {
-            if (interaction.isChatInputCommand()) slashHandler.handleInteraction(interaction);
+            if (interaction.isChatInputCommand()) {
+                slashHandler.handleInteraction(interaction);
+            }
         });
     }
 
@@ -60,7 +62,9 @@ export class EventListener {
         client.on(Events.MessageCreate, async (message: discord.Message) => {
             try {
                 const botMessage = toBotMessage(message);
-                if (botMessage.author.id in disallowed) return;
+                if (botMessage.author.id in disallowed) {
+                    return;
+                }
                 if (message.channel.type === ChannelType.DM) {
                     commandHandler.handleDM(botMessage);
                 } else {
@@ -79,7 +83,9 @@ export class EventListener {
                 newMessage: discord.Message | discord.PartialMessage,
             ) => {
                 try {
-                    if (!newMessage.author || newMessage.author.id in disallowed) return;
+                    if (!newMessage.author || newMessage.author.id in disallowed) {
+                        return;
+                    }
                     if (newMessage.channel.type !== ChannelType.DM && newMessage.content !== null) {
                         const botMsg = toBotMessage(newMessage as discord.Message);
                         await db.updateMessage(botMsg);

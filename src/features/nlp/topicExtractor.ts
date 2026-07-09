@@ -96,7 +96,9 @@ export async function extractTopics(
     const prefixRe = prefix ? new RegExp(`^(?:${prefix})`, "i") : null;
     const filtered = prefixRe ? messages.filter((m) => !prefixRe.test(m.cleanContent)) : messages;
     const tf = computeTf(filtered, dictionary, prefixRe);
-    if (tf.size === 0) return [];
+    if (tf.size === 0) {
+        return [];
+    }
 
     const candidates = [...tf.entries()]
         .sort((a, b) => b[1] - a[1])
@@ -109,7 +111,10 @@ export async function extractTopics(
             `%${word}%`,
         ]);
         const df = parseInt(rows[0]?.cnt ?? "1", 10);
-        if (df < MIN_DOC_FREQUENCY) continue;
+        if (df < MIN_DOC_FREQUENCY) {
+            continue;
+        }
+
         const idf = 1 / Math.log(df + 2);
         scored.push({ word, score: (tf.get(word) ?? 0) * idf });
     }
@@ -149,7 +154,9 @@ function computeTf(
 
         const words = extractNounTokens(cleaned).filter((w) => !stopWords.has(w));
 
-        for (const w of words) freq.set(w, (freq.get(w) ?? 0) + 1);
+        for (const w of words) {
+            freq.set(w, (freq.get(w) ?? 0) + 1);
+        }
     }
 
     return freq;

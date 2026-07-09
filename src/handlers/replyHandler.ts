@@ -41,8 +41,12 @@ export class ReplyHandler {
             if (normalized.match(regex) && this.cooldown.isAllowed(pattern.name, pattern.timeout * 60 * 1000)) {
                 this.logger.debug(`Replying to '${message.content}' matching pattern '${pattern.name}'`);
                 const text = pickRandomItem(pattern.replies) + (pattern.mention ? `, ${message.author.username}` : "");
-                if (pattern.reply) this.messageHandler.reply(message, text);
-                else this.messageHandler.send(message, text);
+                if (pattern.reply) {
+                    this.messageHandler.reply(message, text);
+                } else {
+                    this.messageHandler.send(message, text);
+                }
+
                 matched = true;
             }
         }

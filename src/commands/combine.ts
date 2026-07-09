@@ -38,15 +38,24 @@ export default {
         const args = message.content.split(" ");
         args.shift();
         const { path: _path, files } = readGuildEmoteDir(message.guild?.id);
-        if (!args[0]) args[0] = pickRandomItem(files);
-        if (!args[1]) args[1] = pickRandomItem(files);
+        if (!args[0]) {
+            args[0] = pickRandomItem(files);
+        }
+        if (!args[1]) {
+            args[1] = pickRandomItem(files);
+        }
+
         let image1 = `${args[0]}.png`;
         let image2 = `${args[1]}.png`;
         if (!files.includes(image1) || !files.includes(image2)) {
             const m1 = args[0].match(emoteParser);
             const m2 = args[1].match(emoteParser);
-            if (m1) image1 = `${m1[1]}.png`;
-            if (m2) image2 = `${m2[1]}.png`;
+            if (m1) {
+                image1 = `${m1[1]}.png`;
+            }
+            if (m2) {
+                image2 = `${m2[1]}.png`;
+            }
             if (!files.includes(image1) || !files.includes(image2)) {
                 image1 = findClosestMatchInList(args[0], files);
                 image2 = findClosestMatchInList(args[1], files);

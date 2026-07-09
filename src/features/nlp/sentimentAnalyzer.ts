@@ -16,10 +16,15 @@ function escapeRegex(word: string): string {
 }
 
 function flattenCalculation(raw: unknown): Record<string, number> {
-    if (!Array.isArray(raw)) return raw as Record<string, number>;
+    if (!Array.isArray(raw)) {
+        return raw as Record<string, number>;
+    }
+
     const result: Record<string, number> = {};
     for (const entry of raw as Record<string, number>[]) {
-        for (const [k, v] of Object.entries(entry)) result[k] = v;
+        for (const [k, v] of Object.entries(entry)) {
+            result[k] = v;
+        }
     }
 
     return result;
@@ -33,7 +38,10 @@ function extractScoredWordObjects(
     const lower = text.toLowerCase();
 
     for (const [word, wordScore] of Object.entries(calculation)) {
-        if (wordScore === 0) continue;
+        if (wordScore === 0) {
+            continue;
+        }
+
         const re = new RegExp(`\\b${escapeRegex(word)}\\s+([a-z]{3,})`, "g");
         let m: RegExpExecArray | null;
         while ((m = re.exec(lower)) !== null) {
@@ -50,7 +58,9 @@ function extractScoredWordObjects(
 function isValidTopic(word: string): boolean {
     const terms = nlp(word).json() as { terms: { tags: string[]; dirty?: boolean }[] }[];
     const term = terms[0]?.terms?.[0];
-    if (!term?.dirty) return true;
+    if (!term?.dirty) {
+        return true;
+    }
 
     return term.tags.includes("Noun") || (term.tags.includes("Gerund") && word.length >= 6);
 }
@@ -60,7 +70,10 @@ export function scoreMessages(messages: string[], stopWords: Set<string>): Topic
     const sentimentWords = new Set<string>();
 
     const addScore = (topic: string, value: number): void => {
-        if (stopWords.has(topic)) return;
+        if (stopWords.has(topic)) {
+            return;
+        }
+
         scores.set(topic, (scores.get(topic) ?? 0) + value);
     };
 
@@ -68,17 +81,23 @@ export function scoreMessages(messages: string[], stopWords: Set<string>): Topic
         const result = analyser.analyze(text);
         const calculation = flattenCalculation(result.calculation);
 
-        for (const word of Object.keys(calculation)) sentimentWords.add(word);
+        for (const word of Object.keys(calculation)) {
+            sentimentWords.add(word);
+        }
 
         for (const { topic, score } of extractScoredWordObjects(text, calculation)) {
             addScore(topic, score);
         }
     }
 
-    for (const word of sentimentWords) scores.delete(word);
+    for (const word of sentimentWords) {
+        scores.delete(word);
+    }
 
     for (const word of scores.keys()) {
-        if (!isValidTopic(word)) scores.delete(word);
+        if (!isValidTopic(word)) {
+            scores.delete(word);
+        }
     }
 
     const ranked = [...scores.entries()].sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));

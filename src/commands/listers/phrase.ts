@@ -30,10 +30,15 @@ class PhraseLister extends Lister {
             return;
         }
         try {
-            if (mention) await this.phraseWithMention(message, mention, word, context);
-            else if (leaderboard) await this.phraseLeaderboard(message, word, context);
-            else if (percent) await this.phrasePercentage(message, word, context);
-            else await this.phraseTotal(message, word, context);
+            if (mention) {
+                await this.phraseWithMention(message, mention, word, context);
+            } else if (leaderboard) {
+                await this.phraseLeaderboard(message, word, context);
+            } else if (percent) {
+                await this.phrasePercentage(message, word, context);
+            } else {
+                await this.phraseTotal(message, word, context);
+            }
         } catch (err) {
             context.logger.error(toError(err));
         }
@@ -70,7 +75,7 @@ class PhraseLister extends Lister {
     }
 
     private async phraseTotal(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2`;
+        const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2";
         const rows = await context.database.query<{ count: string }>(selectSQL, [`%${word}%`, message.guild.id]);
         await context.messageHandler.send(
             message,
@@ -84,7 +89,8 @@ class PhraseLister extends Lister {
         word: string,
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2 AND user_id = $3`;
+        const selectSQL =
+            "SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2 AND user_id = $3";
         const rows = await context.database.query<{ count: string }>(selectSQL, [
             `%${word}%`,
             message.guild.id,
@@ -136,8 +142,9 @@ class PhraseLister extends Lister {
         ).sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));
         const pages = await context.pagination.createPages(sortedRows, 10, (pageRows, pageNum, totalPages) => {
             let result = "";
-            for (const row of pageRows)
+            for (const row of pageRows) {
                 result += `\`${row.userName}\` has said ${word} in ${row.percentage}% of their messages! \n`;
+            }
 
             return this.buildPageEmbed(
                 context.config.color_hex,

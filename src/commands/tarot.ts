@@ -20,7 +20,10 @@ export function guessFilename(card: TarotCard): string | null {
     if (card.type === "major") {
         return `${String(card.value_int).padStart(2, "0")}-${card.name.replace(/\s+/g, "").replace(/[^a-zA-Z0-9]/g, "")}.png`;
     } else if (card.type === "minor") {
-        if (!card.suit) return null;
+        if (!card.suit) {
+            return null;
+        }
+
         const suit = card.suit.charAt(0).toUpperCase() + card.suit.slice(1);
         const num = String(card.value_int).padStart(2, "0");
 
@@ -47,7 +50,10 @@ export default {
         }
 
         let image = await Jimp.read(path.join(__dirname, "../../assets/tarot", filename));
-        if (isReversed) image = image.rotate(180);
+        if (isReversed) {
+            image = image.rotate(180);
+        }
+
         const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
         const attachment = new AttachmentBuilder(buffer, { name: `${card.name_short}.png` });
         const userQuestion = removeCommand(message.content).trim();
@@ -65,10 +71,14 @@ export default {
                 .replace("{orientation}", isReversed ? "reversed" : "upright")
                 .replace("{meaning}", meaning);
             const fortuneMsg = await context.messageHandler.reply(message, "🔮 Divining your fortune...");
-            if (!fortuneMsg) return;
+            if (!fortuneMsg) {
+                return;
+            }
             try {
                 const result = await context.llm.streamToMessage(fortuneMsg, prompt);
-                if (result) await context.messageHandler.react(fortuneMsg, "🔮");
+                if (result) {
+                    await context.messageHandler.react(fortuneMsg, "🔮");
+                }
             } catch (err) {
                 context.logger.error(toError(err));
             }

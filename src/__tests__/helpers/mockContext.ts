@@ -48,7 +48,9 @@ export function makeMockContext(overrides?: Partial<IBotContext>): IBotContext {
     };
     ctx.disallowed = {};
 
-    if (overrides) Object.assign(ctx, overrides);
+    if (overrides) {
+        Object.assign(ctx, overrides);
+    }
 
     return ctx;
 }

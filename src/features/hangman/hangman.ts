@@ -71,7 +71,9 @@ export class HangmanGame {
             const candidate = pickRandomItem(words);
             let w = textOnlyHelper(candidate[0]);
             w = w.replace(nonSelectors, "").trim();
-            if (candidate[1] > 10 && w.length >= 5 && w.length <= 20 && /[a-z]+/i.test(w)) this.word = w;
+            if (candidate[1] > 10 && w.length >= 5 && w.length <= 20 && /[a-z]+/i.test(w)) {
+                this.word = w;
+            }
         }
 
         this.visibleWord = "―".repeat(this.word.length);
@@ -105,9 +107,12 @@ export class HangmanGame {
         } else if (this.alreadyGuessed.includes(guessedContent)) {
             content = `${guessedContent} has already been guessed.`;
         } else if (this.word.includes(guessedContent)) {
-            for (let i = 0; i < this.word.length; i++)
-                if (this.word[i] === guessedContent)
+            for (let i = 0; i < this.word.length; i++) {
+                if (this.word[i] === guessedContent) {
                     this.visibleWord = replaceAtHelper(this.visibleWord, i, guessedContent);
+                }
+            }
+
             content = `Good guess! The word contains ${guessedContent}`;
         } else {
             content = `The word does not contain ${guessedContent}!`;
@@ -126,8 +131,11 @@ export class HangmanGame {
     }
 
     private help(message: BotMessage): void {
-        if (this.hasEnded) this.start(message);
-        else this.sendEmbed(message);
+        if (this.hasEnded) {
+            this.start(message);
+        } else {
+            this.sendEmbed(message);
+        }
     }
 
     private sendEmbed(message: BotMessage, content = ""): void {
@@ -141,12 +149,14 @@ export class HangmanGame {
             .setDescription(content)
             .setImage("attachment://hangman.png")
             .addFields({ name: "Word", value: showWord, inline: false });
-        if (this.alreadyGuessed.length > 0)
+        if (this.alreadyGuessed.length > 0) {
             embed.addFields({
                 name: "Already guessed letters",
                 value: this.alreadyGuessed.map((c) => `${c.toUpperCase()} `).join(""),
                 inline: false,
             });
+        }
+
         embed.setFooter({
             text: this.hasEnded ? "Use b!hangman start to start a new game!" : "Use b!hangman guess to guess",
         });

@@ -6,6 +6,8 @@ export default {
     format: "ping",
     async function(message, context) {
         const m = await context.messageHandler.send(message, "Ping?");
-        if (m) context.messageHandler.edit(m, `Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms.`);
+        if (m) {
+            context.messageHandler.edit(m, `Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms.`);
+        }
     },
 } satisfies ICommand;

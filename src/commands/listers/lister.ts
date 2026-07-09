@@ -10,9 +10,9 @@ const ALL_FLAG_TRIGGERS = new Set([...LEADERBOARD_TRIGGERS, ...PERCENT_TRIGGERS]
 export interface ParsedArgs {
     mention:
         | {
-              id: string;
-              username?: string;
-          }
+            id: string;
+            username?: string;
+        }
         | undefined;
     leaderboard: boolean;
     percent: boolean;
@@ -48,10 +48,15 @@ export abstract class Lister {
 
         const { mention, leaderboard, percent } = this.parseArgs(message);
         try {
-            if (mention) await this.mention(message, mention, context);
-            else if (leaderboard) await this.perPerson(message, context);
-            else if (percent) await this.percentage(message, context);
-            else await this.total(message, context);
+            if (mention) {
+                await this.mention(message, mention, context);
+            } else if (leaderboard) {
+                await this.perPerson(message, context);
+            } else if (percent) {
+                await this.percentage(message, context);
+            } else {
+                await this.total(message, context);
+            }
         } catch (err) {
             context.logger.error(toError(err));
         }
@@ -128,7 +133,9 @@ export abstract class Lister {
 
         const pages = await context.pagination.createPages(rows, 10, async (pageRows, pageNum, totalPages) => {
             let result = "";
-            for (const row of pageRows) result += await formatRow(row);
+            for (const row of pageRows) {
+                result += await formatRow(row);
+            }
 
             return this.buildPageEmbed(context.config.color_hex, title, result, pageNum, totalPages);
         });

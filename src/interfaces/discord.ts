@@ -104,12 +104,12 @@ export type MessageContent =
     | string
     | EmbedBuilder
     | {
-          content?: string;
-          embeds?: EmbedBuilder[];
-          files?: (string | AttachmentBuilder)[];
-          components?: ActionRowBuilder[];
-          ephemeral?: boolean;
-      };
+        content?: string;
+        embeds?: EmbedBuilder[];
+        files?: (string | AttachmentBuilder)[];
+        components?: ActionRowBuilder[];
+        ephemeral?: boolean;
+    };
 
 export { EmbedBuilder, AttachmentBuilder, ChannelType, PermissionFlagsBits } from "discord.js";
 

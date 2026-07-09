@@ -113,7 +113,9 @@ export class MessageHandler implements IMessageHandler {
     }
 
     async edit(replyObj: BotMessage, newContent: MessageContent): Promise<BotMessage> {
-        if (!replyObj) throw new Error("No reply object");
+        if (!replyObj) {
+            throw new Error("No reply object");
+        }
         try {
             return await replyObj.edit(newContent);
         } catch (err) {
@@ -156,7 +158,9 @@ export class MessageHandler implements IMessageHandler {
                 call_id: string;
                 reply_id: string;
             }>(sql, [since]);
-            for (const row of rows) this.commandCalls[row.call_id] = row.reply_id;
+            for (const row of rows) {
+                this.commandCalls[row.call_id] = row.reply_id;
+            }
         } catch (err) {
             this.logger.error(toError(err));
         }

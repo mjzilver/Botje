@@ -11,7 +11,10 @@ export default {
     options: [{ type: "string", name: "city", description: "The city name", required: true }],
     async function(message, context) {
         const args = message.content.split(" ");
-        if (!args[1]) return context.messageHandler.send(message, "You need to enter a city");
+        if (!args[1]) {
+            return context.messageHandler.send(message, "You need to enter a city");
+        }
+
         args.shift();
         const city = args.join(" ");
         try {

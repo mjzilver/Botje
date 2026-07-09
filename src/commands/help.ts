@@ -12,8 +12,11 @@ export default {
             commandList,
             10,
             (pageCommands: ICommand[], pageNum: number, totalPages: number) => {
-                let helpMessage = `**Here is a list of all the commands *you* can use: **\nFormat: \`()\` = optional argument, \`[]\` = required argument\n`;
-                for (const command of pageCommands) helpMessage += `\`${command.format}\`: ${command.description} \n`;
+                let helpMessage =
+                    "**Here is a list of all the commands *you* can use: **\nFormat: `()` = optional argument, `[]` = required argument\n";
+                for (const command of pageCommands) {
+                    helpMessage += `\`${command.format}\`: ${command.description} \n`;
+                }
 
                 return new EmbedBuilder()
                     .setColor(context.config.color_hex)

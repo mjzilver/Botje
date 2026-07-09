@@ -38,15 +38,18 @@ class ScoreLister extends Lister {
             ),
         );
         const userNames: Record<string, string> = {};
-        for (const row of rows)
+        for (const row of rows) {
             userNames[row.user_id] = await context.userHandler.getDisplayName(row.user_id, message.guild.id);
+        }
+
         const pages = await context.pagination.createPages(
             rows,
             10,
             (pageRows: ScoreRow[], pageNum: number, totalPages: number) => {
                 let result = "";
-                for (const row of pageRows)
+                for (const row of pageRows) {
                     result += `\`${userNames[row.user_id]}\`'s post score is ${parseInt(row.total_chars, 10)} \n`;
+                }
 
                 return this.buildPageEmbed(
                     context.config.color_hex,

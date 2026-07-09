@@ -23,8 +23,11 @@ export function toBotChannel(channel: discord.TextBasedChannel | null): BotMessa
 
 export function getTextChannels(client: discord.Client): BotGuildTextChannel[] {
     const result: BotGuildTextChannel[] = [];
-    for (const ch of client.channels.cache.values())
-        if (ch.type === discord.ChannelType.GuildText) result.push(ch as unknown as BotGuildTextChannel);
+    for (const ch of client.channels.cache.values()) {
+        if (ch.type === discord.ChannelType.GuildText) {
+            result.push(ch as unknown as BotGuildTextChannel);
+        }
+    }
 
     return result;
 }
@@ -53,7 +56,9 @@ function extractInteractionArgs(interaction: discord.ChatInputCommandInteraction
 } {
     const args: string[] = [];
     const subcommand = interaction.options.getSubcommand(false);
-    if (subcommand) args.push(subcommand);
+    if (subcommand) {
+        args.push(subcommand);
+    }
 
     const optionData = subcommand ? (interaction.options.data[0]?.options ?? []) : interaction.options.data;
     const mentionMap = new Map<string, BotUser>();
@@ -76,7 +81,10 @@ function extractInteractionArgs(interaction: discord.ChatInputCommandInteraction
 }
 
 export function cliToMessage(channel: BotGuildTextChannel, client: discord.Client, content: string): BotMessage | null {
-    if (!client.user) return null;
+    if (!client.user) {
+        return null;
+    }
+
     const botChannel = toBotChannel(channel as unknown as discord.TextChannel);
     const botUser = client.user as BotUser;
     const pseudoMessage: BotMessage = {

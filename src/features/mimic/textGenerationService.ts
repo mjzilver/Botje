@@ -19,8 +19,9 @@ export async function generateMimicMessage(targetId: string, context: IBotContex
     const cached = mimicCache.get(targetId);
     if (cached !== null) {
         const result = generateFromProfile(cached);
-        if (mimicCache.isExpired(cached))
+        if (mimicCache.isExpired(cached)) {
             mimicCache.enqueue(targetId, context.database, context.logger, context.config.prefix);
+        }
 
         return result;
     }
@@ -38,12 +39,16 @@ export async function generateMimicMessage(targetId: string, context: IBotContex
         .map((r) => cleanMessage(r.message, context.config.prefix))
         .filter((m): m is string => m !== null);
 
-    if (cleaned.length < MIN_MESSAGES) return null;
+    if (cleaned.length < MIN_MESSAGES) {
+        return null;
+    }
 
     const style = buildStyleProfile(cleaned);
     const { chain, starts } = buildChain(cleaned);
 
-    if (starts.length === 0) return null;
+    if (starts.length === 0) {
+        return null;
+    }
 
     let generated = generate(chain, starts, style.targetWordCount, style);
     for (let attempt = 1; attempt < MAX_RETRIES && isVerbatimRepeat(generated, cleaned); attempt++) {
@@ -59,8 +64,8 @@ export async function generateMimicMessage(targetId: string, context: IBotContex
 
 export async function generateTalkMessage(context: IBotContext, userId?: string): Promise<string | null> {
     const sql = userId
-        ? `SELECT message FROM messages WHERE message NOT LIKE '%<%' AND user_id = $1 ORDER BY RANDOM() LIMIT 5000`
-        : `SELECT message FROM messages WHERE message NOT LIKE '%<%' ORDER BY RANDOM() LIMIT 5000`;
+        ? "SELECT message FROM messages WHERE message NOT LIKE '%<%' AND user_id = $1 ORDER BY RANDOM() LIMIT 5000"
+        : "SELECT message FROM messages WHERE message NOT LIKE '%<%' ORDER BY RANDOM() LIMIT 5000";
 
     const rows = await context.database.query<{ message: string }>(sql, userId ? [userId] : []);
 
@@ -68,12 +73,16 @@ export async function generateTalkMessage(context: IBotContext, userId?: string)
         .map((r) => cleanMessage(r.message, context.config.prefix))
         .filter((m): m is string => m !== null);
 
-    if (cleaned.length === 0) return null;
+    if (cleaned.length === 0) {
+        return null;
+    }
 
     const style = buildStyleProfile(cleaned);
     const { chain, starts } = buildChain(cleaned);
 
-    if (starts.length === 0) return null;
+    if (starts.length === 0) {
+        return null;
+    }
 
     return generate(chain, starts, style.targetWordCount, style);
 }

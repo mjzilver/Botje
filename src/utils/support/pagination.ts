@@ -25,8 +25,13 @@ export class Pagination {
     }
 
     async sendPaginatedEmbed(message: BotMessage, pages: Page[], timeout = 300000): Promise<BotMessage | undefined> {
-        if (!pages || pages.length === 0) return this.messageHandler.send(message, "No results found.");
-        if (pages.length === 1) return this.messageHandler.send(message, pages[0]);
+        if (!pages || pages.length === 0) {
+            return this.messageHandler.send(message, "No results found.");
+        }
+        if (pages.length === 1) {
+            return this.messageHandler.send(message, pages[0]);
+        }
+
         let currentPage = 0;
         const getButtons = (disabled = false) =>
             new ActionRowBuilder().addComponents(
@@ -52,26 +57,34 @@ export class Pagination {
                 typeof page === "string"
                     ? { content: page }
                     : page instanceof EmbedBuilder
-                      ? { embeds: [page] }
-                      : (page as PageObject);
+                        ? { embeds: [page] }
+                        : (page as PageObject);
 
             return { ...base, components: [getButtons()] };
         };
 
         const sentMessage = await this.messageHandler.send(message, getPageContent(currentPage));
-        if (!sentMessage) return undefined;
+        if (!sentMessage) {
+            return undefined;
+        }
+
         const collector = sentMessage.createMessageComponentCollector({
             componentType: ComponentType.Button,
             time: timeout,
         });
         collector.on("collect", async (interaction) => {
-            if (interaction.user.id !== message.author.id)
+            if (interaction.user.id !== message.author.id) {
                 return interaction.reply({
                     content: "These buttons aren't for you!",
                     ephemeral: true,
                 } as MessageContent);
-            if (interaction.customId === "prev") currentPage = Math.max(0, currentPage - 1);
-            else if (interaction.customId === "next") currentPage = Math.min(pages.length - 1, currentPage + 1);
+            }
+            if (interaction.customId === "prev") {
+                currentPage = Math.max(0, currentPage - 1);
+            } else if (interaction.customId === "next") {
+                currentPage = Math.min(pages.length - 1, currentPage + 1);
+            }
+
             await interaction.update(getPageContent(currentPage));
         });
         collector.on("end", async () => {

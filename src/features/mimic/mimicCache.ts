@@ -58,11 +58,16 @@ export class MimicCache {
 
     enqueue(userId: string, db: IDatabase, logger: ILogger, prefix: string): void {
         const key = userId;
-        if (this.pendingOrQueued.has(key)) return;
+        if (this.pendingOrQueued.has(key)) {
+            return;
+        }
+
         this.pendingOrQueued.add(key);
         const item: QueueItem = { userId, db, logger, prefix };
         this.queue.push(item);
-        if (!this.processing) void this.processQueue();
+        if (!this.processing) {
+            void this.processQueue();
+        }
     }
 
     private itemKey(userId: string): string {
@@ -88,10 +93,12 @@ export class MimicCache {
     }
 
     private async buildAndSave({ userId, db, logger, prefix }: QueueItem): Promise<void> {
-        if (userId === "0") return;
+        if (userId === "0") {
+            return;
+        }
         try {
             const nameRows = await db.query<{ user_name: string }>(
-                `SELECT user_name FROM usernames WHERE user_id = $1 ORDER BY timestamp DESC LIMIT 1`,
+                "SELECT user_name FROM usernames WHERE user_id = $1 ORDER BY timestamp DESC LIMIT 1",
                 [userId],
             );
             const displayName = nameRows[0]?.user_name ?? userId;

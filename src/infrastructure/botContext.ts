@@ -7,7 +7,9 @@ export function setBotContext(value: SystemRegistry): void {
 }
 
 export function getBotContext(): SystemRegistry {
-    if (!registry) throw new Error("BotContext not initialized");
+    if (!registry) {
+        throw new Error("BotContext not initialized");
+    }
 
     return registry;
 }

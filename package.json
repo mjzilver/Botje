@@ -31,11 +31,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^22.0.0",
     "@types/pg": "^8.11.0",
     "@types/pg-format": "^1.0.5",
     "@types/sentiment": "^5.0.4",
-    "@vitest/coverage-v8": "^2.0.0",
+    "@vitest/coverage-v8": "^4.1.10",
     "escomplex": "^2.0.0-alpha",
     "eslint": "^10.4.0",
     "esprima": "^4.0.1",
@@ -46,7 +47,7 @@
     "typescript": "^5.4.0",
     "typescript-eslint": "^8.60.0",
     "typhonjs-escomplex": "^0.1.0",
-    "vitest": "^2.0.0",
+    "vitest": "^4.1.10",
     "vitest-mock-extended": "^4.0.0"
   }
 }

@@ -14,7 +14,10 @@ export const PROFILE_LOOKBACK_MS = PROFILE_MONTHS * 30 * 24 * 60 * 60 * 1000;
 export type MessageRow = { message: string; datetime: string };
 
 export function sampleMessages(rows: MessageRow[], size: number): MessageRow[] {
-    if (rows.length <= size) return rows;
+    if (rows.length <= size) {
+        return rows;
+    }
+
     const copy = rows.slice();
     for (let i = 0; i < size; i++) {
         const j = i + Math.floor(Math.random() * (copy.length - i));
@@ -69,7 +72,9 @@ export default {
             { name: "Likes", value: likes.slice(0, 3).join(", ") || "Nothing found" },
         ];
 
-        if (dislikes.length > 0) fields.push({ name: "Dislikes", value: dislikes.slice(0, 3).join(", ") });
+        if (dislikes.length > 0) {
+            fields.push({ name: "Dislikes", value: dislikes.slice(0, 3).join(", ") });
+        }
 
         const color = colorHex(context.config.color_hex);
         const embed = new EmbedBuilder()

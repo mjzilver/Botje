@@ -24,11 +24,12 @@ export default {
             "An Angel told me in a dream that",
             "The tarot card reads",
         ];
-        if (items.length < 2)
+        if (items.length < 2) {
             return context.messageHandler.reply(
                 message,
                 `Please provide at least two options \nUse format \`${this.format}\``,
             );
+        }
 
         return context.messageHandler.reply(message, `${pickRandomItem(presets)} \`${pickRandomItem(items).trim()}\``);
     },

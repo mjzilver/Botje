@@ -13,20 +13,33 @@ export class WebhookService {
     }
 
     async fetch(channel: discord.TextChannel): Promise<discord.Webhook | null> {
-        if (!channel?.isTextBased?.() || !channel.guild) return null;
+        if (!channel?.isTextBased?.() || !channel.guild) {
+            return null;
+        }
+
         const webhooks = await channel.fetchWebhooks();
-        for (const [, webhook] of webhooks) if (webhook.name === BOT_NAME) return webhook;
+        for (const [, webhook] of webhooks) {
+            if (webhook.name === BOT_NAME) {
+                return webhook;
+            }
+        }
 
         return await channel.createWebhook({ name: BOT_NAME });
     }
 
     async sendMessage(channelId: string, text: string, userId: string): Promise<boolean> {
         const channel = this.client.channels.cache.get(channelId);
-        if (!channel || !channel.isTextBased()) return false;
+        if (!channel || !channel.isTextBased()) {
+            return false;
+        }
+
         const textChannel = channel as discord.TextChannel;
         try {
             const webhook = await this.fetch(textChannel);
-            if (!webhook) return false;
+            if (!webhook) {
+                return false;
+            }
+
             const member = await textChannel.guild.members.fetch(userId);
             await webhook.send({
                 content: text,

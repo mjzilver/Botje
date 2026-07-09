@@ -36,8 +36,8 @@ function makeClient(memberName: string | null = null, userName: string | null = 
         guilds: {
             fetch: member
                 ? vi.fn().mockResolvedValue({
-                      members: { fetch: vi.fn().mockResolvedValue(member) },
-                  })
+                    members: { fetch: vi.fn().mockResolvedValue(member) },
+                })
                 : vi.fn().mockRejectedValue(new Error("guild not found")),
         },
         users: {

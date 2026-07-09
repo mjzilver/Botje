@@ -173,7 +173,7 @@ describe("Database.query", () => {
 
     it("does not retry non-transient query errors", async () => {
         const pool = {
-            query: vi.fn().mockRejectedValue(new Error("syntax error at or near \"SELECT\"")),
+            query: vi.fn().mockRejectedValue(new Error('syntax error at or near "SELECT"')),
         } as unknown as Pool;
         const mockLogger = makeMockLogger();
         const db = new Database(pool, mockLogger, testConfig);

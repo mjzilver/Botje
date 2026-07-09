@@ -11,14 +11,17 @@ export default {
     async function(message, context) {
         const mention = message.mentions?.users?.first?.() as
             | {
-                  id: string;
-                  username: string;
-              }
+                id: string;
+                username: string;
+            }
             | undefined;
         const args = message.content.split(" ");
         const disallowed = JSON.parse(fs.readFileSync(DISALLOWED_PATH, "utf8"));
         if (args[2] && args[2] === "remove") {
-            if (mention) delete disallowed[mention.id];
+            if (mention) {
+                delete disallowed[mention.id];
+            }
+
             context.logger.warn(`${mention?.username} is now allowed to use the bot again`);
             context.messageHandler.markComplete(message);
         } else if (mention) {

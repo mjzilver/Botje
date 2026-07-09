@@ -33,8 +33,12 @@ export class BackupHandler {
         this.logger.console("Saving all emotes...");
         const client = this.client;
         const tasks: Promise<string>[] = [];
-        for (const [, guild] of client.guilds.cache)
-            for (const [, emoji] of guild.emojis.cache) tasks.push(this.saveEmoji(emoji, guild.name, "", destination));
+        for (const [, guild] of client.guilds.cache) {
+            for (const [, emoji] of guild.emojis.cache) {
+                tasks.push(this.saveEmoji(emoji, guild.name, "", destination));
+            }
+        }
+
         await Promise.all(tasks);
         this.logger.console("All emotes saved successfully");
     }
@@ -50,7 +54,10 @@ export class BackupHandler {
         const emojiLink = `https://cdn.discordapp.com/emojis/${emoji.id}.png`;
         const emojiPath = path.join(guildPath, `${emoji.name}${filenameExtra}.png`);
         fs.mkdirSync(guildPath, { recursive: true });
-        if (fs.existsSync(emojiPath) && fs.statSync(emojiPath).size >= 10) return emojiPath;
+        if (fs.existsSync(emojiPath) && fs.statSync(emojiPath).size >= 10) {
+            return emojiPath;
+        }
+
         this.logger.console(`Saving ${emoji.name} at ${emojiPath}`);
         const response = await axios.get(emojiLink, { responseType: "stream" });
         await pipeline(response.data as NodeJS.ReadableStream, fs.createWriteStream(emojiPath, { flags: "w" }));

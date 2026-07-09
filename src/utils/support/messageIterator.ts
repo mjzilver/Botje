@@ -52,7 +52,10 @@ export class MessageIterator {
     async iterate(channel: FetchableChannel, startMessageId?: string | null): Promise<void> {
         const messageId = startMessageId ?? channel.lastMessageId;
         if (!messageId) {
-            if (this.logProgress) this.logger.console(`No messages found in ${channel.name ?? "channel"}`);
+            if (this.logProgress) {
+                this.logger.console(`No messages found in ${channel.name ?? "channel"}`);
+            }
+
             this.onComplete?.(this.stats);
 
             return;
@@ -64,8 +67,10 @@ export class MessageIterator {
     private async fetchBatch(channel: FetchableChannel, messageId: string): Promise<void> {
         const remaining = this.limit - this.stats.totalProcessed;
         if (remaining <= 0) {
-            if (this.logProgress)
+            if (this.logProgress) {
                 this.logger.console(`Limit reached: ${this.stats.totalProcessed} messages from ${channel.name}`);
+            }
+
             this.onComplete?.(this.stats);
 
             return;
@@ -75,8 +80,10 @@ export class MessageIterator {
         try {
             const messages = await channel.messages.fetch({ limit: fetchLimit, before: messageId });
             if (messages.size === 0) {
-                if (this.logProgress)
+                if (this.logProgress) {
                     this.logger.console(`End reached: ${this.stats.totalProcessed} messages from ${channel.name}`);
+                }
+
                 this.onComplete?.(this.stats);
 
                 return;
@@ -89,14 +96,18 @@ export class MessageIterator {
                 this.stats.totalProcessed++;
             }
 
-            if (this.logProgress && messages.size === 100)
+            if (this.logProgress && messages.size === 100) {
                 this.logger.console(
                     `${this.stats.totalProcessed} messages from ${channel.name} in ${channel.guild?.name ?? "DM"}`,
                 );
-            if (messages.size === 100 && this.stats.totalProcessed < this.limit) await this.fetchBatch(channel, lastId);
-            else {
-                if (this.logProgress)
+            }
+            if (messages.size === 100 && this.stats.totalProcessed < this.limit) {
+                await this.fetchBatch(channel, lastId);
+            } else {
+                if (this.logProgress) {
                     this.logger.console(`Done: ${this.stats.totalProcessed} messages from ${channel.name}`);
+                }
+
                 this.onComplete?.(this.stats);
             }
         } catch (err) {

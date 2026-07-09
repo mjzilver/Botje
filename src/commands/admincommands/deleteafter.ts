@@ -12,8 +12,9 @@ export default {
             const iterator = new MessageIterator(context.logger, {
                 limit: 100,
                 async onMessage(fetchedMessage: IterableMessage) {
-                    if (referenceId < fetchedMessage.id)
+                    if (referenceId < fetchedMessage.id) {
                         setTimeout(() => context.messageHandler.delete(fetchedMessage as never), 10);
+                    }
                 },
                 logProgress: false,
             });

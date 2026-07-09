@@ -7,7 +7,10 @@ export class LimitedList<T> {
     }
 
     push(item: T): void {
-        if (this.items.length >= this.limit) this.items.shift();
+        if (this.items.length >= this.limit) {
+            this.items.shift();
+        }
+
         this.items.push(item);
     }
 
@@ -17,7 +20,9 @@ export class LimitedList<T> {
 
     remove(item: T): void {
         const idx = this.items.indexOf(item);
-        if (idx !== -1) this.items.splice(idx, 1);
+        if (idx !== -1) {
+            this.items.splice(idx, 1);
+        }
     }
 
     get length(): number {

@@ -36,8 +36,12 @@ export function parseRedditArgs(content: string): { sub: string; sort: string; t
     const sub = args[1] ?? "";
     let sort = "hot";
     let time = "month";
-    if (["top", "hot", "new"].includes(args[2])) sort = args[2];
-    if (["hour", "day", "week", "month", "year", "all"].includes(args[3])) time = args[3];
+    if (["top", "hot", "new"].includes(args[2])) {
+        sort = args[2];
+    }
+    if (["hour", "day", "week", "month", "year", "all"].includes(args[3])) {
+        time = args[3];
+    }
 
     return { sub, sort, time };
 }
@@ -54,8 +58,11 @@ async function getRedditImage(message: BotMessage, context: IBotContext, last = 
     try {
         const response = await axiosInstance.get(url);
         const body = response.data;
-        if (body?.data?.children) await handleRedditImages(message, sub, body.data.children, context);
-        else context.messageHandler.send(message, "No images were found");
+        if (body?.data?.children) {
+            await handleRedditImages(message, sub, body.data.children, context);
+        } else {
+            context.messageHandler.send(message, "No images were found");
+        }
     } catch (err) {
         context.logger.error(toError(err));
     }
@@ -73,12 +80,19 @@ async function handleRedditImages(
         const rows = await context.database.query<{
             link: string;
         }>(selectSQL, [sub]);
-        for (const row of rows) foundImages[row.link] = true;
+        for (const row of rows) {
+            foundImages[row.link] = true;
+        }
+
         const filteredImages = children.filter((c) => !(c.data.url in foundImages) && isLink(c.data.url));
         if (filteredImages.length > 0) {
             const post = pickRandomItem(filteredImages).data;
-            if (post.url.match(/imgur\.com/gi)) handleImgur(message, post, sub, context);
-            else embedImage(message, post, sub, context);
+            if (post.url.match(/imgur\.com/gi)) {
+                handleImgur(message, post, sub, context);
+            } else {
+                embedImage(message, post, sub, context);
+            }
+
             insertPost(post, sub, context);
         } else {
             if (children.length >= 100) {
@@ -134,20 +148,23 @@ async function handleRedirect(message: BotMessage, post: RedditPost, context: IB
         const redirectUrl = res.request.res.responseUrl;
         context.logger.console(`Redirected to ${redirectUrl}`);
         let url = decodeURIComponent(redirectUrl);
-        if (redirectUrl.includes("over18"))
+        if (redirectUrl.includes("over18")) {
             url = url.substring(
                 url.indexOf("https://www.reddit.com/over18?dest=") + "https://www.reddit.com/over18?dest=".length,
             );
+        }
         try {
             const response = await axiosInstance.get(`${url}.json`);
             const body = response.data;
             const videoLink = body?.[0]?.data?.children?.[0]?.data?.secure_media?.reddit_video?.fallback_url;
-            if (videoLink)
+            if (videoLink) {
                 context.messageHandler.send(
                     message,
                     `${post.title} \n${videoLink} \n<https://reddit.com${post.permalink}>`,
                 );
-            else getRedditImage(message, context);
+            } else {
+                getRedditImage(message, context);
+            }
         } catch (err) {
             context.logger.error(toError(err));
         }

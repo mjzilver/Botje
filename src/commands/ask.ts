@@ -6,7 +6,9 @@ import type { BotMessage } from "../interfaces/discord";
 const bannedPhrases = ["bot:", "user:", "[user]:", "[bot]:"];
 
 function filterBotReply(filtered: string): string {
-    for (const phrase of bannedPhrases) filtered = filtered.replace(new RegExp(phrase, "gi"), "").trim();
+    for (const phrase of bannedPhrases) {
+        filtered = filtered.replace(new RegExp(phrase, "gi"), "").trim();
+    }
 
     return filtered || "thinking...";
 }
@@ -51,10 +53,14 @@ export default {
 
         const prompt = promptTemplate.replace("{userQuestion}", userQuestion);
         const thinkingMsg = await context.messageHandler.reply(message, "Thinking...");
-        if (!thinkingMsg) return;
+        if (!thinkingMsg) {
+            return;
+        }
         try {
             const result = await context.llm.streamToMessage(thinkingMsg, prompt, filterBotReply);
-            if (result) await context.messageHandler.react(thinkingMsg, "🤖");
+            if (result) {
+                await context.messageHandler.react(thinkingMsg, "🤖");
+            }
         } catch (err) {
             context.logger.error(toError(err));
             await context.messageHandler.edit(thinkingMsg, "Error contacting LLM.");

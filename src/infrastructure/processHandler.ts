@@ -7,8 +7,8 @@ export function registerProcessHandlers(
     getCommandHandler: () => CommandHandler | undefined,
     getMessageHandler: () =>
         | {
-              reply(msg: BotMessage, content: string): void;
-          }
+            reply(msg: BotMessage, content: string): void;
+        }
         | undefined,
     logger: ILogger,
 ): void {
@@ -16,7 +16,10 @@ export function registerProcessHandlers(
         const commandHandler = getCommandHandler();
         const messageHandler = getMessageHandler();
         const last = commandHandler?.commandList.get();
-        if (last && messageHandler) messageHandler.reply(last, replyText);
+        if (last && messageHandler) {
+            messageHandler.reply(last, replyText);
+        }
+
         logger.error(toError(error));
     }
 

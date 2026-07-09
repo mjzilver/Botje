@@ -41,7 +41,9 @@ export default {
         await command.function(message, context);
     },
     completer(argIndex: number, context: IBotContext, _input: string[]): string[] {
-        if (argIndex === 0) return getTextChannels(context.client).map((ch) => ch.name);
+        if (argIndex === 0) {
+            return getTextChannels(context.client).map((ch) => ch.name);
+        }
         if (argIndex === 1) {
             return [
                 ...Object.keys(context.loadedCommands.commands),

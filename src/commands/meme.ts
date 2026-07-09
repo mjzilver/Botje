@@ -59,7 +59,10 @@ export default {
         const [top, bottom] = (args.join(" ").split("|") || []).slice(0, 2);
         if (args[0] === "?" || !args[0]) {
             let keyword = "";
-            if (args[0] === "?" && args[1]) keyword = args[1];
+            if (args[0] === "?" && args[1]) {
+                keyword = args[1];
+            }
+
             const selectSQL = `SELECT message FROM messages
                 WHERE message LIKE $1 AND message NOT LIKE '%http%'
                 AND message NOT LIKE '%<%' AND LENGTH(message) < 70`;
@@ -75,7 +78,9 @@ export default {
 
             return context.messageHandler.reply(message, "Can't find anything related, but this is your fault");
         } else if (top) {
-            if (url.match(/\.(jpeg|jpg|gif|png)/gi)) return processPicture(url, top, bottom, message, context);
+            if (url.match(/\.(jpeg|jpg|gif|png)/gi)) {
+                return processPicture(url, top, bottom, message, context);
+            }
 
             return processPicture(null, top, bottom, message, context);
         }

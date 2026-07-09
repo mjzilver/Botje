@@ -59,7 +59,10 @@ export class Bot {
             this.logger.startup("Attempting to log in");
             const isBeta = process.argv.includes("--beta");
             const key = isBeta ? this.config.discord_api_key_beta : this.config.discord_api_key;
-            if (isBeta) this.logger.startup("Logging in with beta key");
+            if (isBeta) {
+                this.logger.startup("Logging in with beta key");
+            }
+
             this.client.login(key);
         }
     }
@@ -83,14 +86,18 @@ export class Bot {
         const channels = this.client.channels.cache
             .filter((ch) => ch.type === discord.ChannelType.GuildText && (ch as discord.TextChannel).viewable)
             .map((ch) => ch as discord.TextChannel);
-        for (const channel of channels) await this.scanChannel(channel, yesterday);
+        for (const channel of channels) {
+            await this.scanChannel(channel, yesterday);
+        }
     }
 
     private async scanChannel(channel: discord.TextChannel, since: number): Promise<void> {
         try {
             const messages = await channel.messages.fetch({ limit: 100 });
             const filteredMessages = messages.filter((m) => m.createdTimestamp > since);
-            for (const message of filteredMessages.values()) await this.processScannedMessage(message);
+            for (const message of filteredMessages.values()) {
+                await this.processScannedMessage(message);
+            }
         } catch (err) {
             this.logger.error(toError(err));
         }
@@ -99,11 +106,17 @@ export class Bot {
     private async processScannedMessage(rawMessage: discord.Message): Promise<void> {
         const message = toBotMessage(rawMessage);
         await this.registry.database.storeMessage(message);
-        if (!rawMessage.content.match(new RegExp(this.config.prefix, "i"))) return;
+        if (!rawMessage.content.match(new RegExp(this.config.prefix, "i"))) {
+            return;
+        }
+
         const calls = this.registry.messageHandler.getCommandCalls();
-        if (rawMessage.id in calls) return;
-        if (!this.registry.commandHandler.isUserBanned(message))
+        if (rawMessage.id in calls) {
+            return;
+        }
+        if (!this.registry.commandHandler.isUserBanned(message)) {
             this.registry.commandHandler.handleCommand(message, true);
+        }
     }
 
     private loadDisallowed(): Record<string, boolean> {

@@ -31,17 +31,29 @@ export function isEligibleMimicTarget(
     getUser: (id: string) => { bot?: boolean; username: string } | undefined,
     isInAnyGuild: (id: string) => boolean,
 ): boolean {
-    if (userId === botUserId) return false;
+    if (userId === botUserId) {
+        return false;
+    }
+
     const user = getUser(userId);
-    if (user?.bot) return false;
-    if (user && DELETED_USER_RE.test(user.username)) return false;
-    if (!isInAnyGuild(userId)) return false;
+    if (user?.bot) {
+        return false;
+    }
+    if (user && DELETED_USER_RE.test(user.username)) {
+        return false;
+    }
+    if (!isInAnyGuild(userId)) {
+        return false;
+    }
 
     return true;
 }
 
 export function cleanMessage(raw: string, prefix: string): string | null {
-    if (new RegExp(`^${prefix}`, "i").test(raw.trim())) return null;
+    if (new RegExp(`^${prefix}`, "i").test(raw.trim())) {
+        return null;
+    }
+
     const cleaned = normalizeSpaces(
         raw
             .replace(/<[@#!&]?\d+>/g, "")
@@ -49,7 +61,9 @@ export function cleanMessage(raw: string, prefix: string): string | null {
             .replace(/https?:\/\/\S+/g, "")
             .replace(/www\.\S+/g, ""),
     );
-    if (cleaned.split(/\s+/).filter((w) => w.length > 0).length < 3) return null;
+    if (cleaned.split(/\s+/).filter((w) => w.length > 0).length < 3) {
+        return null;
+    }
 
     return cleaned;
 }
@@ -64,16 +78,24 @@ export function buildStyleProfile(messages: string[]): StyleProfile {
         const first = msg.charAt(0);
         if (/[a-zA-Z]/.test(first)) {
             letterStartCount++;
-            if (/[a-z]/.test(first)) lowercaseCount++;
+            if (/[a-z]/.test(first)) {
+                lowercaseCount++;
+            }
         }
 
         totalWords += msg.split(/\s+/).filter((w) => w.length > 0).length;
         const trimmed = msg.trimEnd();
-        if (trimmed.endsWith("...")) terminatorCounts["..."]++;
-        else if (trimmed.endsWith("!")) terminatorCounts["!"]++;
-        else if (trimmed.endsWith("?")) terminatorCounts["?"]++;
-        else if (trimmed.endsWith(".")) terminatorCounts["."]++;
-        else terminatorCounts[""]++;
+        if (trimmed.endsWith("...")) {
+            terminatorCounts["..."]++;
+        } else if (trimmed.endsWith("!")) {
+            terminatorCounts["!"]++;
+        } else if (trimmed.endsWith("?")) {
+            terminatorCounts["?"]++;
+        } else if (trimmed.endsWith(".")) {
+            terminatorCounts["."]++;
+        } else {
+            terminatorCounts[""]++;
+        }
     }
 
     const prefersLowercase = letterStartCount > 10 && lowercaseCount / letterStartCount > 0.6;
@@ -96,16 +118,25 @@ export function buildChain(messages: string[]): { chain: Chain; starts: [string,
             .trim()
             .split(/\s+/)
             .filter((w) => w.length > 0);
-        if (words.length < 3) continue;
+        if (words.length < 3) {
+            continue;
+        }
+
         starts.push([words[0], words[1]]);
         for (let i = 0; i < words.length - 2; i++) {
             const key = `${words[i].toLowerCase()} ${words[i + 1].toLowerCase()}`;
-            if (!chain[key]) chain[key] = [];
+            if (!chain[key]) {
+                chain[key] = [];
+            }
+
             chain[key].push(words[i + 2]);
         }
 
         const endKey = `${words[words.length - 2].toLowerCase()} ${words[words.length - 1].toLowerCase()}`;
-        if (!chain[endKey]) chain[endKey] = [];
+        if (!chain[endKey]) {
+            chain[endKey] = [];
+        }
+
         chain[endKey].push(END_TOKEN);
     }
 
@@ -122,14 +153,21 @@ export function generate(chain: Chain, starts: [string, string][], targetLen: nu
 
     while (words.length < hardCap) {
         let options = chain[prev];
-        if (!options || options.length === 0) break;
+        if (!options || options.length === 0) {
+            break;
+        }
         if (words.length < targetLen) {
             options = options.filter((w) => w !== END_TOKEN);
-            if (options.length === 0) break;
+            if (options.length === 0) {
+                break;
+            }
         }
 
         const next = pickRandomItem(options);
-        if (next === END_TOKEN) break;
+        if (next === END_TOKEN) {
+            break;
+        }
+
         words.push(next);
         const last = words.slice(-2);
         prev = `${last[0].toLowerCase()} ${last[1].toLowerCase()}`;
@@ -152,7 +190,9 @@ export function generate(chain: Chain, starts: [string, string][], targetLen: nu
 
 export function isVerbatimRepeat(generated: string, messages: string[]): boolean {
     const norm = generated.toLowerCase().replace(/\s+/g, " ").trim();
-    if (norm.length < 20) return false;
+    if (norm.length < 20) {
+        return false;
+    }
 
     return messages.some((m) => m.toLowerCase().replace(/\s+/g, " ").includes(norm));
 }

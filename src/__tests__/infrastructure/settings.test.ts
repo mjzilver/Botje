@@ -24,7 +24,9 @@ describe("Settings", () => {
         tmpFile = writeTempConfig(MINIMAL_CONFIG);
     });
     afterEach(() => {
-        if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
+        if (fs.existsSync(tmpFile)) {
+            fs.unlinkSync(tmpFile);
+        }
     });
     it("loads config from the given path", () => {
         const settings = new Settings(noop, tmpFile);

@@ -56,8 +56,10 @@ class SaidLister extends Lister {
             mentioned.id,
         ]);
         let result = "";
-        for (let i = 0; i < rows.length && i <= 10; i++)
+        for (let i = 0; i < rows.length && i <= 10; i++) {
             result += `${rows[i].message} was said ${rows[i].count} times \n`;
+        }
+
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         const top = new EmbedBuilder()
             .setColor(context.config.color_hex)

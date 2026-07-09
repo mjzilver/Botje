@@ -22,11 +22,15 @@ export class ReactionHandler implements IReactionHandler {
     ) {}
 
     async process(reaction: BotReaction, isRemove: boolean, message: BotMessage): Promise<void> {
-        if (isRemove) return;
+        if (isRemove) {
+            return;
+        }
 
         await this.db.insertReaction(reaction);
 
-        if (!message.author || message.author.id !== this.getBotUserId()) return;
+        if (!message.author || message.author.id !== this.getBotUserId()) {
+            return;
+        }
 
         const emojiName = reaction.emoji.name;
 

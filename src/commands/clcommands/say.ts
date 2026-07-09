@@ -4,15 +4,20 @@ import { generateMimicMessage } from "../../features/mimic/textGenerationService
 
 function findUserId(input: string, guildId: string, context: IBotContext): string | undefined {
     const guild = context.client.guilds.cache.get(guildId);
-    if (!guild) return undefined;
-    if (guild.members.cache.has(input)) return input;
+    if (!guild) {
+        return undefined;
+    }
+    if (guild.members.cache.has(input)) {
+        return input;
+    }
 
     for (const [, member] of guild.members.cache) {
         if (
             member.displayName.toLowerCase() === input.toLowerCase() ||
             member.user.username.toLowerCase() === input.toLowerCase()
-        )
+        ) {
             return member.user.id;
+        }
     }
 
     return undefined;
@@ -78,7 +83,9 @@ export default {
         if (argIndex === 1) {
             const channel = input[0] ? findChannel(input[0], context.client) : undefined;
             const guild = channel ? context.client.guilds.cache.get(channel.guild.id) : undefined;
-            if (!guild) return [];
+            if (!guild) {
+                return [];
+            }
 
             return [...guild.members.cache.values()].map((m) => m.displayName || m.user.username);
         }

@@ -70,11 +70,18 @@ export class LlmService {
             let shouldAbort = false;
             while (!shouldAbort) {
                 const { done, value } = await reader.read();
-                if (done) break;
+                if (done) {
+                    break;
+                }
+
                 const chunk = decoder.decode(value, { stream: true }).trim();
-                if (!chunk) continue;
+                if (!chunk) {
+                    continue;
+                }
                 for (const line of chunk.split("\n")) {
-                    if (shouldAbort) break;
+                    if (shouldAbort) {
+                        break;
+                    }
                     try {
                         const json = JSON.parse(line) as {
                             response?: string;
@@ -99,7 +106,10 @@ export class LlmService {
                             }
                         }
                     } catch (err) {
-                        if (toError(err).message?.includes("LLM error")) throw err;
+                        if (toError(err).message?.includes("LLM error")) {
+                            throw err;
+                        }
+
                         this.logger.warn(`Skipping invalid JSON line: ${line}`);
                     }
                 }

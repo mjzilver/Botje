@@ -25,8 +25,9 @@ export class Dictionary {
         this.db = db;
         this.logger = logger;
         this.wordsPath = wordsPath;
-        if (fs.existsSync(this.wordsPath)) this.loadWordsFromFile();
-        else {
+        if (fs.existsSync(this.wordsPath)) {
+            this.loadWordsFromFile();
+        } else {
             this.logger.console("words.json not found, generating new file");
             this.generateWordsFile();
         }
@@ -59,15 +60,21 @@ export class Dictionary {
             const rows = await this.db.query<{
                 message: string;
             }>(sql);
-            for (const row of rows)
-                for (const word of row.message.split(/\s+/)) wordHolder[word] = (wordHolder[word] ?? 0) + 1;
+            for (const row of rows) {
+                for (const word of row.message.split(/\s+/)) {
+                    wordHolder[word] = (wordHolder[word] ?? 0) + 1;
+                }
+            }
+
             this.words = Object.entries(wordHolder);
             this.words.sort(([, a], [, b]) => b - a);
             this.stopWordsCache = null;
             this.stopWordsSet = null;
             const shortList = this.words.slice(0, DICTIONARY_TOP_WORDS);
             fs.writeFile(this.wordsPath, JSON.stringify(shortList), (err) => {
-                if (err) this.logger.error(toError(err));
+                if (err) {
+                    this.logger.error(toError(err));
+                }
             });
         } catch (err) {
             this.logger.error(toError(err));
@@ -85,7 +92,10 @@ export class Dictionary {
     }
 
     getStopWordsRegex(): RegExp {
-        if (this.stopWordsCache) return this.stopWordsCache;
+        if (this.stopWordsCache) {
+            return this.stopWordsCache;
+        }
+
         const max = Math.min(this.words.length, 100);
         const terms = this.words
             .slice(0, max)
@@ -97,7 +107,10 @@ export class Dictionary {
     }
 
     getStopWords(): Set<string> {
-        if (this.stopWordsSet) return this.stopWordsSet;
+        if (this.stopWordsSet) {
+            return this.stopWordsSet;
+        }
+
         const max = Math.min(this.words.length, 100);
         this.stopWordsSet = new Set(this.words.slice(0, max).map(([w]) => w.toLowerCase()));
 

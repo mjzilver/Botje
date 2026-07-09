@@ -17,7 +17,10 @@ registerProcessHandlers(
     logger,
 );
 const clInterval = setInterval(() => {
-    if (!bot.registry) return;
+    if (!bot.registry) {
+        return;
+    }
+
     clearInterval(clInterval);
     try {
         const { clcommands } = bot.registry.loadedCommands;

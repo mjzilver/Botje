@@ -63,8 +63,11 @@ function createLogger(consoleLevel = "startup", fileLevel: string | null = "debu
     });
     const ilogger: ILogger = {
         error: (message: string | Error) => {
-            if (message instanceof Error) activeWinstonLogger.error(message.stack ?? message.toString());
-            else activeWinstonLogger.error(message);
+            if (message instanceof Error) {
+                activeWinstonLogger.error(message.stack ?? message.toString());
+            } else {
+                activeWinstonLogger.error(message);
+            }
         },
         warn: (msg: string) => {
             activeWinstonLogger.warn(msg);
@@ -85,7 +88,10 @@ function createLogger(consoleLevel = "startup", fileLevel: string | null = "debu
             activeWinstonLogger.log("repeat", msg);
         },
         printColumns: (arrays: string[][], headers: string[] = [], maxColWidth = 40) => {
-            if (!arrays.length) return;
+            if (!arrays.length) {
+                return;
+            }
+
             const truncate = (s: string, max: number) => (s.length > max ? `${s.slice(0, max - 1)}…` : s);
             const rowCount = arrays[0].length;
             const colWidths = arrays.map((col, i) => {
@@ -106,7 +112,10 @@ function createLogger(consoleLevel = "startup", fileLevel: string | null = "debu
         },
         printRows: (rows: Array<[string, string | number]>, logFn?: (msg: string) => void) => {
             const fn = logFn ?? ((msg: string) => ilogger.console(msg));
-            if (!rows.length) return;
+            if (!rows.length) {
+                return;
+            }
+
             const colCount = rows[0].length;
             const colWidths = Array.from({ length: colCount }, (_, i) =>
                 Math.max(...rows.map((row) => String(row[i]).length)),
@@ -127,7 +136,9 @@ export function createSilentLogger(): ILogger {
 }
 
 export function setLogLevel(level: string): void {
-    if (level in loggerLevels) activeTransports[0].level = level;
+    if (level in loggerLevels) {
+        activeTransports[0].level = level;
+    }
 }
 
 export function getAvailableLevels(): string[] {
@@ -150,8 +161,11 @@ export function queryLogs(
 export function queryLogsAsync(options: Winston.QueryOptions): Promise<{ file?: LogEntry[] }> {
     return new Promise((resolve, reject) => {
         activeWinstonLogger.query(options, (err, results) => {
-            if (err) reject(err);
-            else resolve(results as { file?: LogEntry[] });
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results as { file?: LogEntry[] });
+            }
         });
     });
 }

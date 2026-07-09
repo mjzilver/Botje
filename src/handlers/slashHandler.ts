@@ -21,19 +21,28 @@ export class SlashHandler {
     }
 
     buildSlashCommand(command: ICommand): SlashCommandBuilder {
-        if (command.slashCommand) return command.slashCommand;
+        if (command.slashCommand) {
+            return command.slashCommand;
+        }
+
         const builder = new SlashCommandBuilder()
             .setName(command.name)
             .setDescription(command.description ?? "No description available");
-        if (command.options && !command.subcommands) this.addOptionsToBuilder(builder, command.options);
-        if (command.subcommands)
-            for (const sub of command.subcommands)
+        if (command.options && !command.subcommands) {
+            this.addOptionsToBuilder(builder, command.options);
+        }
+        if (command.subcommands) {
+            for (const sub of command.subcommands) {
                 builder.addSubcommand((subcommand) => {
                     subcommand.setName(sub.name).setDescription(sub.description ?? "No description");
-                    if (sub.options) this.addOptionsToBuilder(subcommand, sub.options);
+                    if (sub.options) {
+                        this.addOptionsToBuilder(subcommand, sub.options);
+                    }
 
                     return subcommand;
                 });
+            }
+        }
 
         return builder;
     }
@@ -47,36 +56,50 @@ export class SlashHandler {
         options: CommandOption[],
     ): void {
         for (const opt of options) {
-            if (opt.type === "user")
+            if (opt.type === "user") {
                 builder.addUserOption((o) => {
                     o.setName(opt.name).setDescription(opt.description ?? "No description");
-                    if (opt.required) o.setRequired(true);
+                    if (opt.required) {
+                        o.setRequired(true);
+                    }
 
                     return o;
                 });
-            else if (opt.type === "string")
+            } else if (opt.type === "string") {
                 builder.addStringOption((o) => {
                     o.setName(opt.name).setDescription(opt.description ?? "No description");
-                    if (opt.required) o.setRequired(true);
-                    if (opt.choices) for (const choice of opt.choices) o.addChoices(choice);
+                    if (opt.required) {
+                        o.setRequired(true);
+                    }
+                    if (opt.choices) {
+                        for (const choice of opt.choices) {
+                            o.addChoices(choice);
+                        }
+                    }
 
                     return o;
                 });
-            else if (opt.type === "integer")
+            } else if (opt.type === "integer") {
                 builder.addIntegerOption((o) => {
                     o.setName(opt.name).setDescription(opt.description ?? "No description");
-                    if (opt.required) o.setRequired(true);
+                    if (opt.required) {
+                        o.setRequired(true);
+                    }
 
                     return o;
                 });
-            else this.logger.warn(`[SlashCommands] Unsupported option type "${opt.type}" for "${opt.name}"`);
+            } else {
+                this.logger.warn(`[SlashCommands] Unsupported option type "${opt.type}" for "${opt.name}"`);
+            }
         }
     }
 
     async handleInteraction(interaction: discord.ChatInputCommandInteraction): Promise<void> {
         const commandName = interaction.commandName;
         const found = this.slashCommands.find((sc) => sc.name === commandName);
-        if (!found) return;
+        if (!found) {
+            return;
+        }
 
         try {
             await interaction.deferReply();
@@ -97,10 +120,13 @@ export class SlashHandler {
                     ?.split(",")
                     .map((a) => a.trim())
                     .includes(name)
-            )
+            ) {
                 continue;
+            }
 
-            if (!command.function) continue;
+            if (!command.function) {
+                continue;
+            }
 
             try {
                 const builder = this.buildSlashCommand(command);

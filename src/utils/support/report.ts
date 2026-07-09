@@ -24,7 +24,7 @@ export async function getReportRows(context: IBotContext): Promise<ReportRow[] |
         ["Memory: heapTotal", `${Math.round((heapTotal / 1024 / 1024) * 100) / 100} MB`],
         ["Uptime", formattedUptime],
     ];
-    const sql = `SELECT pg_size_pretty(pg_database_size('botdb')) AS size, COUNT(messages.id) as count FROM messages`;
+    const sql = "SELECT pg_size_pretty(pg_database_size('botdb')) AS size, COUNT(messages.id) as count FROM messages";
     const rows = await context.database.query<{ size: string; count: string }>(sql, []);
     if (rows.length === 0) {
         return null;

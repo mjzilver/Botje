@@ -62,8 +62,11 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
                 const regexPatterns = words.map((w: string) => new RegExp(w, "gmi"));
                 for (const row of rows) {
                     let amount = 0;
-                    for (const [j, pattern] of regexPatterns.entries())
-                        if (row.message.match(pattern)) amount += 30 - j * j;
+                    for (const [j, pattern] of regexPatterns.entries()) {
+                        if (row.message.match(pattern)) {
+                            amount += 30 - j * j;
+                        }
+                    }
                     if (amount > 0 && levenshtein(row.message, message.content) > 15) {
                         scored.push({ message: row.message, score: amount });
                     }
@@ -113,7 +116,9 @@ async function findRandom(message: BotMessage, context: IBotContext): Promise<vo
     const rows = await context.database.queryRandomMessage<{
         message: string;
     }>(selectSQL, [earliest.getTime()]);
-    if (rows.length > 0) context.messageHandler.send(message, normalizeSpaces(rows[0].message));
+    if (rows.length > 0) {
+        context.messageHandler.send(message, normalizeSpaces(rows[0].message));
+    }
 }
 
 async function findTopic(message: BotMessage, topic: string, context: IBotContext): Promise<void> {
@@ -156,7 +161,10 @@ export default {
     ],
     async function(message, context) {
         const matches = textOnly(message.content).match(/(?:think of|about) +(.+)/i);
-        if (matches && matches[1] !== "") await findTopic(message, matches[1], context);
-        else await findByWord(message, context);
+        if (matches && matches[1] !== "") {
+            await findTopic(message, matches[1], context);
+        } else {
+            await findByWord(message, context);
+        }
     },
 } satisfies ICommand;

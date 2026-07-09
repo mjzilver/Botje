@@ -10,8 +10,10 @@ export default {
         const dmcommands = context.loadedCommands.dmcommands;
         let helpMessage =
             "**Here is a list of all the commands *you* can use in private message (use b!help in a server to see server commands):  \n**";
-        for (const [, command] of Object.entries(dmcommands))
+        for (const [, command] of Object.entries(dmcommands)) {
             helpMessage += `\`${command.format}\`: ${command.description} \n`;
+        }
+
         const help = new EmbedBuilder()
             .setColor(context.config.color_hex)
             .setTitle(":robot: Current DirectMessage commands: :robot:")

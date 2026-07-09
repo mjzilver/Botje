@@ -58,8 +58,12 @@ export function replaceAt(str: string, index: number, replacement: string): stri
 }
 
 export function getAttachmentUrl(message: BotMessage): string {
-    if ((message.attachments?.size ?? 0) >= 1) return message.attachments?.first()?.url ?? "";
-    if ((message.embeds?.length ?? 0) >= 1) return message.embeds?.[0]?.url ?? "";
+    if ((message.attachments?.size ?? 0) >= 1) {
+        return message.attachments?.first()?.url ?? "";
+    }
+    if ((message.embeds?.length ?? 0) >= 1) {
+        return message.embeds?.[0]?.url ?? "";
+    }
 
     return "";
 }
@@ -73,7 +77,9 @@ export async function resolveImageUrl(message: BotMessage, args: string[]): Prom
         url = getAttachmentUrl(message);
     }
 
-    if (args[0]?.startsWith("http")) url = args.shift() ?? url;
+    if (args[0]?.startsWith("http")) {
+        url = args.shift() ?? url;
+    }
 
     return url;
 }

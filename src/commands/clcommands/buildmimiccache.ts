@@ -46,6 +46,6 @@ export default {
             mimicCache.enqueue(row.user_id, context.database, context.logger, context.config.prefix);
         }
 
-        context.logger.console(`Queued. Builds will process in the background.`);
+        context.logger.console("Queued. Builds will process in the background.");
     },
 } satisfies IClCommand;

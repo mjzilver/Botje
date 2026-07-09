@@ -18,8 +18,11 @@ async function nukechannel(channel: BotGuildTextChannel, context: IBotContext): 
 }
 
 async function nukeguild(message: BotMessage, context: IBotContext): Promise<void> {
-    for (const channel of getTextChannels(context.client))
-        if (channel.guild.id === message.guild?.id) await nukechannel(channel, context);
+    for (const channel of getTextChannels(context.client)) {
+        if (channel.guild.id === message.guild?.id) {
+            await nukechannel(channel, context);
+        }
+    }
 }
 
 export default {
