@@ -27,8 +27,8 @@ export const DELETED_USER_RE = /^deleted.?user/i;
 
 export function isEligibleMimicTarget(
     userId: string,
-    botUserId: string | undefined,
-    getUser: (id: string) => { bot?: boolean; username: string } | undefined,
+    botUserId: string | null,
+    getUser: (id: string) => { bot?: boolean; username: string } | null,
     isInAnyGuild: (id: string) => boolean,
 ): boolean {
     if (userId === botUserId) {

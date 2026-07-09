@@ -9,7 +9,7 @@ export interface ILlmService {
         placeholder: BotMessage,
         prompt: string,
         filterFn?: ((text: string) => string) | null,
-    ): Promise<string | undefined>;
+    ): Promise<string | null>;
 }
 
 export class LlmService {
@@ -49,7 +49,7 @@ export class LlmService {
         placeholder: BotMessage,
         prompt: string,
         filterFn: ((text: string) => string) | null = null,
-    ): Promise<string | undefined> {
+    ): Promise<string | null> {
         await this.acquireSlot();
         const controller = new AbortController();
         try {
@@ -115,7 +115,7 @@ export class LlmService {
                 }
             }
 
-            return accumulated;
+            return accumulated || null;
         } catch (err) {
             if (toError(err).name === "AbortError") {
                 this.logger.info("LLM stream aborted.");
@@ -126,5 +126,7 @@ export class LlmService {
         } finally {
             this.releaseSlot();
         }
+
+        return null;
     }
 }

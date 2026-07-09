@@ -93,7 +93,7 @@ export function toError(err: unknown): Error {
 
 export const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-export function readGuildEmoteDir(guildId: string | undefined): { path: string; files: string[] } {
+export function readGuildEmoteDir(guildId: string | null): { path: string; files: string[] } {
     const path = `backups/emotes/${guildId}/`;
 
     return { path, files: fs.readdirSync(path) };

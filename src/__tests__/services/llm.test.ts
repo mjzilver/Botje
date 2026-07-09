@@ -105,11 +105,11 @@ describe("LlmService.streamToMessage", () => {
         const service = new LlmService(CONFIG, logger, handler);
 
         const result = await service.streamToMessage(makeMessage(), "p");
-        expect(result).toBe("");
+        expect(result).toBeNull();
         expect(logger.error).toHaveBeenCalledWith(expect.stringContaining("out of memory"));
 
         const second = service.streamToMessage(makeMessage(), "p2");
-        await expect(second).resolves.toBe("");
+        await expect(second).resolves.toBeNull();
     });
 
     it("stops streaming when message edit fails and still releases slot", async () => {

@@ -18,7 +18,7 @@ export class ReactionHandler implements IReactionHandler {
         private messageHandler: IMessageHandler,
         private config: BotConfig,
         private logger: ILogger,
-        private getBotUserId: () => string | undefined,
+        private getBotUserId: () => string | null,
     ) {}
 
     async process(reaction: BotReaction, isRemove: boolean, message: BotMessage): Promise<void> {

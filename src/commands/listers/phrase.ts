@@ -23,7 +23,7 @@ class PhraseLister extends Lister {
         }
 
         const { mention, leaderboard, percent, args } = this.parseArgs(message, { preserveQuotes: true });
-        const word = args[0] ? removeQuotes(args[0]).toLowerCase() : undefined;
+        const word = args[0] ? removeQuotes(args[0]).toLowerCase() : null;
         if (!word) {
             await context.messageHandler.send(message, phraseHelperMessage);
 

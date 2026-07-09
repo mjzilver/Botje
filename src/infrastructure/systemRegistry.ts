@@ -88,7 +88,7 @@ export class SystemRegistry implements IBotContext {
             this.messageHandler,
             this.config,
             this.logger,
-            () => this.client.user?.id,
+            () => this.client.user?.id ?? null,
         );
         this.eventListener = new EventListener(
             this.client,

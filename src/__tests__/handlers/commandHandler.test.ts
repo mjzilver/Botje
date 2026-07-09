@@ -285,7 +285,7 @@ describe("CommandHandler", () => {
             const { handler, mh } = makeHandler();
             const fetchMessage = vi.fn();
 
-            vi.mocked(mh.findFromReply).mockReturnValue(undefined);
+            vi.mocked(mh.findFromReply).mockReturnValue(null);
 
             handler.redo(makeMessage("..."), fetchMessage);
 

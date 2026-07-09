@@ -37,7 +37,7 @@ export default {
     async function(message, context) {
         const args = message.content.split(" ");
         args.shift();
-        const { path: _path, files } = readGuildEmoteDir(message.guild?.id);
+        const { path: _path, files } = readGuildEmoteDir(message.guild?.id ?? null);
         if (!args[0]) {
             args[0] = pickRandomItem(files);
         }

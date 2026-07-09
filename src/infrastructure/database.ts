@@ -206,14 +206,14 @@ export class Database implements IDatabase {
     }
 
     async query<T extends QueryResultRow = QueryResultRow>(sql: string, params: SqlParam[] = []): Promise<T[]> {
-        let start: number | undefined;
+        let start: number | null = null;
         if (DEBUG_SQL) {
             start = Date.now();
         }
         for (let attempt = 0; attempt <= QUERY_RETRY_DELAYS_MS.length; attempt++) {
             try {
                 const result = await this.pool.query(sql, params);
-                if (DEBUG_SQL && start !== undefined) {
+                if (DEBUG_SQL && start !== null) {
                     const duration = Date.now() - start;
                     if (duration > 1000) {
                         let interpolated: string;

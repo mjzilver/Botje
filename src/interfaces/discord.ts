@@ -64,7 +64,7 @@ export interface BotMessage {
     member: BotMember | null;
     mentions: {
         users: Map<string, BotUser> & {
-            first(): BotUser | undefined;
+            first(): BotUser | null;
         };
     };
     type?: number;
@@ -76,7 +76,7 @@ export interface BotMessage {
     cleanContent: string;
     attachments?: {
         size: number;
-        first(): { url?: string } | undefined;
+        first(): { url?: string } | null;
     };
     embeds?: { url?: string }[];
     reactions: {

@@ -30,7 +30,7 @@ describe("ask — integration", () => {
 
     it("does nothing if messageHandler.reply returns undefined", async () => {
         const context = makeMockContext();
-        vi.mocked(context.messageHandler.reply).mockResolvedValue(undefined);
+        vi.mocked(context.messageHandler.reply).mockResolvedValue(null);
 
         await askCommand.function(makeMessage("!ask hello"), context);
 

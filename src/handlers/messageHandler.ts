@@ -7,14 +7,14 @@ import { toBotMessage } from "../adapters/messageAdapter";
 import { toError, ONE_DAY_MS } from "../utils";
 
 export interface IMessageHandler {
-    send(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined>;
-    reply(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined>;
+    send(call: BotMessage, content: MessageContent): Promise<BotMessage | null>;
+    reply(call: BotMessage, content: MessageContent): Promise<BotMessage | null>;
     edit(replyObj: BotMessage, newContent: MessageContent): Promise<BotMessage>;
     delete(message: BotMessage): Promise<void>;
     react(message: BotMessage, emoji: string): Promise<void>;
     addCommandCall(call: BotMessage, reply: BotMessage): void;
     markComplete(call: BotMessage): void;
-    findFromReply(replyMessage: BotMessage): string | undefined;
+    findFromReply(replyMessage: BotMessage): string | null;
 }
 
 const COMMAND_CALL_SQL = `INSERT INTO command_calls (call_id, reply_id, timestamp)
@@ -49,12 +49,12 @@ export class MessageHandler implements IMessageHandler {
         call: BotMessage,
         content: MessageContent,
         useReply: boolean,
-    ): Promise<BotMessage | undefined> {
+    ): Promise<BotMessage | null> {
         if (!content) {
             this.logger.error(`Content empty, could not send. Call: "${call.id}"`);
             this.markComplete(call);
 
-            return undefined;
+            return null;
         }
 
         let reply: BotMessage;
@@ -76,7 +76,7 @@ export class MessageHandler implements IMessageHandler {
                 } catch (err) {
                     this.logger.error(`Failed to reply (likely deleted): ${toError(err).message}`);
 
-                    return undefined;
+                    return null;
                 }
             } else {
                 reply = await call.channel.send(normalized);
@@ -84,7 +84,7 @@ export class MessageHandler implements IMessageHandler {
         } catch (err) {
             this.logger.error(`Failed to send message: ${toError(err).message}`);
 
-            return undefined;
+            return null;
         }
 
         this.addCommandCall(call, reply);
@@ -96,11 +96,11 @@ export class MessageHandler implements IMessageHandler {
         return reply;
     }
 
-    send(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined> {
+    send(call: BotMessage, content: MessageContent): Promise<BotMessage | null> {
         return this.sendMessage(call, content, false);
     }
 
-    reply(call: BotMessage, content: MessageContent): Promise<BotMessage | undefined> {
+    reply(call: BotMessage, content: MessageContent): Promise<BotMessage | null> {
         return this.sendMessage(call, content, true);
     }
 
@@ -132,8 +132,8 @@ export class MessageHandler implements IMessageHandler {
         }
     }
 
-    findFromReply(replyMessage: BotMessage): string | undefined {
-        return Object.entries(this.commandCalls).find(([, replyId]) => replyId === replyMessage.id)?.[0];
+    findFromReply(replyMessage: BotMessage): string | null {
+        return Object.entries(this.commandCalls).find(([, replyId]) => replyId === replyMessage.id)?.[0] ?? null;
     }
 
     markComplete(call: BotMessage): void {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { CommandHandler } from "../../handlers/commandHandler";
 import { ReplyHandler } from "../../handlers/replyHandler";
 import type { ICommand } from "../../interfaces";
-import { makeMockContext, TEST_CONFIG, makeMessage } from "@test/helpers";
+import { makeMockContext, TEST_CONFIG, makeMessage, makeCommand } from "@test/helpers";
 import { randomBetween } from "../../utils";
 import { extractTopics } from "../../features/nlp/topicExtractor";
 
@@ -18,12 +18,7 @@ vi.mock("../../utils", async (importOriginal) => {
 });
 
 function stubCommand(name: string): ICommand {
-    return {
-        name,
-        description: "stub",
-        format: name,
-        function: vi.fn(),
-    } satisfies ICommand;
+    return makeCommand(name, { description: "stub" });
 }
 
 function makeHandler(
@@ -173,7 +168,7 @@ describe("CommandHandler integration", () => {
         it("does nothing when no original command is found", async () => {
             const ping = stubCommand("ping");
             const { handler, context } = makeHandler({ ping });
-            vi.mocked(context.messageHandler.findFromReply).mockReturnValue(undefined);
+            vi.mocked(context.messageHandler.findFromReply).mockReturnValue(null);
 
             await handler.redo(makeMessage("redo-msg"), vi.fn());
 

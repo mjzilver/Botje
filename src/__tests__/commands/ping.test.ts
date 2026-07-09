@@ -29,7 +29,7 @@ describe("ping command", () => {
     });
 
     it("does not call edit if send returns undefined", async () => {
-        vi.mocked(context.messageHandler.send).mockResolvedValue(undefined);
+        vi.mocked(context.messageHandler.send).mockResolvedValue(null);
 
         await pingCommand.function(makeMessage("!ping"), context);
 

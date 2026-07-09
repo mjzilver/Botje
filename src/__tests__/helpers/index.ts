@@ -1,3 +1,3 @@
-export { TEST_CONFIG, makeMockContext } from "./mockContext";
+export { TEST_CONFIG, makeTestConfig, makeLoadedCommands, makeMockContext } from "./mockContext";
 
-export { makeMessage, makeNoGuildMessage, makeCommand } from "./mockMessage";
+export { makeBotUser, makeBotGuild, makeBotMember, makeMessage, makeNoGuildMessage, makeCommand } from "./mockMessage";

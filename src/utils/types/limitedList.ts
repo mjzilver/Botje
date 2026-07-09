@@ -14,8 +14,8 @@ export class LimitedList<T> {
         this.items.push(item);
     }
 
-    get(): T | undefined {
-        return this.items[this.items.length - 1];
+    get(): T | null {
+        return this.items[this.items.length - 1] ?? null;
     }
 
     remove(item: T): void {

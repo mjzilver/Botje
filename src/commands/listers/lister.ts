@@ -13,7 +13,7 @@ export interface ParsedArgs {
             id: string;
             username?: string;
         }
-        | undefined;
+        | null;
     leaderboard: boolean;
     percent: boolean;
     args: string[];
@@ -31,7 +31,7 @@ export abstract class Lister {
             ? (message.content.match(/([^" ]+)|"([^"]+)"/gi) ?? [])
             : message.content.split(" ");
         const args = rawArgs.slice(1);
-        const mention = message.mentions?.users?.first?.();
+        const mention = message.mentions?.users?.first?.() ?? null;
         const hasLeaderboard = args.some((a) => a && LEADERBOARD_TRIGGERS.includes(a.toLowerCase()));
         const hasPercent = args.some((a) => a && PERCENT_TRIGGERS.includes(a.toLowerCase()));
         const filteredArgs = args.filter((a) => a && !ALL_FLAG_TRIGGERS.has(a.toLowerCase()) && !a.startsWith("<@"));

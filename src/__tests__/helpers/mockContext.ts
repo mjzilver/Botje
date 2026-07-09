@@ -1,6 +1,7 @@
 import { mockDeep } from "vitest-mock-extended";
 import type { IBotContext } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
+import type { LoadedCommands } from "../../handlers/commandLoader";
 
 export const TEST_CONFIG: BotConfig = {
     prefix: "!",
@@ -35,21 +36,59 @@ export const TEST_CONFIG: BotConfig = {
     scan_on_startup: false,
 };
 
-export function makeMockContext(overrides?: Partial<IBotContext>): IBotContext {
-    const ctx = mockDeep<IBotContext>();
+export function makeTestConfig(overrides: Partial<BotConfig> = {}): BotConfig {
+    return {
+        ...TEST_CONFIG,
+        ...overrides,
+        db: {
+            ...TEST_CONFIG.db,
+            ...(overrides.db ?? {}),
+        },
+        llm: {
+            ...TEST_CONFIG.llm,
+            ...(overrides.llm ?? {}),
+        },
+        image: {
+            ...TEST_CONFIG.image,
+            ...(overrides.image ?? {}),
+        },
+    };
+}
 
-    ctx.config = TEST_CONFIG;
-    ctx.loadedCommands = {
+export function makeLoadedCommands(overrides?: Partial<LoadedCommands>): LoadedCommands {
+    const loadedCommands: LoadedCommands = {
         commands: {},
         admincommands: {},
         dmcommands: {},
         clcommands: {},
-        disabled: new Set<string>() as Set<string> & typeof ctx.loadedCommands.disabled,
+        disabled: new Set<string>(),
     };
+
+    if (overrides) {
+        Object.assign(loadedCommands, overrides);
+    }
+
+    return loadedCommands;
+}
+
+export function makeMockContext(overrides?: Partial<IBotContext> & { config?: Partial<BotConfig> }): IBotContext {
+    const ctx = mockDeep<IBotContext>();
+
+    ctx.config = makeTestConfig(overrides?.config);
+    ctx.loadedCommands = mockDeep<LoadedCommands>();
+    Object.assign(ctx.loadedCommands, makeLoadedCommands());
     ctx.disallowed = {};
 
     if (overrides) {
         Object.assign(ctx, overrides);
+        if (overrides.config) {
+            ctx.config = makeTestConfig(overrides.config);
+        }
+        if (overrides.loadedCommands) {
+            const loadedCommands = mockDeep<LoadedCommands>();
+            Object.assign(loadedCommands, makeLoadedCommands(overrides.loadedCommands));
+            ctx.loadedCommands = loadedCommands;
+        }
     }
 
     return ctx;

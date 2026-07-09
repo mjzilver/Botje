@@ -4,12 +4,12 @@ import type { BotMessage } from "../interfaces/discord";
 import { toError } from "../utils";
 
 export function registerProcessHandlers(
-    getCommandHandler: () => CommandHandler | undefined,
+    getCommandHandler: () => CommandHandler | null,
     getMessageHandler: () =>
         | {
             reply(msg: BotMessage, content: string): void;
         }
-        | undefined,
+        | null,
     logger: ILogger,
 ): void {
     function handleError(error: unknown, replyText: string): void {

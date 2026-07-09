@@ -2,10 +2,10 @@ import type { IClCommand, IBotContext } from "../../interfaces";
 import { findChannel, getTextChannels } from "../../adapters/messageAdapter";
 import { generateMimicMessage } from "../../features/mimic/textGenerationService";
 
-function findUserId(input: string, guildId: string, context: IBotContext): string | undefined {
+function findUserId(input: string, guildId: string, context: IBotContext): string | null {
     const guild = context.client.guilds.cache.get(guildId);
     if (!guild) {
-        return undefined;
+        return null;
     }
     if (guild.members.cache.has(input)) {
         return input;
@@ -20,7 +20,7 @@ function findUserId(input: string, guildId: string, context: IBotContext): strin
         }
     }
 
-    return undefined;
+    return null;
 }
 
 export default {
@@ -42,7 +42,7 @@ export default {
             return;
         }
 
-        let userId: string | undefined;
+        let userId: string | null = null;
         let messageStartIndex = 0;
         for (let i = rest.length; i >= 1; i--) {
             const candidate = rest.slice(0, i).join(" ");
@@ -81,8 +81,8 @@ export default {
         }
 
         if (argIndex === 1) {
-            const channel = input[0] ? findChannel(input[0], context.client) : undefined;
-            const guild = channel ? context.client.guilds.cache.get(channel.guild.id) : undefined;
+            const channel = input[0] ? findChannel(input[0], context.client) : null;
+            const guild = channel ? context.client.guilds.cache.get(channel.guild.id) : null;
             if (!guild) {
                 return [];
             }

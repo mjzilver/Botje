@@ -36,11 +36,11 @@ export function getTextChannels(client: discord.Client): BotGuildTextChannel[] {
     return result;
 }
 
-export function findChannel(input: string, client: discord.Client): BotGuildTextChannel | undefined {
+export function findChannel(input: string, client: discord.Client): BotGuildTextChannel | null {
     const channels = getTextChannels(client);
 
     return (
-        channels.find((ch) => ch.id === input) ?? channels.find((ch) => ch.name.toLowerCase() === input.toLowerCase())
+        channels.find((ch) => ch.id === input) ?? channels.find((ch) => ch.name.toLowerCase() === input.toLowerCase()) ?? null
     );
 }
 
@@ -109,7 +109,7 @@ export function cliToMessage(channel: BotGuildTextChannel, client: discord.Clien
         channel: botChannel,
         guild: channel.guild as BotMessage["guild"],
         member: null,
-        mentions: { users: Object.assign(new Map<string, BotUser>(), { first: (): BotUser | undefined => undefined }) },
+        mentions: { users: Object.assign(new Map<string, BotUser>(), { first: (): BotUser | null => null }) },
         createdAt: new Date(),
         createdTimestamp: Date.now(),
         reference: null,
@@ -129,7 +129,7 @@ export function interactionToMessage(
     const { content: argContent, mentionMap } = extractInteractionArgs(interaction);
     const fullContent = argContent ? `${commandName} ${argContent}` : commandName;
     const mentions = Object.assign(new Map<string, BotUser>(mentionMap), {
-        first: (): BotUser | undefined => mentionMap.values().next().value,
+        first: (): BotUser | null => mentionMap.values().next().value ?? null,
     });
 
     const pseudoMessage: BotMessage = {

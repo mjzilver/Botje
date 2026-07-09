@@ -83,7 +83,7 @@ describe("poll command", () => {
         const context = makeMockContext();
 
         vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
-        vi.mocked(context.messageHandler.send).mockResolvedValueOnce(undefined);
+        vi.mocked(context.messageHandler.send).mockResolvedValueOnce(null);
 
         await runPoll(makeMessage('!poll "Question?" yes no'), context);
 

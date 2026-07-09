@@ -48,7 +48,7 @@ describe("topic command", () => {
     });
 
     it("sends error fallback when fetch returns undefined", async () => {
-        vi.mocked(tryFetchTopics).mockResolvedValue(undefined);
+        vi.mocked(tryFetchTopics).mockResolvedValue(null);
         const context = makeMockContext();
         const message = makeMessage("!topic");
 

@@ -83,7 +83,7 @@ export class HangmanGame {
         this.sendEmbed(message);
     }
 
-    private guess(message: BotMessage, guessedContent: string | undefined): void {
+    private guess(message: BotMessage, guessedContent: string | null): void {
         if (this.hasEnded) {
             this.messageHandler.send(message, "This hangman game has ended...");
 

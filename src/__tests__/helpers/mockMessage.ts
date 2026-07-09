@@ -18,6 +18,34 @@ interface MessageOptions {
     createdTimestamp?: number;
 }
 
+export function makeBotUser(overrides: Record<string, unknown> = {}): BotUser {
+    return {
+        id: "user-id",
+        username: "TestUser",
+        bot: false,
+        ...overrides,
+    } as BotUser;
+}
+
+export function makeBotGuild(overrides: Record<string, unknown> = {}): BotGuild {
+    return {
+        id: "guild-id",
+        ownerId: "owner-id",
+        name: "Test Guild",
+        ...overrides,
+    } as BotGuild;
+}
+
+export function makeBotMember(overrides: Record<string, unknown> = {}): BotMember {
+    return {
+        id: "user-id",
+        permissions: {
+            has: () => false,
+        } as unknown as BotMember["permissions"],
+        ...overrides,
+    } as BotMember;
+}
+
 export function makeMessage(content: string, opts: MessageOptions = {}): BotMessage {
     const {
         id = "msg-id",
@@ -31,23 +59,19 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
         createdTimestamp = Date.now(),
     } = opts;
 
-    const guild = {
-        id: guildId,
-        ownerId: guildOwnerId,
-        name: "Test Guild",
-    } as unknown as BotGuild;
+    const guild = makeBotGuild({ id: guildId, ownerId: guildOwnerId });
 
-    const member = {
+    const member = makeBotMember({
         id: authorId,
         permissions: {
             has: () => isAdmin,
         },
-    } as unknown as BotMember;
+    });
 
     return {
         id,
         content,
-        author: { id: authorId, username: "TestUser", bot: isBot } as BotUser,
+        author: makeBotUser({ id: authorId, bot: isBot }),
         channel: {
             id: channelId,
             type: channelType,
@@ -57,7 +81,7 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
         },
         guild,
         member,
-        mentions: { users: Object.assign(new Map(), { first: () => undefined }) },
+        mentions: { users: Object.assign(new Map(), { first: () => null }) },
         createdAt: new Date(),
         createdTimestamp,
         cleanContent: content,

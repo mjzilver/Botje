@@ -11,7 +11,7 @@ export default {
     async function(message, context) {
         const args = message.content.split(" ");
         args.shift();
-        const { path, files } = readGuildEmoteDir(message.guild?.id);
+        const { path, files } = readGuildEmoteDir(message.guild?.id ?? null);
         if (!args[0]) {
             const emoteNames = files.map((f) => f.replace(".png", ""));
             const pages = await context.pagination.createPages(

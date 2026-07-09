@@ -10,7 +10,7 @@ export interface IPagination {
         itemsPerPage: number,
         formatPage: (items: T[], pageNum: number, totalPages: number) => Promise<MessageContent> | MessageContent,
     ): Promise<MessageContent[]>;
-    sendPaginatedEmbed(message: BotMessage, pages: MessageContent[], timeout?: number): Promise<BotMessage | undefined>;
+    sendPaginatedEmbed(message: BotMessage, pages: MessageContent[], timeout?: number): Promise<BotMessage | null>;
 }
 
 type PageObject = Exclude<MessageContent, string | EmbedBuilder>;
@@ -24,7 +24,7 @@ export class Pagination {
         this.logger = logger;
     }
 
-    async sendPaginatedEmbed(message: BotMessage, pages: Page[], timeout = 300000): Promise<BotMessage | undefined> {
+    async sendPaginatedEmbed(message: BotMessage, pages: Page[], timeout = 300000): Promise<BotMessage | null> {
         if (!pages || pages.length === 0) {
             return this.messageHandler.send(message, "No results found.");
         }
@@ -65,7 +65,7 @@ export class Pagination {
 
         const sentMessage = await this.messageHandler.send(message, getPageContent(currentPage));
         if (!sentMessage) {
-            return undefined;
+            return null;
         }
 
         const collector = sentMessage.createMessageComponentCollector({

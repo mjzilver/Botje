@@ -25,7 +25,7 @@ describe("ask command", () => {
     it("returns early and does not stream when reply returns undefined", async () => {
         const context = makeMockContext();
 
-        vi.mocked(context.messageHandler.reply).mockResolvedValueOnce(undefined);
+        vi.mocked(context.messageHandler.reply).mockResolvedValueOnce(null);
 
         await askCommand.function(makeMessage("!ask hello"), context);
 
@@ -57,19 +57,22 @@ describe("ask command", () => {
 
         vi.mocked(context.messageHandler.reply).mockResolvedValueOnce(thinkingMsg);
 
-        let capturedFilter: ((text: string) => string) | null | undefined;
+        let capturedFilter: ((text: string) => string) | null = null;
 
         vi.mocked(context.llm.streamToMessage).mockImplementation(async (_m, _p, filterFn) => {
-            capturedFilter = filterFn;
+            capturedFilter = filterFn ?? null;
 
-            return undefined;
+            return null;
         });
 
         await askCommand.function(makeMessage("!ask hey"), context);
 
-        expect(capturedFilter).toBeDefined();
-        expect(capturedFilter?.("bot: hello world")).toBe("hello world");
-        expect(capturedFilter?.("user: something here")).toBe("something here");
-        expect(capturedFilter?.("plain text")).toBe("plain text");
+        if (capturedFilter === null) {
+            throw new Error("filterFn missing");
+        }
+        const filter = capturedFilter as unknown as (text: string) => string;
+        expect(filter("bot: hello world")).toBe("hello world");
+        expect(filter("user: something here")).toBe("something here");
+        expect(filter("plain text")).toBe("plain text");
     });
 });

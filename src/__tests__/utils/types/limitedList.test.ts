@@ -24,9 +24,9 @@ describe("LimitedList", () => {
         list.push("b");
         expect(list.get()).toBe("b");
     });
-    it("get returns undefined when empty", () => {
+    it("get returns null when empty", () => {
         const list = new LimitedList<string>(5);
-        expect(list.get()).toBeUndefined();
+        expect(list.get()).toBeNull();
     });
     it("remove deletes specific item", () => {
         const list = new LimitedList<number>(5);

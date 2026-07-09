@@ -72,7 +72,7 @@ export async function fetchTopicsFromContext(
     return extractTopics(recent, db, dictionary, prefix);
 }
 
-export async function tryFetchTopics(message: BotMessage, context: IBotContext): Promise<string[] | undefined> {
+export async function tryFetchTopics(message: BotMessage, context: IBotContext): Promise<string[] | null> {
     try {
         return await fetchTopicsFromContext(
             message.channel,
@@ -83,7 +83,7 @@ export async function tryFetchTopics(message: BotMessage, context: IBotContext):
     } catch (err) {
         context.logger.error(toError(err));
 
-        return undefined;
+        return null;
     }
 }
 

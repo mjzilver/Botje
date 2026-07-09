@@ -14,7 +14,7 @@ export default {
                 id: string;
                 username: string;
             }
-            | undefined;
+            | null;
         const args = message.content.split(" ");
         const disallowed = JSON.parse(fs.readFileSync(DISALLOWED_PATH, "utf8"));
         if (args[2] && args[2] === "remove") {

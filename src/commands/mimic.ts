@@ -43,8 +43,8 @@ export default {
             const eligible = candidates.filter((c) =>
                 isEligibleMimicTarget(
                     c.user_id,
-                    context.client.user?.id,
-                    (id) => context.client.users.cache.get(id),
+                    context.client.user?.id ?? null,
+                    (id) => context.client.users.cache.get(id) ?? null,
                     (id) => message.guild.members.cache.has(id),
                 ),
             );

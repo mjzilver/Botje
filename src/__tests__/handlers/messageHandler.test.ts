@@ -40,11 +40,11 @@ describe("MessageHandler", () => {
             expect(call.channel.send).toHaveBeenCalledWith("hello");
         });
 
-        it("returns undefined and logs an error when content is empty", async () => {
+        it("returns null and logs an error when content is empty", async () => {
             const call = makeMessage("!ping");
             const result = await handler.send(call, "");
 
-            expect(result).toBeUndefined();
+            expect(result).toBeNull();
             expect(logger.error).toHaveBeenCalled();
         });
     });
@@ -61,11 +61,11 @@ describe("MessageHandler", () => {
             expect(call.reply).toHaveBeenCalledWith("pong");
         });
 
-        it("returns undefined and logs an error when content is empty", async () => {
+        it("returns null and logs an error when content is empty", async () => {
             const call = makeMessage("!ping");
             const result = await handler.reply(call, "" as MessageContent);
 
-            expect(result).toBeUndefined();
+            expect(result).toBeNull();
             expect(logger.error).toHaveBeenCalled();
         });
     });
@@ -142,10 +142,10 @@ describe("MessageHandler", () => {
             expect(handler.findFromReply(replyMsg)).toBe("call-1");
         });
 
-        it("returns undefined for an unknown reply id", () => {
+        it("returns null for an unknown reply id", () => {
             const unknown = { id: "not-tracked" } as unknown as BotMessage;
 
-            expect(handler.findFromReply(unknown)).toBeUndefined();
+            expect(handler.findFromReply(unknown)).toBeNull();
         });
     });
 
