@@ -17,8 +17,6 @@ export const TEST_CONFIG: BotConfig = {
     timeoutDuration: 5,
     bot_avatar: "avatar.png",
     color_hex: "#ffffff",
-    port: 3000,
-    "dev-port": 3001,
     spamchecker: 5,
     image: { size: 256, magnification: 2 },
     positive_emoji: "👍",

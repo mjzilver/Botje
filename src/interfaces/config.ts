@@ -37,8 +37,6 @@ export interface BotConfig {
     timeoutDuration: number;
     bot_avatar: string;
     color_hex: `#${string}`;
-    port: number;
-    "dev-port": number;
     spamchecker: number;
     image: ImageConfig;
     positive_emoji: string;
