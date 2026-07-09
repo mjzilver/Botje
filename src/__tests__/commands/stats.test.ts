@@ -3,7 +3,7 @@ import statsCommand from "../../commands/stats";
 import { makeMockContext } from "../helpers/mockContext";
 import { makeMessage } from "../helpers/mockMessage";
 
-vi.mock("../../systems/queryCache", () => ({
+vi.mock("../../services/queryCache", () => ({
     queryCache: (_key: string, factory: () => Promise<unknown>) => factory(),
     CacheKey: {
         statsUser: (serverId: string, userId: string) => `stats-user:${serverId}:${userId}`,

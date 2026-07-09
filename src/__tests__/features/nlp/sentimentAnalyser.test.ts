@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { scoreMessages } from "../../features/nlp/sentimentAnalyzer";
+import { scoreMessages } from "../../../features/nlp/sentimentAnalyzer";
 
 describe("scoreMessages", () => {
     describe("positive topic extraction", () => {

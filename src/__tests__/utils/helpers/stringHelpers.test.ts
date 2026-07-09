@@ -11,7 +11,7 @@ import {
     sanitizeFilename,
     replaceAt,
     makeStringHelpers,
-} from "../../utils/helpers/stringHelpers";
+} from "../../../utils/helpers/stringHelpers";
 
 describe("capitalize", () => {
     it("capitalizes first letter and lowercases rest", () => {

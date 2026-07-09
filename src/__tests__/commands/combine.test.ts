@@ -9,9 +9,12 @@ vi.mock("jimp", () => {
         composite: vi.fn().mockReturnThis(),
         writeAsync: vi.fn().mockResolvedValue(undefined),
     };
-    const Jimp = vi.fn().mockReturnValue(fakeImage);
-
-    (Jimp as unknown as Record<string, unknown>).read = vi.fn().mockResolvedValue(fakeImage);
+    class Jimp {
+        constructor() {
+            return fakeImage as unknown as this;
+        }
+        static read = vi.fn().mockResolvedValue(fakeImage);
+    }
 
     return { default: Jimp };
 });

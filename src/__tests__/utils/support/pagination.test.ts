@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { EmbedBuilder } from "discord.js";
-import { Pagination } from "../../utils/support/pagination";
+import { Pagination } from "../../../utils/support/pagination";
 import type { IMessageHandler } from "../../interfaces";
 import type { ILogger } from "../../interfaces";
 import type { MessageContent } from "../../interfaces/discord";

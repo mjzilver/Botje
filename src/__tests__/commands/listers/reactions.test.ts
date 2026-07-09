@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("../../../systems/queryCache", () => ({
+vi.mock("../../../services/queryCache", () => ({
     queryCache: <T>(_key: string, factory: () => Promise<T>) => factory(),
     CacheKey: {
         reactionsServer: (s: string) => `reactions-server:${s}`,

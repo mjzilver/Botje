@@ -3,7 +3,7 @@ import mimicCommand from "../../commands/mimic";
 import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 import type { CachedProfile } from "../../features/mimic/mimicBuilder";
 
-vi.mock("../../systems/mimicCache", () => ({
+vi.mock("../../features/mimic/mimicCache", () => ({
     mimicCache: {
         get: vi.fn(),
         isExpired: vi.fn(),
@@ -12,8 +12,8 @@ vi.mock("../../systems/mimicCache", () => ({
     },
 }));
 
-vi.mock("../../systems/mimicBuilder", async (importOriginal) => {
-    const real = await importOriginal<typeof import("../../NEWLOC/mimicBuilder")>();
+vi.mock("../../features/mimic/mimicBuilder", async (importOriginal) => {
+    const real = await importOriginal();
 
     return {
         ...real,

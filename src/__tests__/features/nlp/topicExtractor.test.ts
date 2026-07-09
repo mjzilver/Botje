@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
-import { extractTopics, extractNounTokens } from "../../features/nlp/topicExtractor";
-import type { IDatabase } from "../../infrastructure/database";
-import type { IDictionary } from "../../features/nlp/dictionary";
+import { extractTopics, extractNounTokens } from "../../../features/nlp/topicExtractor";
+import type { IDatabase } from "../../../infrastructure/database";
+import type { IDictionary } from "../../../features/nlp/dictionary";
 
 function makeMockDb(docFreq = 5): IDatabase {
     return {

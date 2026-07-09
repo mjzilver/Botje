@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MessageIterator } from "../../utils/support/messageIterator";
+import { MessageIterator } from "../../../utils/support/messageIterator";
 import type { IterableMessage } from "../../utils/support/messageIterator";
 import type { ILogger } from "../../interfaces";
 

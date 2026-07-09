@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("../../systems/botContext");
+vi.mock("../../infrastructure/botContext");
 
 import remindCommand from "../../commands/remind";
 import { getBotContext } from "../../infrastructure/botContext";
