@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { BotMessage, BotGuild, BotMember } from "../../interfaces/discord";
+import type { BotMessage, BotGuild, BotMember, BotUser } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
 
 export function makeCommand(name = "test", overrides?: Partial<ICommand>): ICommand {
@@ -47,7 +47,7 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
     return {
         id,
         content,
-        author: { id: authorId, username: "TestUser", bot: isBot },
+        author: { id: authorId, username: "TestUser", bot: isBot } as BotUser,
         channel: {
             id: channelId,
             type: channelType,
@@ -67,9 +67,9 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
         edit: vi.fn().mockResolvedValue(undefined),
         delete: vi.fn().mockResolvedValue(undefined),
         createMessageComponentCollector: vi.fn().mockReturnValue({ on: vi.fn() }),
-    } as unknown as BotMessage;
+    } as BotMessage;
 }
 
 export function makeNoGuildMessage(content: string): BotMessage {
-    return { ...makeMessage(content), guild: null } as unknown as BotMessage;
+    return { ...makeMessage(content), guild: null } as BotMessage;
 }

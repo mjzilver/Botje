@@ -13,7 +13,7 @@ vi.mock("../../features/mimic/mimicCache", () => ({
 }));
 
 vi.mock("../../features/mimic/mimicBuilder", async (importOriginal) => {
-    const real = await importOriginal();
+    const real = (await importOriginal()) as Record<string, unknown>;
 
     return {
         ...real,

@@ -21,11 +21,15 @@ export function toBotChannel(channel: discord.TextBasedChannel | null): BotMessa
     return channel as BotMessage["channel"];
 }
 
+function isDiscordTextChannel(channel: discord.Channel): channel is discord.TextChannel {
+    return channel.type === discord.ChannelType.GuildText;
+}
+
 export function getTextChannels(client: discord.Client): BotGuildTextChannel[] {
     const result: BotGuildTextChannel[] = [];
     for (const ch of client.channels.cache.values()) {
-        if (ch.type === discord.ChannelType.GuildText) {
-            result.push(ch as unknown as BotGuildTextChannel);
+        if (isDiscordTextChannel(ch)) {
+            result.push(ch as BotGuildTextChannel);
         }
     }
 
@@ -40,10 +44,20 @@ export function findChannel(input: string, client: discord.Client): BotGuildText
     );
 }
 
+const emptyBotReaction: BotReaction = {
+    count: null,
+    emoji: { name: null },
+    message: { id: "" },
+    users: {
+        cache: new Map<string, BotUser>(),
+        fetch: async () => new Map<string, BotUser>(),
+    },
+};
+
 function makePseudoStubs(): Pick<BotMessage, "reactions" | "react" | "createMessageComponentCollector"> {
     return {
         reactions: { cache: new Map<string, BotReaction>(), resolve: () => null },
-        react: (_emoji: string) => Promise.resolve({} as unknown as BotReaction),
+        react: (_emoji: string) => Promise.resolve(emptyBotReaction),
         createMessageComponentCollector: (_options: { componentType: number; time: number }): ComponentCollector => ({
             on: () => {},
         }),
@@ -85,7 +99,7 @@ export function cliToMessage(channel: BotGuildTextChannel, client: discord.Clien
         return null;
     }
 
-    const botChannel = toBotChannel(channel as unknown as discord.TextChannel);
+    const botChannel = toBotChannel(channel as discord.TextChannel);
     const botUser = client.user as BotUser;
     const pseudoMessage: BotMessage = {
         id: Date.now().toString(),
@@ -93,7 +107,7 @@ export function cliToMessage(channel: BotGuildTextChannel, client: discord.Clien
         cleanContent: content,
         author: botUser,
         channel: botChannel,
-        guild: (channel as unknown as discord.TextChannel).guild as BotMessage["guild"],
+        guild: channel.guild as BotMessage["guild"],
         member: null,
         mentions: { users: Object.assign(new Map<string, BotUser>(), { first: (): BotUser | undefined => undefined }) },
         createdAt: new Date(),

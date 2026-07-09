@@ -44,7 +44,7 @@ export function makeMockContext(overrides?: Partial<IBotContext>): IBotContext {
         admincommands: {},
         dmcommands: {},
         clcommands: {},
-        disabled: new Set<string>() as unknown as Set<string> & typeof ctx.loadedCommands.disabled,
+        disabled: new Set<string>() as Set<string> & typeof ctx.loadedCommands.disabled,
     };
     ctx.disallowed = {};
 
