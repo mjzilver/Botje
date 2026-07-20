@@ -70,6 +70,7 @@ describe("ask command", () => {
         if (capturedFilter === null) {
             throw new Error("filterFn missing");
         }
+
         const filter = capturedFilter as unknown as (text: string) => string;
         expect(filter("bot: hello world")).toBe("hello world");
         expect(filter("user: something here")).toBe("something here");

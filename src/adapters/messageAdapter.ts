@@ -40,7 +40,9 @@ export function findChannel(input: string, client: discord.Client): BotGuildText
     const channels = getTextChannels(client);
 
     return (
-        channels.find((ch) => ch.id === input) ?? channels.find((ch) => ch.name.toLowerCase() === input.toLowerCase()) ?? null
+        channels.find((ch) => ch.id === input) ??
+        channels.find((ch) => ch.name.toLowerCase() === input.toLowerCase()) ??
+        null
     );
 }
 

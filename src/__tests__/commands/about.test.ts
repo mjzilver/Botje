@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import aboutCommand from "../../commands/about";
-import { makeMockContext, makeMessage, makeCommand } from "@test/helpers";
+import { makeMockContext, makeMessage } from "@test/helpers";
 
 vi.mock("../../commands/speak", () => ({
     speakAbout: vi.fn().mockResolvedValue(undefined),

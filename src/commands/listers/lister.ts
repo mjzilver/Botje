@@ -8,12 +8,10 @@ const PERCENT_TRIGGERS = ["percent", "percentage", "%"];
 const ALL_FLAG_TRIGGERS = new Set([...LEADERBOARD_TRIGGERS, ...PERCENT_TRIGGERS]);
 
 export interface ParsedArgs {
-    mention:
-        | {
-            id: string;
-            username?: string;
-        }
-        | null;
+    mention: {
+        id: string;
+        username?: string;
+    } | null;
     leaderboard: boolean;
     percent: boolean;
     args: string[];

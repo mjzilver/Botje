@@ -9,12 +9,10 @@ export default {
     description: "disallows or re-allows a user from using the bot",
     format: "disallow [@user] (remove)",
     async function(message, context) {
-        const mention = message.mentions?.users?.first?.() as
-            | {
-                id: string;
-                username: string;
-            }
-            | null;
+        const mention = message.mentions?.users?.first?.() as {
+            id: string;
+            username: string;
+        } | null;
         const args = message.content.split(" ");
         const disallowed = JSON.parse(fs.readFileSync(DISALLOWED_PATH, "utf8"));
         if (args[2] && args[2] === "remove") {

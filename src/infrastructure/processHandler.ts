@@ -5,11 +5,9 @@ import { toError } from "../utils";
 
 export function registerProcessHandlers(
     getCommandHandler: () => CommandHandler | null,
-    getMessageHandler: () =>
-        | {
-            reply(msg: BotMessage, content: string): void;
-        }
-        | null,
+    getMessageHandler: () => {
+        reply(msg: BotMessage, content: string): void;
+    } | null,
     logger: ILogger,
 ): void {
     function handleError(error: unknown, replyText: string): void {
