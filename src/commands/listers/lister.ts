@@ -1,6 +1,6 @@
-import { EmbedBuilder, isGuildMessage } from "../../interfaces/discord";
-import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
 import type { IBotContext } from "../../interfaces";
+import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
+import { EmbedBuilder, isGuildMessage } from "../../interfaces/discord";
 import { toError } from "../../utils";
 
 const LEADERBOARD_TRIGGERS = ["leaderboard", "top", "?"];

@@ -1,8 +1,7 @@
-import type { ICommand } from "../../interfaces";
-import { Lister } from "./lister";
+import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
-import type { IBotContext } from "../../interfaces";
-import { queryCache, CacheKey } from "../../services/queryCache";
+import { CacheKey, queryCache } from "../../services/queryCache";
+import { Lister } from "./lister";
 
 class QualityLister extends Lister {
     override async mention(

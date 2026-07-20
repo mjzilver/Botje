@@ -11,8 +11,8 @@ export default {
     ],
     function(message, context) {
         const args = message.content.split(" ");
-        if (args[1] && !isNaN(Number(args[1]))) {
-            if (args[2] && !isNaN(Number(args[2]))) {
+        if (args[1] && !Number.isNaN(Number(args[1]))) {
+            if (args[2] && !Number.isNaN(Number(args[2]))) {
                 context.messageHandler.reply(
                     message,
                     `You rolled ${randomBetween(parseInt(args[1], 10), parseInt(args[2], 10))} between ${args[1]} and ${args[2]}`,

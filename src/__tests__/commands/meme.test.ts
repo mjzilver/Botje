@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import fs from "fs";
+import fs from "node:fs";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("fs");
 vi.mock("jimp", () => {
@@ -21,8 +21,8 @@ vi.mock("jimp", () => {
     return { default: Jimp };
 });
 
+import { makeMessage, makeMockContext } from "@test/helpers";
 import memeCommand from "../../commands/meme";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("meme", () => {
     beforeEach(() => vi.clearAllMocks());

@@ -25,12 +25,12 @@ export default {
             "The tarot card reads",
         ];
         if (items.length < 2) {
-            return context.messageHandler.reply(
+            context.messageHandler.reply(
                 message,
                 `Please provide at least two options \nUse format \`${this.format}\``,
             );
+        } else {
+            context.messageHandler.reply(message, `${pickRandomItem(presets)} \`${pickRandomItem(items).trim()}\``);
         }
-
-        return context.messageHandler.reply(message, `${pickRandomItem(presets)} \`${pickRandomItem(items).trim()}\``);
     },
 } satisfies ICommand;

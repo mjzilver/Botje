@@ -1,6 +1,6 @@
-import type { IClCommand, IBotContext } from "../../interfaces";
-import type { BotGuildTextChannel } from "../../interfaces/discord";
 import { getTextChannels } from "../../adapters/messageAdapter";
+import type { IBotContext, IClCommand } from "../../interfaces";
+import type { BotGuildTextChannel } from "../../interfaces/discord";
 
 export default {
     name: "channels",

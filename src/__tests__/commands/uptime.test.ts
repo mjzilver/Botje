@@ -1,8 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
 import type { Client } from "discord.js";
-
+import { describe, expect, it, vi } from "vitest";
 import uptimeCommand from "../../commands/uptime";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("uptime command", () => {
     it("sends a message containing the formatted uptime", () => {

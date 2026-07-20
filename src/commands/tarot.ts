@@ -1,10 +1,10 @@
-import path from "path";
-import { EmbedBuilder, AttachmentBuilder } from "../interfaces/discord";
+import path from "node:path";
 import Jimp from "jimp";
 import type { ICommand } from "../interfaces";
-import { makeStringHelpers } from "../utils/helpers/stringHelpers";
-import { toError } from "../utils";
+import { AttachmentBuilder, EmbedBuilder } from "../interfaces/discord";
 import cardData from "../json/card_data.json";
+import { toError } from "../utils";
+import { makeStringHelpers } from "../utils/helpers/stringHelpers";
 
 interface TarotCard {
     type: "major" | "minor";

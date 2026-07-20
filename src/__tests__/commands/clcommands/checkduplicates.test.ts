@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
-import checkdupesCommand from "../../../commands/clcommands/checkduplicates";
 import { makeMockContext } from "@test/helpers";
+import { describe, expect, it, vi } from "vitest";
+import checkdupesCommand from "../../../commands/clcommands/checkduplicates";
 
 describe("checkduplicates (cl)", () => {
     it("logs duplicate count from database", async () => {

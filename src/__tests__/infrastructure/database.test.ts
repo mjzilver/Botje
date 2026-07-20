@@ -1,9 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
-import { Database } from "../../infrastructure/database";
-import { createSilentLogger } from "../../infrastructure/logger";
 import type { Pool } from "pg";
 import { DatabaseError } from "pg";
+import { describe, expect, it, vi } from "vitest";
+import { Database } from "../../infrastructure/database";
 import type { ILogger } from "../../infrastructure/logger";
+import { createSilentLogger } from "../../infrastructure/logger";
 
 function makeMockPool(rows: Record<string, unknown>[] = []): Pool {
     return {

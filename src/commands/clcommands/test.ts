@@ -1,5 +1,5 @@
-import type { IClCommand, ICommand, IBotContext, CommandOption } from "../../interfaces";
-import { findChannel, getTextChannels, cliToMessage } from "../../adapters/messageAdapter";
+import { cliToMessage, findChannel, getTextChannels } from "../../adapters/messageAdapter";
+import type { CommandOption, IBotContext, IClCommand, ICommand } from "../../interfaces";
 import { toError } from "../../utils";
 
 const CALL_DELAY_MS = 800;

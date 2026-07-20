@@ -1,5 +1,5 @@
-import type { IClCommand, IBotContext } from "../../interfaces";
 import { getTextChannels } from "../../adapters/messageAdapter";
+import type { IBotContext, IClCommand } from "../../interfaces";
 
 export default {
     name: "cleanwebhooks",

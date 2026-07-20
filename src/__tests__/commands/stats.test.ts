@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import statsCommand from "../../commands/stats";
 import { makeMockContext } from "../helpers/mockContext";
 import { makeMessage } from "../helpers/mockMessage";

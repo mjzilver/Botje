@@ -1,9 +1,9 @@
-import type { ICommand, IBotContext } from "../../interfaces";
-import { Lister } from "./lister";
-import { isGuildMessage } from "../../interfaces/discord";
+import type { IBotContext, ICommand } from "../../interfaces";
 import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
-import { removeQuotes } from "../../utils/helpers/stringHelpers";
+import { isGuildMessage } from "../../interfaces/discord";
 import { toError } from "../../utils";
+import { removeQuotes } from "../../utils/helpers/stringHelpers";
+import { Lister } from "./lister";
 
 const phraseHelperMessage = `Please specify a word or phrase to search for!
 
@@ -136,7 +136,7 @@ class PhraseLister extends Lister {
             await Promise.all(
                 rows.map(async (row) => ({
                     userName: await context.userHandler.getDisplayName(row.user_id, row.server_id),
-                    percentage: ((parseInt(row.count) / parseInt(row.total)) * 100).toFixed(3),
+                    percentage: ((parseInt(row.count, 10) / parseInt(row.total, 10)) * 100).toFixed(3),
                 })),
             )
         ).sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));

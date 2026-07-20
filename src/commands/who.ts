@@ -46,7 +46,12 @@ async function handleReplyLookup(
     let repliedContent: string;
 
     try {
-        const replied = await message.channel.messages.fetch(message.reference!.messageId!);
+        const messageId = message.reference?.messageId;
+        if (!messageId) {
+            context.messageHandler.reply(message, "Couldn't read the message you replied to.");
+            return;
+        }
+        const replied = await message.channel.messages.fetch(messageId);
         repliedContent = replied.content.trim();
     } catch (err) {
         context.logger.error(toError(err));

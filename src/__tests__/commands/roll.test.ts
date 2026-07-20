@@ -1,7 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
-
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { describe, expect, it, vi } from "vitest";
 import rollCommand from "../../commands/roll";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("roll command", () => {
     it("rolls between 0 and the given max when one numeric argument is provided", () => {
@@ -12,7 +11,7 @@ describe("roll command", () => {
         const reply = vi.mocked(context.messageHandler.reply).mock.calls[0][1] as string;
 
         expect(reply).toContain("out of 100");
-        const rolled = parseInt(reply.match(/rolled (\d+)/)![1]);
+        const rolled = parseInt(reply.match(/rolled (\d+)/)![1], 10);
         expect(rolled).toBeGreaterThanOrEqual(0);
         expect(rolled).toBeLessThanOrEqual(100);
     });
@@ -25,7 +24,7 @@ describe("roll command", () => {
         const reply = vi.mocked(context.messageHandler.reply).mock.calls[0][1] as string;
 
         expect(reply).toContain("between 10 and 20");
-        const rolled = parseInt(reply.match(/rolled (\d+)/)![1]);
+        const rolled = parseInt(reply.match(/rolled (\d+)/)![1], 10);
         expect(rolled).toBeGreaterThanOrEqual(10);
         expect(rolled).toBeLessThanOrEqual(20);
     });

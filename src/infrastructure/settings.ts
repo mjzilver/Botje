@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
-import type { BotConfig } from "../interfaces/config";
+import fs from "node:fs";
+import path from "node:path";
 import type { ILogger } from "../interfaces";
+import type { BotConfig } from "../interfaces/config";
 import { toError } from "../utils";
 
 const DEFAULT_CONFIG_PATH = path.resolve(process.cwd(), "config.json");

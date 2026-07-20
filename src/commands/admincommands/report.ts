@@ -1,6 +1,6 @@
 import type { ICommand } from "../../interfaces";
-import { getReportRows } from "../../utils/support/report";
 import { toError } from "../../utils";
+import { getReportRows } from "../../utils/support/report";
 
 function toDiscordReport(rows: [string, string | number][]): string {
     const widestLabel = rows.reduce((max, [label]) => Math.max(max, label.length), 0);

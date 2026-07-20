@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import talkCommand from "../../commands/talk";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 function mockDbWithRows(rows: { message: string }[]) {
     const ctx = makeMockContext();

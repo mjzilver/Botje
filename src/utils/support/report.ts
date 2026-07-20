@@ -1,4 +1,4 @@
-import os from "os";
+import os from "node:os";
 import type { IBotContext } from "../../interfaces";
 import { formatUptime } from "../utils";
 

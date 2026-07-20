@@ -1,13 +1,13 @@
-import * as discord from "discord.js";
+import type * as discord from "discord.js";
 import { ChannelType, Events } from "discord.js";
-import type { IDatabase, ILogger } from "../interfaces";
-import type { CommandHandler } from "./commandHandler";
-import type { EmoteInjector } from "../features/emoji/emoteInjector";
-import type { SlashHandler } from "./slashHandler";
-import type { BackupHandler } from "../features/backup/backupHandler";
-import type { ReactionHandler } from "./reactionHandler";
 import { toBotMessage, toBotReaction } from "../adapters/messageAdapter";
+import type { BackupHandler } from "../features/backup/backupHandler";
+import type { EmoteInjector } from "../features/emoji/emoteInjector";
+import type { IDatabase, ILogger } from "../interfaces";
 import { toError } from "../utils";
+import type { CommandHandler } from "./commandHandler";
+import type { ReactionHandler } from "./reactionHandler";
+import type { SlashHandler } from "./slashHandler";
 
 type EmojiLike = {
     id: string;

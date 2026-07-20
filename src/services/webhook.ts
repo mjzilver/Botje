@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import type * as discord from "discord.js";
 import type { ILogger } from "../interfaces";
 import { toError } from "../utils";
 
@@ -29,7 +29,7 @@ export class WebhookService {
 
     async sendMessage(channelId: string, text: string, userId: string): Promise<boolean> {
         const channel = this.client.channels.cache.get(channelId);
-        if (!channel || !channel.isTextBased()) {
+        if (!channel?.isTextBased()) {
             return false;
         }
 

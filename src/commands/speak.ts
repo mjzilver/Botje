@@ -1,8 +1,8 @@
 import nlp from "compromise";
-import type { ICommand, IBotContext } from "../interfaces";
-import { textOnly, normalizeSpaces, countVowelGroups, makeStringHelpers } from "../utils/helpers/stringHelpers";
-import { randomBetween, levenshtein, pickRandomItem } from "../utils";
+import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
+import { levenshtein, pickRandomItem, randomBetween } from "../utils";
+import { countVowelGroups, makeStringHelpers, normalizeSpaces, textOnly } from "../utils/helpers/stringHelpers";
 
 const TOPIC_QUERY_LIMIT = 15;
 const TOPIC_SENTENCE_MIN_WORDS = 4;

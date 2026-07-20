@@ -1,12 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { mockDeep } from "vitest-mock-extended";
-
-import { CommandHandler } from "../../handlers/commandHandler";
-import type { IMessageHandler, ILogger, ICommand, IBotContext } from "../../interfaces";
-import type { BotConfig } from "../../interfaces/config";
-import type { ReplyHandler } from "../../handlers/replyHandler";
-import type { LoadedCommands } from "../../handlers/commandLoader";
 import { makeCommand, makeMessage } from "@test/helpers";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { mockDeep } from "vitest-mock-extended";
+import { CommandHandler } from "../../handlers/commandHandler";
+import type { LoadedCommands } from "../../handlers/commandLoader";
+import type { ReplyHandler } from "../../handlers/replyHandler";
+import type { IBotContext, ICommand, ILogger, IMessageHandler } from "../../interfaces";
+import type { BotConfig } from "../../interfaces/config";
 
 const config = {
     prefix: "!",

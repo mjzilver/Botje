@@ -1,6 +1,6 @@
-import { EmbedBuilder } from "../../interfaces/discord";
-import type { ICommand } from "../../interfaces";
 import packageJson from "../../../package.json";
+import type { ICommand } from "../../interfaces";
+import { EmbedBuilder } from "../../interfaces/discord";
 
 export default {
     name: "help",
@@ -20,6 +20,6 @@ export default {
             .setDescription(helpMessage)
             .setFooter({ text: `Current Version: ${packageJson.version}` });
 
-        return context.messageHandler.send(message, { embeds: [help] });
+        context.messageHandler.send(message, { embeds: [help] });
     },
 } satisfies ICommand;

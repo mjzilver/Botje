@@ -1,8 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { UserHandler } from "../../handlers/userHandler";
-import type { IDatabase } from "../../interfaces";
-import type { ILogger } from "../../interfaces";
 import type { Client } from "discord.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { UserHandler } from "../../handlers/userHandler";
+import type { IDatabase, ILogger } from "../../interfaces";
 
 function makeDb(overrides: Partial<IDatabase> = {}): IDatabase {
     return {
@@ -36,8 +35,8 @@ function makeClient(memberName: string | null = null, userName: string | null = 
         guilds: {
             fetch: member
                 ? vi.fn().mockResolvedValue({
-                    members: { fetch: vi.fn().mockResolvedValue(member) },
-                })
+                      members: { fetch: vi.fn().mockResolvedValue(member) },
+                  })
                 : vi.fn().mockRejectedValue(new Error("guild not found")),
         },
         users: {

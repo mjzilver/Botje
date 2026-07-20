@@ -1,0 +1,71 @@
+{
+    "files": {
+        "includes": [
+            "**",
+            "!**/dist/",
+            "!**/coverage/",
+            "!**/node_modules/",
+            "!**/src/json/"
+        ]
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "preset": "recommended",
+            "correctness": {
+                "noUnusedVariables": "error"
+            },
+            "style": {
+                "noNonNullAssertion": "error",
+                "useBlockStatements": "error",
+                "useSingleVarDeclarator": "error"
+            },
+            "suspicious": {
+                "noExplicitAny": "error"
+            }
+        }
+    },
+    "overrides": [
+        {
+            "includes": [
+                "**/*.test.ts",
+                "**/*.test.tsx",
+                "**/*.spec.ts",
+                "**/*.spec.tsx",
+                "**/__tests__/**"
+            ],
+            "linter": {
+                "rules": {
+                    "style": {
+                        "noNonNullAssertion": "off"
+                    }
+                }
+            }
+        }
+    ],
+    "formatter": {
+        "enabled": true,
+        "formatWithErrors": false,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120,
+        "lineEnding": "lf"
+    },
+    "javascript": {
+        "formatter": {
+            "enabled": true,
+            "quoteStyle": "double",
+            "trailingCommas": "all",
+            "semicolons": "always",
+            "bracketSpacing": true,
+            "arrowParentheses": "always"
+        }
+    },
+    "assist": {
+        "actions": {
+            "source": {
+                "organizeImports": "on"
+            }
+        }
+    }
+}

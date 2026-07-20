@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import fs from "fs";
+import fs from "node:fs";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("fs");
 vi.mock("jimp", () => {
@@ -11,18 +11,14 @@ vi.mock("jimp", () => {
     };
 
     class Jimp {
-        constructor() {
-            return fakeImage as unknown as this;
-        }
-
-        static read = vi.fn().mockResolvedValue(fakeImage);
+        public read = vi.fn().mockResolvedValue(fakeImage);
     }
 
     return { default: Jimp };
 });
 
+import { makeMessage, makeMockContext } from "@test/helpers";
 import combineCommand from "../../commands/combine";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("combine", () => {
     beforeEach(() => vi.clearAllMocks());

@@ -1,7 +1,6 @@
-import type { ICommand } from "../../interfaces";
-import { Lister } from "./lister";
+import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
-import type { IBotContext } from "../../interfaces";
+import { Lister } from "./lister";
 
 class CountLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
@@ -62,7 +61,7 @@ class CountLister extends Lister {
             context,
             rows,
             (userName, row) =>
-                `\`${userName}\` has posted ${Math.round((parseInt(row.count) / parseInt(row.total)) * 100)}% of all messages! \n`,
+                `\`${userName}\` has posted ${Math.round((parseInt(row.count, 10) / parseInt(row.total, 10)) * 100)}% of all messages! \n`,
         );
     }
 }

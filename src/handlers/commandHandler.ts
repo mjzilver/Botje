@@ -1,14 +1,14 @@
-import { PermissionFlagsBits } from "../interfaces/discord";
-import type { IMessageHandler, ILogger, ICommand, IBotContext } from "../interfaces";
+import { extractTopics, fetchContextMessages } from "../features/nlp/topicExtractor";
+import type { IBotContext, ICommand, ILogger, IMessageHandler } from "../interfaces";
 import type { BotConfig } from "../interfaces/config";
 import type { BotMessage } from "../interfaces/discord";
-import type { ReplyHandler } from "./replyHandler";
-import type { LoadedCommands } from "./commandLoader";
-import { LimitedList } from "../utils/types/limitedList";
-import { normalizeSpaces, makeStringHelpers, capitalize } from "../utils/helpers/stringHelpers";
-import { extractTopics, fetchContextMessages } from "../features/nlp/topicExtractor";
+import { PermissionFlagsBits } from "../interfaces/discord";
 import { randomBetween, toError } from "../utils";
+import { capitalize, makeStringHelpers, normalizeSpaces } from "../utils/helpers/stringHelpers";
 import { CooldownTracker } from "../utils/support/cooldownTracker";
+import { LimitedList } from "../utils/types/limitedList";
+import type { LoadedCommands } from "./commandLoader";
+import type { ReplyHandler } from "./replyHandler";
 
 export class CommandHandler {
     private commands: Record<string, ICommand>;
@@ -200,7 +200,7 @@ export class CommandHandler {
                 createdAt: message.createdAt,
                 createdTimestamp: message.createdTimestamp,
             };
-            await this.runCommand(() => this.commands["speak"]?.function(topicMessage, this.context), topicMessage);
+            await this.runCommand(() => this.commands.speak?.function(topicMessage, this.context), topicMessage);
         } catch (err) {
             this.logger.error(toError(err));
         } finally {
@@ -220,7 +220,7 @@ export class CommandHandler {
 
         const isAdmin = message.member?.permissions.has(PermissionFlagsBits.Administrator) ?? false;
         if (isAdmin || this.isUserAllowed(message, false)) {
-            void this.runCommand(() => this.commands["speak"]?.function(message, this.context), message);
+            void this.runCommand(() => this.commands.speak?.function(message, this.context), message);
         }
     }
 

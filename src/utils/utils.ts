@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 
 export function levenshtein(a: string, b: string): number {
     if (a.length === 0) {

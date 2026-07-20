@@ -1,11 +1,11 @@
-import { Pool, DatabaseError } from "pg";
 import type { QueryResultRow } from "pg";
+import { DatabaseError, Pool } from "pg";
 import format from "pg-format";
-import type { ILogger } from "./logger";
 import type { BotConfig } from "../interfaces/config";
-import { isGuildMessage } from "../interfaces/discord";
 import type { BotMessage, BotReaction, GuildBotMessage } from "../interfaces/discord";
+import { isGuildMessage } from "../interfaces/discord";
 import { toError } from "../utils";
+import type { ILogger } from "./logger";
 
 export type SqlParam = string | number | boolean | null | Date | Buffer;
 

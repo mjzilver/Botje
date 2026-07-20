@@ -1,6 +1,6 @@
 import type { ICommand } from "../../interfaces";
-import { MessageIterator } from "../../utils/support/messageIterator";
 import type { IterableMessage } from "../../utils/support/messageIterator";
+import { MessageIterator } from "../../utils/support/messageIterator";
 
 export default {
     name: "purge",

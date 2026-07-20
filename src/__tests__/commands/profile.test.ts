@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import { EmbedBuilder } from "discord.js";
-import profileCommand, { sampleMessages, PROFILE_LOOKBACK_MS } from "../../commands/profile";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { MessageRow } from "../../commands/profile";
-import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
+import profileCommand, { PROFILE_LOOKBACK_MS, sampleMessages } from "../../commands/profile";
 import type { BotUser } from "../../interfaces/discord";
 
 function makeRows(n: number, overrides?: Partial<MessageRow>): MessageRow[] {

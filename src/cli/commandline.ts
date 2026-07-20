@@ -1,5 +1,5 @@
-import readline from "readline";
-import type { IBotContext, ILogger, IClCommand } from "../interfaces";
+import readline from "node:readline";
+import type { IBotContext, IClCommand, ILogger } from "../interfaces";
 
 export class CommandLine {
     private commands: Record<string, IClCommand>;

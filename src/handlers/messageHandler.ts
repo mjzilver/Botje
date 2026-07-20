@@ -1,10 +1,10 @@
 import * as discord from "discord.js";
+import { toBotMessage } from "../adapters/messageAdapter";
 import type { IDatabase } from "../infrastructure/database";
 import type { ILogger } from "../infrastructure/logger";
 import type { BotConfig } from "../interfaces/config";
 import type { BotMessage, MessageContent } from "../interfaces/discord";
-import { toBotMessage } from "../adapters/messageAdapter";
-import { toError, ONE_DAY_MS } from "../utils";
+import { ONE_DAY_MS, toError } from "../utils";
 
 export interface IMessageHandler {
     send(call: BotMessage, content: MessageContent): Promise<BotMessage | null>;

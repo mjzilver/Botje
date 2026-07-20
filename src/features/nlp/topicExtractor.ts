@@ -1,9 +1,9 @@
 import nlp from "compromise";
-import type { BotMessage } from "../../interfaces/discord";
-import type { IBotContext } from "../../interfaces";
 import type { IDatabase } from "../../infrastructure/database";
-import type { IDictionary } from "./dictionary";
+import type { IBotContext } from "../../interfaces";
+import type { BotMessage } from "../../interfaces/discord";
 import { toError } from "../../utils";
+import type { IDictionary } from "./dictionary";
 
 const MIN_WORD_LENGTH = 4;
 const CANDIDATE_LIMIT = 10;
@@ -129,12 +129,12 @@ export function extractNounTokens(text: string): string[] {
         .filter((w) => w.length >= MIN_WORD_LENGTH && !INDEFINITE_PRONOUNS.has(w));
 }
 
-function isNoiseToken(token: string, prefixRe: RegExp | null): boolean {
+function isNoiseToken(token: string, prefixRe: RegExp | null): boolean | undefined {
     return (
         URL_TOKEN_RE.test(token) ||
         DISCORD_EMOTE_TOKEN_RE.test(token) ||
         DISCORD_MENTION_TOKEN_RE.test(token) ||
-        (prefixRe !== null && prefixRe.test(token))
+        prefixRe?.test(token)
     );
 }
 

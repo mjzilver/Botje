@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { describe, expect, it, vi } from "vitest";
+import chooseCommand from "../../../commands/choose";
 import pingCommand from "../../../commands/ping";
 import rollCommand from "../../../commands/roll";
-import chooseCommand from "../../../commands/choose";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("ping — integration", () => {
     it("sends Ping? and then edits with latency", async () => {
@@ -24,7 +24,7 @@ describe("roll — integration", () => {
         rollCommand.function(makeMessage("!roll 1 6"), context);
 
         const reply = vi.mocked(context.messageHandler.reply).mock.calls[0][1] as string;
-        const rolled = parseInt(reply.match(/rolled (\d+)/)![1]);
+        const rolled = parseInt(reply.match(/rolled (\d+)/)![1], 10);
         expect(rolled).toBeGreaterThanOrEqual(1);
         expect(rolled).toBeLessThanOrEqual(6);
     });

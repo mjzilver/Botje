@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../../services/queryCache", () => ({
     queryCache: <T>(_key: string, factory: () => Promise<T>) => factory(),
@@ -9,8 +9,8 @@ vi.mock("../../../services/queryCache", () => ({
     },
 }));
 
+import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import reactionsCommand from "../../../commands/listers/reactions";
-import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 import type { BotUser } from "../../../interfaces/discord";
 
 function withMention(content: string, mentionId: string, username: string) {

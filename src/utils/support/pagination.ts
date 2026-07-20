@@ -1,8 +1,8 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder } from "discord.js";
 import type { IMessageHandler } from "../../handlers/messageHandler";
 import type { ILogger } from "../../infrastructure/logger";
-import { toError } from "../utils";
 import type { BotMessage, MessageContent } from "../../interfaces/discord";
+import { toError } from "../utils";
 
 export interface IPagination {
     createPages<T>(
@@ -57,8 +57,8 @@ export class Pagination {
                 typeof page === "string"
                     ? { content: page }
                     : page instanceof EmbedBuilder
-                        ? { embeds: [page] }
-                        : (page as PageObject);
+                      ? { embeds: [page] }
+                      : (page as PageObject);
 
             return { ...base, components: [getButtons()] };
         };

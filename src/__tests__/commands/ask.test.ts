@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import askCommand from "../../commands/ask";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("ask command", () => {
     beforeEach(() => vi.clearAllMocks());

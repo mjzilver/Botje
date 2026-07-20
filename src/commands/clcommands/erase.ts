@@ -1,5 +1,5 @@
-import fs from "fs";
-import type { IClCommand, IBotContext } from "../../interfaces";
+import fs from "node:fs";
+import type { IBotContext, IClCommand } from "../../interfaces";
 import { toError } from "../../utils";
 
 export default {

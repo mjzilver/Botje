@@ -1,10 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
-import { EmbedBuilder } from "discord.js";
-import { Pagination } from "../../../utils/support/pagination";
-import type { IMessageHandler } from "../../../interfaces";
-import type { ILogger } from "../../../interfaces";
-import type { MessageContent } from "../../../interfaces/discord";
 import { makeMessage } from "@test/helpers";
+import { EmbedBuilder } from "discord.js";
+import { describe, expect, it, vi } from "vitest";
+import type { ILogger, IMessageHandler } from "../../../interfaces";
+import type { MessageContent } from "../../../interfaces/discord";
+import { Pagination } from "../../../utils/support/pagination";
 
 function makeLogger(): Pick<ILogger, "error"> {
     return { error: vi.fn() };

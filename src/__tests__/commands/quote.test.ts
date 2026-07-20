@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import { EmbedBuilder } from "discord.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import quoteCommand from "../../commands/quote";
-import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 import type { BotUser } from "../../interfaces/discord";
 
 function withMention(content: string, mentionId: string) {

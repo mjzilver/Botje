@@ -104,16 +104,15 @@ export type MessageContent =
     | string
     | EmbedBuilder
     | {
-        content?: string;
-        embeds?: EmbedBuilder[];
-        files?: (string | AttachmentBuilder)[];
-        components?: ActionRowBuilder[];
-        ephemeral?: boolean;
-    };
-
-export { EmbedBuilder, AttachmentBuilder, ChannelType, PermissionFlagsBits } from "discord.js";
+          content?: string;
+          embeds?: EmbedBuilder[];
+          files?: (string | AttachmentBuilder)[];
+          components?: ActionRowBuilder[];
+          ephemeral?: boolean;
+      };
 
 export type { TextChannel } from "discord.js";
+export { AttachmentBuilder, ChannelType, EmbedBuilder, PermissionFlagsBits } from "discord.js";
 
 export interface BotWebhook {
     delete(): Promise<unknown>;

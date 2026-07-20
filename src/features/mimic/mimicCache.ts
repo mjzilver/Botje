@@ -1,9 +1,9 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import type { IDatabase, ILogger } from "../../interfaces";
 import { toError } from "../../utils";
-import { cleanMessage, buildStyleProfile, buildChain, MIN_MESSAGES } from "./mimicBuilder";
 import type { CachedProfile } from "./mimicBuilder";
+import { buildChain, buildStyleProfile, cleanMessage, MIN_MESSAGES } from "./mimicBuilder";
 
 const EXPIRY_MS = 14 * 24 * 60 * 60 * 1000;
 const QUEUE_DELAY_MS = 2_000;
@@ -81,7 +81,10 @@ export class MimicCache {
     private async processQueue(): Promise<void> {
         this.processing = true;
         while (this.queue.length > 0) {
-            const item = this.queue.shift()!;
+            const item = this.queue.shift();
+            if (!item) {
+                break;
+            }
             await this.buildAndSave(item);
             this.pendingOrQueued.delete(this.itemKey(item.userId));
             if (this.queue.length > 0) {

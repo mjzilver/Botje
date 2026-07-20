@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import weatherCommand from "../../commands/weather";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 vi.mock("axios", () => ({ default: { get: vi.fn() } }));
 

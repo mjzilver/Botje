@@ -1,9 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
+import { makeMockContext } from "@test/helpers";
 import type { Client } from "discord.js";
-
+import { describe, expect, it, vi } from "vitest";
 import ageCommand from "../../commands/age";
 import type { BotMessage } from "../../interfaces/discord";
-import { makeMockContext } from "@test/helpers";
 
 function makeMessage(joinedAt?: Date): BotMessage {
     const member = joinedAt ? { id: "bot-id", joinedAt } : undefined;

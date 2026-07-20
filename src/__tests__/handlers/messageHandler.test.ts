@@ -1,11 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
-
 import { MessageHandler } from "../../handlers/messageHandler";
 import type { IDatabase, ILogger } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
 import type { BotMessage, MessageContent } from "../../interfaces/discord";
-import { makeMessage } from "@test/helpers";
 
 const config = {
     positive_emoji: "👍",
@@ -223,7 +222,7 @@ describe("MessageHandler", () => {
             await handler.send(call, "hi");
 
             const snapshot = handler.getCommandCalls();
-            delete snapshot["c1"];
+            delete snapshot.c1;
 
             expect(handler.findFromReply({ id: "r1" } as unknown as BotMessage)).toBe("c1");
         });

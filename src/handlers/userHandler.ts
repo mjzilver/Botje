@@ -1,4 +1,4 @@
-import * as discord from "discord.js";
+import type * as discord from "discord.js";
 import type { IDatabase } from "../infrastructure/database";
 import type { ILogger } from "../infrastructure/logger";
 import { toError } from "../utils";

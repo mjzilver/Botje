@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { queryCache, CACHE_TTL_MS } from "../../services/queryCache";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { CACHE_TTL_MS, queryCache } from "../../services/queryCache";
 
 afterEach(() => {
     vi.useRealTimers();

@@ -1,7 +1,7 @@
 import { mockDeep } from "vitest-mock-extended";
+import type { LoadedCommands } from "../../handlers/commandLoader";
 import type { IBotContext } from "../../interfaces";
 import type { BotConfig } from "../../interfaces/config";
-import type { LoadedCommands } from "../../handlers/commandLoader";
 
 export const TEST_CONFIG: BotConfig = {
     prefix: "!",

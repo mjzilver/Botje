@@ -1,9 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
+import { makeCommand, makeMessage, makeMockContext } from "@test/helpers";
 import { EmbedBuilder } from "discord.js";
+import { describe, expect, it, type vi } from "vitest";
 import helpCommand from "../../commands/help";
 import type { ICommand } from "../../interfaces";
 import type { MessageContent } from "../../interfaces/discord";
-import { makeCommand, makeMockContext, makeMessage } from "@test/helpers";
 
 describe("help command – execution", () => {
     it("calls createPages with all loaded commands", async () => {

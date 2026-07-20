@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("fs", () => ({
     default: { readFileSync: vi.fn().mockReturnValue("{}"), writeFile: vi.fn() },
@@ -6,8 +6,8 @@ vi.mock("fs", () => ({
     writeFile: vi.fn(),
 }));
 
+import { makeMessage, makeMockContext } from "@test/helpers";
 import disallowCommand from "../../../commands/admincommands/disallow";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("disallow", () => {
     it("sends error when no mention is provided", () => {

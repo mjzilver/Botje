@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import type { ICommand } from "../../interfaces";
 import { toError } from "../../utils";
 
@@ -28,7 +28,8 @@ export default {
             context.logger.warn(`${mention.username} is no longer allowed to use the bot`);
             context.messageHandler.markComplete(message);
         } else {
-            return context.messageHandler.send(message, "You need to @ someone to disallow them");
+            context.messageHandler.send(message, "You need to @ someone to disallow them");
+            return;
         }
 
         try {

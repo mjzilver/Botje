@@ -1,8 +1,8 @@
 import axios from "axios";
-import { EmbedBuilder } from "../interfaces/discord";
 import type { ICommand } from "../interfaces";
-import { capitalize } from "../utils/helpers/stringHelpers";
+import { EmbedBuilder } from "../interfaces/discord";
 import { toError } from "../utils";
+import { capitalize } from "../utils/helpers/stringHelpers";
 
 export default {
     name: "weather",
@@ -12,7 +12,7 @@ export default {
     async function(message, context) {
         const args = message.content.split(" ");
         if (!args[1]) {
-            return context.messageHandler.send(message, "You need to enter a city");
+            context.messageHandler.send(message, "You need to enter a city");
         }
 
         args.shift();

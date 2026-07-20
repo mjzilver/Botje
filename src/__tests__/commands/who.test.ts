@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import { EmbedBuilder } from "discord.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import whoCommand from "../../commands/who";
-import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 
 describe("who command", () => {
     beforeEach(() => vi.clearAllMocks());

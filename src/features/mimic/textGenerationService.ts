@@ -1,14 +1,14 @@
 import type { IBotContext } from "../../interfaces";
+import type { CachedProfile } from "./mimicBuilder";
 import {
-    cleanMessage,
-    buildStyleProfile,
     buildChain,
+    buildStyleProfile,
+    cleanMessage,
     generate,
     isVerbatimRepeat,
-    MIN_MESSAGES,
     MAX_RETRIES,
+    MIN_MESSAGES,
 } from "./mimicBuilder";
-import type { CachedProfile } from "./mimicBuilder";
 import { mimicCache } from "./mimicCache";
 
 function generateFromProfile(profile: CachedProfile): string {

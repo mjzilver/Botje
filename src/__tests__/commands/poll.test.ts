@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../infrastructure/botContext");
 
+import { makeMessage, makeMockContext } from "@test/helpers";
 import pollCommand from "../../commands/poll";
 import { getBotContext } from "../../infrastructure/botContext";
-import { makeMockContext, makeMessage } from "@test/helpers";
-import type { ICommand } from "../../interfaces";
 import type { SystemRegistry } from "../../infrastructure/systemRegistry";
+import type { ICommand } from "../../interfaces";
 
 const runPoll = (pollCommand as ICommand).function.bind(pollCommand);
 

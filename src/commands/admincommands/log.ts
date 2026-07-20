@@ -1,7 +1,6 @@
-import type { ICommand } from "../../interfaces";
-import { queryLogsAsync } from "../../infrastructure/logger";
-import type { LogEntry } from "../../interfaces";
 import type { QueryOptions } from "winston";
+import { queryLogsAsync } from "../../infrastructure/logger";
+import type { ICommand, LogEntry } from "../../interfaces";
 import { toError } from "../../utils";
 
 const LOG_LEVEL = "error";

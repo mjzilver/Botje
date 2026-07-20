@@ -1,4 +1,4 @@
-import type { IMessageHandler, ILogger } from "../interfaces";
+import type { ILogger, IMessageHandler } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { pickRandomItem } from "../utils";
 import { CooldownTracker } from "../utils/support/cooldownTracker";
@@ -37,8 +37,8 @@ export class ReplyHandler {
         let matched = false;
         const normalized = normalizeForMatching(message.content);
         for (const pattern of this.replyPatterns) {
-            const regex = this.compiledPatterns.get(pattern.name)!;
-            if (normalized.match(regex) && this.cooldown.isAllowed(pattern.name, pattern.timeout * 60 * 1000)) {
+            const regex = this.compiledPatterns.get(pattern.name);
+            if (regex && normalized.match(regex) && this.cooldown.isAllowed(pattern.name, pattern.timeout * 60 * 1000)) {
                 this.logger.debug(`Replying to '${message.content}' matching pattern '${pattern.name}'`);
                 const text = pickRandomItem(pattern.replies) + (pattern.mention ? `, ${message.author.username}` : "");
                 if (pattern.reply) {

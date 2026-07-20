@@ -1,5 +1,5 @@
-import Sentiment from "sentiment";
 import nlp from "compromise";
+import Sentiment from "sentiment";
 
 const analyser = new Sentiment();
 
@@ -43,12 +43,13 @@ function extractScoredWordObjects(
         }
 
         const re = new RegExp(`\\b${escapeRegex(word)}\\s+([a-z]{3,})`, "g");
-        let m: RegExpExecArray | null;
-        while ((m = re.exec(lower)) !== null) {
+        let m: RegExpExecArray | null = re.exec(lower);
+        while (m !== null) {
             const topic = m[1];
             if (!INDEFINITE_PRONOUN_RE.test(topic) && !CONTRACTION_ARTIFACT_RE.test(topic)) {
                 results.push({ topic, score: wordScore * 2 });
             }
+            m = re.exec(lower);
         }
     }
 

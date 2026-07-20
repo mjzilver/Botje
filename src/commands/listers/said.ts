@@ -1,8 +1,7 @@
-import type { ICommand } from "../../interfaces";
+import type { IBotContext, ICommand } from "../../interfaces";
+import type { GuildBotMessage } from "../../interfaces/discord";
 import { EmbedBuilder } from "../../interfaces/discord";
 import { Lister } from "./lister";
-import type { GuildBotMessage } from "../../interfaces/discord";
-import type { IBotContext } from "../../interfaces";
 
 class SaidLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {

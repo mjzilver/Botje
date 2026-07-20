@@ -1,7 +1,7 @@
+import { extractNounTokens, tryFetchTopics } from "../features/nlp/topicExtractor";
 import type { ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { normalizeSpaces, makeStringHelpers } from "../utils/helpers/stringHelpers";
-import { extractNounTokens, tryFetchTopics } from "../features/nlp/topicExtractor";
+import { makeStringHelpers, normalizeSpaces } from "../utils/helpers/stringHelpers";
 import { speakAbout } from "./speak";
 
 export default {

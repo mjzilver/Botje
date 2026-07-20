@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ReplyHandler } from "../../handlers/replyHandler";
-import type { IMessageHandler, ILogger } from "../../interfaces";
+import type { ILogger, IMessageHandler } from "../../interfaces";
 import type { BotMessage } from "../../interfaces/discord";
 
 function makeMockMessageHandler(): IMessageHandler {

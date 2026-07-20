@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import fs from "fs";
-import { makeMockContext, makeMessage } from "@test/helpers";
+import fs from "node:fs";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("fs");
 

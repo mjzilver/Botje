@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MessageIterator } from "../../../utils/support/messageIterator";
-import type { IterableMessage } from "../../../utils/support/messageIterator";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ILogger } from "../../../interfaces";
+import type { IterableMessage } from "../../../utils/support/messageIterator";
+import { MessageIterator } from "../../../utils/support/messageIterator";
 
 function makeLogger(): ILogger {
     return {

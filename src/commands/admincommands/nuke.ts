@@ -1,8 +1,8 @@
-import type { ICommand, IBotContext } from "../../interfaces";
-import type { BotMessage, BotGuildTextChannel } from "../../interfaces/discord";
-import { MessageIterator } from "../../utils/support/messageIterator";
 import { getTextChannels } from "../../adapters/messageAdapter";
+import type { IBotContext, ICommand } from "../../interfaces";
+import type { BotGuildTextChannel, BotMessage } from "../../interfaces/discord";
 import type { IterableMessage, IteratorStats } from "../../utils/support/messageIterator";
+import { MessageIterator } from "../../utils/support/messageIterator";
 
 async function nukechannel(channel: BotGuildTextChannel, context: IBotContext): Promise<void> {
     context.logger.warn(`NUKING channel: ${channel.name}`);

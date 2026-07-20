@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { describe, expect, it } from "vitest";
 import nukeCommand from "../../../commands/admincommands/nuke";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("nuke", () => {
     it("sends rejection message to non-owner", async () => {

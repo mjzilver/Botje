@@ -1,16 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
     capitalize,
+    countVowelGroups,
     isImage,
     isLink,
+    makeStringHelpers,
     normalizeSpaces,
-    countVowelGroups,
-    textOnly,
     removeQuotes,
+    replaceAt,
     replaceFancyQuotes,
     sanitizeFilename,
-    replaceAt,
-    makeStringHelpers,
+    textOnly,
 } from "../../../utils/helpers/stringHelpers";
 
 describe("capitalize", () => {

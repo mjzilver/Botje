@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { loadCommands } from "../../handlers/commandLoader";
 import { createSilentLogger } from "../../infrastructure/logger";
 
@@ -46,8 +46,8 @@ describe("loadCommands – basic loading", () => {
             function: "function() {}",
         });
         const result = loadCommands(baseDir, logger);
-        expect(result.commands["ping"]).toBeDefined();
-        expect(result.commands["ping"].name).toBe("ping");
+        expect(result.commands.ping).toBeDefined();
+        expect(result.commands.ping.name).toBe("ping");
     });
     it("skips disabled commands", () => {
         writeCommand(path.join(baseDir, "commands"), "disabled.js", {
@@ -58,7 +58,7 @@ describe("loadCommands – basic loading", () => {
             function: "function() {}",
         });
         const result = loadCommands(baseDir, logger);
-        expect(result.commands["disabled"]).toBeUndefined();
+        expect(result.commands.disabled).toBeUndefined();
     });
     it("registers aliases", () => {
         writeCommand(path.join(baseDir, "commands"), "help.js", {
@@ -69,9 +69,9 @@ describe("loadCommands – basic loading", () => {
             function: "function() {}",
         });
         const result = loadCommands(baseDir, logger);
-        expect(result.commands["h"]).toBeDefined();
+        expect(result.commands.h).toBeDefined();
         expect(result.commands["?"]).toBeDefined();
-        expect(result.commands["h"]).toBe(result.commands["help"]);
+        expect(result.commands.h).toBe(result.commands.help);
     });
     it("skips non-js/ts files", () => {
         fs.writeFileSync(path.join(baseDir, "commands", "readme.md"), "# readme");
@@ -96,8 +96,8 @@ describe("loadCommands – admin + cl + dm sub-directories", () => {
             function: "function() {}",
         });
         const result = loadCommands(baseDir, logger);
-        expect(result.admincommands["nuke"]).toBeDefined();
-        expect(result.commands["nuke"]).toBeUndefined();
+        expect(result.admincommands.nuke).toBeDefined();
+        expect(result.commands.nuke).toBeUndefined();
     });
     it("loads cl commands into clcommands map", () => {
         writeCommand(path.join(baseDir, "commands", "clcommands"), "save.js", {
@@ -107,7 +107,7 @@ describe("loadCommands – admin + cl + dm sub-directories", () => {
             function: "function() {}",
         });
         const result = loadCommands(baseDir, logger);
-        expect(result.clcommands["save"]).toBeDefined();
+        expect(result.clcommands.save).toBeDefined();
     });
     it("loads dm commands into dmcommands map", () => {
         writeCommand(path.join(baseDir, "commands", "dmcommands"), "help.js", {
@@ -117,7 +117,7 @@ describe("loadCommands – admin + cl + dm sub-directories", () => {
             function: "function() {}",
         });
         const result = loadCommands(baseDir, logger);
-        expect(result.dmcommands["help"]).toBeDefined();
+        expect(result.dmcommands.help).toBeDefined();
     });
 });
 describe("loadCommands – alias edge cases", () => {
@@ -137,6 +137,6 @@ describe("loadCommands – alias edge cases", () => {
         });
         const result = loadCommands(baseDir, logger);
         expect(result.commands[""]).toBeUndefined();
-        expect(result.commands["cmd"]).toBeDefined();
+        expect(result.commands.cmd).toBeDefined();
     });
 });

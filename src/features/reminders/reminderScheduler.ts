@@ -1,6 +1,5 @@
 import type * as discord from "discord.js";
-import type { IDatabase, ReminderRow } from "../../interfaces";
-import type { ILogger } from "../../interfaces";
+import type { IDatabase, ILogger, ReminderRow } from "../../interfaces";
 import { toError } from "../../utils";
 
 const MAX_REMINDER_MS = 24 * 60 * 60 * 1000;
@@ -65,7 +64,7 @@ export class ReminderScheduler {
         try {
             const channel = await this.client.channels.fetch(row.channel_id);
 
-            if (channel && channel.isTextBased() && "send" in channel) {
+            if (channel?.isTextBased() && "send" in channel) {
                 await (channel as discord.TextChannel).send(`<@${row.user_id}> ⏰ Reminder: ${row.reminder_message}`);
             } else {
                 const user = await this.client.users.fetch(row.user_id);

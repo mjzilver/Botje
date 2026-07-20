@@ -30,7 +30,7 @@ export function isLink(str: string): boolean {
 }
 
 export function normalizeSpaces(str: string): string {
-    return str.replace(/  +/g, " ").trim();
+    return str.replace(/ {2,}/g, " ").trim();
 }
 
 export function countVowelGroups(str: string): number {

@@ -1,5 +1,5 @@
+import type { IBotContext, IClCommand } from "../../interfaces";
 import { ChannelType } from "../../interfaces/discord";
-import type { IClCommand, IBotContext } from "../../interfaces";
 import save from "./save";
 
 export default {

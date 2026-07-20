@@ -1,5 +1,5 @@
-import fs from "fs";
-import { pipeline } from "stream/promises";
+import fs from "node:fs";
+import { pipeline } from "node:stream/promises";
 import axios from "axios";
 import type { ICommand } from "../../interfaces";
 import { toError } from "../../utils";
@@ -13,7 +13,7 @@ export default {
         const args = message.content.split(" ");
         args.shift();
         const url = await resolveImageUrl(message, args);
-        const filename = args[0] ? `${args[0]}.png` : `${new Date().getTime()}.png`;
+        const filename = args[0] ? `${args[0]}.png` : `${Date.now()}.png`;
         if (url) {
             const path = "assets/meme_templates";
             try {

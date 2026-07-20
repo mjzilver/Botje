@@ -1,9 +1,9 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import type { IDatabase } from "../../infrastructure/database";
 import type { ILogger } from "../../infrastructure/logger";
-import { textOnly } from "../../utils/helpers/stringHelpers";
 import { toError } from "../../utils";
+import { textOnly } from "../../utils/helpers/stringHelpers";
 
 export interface IDictionary {
     getStopWordsRegex(): RegExp;

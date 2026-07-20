@@ -1,11 +1,10 @@
 import { chromium } from "playwright-extra";
 import stealth from "puppeteer-extra-plugin-stealth";
-
-import { EmbedBuilder } from "../interfaces/discord";
-import type { ICommand, IBotContext } from "../interfaces";
-import { toError, pickRandomItem } from "../utils";
-import { colorHex, isImage, isLink } from "../utils/helpers/stringHelpers";
+import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
+import { EmbedBuilder } from "../interfaces/discord";
+import { pickRandomItem, toError } from "../utils";
+import { colorHex, isImage, isLink } from "../utils/helpers/stringHelpers";
 
 interface RedditPost {
     url: string;

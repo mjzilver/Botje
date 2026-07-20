@@ -1,5 +1,5 @@
-import { execSync } from "child_process";
-import type { IClCommand, IBotContext } from "../../interfaces";
+import { execSync } from "node:child_process";
+import type { IBotContext, IClCommand } from "../../interfaces";
 
 export default {
     name: "listdrives",
@@ -14,7 +14,9 @@ export default {
             output
                 .trim()
                 .split("\n")
-                .forEach((line) => context.logger.console(line));
+                .forEach((line) => {
+                    context.logger.console(line);
+                });
         } catch (err) {
             context.logger.console(`Could not list drives: ${err instanceof Error ? err.message : String(err)}`);
         }

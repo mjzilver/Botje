@@ -1,8 +1,8 @@
+import { isEligibleMimicTarget } from "../features/mimic/mimicBuilder";
+import { generateMimicMessage } from "../features/mimic/textGenerationService";
 import type { ICommand } from "../interfaces";
 import { isGuildMessage } from "../interfaces/discord";
 import { pickRandomItem, toError } from "../utils";
-import { isEligibleMimicTarget } from "../features/mimic/mimicBuilder";
-import { generateMimicMessage } from "../features/mimic/textGenerationService";
 
 export default {
     name: "mimic",

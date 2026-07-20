@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import speakCommand, { extractTopicSentences } from "../../commands/speak";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("extractTopicSentences", () => {
     it("returns empty array when no messages are provided", () => {
@@ -28,7 +28,7 @@ describe("extractTopicSentences", () => {
     });
 
     it("filters out sentences longer than the maximum word count", () => {
-        const long = Array.from({ length: 26 }, (_, i) => `word${i}`).join(" ") + " cats";
+        const long = `${Array.from({ length: 26 }, (_, i) => `word${i}`).join(" ")} cats`;
         const result = extractTopicSentences([long], "cats");
         expect(result).toEqual([]);
     });

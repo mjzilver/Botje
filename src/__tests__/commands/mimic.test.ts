@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import mimicCommand from "../../commands/mimic";
-import { makeMockContext, makeMessage, makeNoGuildMessage } from "@test/helpers";
 import type { CachedProfile } from "../../features/mimic/mimicBuilder";
 
 vi.mock("../../features/mimic/mimicCache", () => ({

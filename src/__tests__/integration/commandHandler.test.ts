@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from "vitest";
+import { makeCommand, makeMessage, makeMockContext, TEST_CONFIG } from "@test/helpers";
+import { describe, expect, it, vi } from "vitest";
+import { extractTopics } from "../../features/nlp/topicExtractor";
 import { CommandHandler } from "../../handlers/commandHandler";
 import { ReplyHandler } from "../../handlers/replyHandler";
 import type { ICommand } from "../../interfaces";
-import { makeMockContext, TEST_CONFIG, makeMessage, makeCommand } from "@test/helpers";
 import { randomBetween } from "../../utils";
-import { extractTopics } from "../../features/nlp/topicExtractor";
 
 vi.mock("../../features/nlp/topicExtractor", () => ({
     fetchContextMessages: vi.fn().mockResolvedValue([]),

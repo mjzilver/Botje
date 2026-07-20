@@ -1,9 +1,8 @@
-import type { ICommand, IBotContext } from "../interfaces";
+import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { EmbedBuilder } from "../interfaces/discord";
+import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
+import { CacheKey, queryCache } from "../services/queryCache";
 import { toError } from "../utils";
-import { isGuildMessage } from "../interfaces/discord";
-import { queryCache, CacheKey } from "../services/queryCache";
 import { colorHex, formatDate, formatHour } from "../utils/helpers/stringHelpers";
 
 interface StatsData {

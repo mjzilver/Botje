@@ -1,4 +1,4 @@
-import type { IClCommand, IBotContext } from "../../interfaces";
+import type { IBotContext, IClCommand } from "../../interfaces";
 import { toError } from "../../utils";
 import { getReportRows } from "../../utils/support/report";
 

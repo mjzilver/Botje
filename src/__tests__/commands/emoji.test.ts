@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import emojiCommand from "../../commands/emoji";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("emoji", () => {
     beforeEach(() => vi.clearAllMocks());

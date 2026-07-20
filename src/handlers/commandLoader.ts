@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
 import { createRequire } from "node:module";
-import type { ICommand, IClCommand, ILogger } from "../interfaces";
+import path from "node:path";
+import type { IClCommand, ICommand, ILogger } from "../interfaces";
 
 export interface LoadedCommands {
     commands: Record<string, ICommand>;

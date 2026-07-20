@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { ApplicationCommandOptionType } from "discord.js";
 import type * as discord from "discord.js";
+import { ApplicationCommandOptionType } from "discord.js";
+import { describe, expect, it } from "vitest";
 import { interactionToMessage } from "../../adapters/messageAdapter";
 
 function makeInteraction(opts: {
@@ -23,12 +23,12 @@ function makeInteraction(opts: {
 
     const optionData = subcommand
         ? [
-            {
-                name: subcommand,
-                type: ApplicationCommandOptionType.Subcommand,
-                options,
-            } as discord.CommandInteractionOption,
-        ]
+              {
+                  name: subcommand,
+                  type: ApplicationCommandOptionType.Subcommand,
+                  options,
+              } as discord.CommandInteractionOption,
+          ]
         : options;
 
     return {

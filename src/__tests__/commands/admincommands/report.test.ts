@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { describe, expect, it, vi } from "vitest";
 import reportCommand from "../../../commands/admincommands/report";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("report (admin)", () => {
     it("sends process stats when db query succeeds", async () => {

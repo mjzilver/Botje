@@ -1,6 +1,6 @@
-import fs from "fs";
+import fs from "node:fs";
 import Jimp from "jimp";
-import type { ICommand, IBotContext } from "../interfaces";
+import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { replaceFancyQuotes, resolveImageUrl } from "../utils/helpers/stringHelpers";
 
@@ -52,7 +52,7 @@ export default {
         { type: "string", name: "top", description: "Top text for the meme", required: false },
         { type: "string", name: "bottom", description: "Bottom text for the meme", required: false },
     ],
-    async function(message, context) {
+    async function(message, context): Promise<void> {
         const args = message.content.split(" ");
         args.shift();
         const url = await resolveImageUrl(message, args);
@@ -67,7 +67,7 @@ export default {
                 WHERE message LIKE $1 AND message NOT LIKE '%http%'
                 AND message NOT LIKE '%<%' AND LENGTH(message) < 70`;
             const rows = await context.database.queryRandomMessage<{ message: string }>(selectSQL, [`%${keyword}%`]);
-            if (rows && rows[0]) {
+            if (rows?.[0]) {
                 const content = rows[0].message;
                 const middle = content.lastIndexOf(" ", content.length / 2);
                 const top = content.substring(0, middle);
@@ -76,7 +76,7 @@ export default {
                 return processPicture(url ?? null, top, bottom, message, context);
             }
 
-            return context.messageHandler.reply(message, "Can't find anything related, but this is your fault");
+            context.messageHandler.reply(message, "Can't find anything related, but this is your fault");
         } else if (top) {
             if (url.match(/\.(jpeg|jpg|gif|png)/gi)) {
                 return processPicture(url, top, bottom, message, context);

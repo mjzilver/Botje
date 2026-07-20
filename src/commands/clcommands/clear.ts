@@ -1,4 +1,4 @@
-import type { IClCommand, IBotContext } from "../../interfaces";
+import type { IBotContext, IClCommand } from "../../interfaces";
 
 export default {
     name: "clear",

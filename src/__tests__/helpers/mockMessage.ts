@@ -1,6 +1,6 @@
 import { vi } from "vitest";
-import type { BotMessage, BotGuild, BotMember, BotUser } from "../../interfaces/discord";
 import type { ICommand } from "../../interfaces";
+import type { BotGuild, BotMember, BotMessage, BotUser } from "../../interfaces/discord";
 
 export function makeCommand(name = "test", overrides?: Partial<ICommand>): ICommand {
     return { name, description: `${name} description`, format: name, function: vi.fn(), ...overrides };

@@ -1,8 +1,8 @@
-import { execSync } from "child_process";
-import fs from "fs";
-import os from "os";
-import path from "path";
-import type { IClCommand, IBotContext } from "../../interfaces";
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import type { IBotContext, IClCommand } from "../../interfaces";
 
 export default {
     name: "backup",

@@ -1,8 +1,8 @@
-import type { LlmConfig } from "../interfaces/config";
-import { toError } from "../utils";
-import type { BotMessage } from "../interfaces/discord";
 import type { IMessageHandler } from "../handlers/messageHandler";
 import type { ILogger } from "../infrastructure/logger";
+import type { LlmConfig } from "../interfaces/config";
+import type { BotMessage } from "../interfaces/discord";
+import { toError } from "../utils";
 
 export interface ILlmService {
     streamToMessage(
@@ -40,8 +40,8 @@ export class LlmService {
         this.activeRequests--;
         if (this.requestQueue.length > 0) {
             this.activeRequests++;
-            const next = this.requestQueue.shift()!;
-            next();
+            const next = this.requestQueue.shift();
+            next?.();
         }
     }
 

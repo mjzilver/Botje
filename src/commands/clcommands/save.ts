@@ -1,7 +1,7 @@
+import type { IBotContext, IClCommand } from "../../interfaces";
 import { ChannelType } from "../../interfaces/discord";
-import type { IClCommand, IBotContext } from "../../interfaces";
-import { MessageIterator } from "../../utils/support/messageIterator";
 import type { IterableMessage, IteratorStats } from "../../utils/support/messageIterator";
+import { MessageIterator } from "../../utils/support/messageIterator";
 
 export default {
     name: "save",
@@ -11,7 +11,7 @@ export default {
         const channels = context.client.channels.cache;
         if (input[0]) {
             const channelId = input[0];
-            const amount = input[1]?.length !== 0 ? parseInt(input[1] ?? "1000000") : 1000000;
+            const amount = input[1]?.length !== 0 ? parseInt(input[1] ?? "1000000", 10) : 1000000;
             const channel = channels.get(channelId);
             if (channel && channel.type === ChannelType.GuildText && channel.messages) {
                 const messages = channel.messages;

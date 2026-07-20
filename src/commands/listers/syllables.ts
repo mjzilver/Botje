@@ -1,9 +1,8 @@
-import type { ICommand } from "../../interfaces";
-import { Lister } from "./lister";
+import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
-import type { IBotContext } from "../../interfaces";
+import { CacheKey, queryCache } from "../../services/queryCache";
 import { countVowelGroups } from "../../utils/helpers/stringHelpers";
-import { queryCache, CacheKey } from "../../services/queryCache";
+import { Lister } from "./lister";
 
 type MessageRow = { user_id: string; message: string };
 

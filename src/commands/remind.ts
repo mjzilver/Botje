@@ -1,6 +1,6 @@
+import { getBotContext } from "../infrastructure/botContext";
 import type { ICommand } from "../interfaces";
 import { toError } from "../utils";
-import { getBotContext } from "../infrastructure/botContext";
 
 const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
 

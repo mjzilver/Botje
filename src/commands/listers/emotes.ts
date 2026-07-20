@@ -1,7 +1,6 @@
-import type { ICommand } from "../../interfaces";
-import { Lister } from "./lister";
+import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
-import type { IBotContext } from "../../interfaces";
+import { Lister } from "./lister";
 
 class EmotesLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {

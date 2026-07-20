@@ -1,8 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Client } from "discord.js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReminderScheduler } from "../../../features/reminders/reminderScheduler";
-import type { IDatabase, ReminderRow } from "../../../interfaces";
-import type { ILogger } from "../../../interfaces";
+import type { IDatabase, ILogger, ReminderRow } from "../../../interfaces";
 
 function makeDb(overrides: Partial<IDatabase> = {}): IDatabase {
     return {

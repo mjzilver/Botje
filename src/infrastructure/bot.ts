@@ -1,13 +1,13 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import * as discord from "discord.js";
-import type { BotConfig } from "../interfaces/config";
-import type { ILogger } from "../interfaces";
 import { toBotMessage } from "../adapters/messageAdapter";
+import type { ILogger } from "../interfaces";
+import type { BotConfig } from "../interfaces/config";
+import { ONE_DAY_MS, toError } from "../utils";
 import { setBotContext } from "./botContext";
+import type { Settings } from "./settings";
 import { SystemRegistry } from "./systemRegistry";
-import { Settings } from "./settings";
-import { toError, ONE_DAY_MS } from "../utils";
 
 const DISALLOWED_PATH = path.resolve(__dirname, "../json/disallowed.json");
 

@@ -1,6 +1,6 @@
-import * as discord from "discord.js";
-import type { BotMessage } from "../../interfaces/discord";
+import type * as discord from "discord.js";
 import type { IMessageHandler } from "../../interfaces";
+import type { BotMessage } from "../../interfaces/discord";
 import type { WebhookService } from "../../services/webhook";
 
 const UNMATCHED_EMOTE_PATTERN = /(?<!<a?):([a-zA-Z0-9_]+):(?!\d+>)/g;

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import topicCommand from "../../commands/topic";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 vi.mock("../../features/nlp/topicExtractor", () => ({
     tryFetchTopics: vi.fn(),

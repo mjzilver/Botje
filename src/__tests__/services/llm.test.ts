@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LlmService } from "../../services/llm";
-import type { LlmConfig } from "../../interfaces/config";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { IMessageHandler } from "../../handlers/messageHandler";
 import type { ILogger } from "../../interfaces";
+import type { LlmConfig } from "../../interfaces/config";
 import type { BotMessage } from "../../interfaces/discord";
+import { LlmService } from "../../services/llm";
 
 const CONFIG: LlmConfig = {
     model: "test-model",
@@ -69,7 +69,7 @@ describe("LlmService.streamToMessage", () => {
     beforeEach(() => vi.clearAllMocks());
 
     it("accumulates text from streamed JSON chunks and returns it", async () => {
-        mockFetch([JSON.stringify({ response: "Hello" }), "\n" + JSON.stringify({ response: " world" })]);
+        mockFetch([JSON.stringify({ response: "Hello" }), `\n${JSON.stringify({ response: " world" })}`]);
         const handler = makeMessageHandler();
         const service = new LlmService(CONFIG, makeLogger(), handler);
 

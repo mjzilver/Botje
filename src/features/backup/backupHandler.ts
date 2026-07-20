@@ -1,9 +1,9 @@
-import * as discord from "discord.js";
-import { spawn } from "child_process";
-import fs from "fs";
-import path from "path";
-import { pipeline } from "stream/promises";
+import { spawn } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { pipeline } from "node:stream/promises";
 import axios from "axios";
+import type * as discord from "discord.js";
 import type { ILogger } from "../../infrastructure/logger";
 import type { BotConfig } from "../../interfaces/config";
 import { sanitizeFilename } from "../../utils/helpers/stringHelpers";

@@ -56,7 +56,7 @@ export interface ICommand {
     format: string;
     disabled?: boolean;
     aliases?: string;
-    function(message: BotMessage, context: IBotContext): void | Promise<void | BotMessage | null>;
+    function(message: BotMessage, context: IBotContext): void | Promise<void>;
     slashCommand?: SlashCommandBuilder;
     options?: CommandOption[];
     subcommands?: SubCommand[];

@@ -1,6 +1,6 @@
-import fs from "fs";
-import { EmbedBuilder } from "../interfaces/discord";
+import fs from "node:fs";
 import type { ICommand } from "../interfaces";
+import { EmbedBuilder } from "../interfaces/discord";
 import { findClosestMatchInList, readGuildEmoteDir } from "../utils";
 
 export default {

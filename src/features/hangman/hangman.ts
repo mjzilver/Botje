@@ -1,13 +1,13 @@
-import { AttachmentBuilder, EmbedBuilder } from "../../interfaces/discord";
-import path from "path";
+import path from "node:path";
 import type { IMessageHandler } from "../../handlers/messageHandler";
 import type { ILogger } from "../../infrastructure/logger";
-import wordsJson from "../../json/words.json";
 import type { BotConfig } from "../../interfaces/config";
 import type { BotMessage } from "../../interfaces/discord";
-import type { Dictionary } from "../nlp/dictionary";
+import { AttachmentBuilder, EmbedBuilder } from "../../interfaces/discord";
+import wordsJson from "../../json/words.json";
 import { pickRandomItem } from "../../utils";
-import { textOnly as textOnlyHelper, replaceAt as replaceAtHelper } from "../../utils/helpers/stringHelpers";
+import { replaceAt as replaceAtHelper, textOnly as textOnlyHelper } from "../../utils/helpers/stringHelpers";
+import type { Dictionary } from "../nlp/dictionary";
 
 export interface IHangman {
     run(message: BotMessage): void;
@@ -48,7 +48,6 @@ export class HangmanGame {
             case "guess":
                 this.guess(message, args[2]);
                 break;
-            case "help":
             default:
                 this.help(message);
         }

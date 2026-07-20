@@ -1,9 +1,9 @@
-import type { BotMessage, BotReaction } from "../interfaces/discord";
 import type { IDatabase } from "../infrastructure/database";
-import type { IMessageHandler } from "./messageHandler";
 import type { ILogger } from "../infrastructure/logger";
 import type { BotConfig } from "../interfaces/config";
+import type { BotMessage, BotReaction } from "../interfaces/discord";
 import type { CommandHandler } from "./commandHandler";
+import type { IMessageHandler } from "./messageHandler";
 
 const DELETE_DELAY_MS = 5000;
 

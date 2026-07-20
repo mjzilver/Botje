@@ -1,9 +1,9 @@
 import * as discord from "discord.js";
 import { ApplicationCommandOptionType } from "discord.js";
 import type {
+    BotGuildTextChannel,
     BotMessage,
     BotReaction,
-    BotGuildTextChannel,
     BotUser,
     ComponentCollector,
     MessageContent,

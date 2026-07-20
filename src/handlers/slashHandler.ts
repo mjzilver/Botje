@@ -1,12 +1,12 @@
-import * as discord from "discord.js";
+import type * as discord from "discord.js";
 import {
     SlashCommandBuilder,
-    SlashCommandUserOption,
-    SlashCommandStringOption,
-    SlashCommandIntegerOption,
+    type SlashCommandIntegerOption,
+    type SlashCommandStringOption,
+    type SlashCommandUserOption,
 } from "discord.js";
-import type { ICommand, ILogger, CommandOption, IBotContext } from "../interfaces";
 import { interactionToMessage } from "../adapters/messageAdapter";
+import type { CommandOption, IBotContext, ICommand, ILogger } from "../interfaces";
 import { toError } from "../utils";
 
 export class SlashHandler {

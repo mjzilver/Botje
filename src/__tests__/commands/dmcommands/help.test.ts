@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { makeMessage, makeMockContext } from "@test/helpers";
+import { describe, expect, it } from "vitest";
 import dmHelpCommand from "../../../commands/dmcommands/help";
-import { makeMockContext, makeMessage } from "@test/helpers";
 
 describe("dmcommands/help", () => {
     it("sends an embed to the user", () => {
