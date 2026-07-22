@@ -228,7 +228,6 @@ export default {
     name: "reddit",
     description: "gets a random link from the given subreddit",
     format: "reddit [subreddit] (top|hot|new) (hour|day|week|month|year|all)",
-    disabled: true,
     options: [
         { type: "string", name: "subreddit", description: "The subreddit name", required: true },
         {
