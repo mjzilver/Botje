@@ -11,7 +11,11 @@ vi.mock("jimp", () => {
     };
 
     class Jimp {
-        public read = vi.fn().mockResolvedValue(fakeImage);
+        static read = vi.fn().mockResolvedValue(fakeImage);
+        resize = fakeImage.resize;
+        crop = fakeImage.crop;
+        composite = fakeImage.composite;
+        writeAsync = fakeImage.writeAsync;
     }
 
     return { default: Jimp };

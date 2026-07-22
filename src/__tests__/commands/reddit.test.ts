@@ -4,22 +4,16 @@ import { buildRedditUrl, parseRedditArgs } from "../../commands/reddit";
 describe("buildRedditUrl", () => {
     it("builds a basic URL with defaults", () => {
         const url = buildRedditUrl("cats", "hot", "month");
-        expect(url).toBe("https://www.reddit.com/r/cats/hot.json?sort=hot&t=month&limit=100&after=");
+        expect(url).toBe("https://www.reddit.com/r/cats/hot/");
     });
 
-    // it("includes the after parameter when given", () => {
-    //     const url = buildRedditUrl("cats", "top", "week", "t3_abc123");
-    //     expect(url).toBe("https://www.reddit.com/r/cats/top.json?sort=top&t=week&limit=100&after=t3_abc123");
-    // });
-
-    it("always includes limit=100", () => {
-        expect(buildRedditUrl("pics", "new", "day")).toContain("limit=100");
+    it("omits the time query for non-top sorts", () => {
+        expect(buildRedditUrl("pics", "new", "day")).toBe("https://www.reddit.com/r/pics/new/");
     });
 
-    it("puts sort in both path and query", () => {
+    it("puts sort in the path and time in the query for top", () => {
         const url = buildRedditUrl("worldnews", "top", "year");
-        expect(url).toContain("/top.json");
-        expect(url).toContain("sort=top");
+        expect(url).toBe("https://www.reddit.com/r/worldnews/top/?t=year");
     });
 });
 
