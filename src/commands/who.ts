@@ -18,7 +18,7 @@ export default {
         }
 
         const args = message.content.split(/\s+/).slice(1);
-        const color = colorHex(context.config.color_hex);
+        const color = colorHex(context.config.colorHex);
 
         if (args.length === 0 && message.reference?.messageId) {
             await handleReplyLookup(message, context, color);

@@ -78,7 +78,7 @@ async function sendStats(
         const stats = await fetchStats(targetId, message.guild.id, context);
 
         const embed = new EmbedBuilder()
-            .setColor(colorHex(context.config.color_hex))
+            .setColor(colorHex(context.config.colorHex))
             .setTitle(`📊 Stats for ${targetName}`)
             .addFields(
                 {

@@ -147,7 +147,7 @@ class PhraseLister extends Lister {
             }
 
             return this.buildPageEmbed(
-                context.config.color_hex,
+                context.config.colorHex,
                 `Top users by percentage for "${word}" in ${message.guild?.name}`,
                 result,
                 pageNum,

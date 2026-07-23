@@ -61,7 +61,7 @@ class SaidLister extends Lister {
 
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         const top = new EmbedBuilder()
-            .setColor(context.config.color_hex)
+            .setColor(context.config.colorHex)
             .setTitle(`Top 10 most used phrases in ${message.guild?.name} by \`${userName}\``)
             .setDescription(result);
         await context.messageHandler.send(message, { embeds: [top] });

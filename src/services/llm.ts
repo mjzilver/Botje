@@ -26,7 +26,7 @@ export class LlmService {
 
     private acquireSlot(): Promise<void> {
         return new Promise((resolve) => {
-            if (this.activeRequests < this.config.max_concurrent_requests) {
+            if (this.activeRequests < this.config.maxConcurrentRequests) {
                 this.activeRequests++;
                 resolve();
             } else {

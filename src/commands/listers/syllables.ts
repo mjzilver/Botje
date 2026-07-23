@@ -80,7 +80,7 @@ class SyllableLister extends Lister {
                 }
 
                 return this.buildPageEmbed(
-                    context.config.color_hex,
+                    context.config.colorHex,
                     `Top most intellectual posters in ${message.guild?.name}`,
                     result,
                     pageNum,

@@ -7,27 +7,22 @@ export interface DbConfig {
     poolSize: number;
 }
 
-export interface ImageConfig {
-    size: number;
-    magnification: number;
-}
-
 export interface LlmConfig {
     model: string;
     api: string;
-    base_prompt: string;
-    conversation: string;
-    conversation_prompt: string;
-    tarot_prompt: string;
-    max_concurrent_requests: number;
+    basePrompt: string;
+    conversationPrompt: string;
+    tarotPrompt: string;
+    maxConcurrentRequests: number;
 }
 
 export interface BotConfig {
     prefix: string;
-    discord_api_key: string;
-    discord_api_key_beta: string;
-    weather_api_key: string;
-    youtube_api_key: string;
+    botName: string;
+    discordApiKey: string;
+    discordApiKeyBeta: string;
+    weatherApiKey: string;
+    youtubeApiKey: string;
     owner: string;
     speakEvery: number;
     speakMinTimeoutMinutes: number;
@@ -35,14 +30,11 @@ export interface BotConfig {
     speakRandomChance: number;
     downvoteThreshold: number;
     timeoutDuration: number;
-    bot_avatar: string;
-    color_hex: `#${string}`;
-    spamchecker: number;
-    image: ImageConfig;
-    positive_emoji: string;
-    negative_emoji: string;
-    redo_emoji: string;
+    colorHex: `#${string}`;
+    positiveEmoji: string;
+    negativeEmoji: string;
+    redoEmoji: string;
     db: DbConfig;
     llm: LlmConfig;
-    scan_on_startup: string | boolean;
+    shouldScanOnStartup: boolean;
 }

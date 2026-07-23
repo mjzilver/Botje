@@ -76,7 +76,7 @@ export class SystemRegistry implements IBotContext {
             context: this,
         });
         this.messageHandler.setCommandListRemover((msg) => this.commandHandler.commandList.remove(msg));
-        this.webhook = new WebhookService(this.logger, this.client);
+        this.webhook = new WebhookService(this.logger, this.client, this.config);
         this.emoteInjector = new EmoteInjector(this.webhook, this.messageHandler, this.client);
         this.userHandler = new UserHandler(this.database, this.logger, this.client);
         this.backupHandler = new BackupHandler(this.logger, this.config, this.client);

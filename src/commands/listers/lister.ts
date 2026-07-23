@@ -135,7 +135,7 @@ export abstract class Lister {
                 result += await formatRow(row);
             }
 
-            return this.buildPageEmbed(context.config.color_hex, title, result, pageNum, totalPages);
+            return this.buildPageEmbed(context.config.colorHex, title, result, pageNum, totalPages);
         });
 
         await context.pagination.sendPaginatedEmbed(message, pages);

@@ -5,10 +5,11 @@ import type { BotConfig } from "../../interfaces/config";
 
 export const TEST_CONFIG: BotConfig = {
     prefix: "!",
-    discord_api_key: "test",
-    discord_api_key_beta: "test",
-    weather_api_key: "test",
-    youtube_api_key: "test",
+    botName: "test-bot",
+    discordApiKey: "test",
+    discordApiKeyBeta: "test",
+    weatherApiKey: "test",
+    youtubeApiKey: "test",
     owner: "owner-id",
     speakEvery: 100,
     speakMinTimeoutMinutes: 20,
@@ -16,24 +17,20 @@ export const TEST_CONFIG: BotConfig = {
     speakRandomChance: 20,
     downvoteThreshold: 3,
     timeoutDuration: 5,
-    bot_avatar: "avatar.png",
-    color_hex: "#ffffff",
-    spamchecker: 5,
-    image: { size: 256, magnification: 2 },
-    positive_emoji: "👍",
-    negative_emoji: "👎",
-    redo_emoji: "🔄",
+    colorHex: "#ffffff",
+    positiveEmoji: "👍",
+    negativeEmoji: "👎",
+    redoEmoji: "🔄",
     db: { user: "test", host: "localhost", database: "test", password: "test", port: 5432, poolSize: 5 },
     llm: {
         model: "test",
         api: "test",
-        base_prompt: "test",
-        conversation: "test",
-        conversation_prompt: "test",
-        tarot_prompt: "test",
-        max_concurrent_requests: 1,
+        basePrompt: "test",
+        conversationPrompt: "test",
+        tarotPrompt: "test",
+        maxConcurrentRequests: 1,
     },
-    scan_on_startup: false,
+    shouldScanOnStartup: false,
 };
 
 export function makeTestConfig(overrides: Partial<BotConfig> = {}): BotConfig {
@@ -47,10 +44,6 @@ export function makeTestConfig(overrides: Partial<BotConfig> = {}): BotConfig {
         llm: {
             ...TEST_CONFIG.llm,
             ...(overrides.llm ?? {}),
-        },
-        image: {
-            ...TEST_CONFIG.image,
-            ...(overrides.image ?? {}),
         },
     };
 }

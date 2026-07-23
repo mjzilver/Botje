@@ -147,7 +147,7 @@ async function handleRedditImages(
 function embedImage(message: BotMessage, post: RedditPost, sub: string, context: IBotContext): void {
     if (isImage(post.url)) {
         const image = new EmbedBuilder()
-            .setColor(colorHex(context.config.color_hex))
+            .setColor(colorHex(context.config.colorHex))
             .setTitle(post.title)
             .addFields(
                 { name: "Updoots", value: `${post.score}`, inline: true },

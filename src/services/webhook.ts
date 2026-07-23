@@ -1,15 +1,16 @@
 import type * as discord from "discord.js";
 import type { ILogger } from "../interfaces";
+import type { BotConfig } from "../interfaces/config";
 import { toError } from "../utils";
-
-const BOT_NAME = "botje";
 
 export class WebhookService {
     private logger: ILogger;
     private client: discord.Client;
-    constructor(logger: ILogger, client: discord.Client) {
+    private config: BotConfig;
+    constructor(logger: ILogger, client: discord.Client, config: BotConfig) {
         this.logger = logger;
         this.client = client;
+        this.config = config;
     }
 
     async fetch(channel: discord.TextChannel): Promise<discord.Webhook | null> {
@@ -19,12 +20,12 @@ export class WebhookService {
 
         const webhooks = await channel.fetchWebhooks();
         for (const [, webhook] of webhooks) {
-            if (webhook.name === BOT_NAME) {
+            if (webhook.name === this.config.botName) {
                 return webhook;
             }
         }
 
-        return await channel.createWebhook({ name: BOT_NAME });
+        return await channel.createWebhook({ name: this.config.botName });
     }
 
     async sendMessage(channelId: string, text: string, userId: string): Promise<boolean> {

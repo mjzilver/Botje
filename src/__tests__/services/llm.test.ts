@@ -8,11 +8,10 @@ import { LlmService } from "../../services/llm";
 const CONFIG: LlmConfig = {
     model: "test-model",
     api: "http://localhost:11434/api/generate",
-    base_prompt: "",
-    conversation: "",
-    conversation_prompt: "",
-    tarot_prompt: "",
-    max_concurrent_requests: 1,
+    basePrompt: "",
+    conversationPrompt: "",
+    tarotPrompt: "",
+    maxConcurrentRequests: 1,
 };
 
 function makeMessageHandler(editResolves = true): IMessageHandler {

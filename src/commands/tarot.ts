@@ -59,13 +59,13 @@ export default {
         const userQuestion = removeCommand(message.content).trim();
         const meaning = isReversed ? card.meaning_rev : card.meaning_up;
         const tarotEmbed = new EmbedBuilder()
-            .setColor(context.config.color_hex)
+            .setColor(context.config.colorHex)
             .setTitle(`Your card is: ${card.name} ${isReversed ? "(Reversed)" : ""}`)
             .setImage(`attachment://${card.name_short}.png`)
             .addFields({ name: "Meaning", value: meaning });
-        if (userQuestion && context.config.llm?.tarot_prompt) {
+        if (userQuestion && context.config.llm?.tarotPrompt) {
             await context.messageHandler.reply(message, { embeds: [tarotEmbed], files: [attachment] });
-            const prompt = context.config.llm.tarot_prompt
+            const prompt = context.config.llm.tarotPrompt
                 .replace("{userQuestion}", userQuestion)
                 .replace("{cardName}", card.name)
                 .replace("{orientation}", isReversed ? "reversed" : "upright")

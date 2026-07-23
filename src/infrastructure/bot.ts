@@ -58,7 +58,7 @@ export class Bot {
         if (!this.client.isReady()) {
             this.logger.startup("Attempting to log in");
             const isBeta = process.argv.includes("--beta");
-            const key = isBeta ? this.config.discord_api_key_beta : this.config.discord_api_key;
+            const key = isBeta ? this.config.discordApiKeyBeta : this.config.discordApiKey;
             if (isBeta) {
                 this.logger.startup("Logging in with beta key");
             }
@@ -73,7 +73,7 @@ export class Bot {
         await registry.initialize(disallowed);
         this.registry = registry;
         setBotContext(this.registry);
-        if (this.config.scan_on_startup === true || this.config.scan_on_startup === "1") {
+        if (this.config.shouldScanOnStartup) {
             this.scanOnStartup().catch((err) => {
                 this.logger.error(toError(err));
             });

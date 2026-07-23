@@ -34,8 +34,8 @@ export class ReactionHandler implements IReactionHandler {
 
         const emojiName = reaction.emoji.name;
 
-        if (emojiName === this.config.negative_emoji) {
-            const positiveReaction = message.reactions.resolve(this.config.positive_emoji);
+        if (emojiName === this.config.negativeEmoji) {
+            const positiveReaction = message.reactions.resolve(this.config.positiveEmoji);
             if (
                 (reaction.count ?? 0) >= this.config.downvoteThreshold &&
                 (reaction.count ?? 0) > (positiveReaction?.count ?? 0)
@@ -43,7 +43,7 @@ export class ReactionHandler implements IReactionHandler {
                 setTimeout(() => this.messageHandler.delete(message), DELETE_DELAY_MS);
                 this.logger.warn(`Post deleted due to downvotes: ${message.content}`);
             }
-        } else if (emojiName === this.config.redo_emoji) {
+        } else if (emojiName === this.config.redoEmoji) {
             this.commandHandler.redo(message, (id) => message.channel.messages.fetch(id));
         }
     }

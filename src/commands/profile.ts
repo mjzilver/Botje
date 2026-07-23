@@ -76,7 +76,7 @@ export default {
             fields.push({ name: "Dislikes", value: dislikes.slice(0, 3).join(", ") });
         }
 
-        const color = colorHex(context.config.color_hex);
+        const color = colorHex(context.config.colorHex);
         const embed = new EmbedBuilder()
             .setColor(color)
             .setTitle(`Profile: ${displayName}`)

@@ -143,7 +143,7 @@ export class HangmanGame {
         });
         const showWord = [...this.visibleWord].map((c) => `${c.toUpperCase()} `).join("");
         const embed = new EmbedBuilder()
-            .setColor(this.config.color_hex as `#${string}`)
+            .setColor(this.config.colorHex as `#${string}`)
             .setTitle(`Hangman -- ${this.tries}/${this.maxTries} tries`)
             .setDescription(content)
             .setImage("attachment://hangman.png")

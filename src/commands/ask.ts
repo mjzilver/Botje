@@ -45,10 +45,10 @@ export default {
         let promptTemplate: string;
         if (message.reference?.messageId) {
             userQuestion = await buildChain(message, removeCommand, context);
-            promptTemplate = context.config.llm?.conversation_prompt ?? "";
+            promptTemplate = context.config.llm?.conversationPrompt ?? "";
         } else {
             userQuestion = removeCommand(message.content);
-            promptTemplate = context.config.llm?.base_prompt ?? "";
+            promptTemplate = context.config.llm?.basePrompt ?? "";
         }
 
         const prompt = promptTemplate.replace("{userQuestion}", userQuestion);

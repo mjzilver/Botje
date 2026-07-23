@@ -19,7 +19,7 @@ export default {
                 }
 
                 return new EmbedBuilder()
-                    .setColor(context.config.color_hex)
+                    .setColor(context.config.colorHex)
                     .setTitle(":robot: Current commands: :robot:")
                     .setDescription(helpMessage)
                     .setFooter({ text: `Page ${pageNum}/${totalPages} \nCurrent Version: ${packageJson.version}` });

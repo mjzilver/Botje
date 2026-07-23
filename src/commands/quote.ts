@@ -65,7 +65,7 @@ export default {
             const row = rows[0];
             const authorName = await context.userHandler.getDisplayName(row.user_id, message.guild.id);
             const embed = new EmbedBuilder()
-                .setColor(colorHex(context.config.color_hex))
+                .setColor(colorHex(context.config.colorHex))
                 .setDescription(`"${row.message}"`)
                 .setFooter({ text: `— ${authorName} · ${formatDate(parseInt(row.datetime, 10))}` });
 

@@ -15,7 +15,7 @@ export default {
         }
 
         const help = new EmbedBuilder()
-            .setColor(context.config.color_hex)
+            .setColor(context.config.colorHex)
             .setTitle(":robot: Current DirectMessage commands: :robot:")
             .setDescription(helpMessage)
             .setFooter({ text: `Current Version: ${packageJson.version}` });

@@ -21,7 +21,7 @@ export default {
                     const result = pageEmotes.join(", ");
 
                     return new EmbedBuilder()
-                        .setColor(context.config.color_hex)
+                        .setColor(context.config.colorHex)
                         .setTitle(`Emotes backed up for ${message.guild?.name}`)
                         .setDescription(result)
                         .setFooter({ text: `Page ${pageNum}/${totalPages} | Total: ${emoteNames.length} emotes` });

@@ -7,8 +7,8 @@ import type { BotConfig } from "../../interfaces/config";
 import type { BotMessage, MessageContent } from "../../interfaces/discord";
 
 const config = {
-    positive_emoji: "👍",
-    negative_emoji: "👎",
+    positiveEmoji: "👍",
+    negativeEmoji: "👎",
 } as unknown as BotConfig;
 
 function makeSentMessage(id = "sent-1"): BotMessage {

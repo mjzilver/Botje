@@ -46,7 +46,7 @@ export default {
         const description = optionTokens.map((opt, i) => `${POLL_EMOJIS[i]} ${opt}`).join("\n");
 
         const embed = new EmbedBuilder()
-            .setColor(colorHex(context.config.color_hex))
+            .setColor(colorHex(context.config.colorHex))
             .setTitle(question)
             .setDescription(description)
             .setFooter({ text: `Poll by ${message.author.username}` });

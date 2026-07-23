@@ -89,8 +89,8 @@ export class MessageHandler implements IMessageHandler {
 
         this.addCommandCall(call, reply);
         if (reply.reactions) {
-            this.react(reply, this.config.positive_emoji);
-            this.react(reply, this.config.negative_emoji);
+            this.react(reply, this.config.positiveEmoji);
+            this.react(reply, this.config.negativeEmoji);
         }
 
         return reply;
