@@ -1,3 +1,4 @@
+import type { PermissionsBitField } from "discord.js";
 import { vi } from "vitest";
 import type { ICommand } from "../../interfaces";
 import type { BotGuild, BotMember, BotMessage, BotUser } from "../../interfaces/discord";
@@ -41,7 +42,7 @@ export function makeBotMember(overrides: Record<string, unknown> = {}): BotMembe
         id: "user-id",
         permissions: {
             has: () => false,
-        } as unknown as BotMember["permissions"],
+        } as unknown as Readonly<PermissionsBitField>,
         ...overrides,
     } as BotMember;
 }

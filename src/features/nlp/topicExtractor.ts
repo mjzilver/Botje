@@ -1,7 +1,7 @@
 import nlp from "compromise";
 import type { IDatabase } from "../../infrastructure/database";
 import type { IBotContext } from "../../interfaces";
-import type { BotMessage } from "../../interfaces/discord";
+import type { BotChannel, BotMessage } from "../../interfaces/discord";
 import { toError } from "../../utils";
 import type { IDictionary } from "./dictionary";
 
@@ -54,7 +54,7 @@ export const CONTEXT_WINDOW_MS = 10 * 60 * 60 * 1000;
 
 export const CONTEXT_LIMIT = 20;
 
-export async function fetchContextMessages(channel: BotMessage["channel"]): Promise<BotMessage[]> {
+export async function fetchContextMessages(channel: BotChannel): Promise<BotMessage[]> {
     const fetched = await channel.messages.fetch({ limit: CONTEXT_LIMIT });
     const cutoff = Date.now() - CONTEXT_WINDOW_MS;
 
@@ -62,7 +62,7 @@ export async function fetchContextMessages(channel: BotMessage["channel"]): Prom
 }
 
 export async function fetchTopicsFromContext(
-    channel: BotMessage["channel"],
+    channel: BotChannel,
     db: IDatabase,
     dictionary: IDictionary,
     prefix?: string,

@@ -1,4 +1,4 @@
-import type * as discord from "discord.js";
+import * as discord from "discord.js";
 import type { ILogger } from "../interfaces";
 import type { BotConfig } from "../interfaces/config";
 import { toError } from "../utils";
@@ -34,7 +34,12 @@ export class WebhookService {
             return false;
         }
 
-        const textChannel = channel as discord.TextChannel;
+        const textChannel = channel;
+        if (!(textChannel instanceof discord.TextChannel)) {
+            this.logger.error(`Channel ${channelId} is not a text channel.`);
+            return false;
+        }
+
         try {
             const webhook = await this.fetch(textChannel);
             if (!webhook) {

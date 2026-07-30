@@ -112,7 +112,7 @@ export class SlashHandler {
     }
 
     async registerCommands(commands: Record<string, ICommand>): Promise<void> {
-        const builders: ReturnType<SlashCommandBuilder["toJSON"]>[] = [];
+        const builders: discord.RESTPostAPIApplicationCommandsJSONBody[] = [];
         this.slashCommands = [];
         for (const [name, command] of Object.entries(commands)) {
             if (

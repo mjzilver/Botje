@@ -1,5 +1,5 @@
-import type { ICommand } from "../interfaces";
-import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
+import type { IBotContext, ICommand } from "../interfaces";
+import { type BotGuild, type BotMessage, EmbedBuilder, isGuildMessage } from "../interfaces/discord";
 import { toError } from "../utils";
 import { colorHex, formatDate } from "../utils/helpers/stringHelpers";
 
@@ -39,8 +39,8 @@ export default {
 } satisfies ICommand;
 
 async function handleReplyLookup(
-    message: Parameters<ICommand["function"]>[0] & { guild: NonNullable<Parameters<ICommand["function"]>[0]["guild"]> },
-    context: Parameters<ICommand["function"]>[1],
+    message: BotMessage & { guild: BotGuild },
+    context: IBotContext,
     color: number,
 ): Promise<void> {
     let repliedContent: string;
@@ -113,8 +113,8 @@ async function handleReplyLookup(
 }
 
 async function handleTextSearch(
-    message: Parameters<ICommand["function"]>[0] & { guild: NonNullable<Parameters<ICommand["function"]>[0]["guild"]> },
-    context: Parameters<ICommand["function"]>[1],
+    message: BotMessage & { guild: BotGuild },
+    context: IBotContext,
     searchText: string,
     color: number,
 ): Promise<void> {

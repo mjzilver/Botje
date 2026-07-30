@@ -51,7 +51,7 @@ export class Dictionary {
 
     async generateWordsFile(): Promise<void> {
         const sql = `
-            SELECT LOWER(message) as message
+            SELECT LOWER(message) AS message
             FROM messages
             WHERE message NOT LIKE '%<%' AND message != ''
         `;

@@ -45,12 +45,12 @@ class PhraseLister extends Lister {
     }
 
     private async phraseLeaderboard(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, server_id, count(message) as count
+        const selectSQL = `SELECT user_id, server_id, COUNT(message) AS count
             FROM messages
             WHERE message ILIKE $1 AND server_id = $2
             GROUP BY user_id, server_id
-            HAVING count(message) > 1
-            ORDER BY count(message) DESC`;
+            HAVING COUNT(message) > 1
+            ORDER BY COUNT(message) DESC`;
         const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
             `%${word}%`,
             message.guild.id,
@@ -75,7 +75,7 @@ class PhraseLister extends Lister {
     }
 
     private async phraseTotal(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
-        const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2";
+        const selectSQL = "SELECT COUNT(*) AS count FROM messages WHERE message ILIKE $1 AND server_id = $2";
         const rows = await context.database.query<{ count: string }>(selectSQL, [`%${word}%`, message.guild.id]);
         await context.messageHandler.send(
             message,
@@ -90,7 +90,7 @@ class PhraseLister extends Lister {
         context: IBotContext,
     ): Promise<void> {
         const selectSQL =
-            "SELECT COUNT(*) as count FROM messages WHERE message ILIKE $1 AND server_id = $2 AND user_id = $3";
+            "SELECT COUNT(*) AS count FROM messages WHERE message ILIKE $1 AND server_id = $2 AND user_id = $3";
         const rows = await context.database.query<{ count: string }>(selectSQL, [
             `%${word}%`,
             message.guild.id,

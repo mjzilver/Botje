@@ -14,7 +14,7 @@ class SaidLister extends Lister {
                 FROM messages
                 WHERE message NOT LIKE '%<%' AND server_id = $1
             )
-            SELECT message, COUNT(*) as count
+            SELECT message, COUNT(*) AS count
             FROM normalized
             GROUP BY message
             HAVING COUNT(*) > 1
@@ -44,7 +44,7 @@ class SaidLister extends Lister {
                 WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%'
                 AND server_id = $1 AND user_id = $2
             )
-            SELECT message, COUNT(*) as count
+            SELECT message, COUNT(*) AS count
             FROM normalized
             GROUP BY message
             HAVING COUNT(*) > 1

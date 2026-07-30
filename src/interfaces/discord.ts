@@ -40,26 +40,28 @@ export interface ComponentCollector {
     on(event: "end", handler: () => void): void;
 }
 
+export interface BotChannel {
+    id: string;
+    type: number;
+    name?: string;
+    send(content: MessageContent): Promise<BotMessage>;
+    awaitMessages?(options: {
+        filter: (m: BotMessage) => boolean;
+        max?: number;
+        time?: number;
+    }): Promise<Map<string, BotMessage>>;
+    messages: {
+        fetch(options: { limit: number; before?: string }): Promise<Map<string, BotMessage>>;
+        fetch(id: string): Promise<BotMessage>;
+        fetch(options: { limit: number; before?: string } | string): Promise<Map<string, BotMessage> | BotMessage>;
+    };
+}
+
 export interface BotMessage {
     id: string;
     content: string;
     author: BotUser;
-    channel: {
-        id: string;
-        type: number;
-        name?: string;
-        send(content: MessageContent): Promise<BotMessage>;
-        awaitMessages?(options: {
-            filter: (m: BotMessage) => boolean;
-            max?: number;
-            time?: number;
-        }): Promise<Map<string, BotMessage>>;
-        messages: {
-            fetch(options: { limit: number; before?: string }): Promise<Map<string, BotMessage>>;
-            fetch(id: string): Promise<BotMessage>;
-            fetch(options: { limit: number; before?: string } | string): Promise<Map<string, BotMessage> | BotMessage>;
-        };
-    };
+    channel: BotChannel;
     guild: BotGuild | null;
     member: BotMember | null;
     mentions: {

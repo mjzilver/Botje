@@ -63,12 +63,14 @@ export class LlmService {
                 }),
                 signal: controller.signal,
             });
-            const reader = (response.body as ReadableStream<Uint8Array>).getReader();
+
+            const reader = response.body?.getReader();
             const decoder = new TextDecoder("utf-8");
             let accumulated = "";
             let firstChunk = true;
             let shouldAbort = false;
-            while (!shouldAbort) {
+
+            while (!shouldAbort && reader) {
                 const { done, value } = await reader.read();
                 if (done) {
                     break;
@@ -83,10 +85,7 @@ export class LlmService {
                         break;
                     }
                     try {
-                        const json = JSON.parse(line) as {
-                            response?: string;
-                            error?: string;
-                        };
+                        const json = JSON.parse(line);
                         if (json.error) {
                             this.logger.error(`LLM error: ${json.error}`);
                             throw new Error(json.error);

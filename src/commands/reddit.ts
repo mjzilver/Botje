@@ -82,7 +82,7 @@ async function getRedditImage(message: BotMessage, context: IBotContext): Promis
             timeout: 15000,
         });
         const posts: RedditPost[] = await page.evaluate(() => {
-            const elements = Array.from(document.querySelectorAll("shreddit-post")) as HTMLElement[];
+            const elements = Array.from(document.querySelectorAll("shreddit-post"));
 
             return elements.map((post) => ({
                 url: post.getAttribute("content-href") ?? "",

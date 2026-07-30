@@ -4,7 +4,7 @@ import { Lister } from "./lister";
 
 class CountLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1";
+        const selectSQL = "SELECT COUNT(*) AS count FROM messages WHERE server_id = $1";
         const rows = await context.database.query<{ count: string }>(selectSQL, [message.guild.id]);
         await context.messageHandler.send(message, `Ive found ${rows[0].count} messages in ${message.guild?.name}`);
     }
@@ -16,7 +16,7 @@ class CountLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = "SELECT COUNT(*) as count FROM messages WHERE server_id = $1 AND user_id = $2";
+        const selectSQL = "SELECT COUNT(*) AS count FROM messages WHERE server_id = $1 AND user_id = $2";
         const rows = await context.database.query<{ count: string }>(selectSQL, [message.guild.id, mentioned.id]);
         const userName = await context.userHandler.getDisplayName(mentioned.id, message.guild.id);
         await context.messageHandler.send(
@@ -26,7 +26,7 @@ class CountLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, server_id, COUNT(*) as count
+        const selectSQL = `SELECT user_id, server_id, COUNT(*) AS count
             FROM messages
             WHERE server_id = $1
             GROUP BY user_id, server_id
@@ -45,7 +45,7 @@ class CountLister extends Lister {
                 WHERE server_id = $1
                 GROUP BY server_id
             )
-            SELECT m.user_id, m.server_id, COUNT(*) as count, t.total
+            SELECT m.user_id, m.server_id, COUNT(*) AS count, t.total
             FROM messages m
             JOIN totals t ON m.server_id = t.server_id
             WHERE m.server_id = $1

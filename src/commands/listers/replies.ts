@@ -4,7 +4,7 @@ import { Lister } from "./lister";
 
 class RepliesLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT m.user_id as from_user, t.user_id as to_user, COUNT(*) as count
+        const selectSQL = `SELECT m.user_id AS from_user, t.user_id AS to_user, COUNT(*) AS count
             FROM messages m
             JOIN messages t ON m.reply_to = t.id
             WHERE m.server_id = $1
@@ -41,7 +41,7 @@ class RepliesLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `SELECT t.user_id as to_user, COUNT(*) as count
+        const selectSQL = `SELECT t.user_id AS to_user, COUNT(*) AS count
             FROM messages m
             JOIN messages t ON m.reply_to = t.id
             WHERE m.server_id = $1 AND m.user_id = $2
@@ -69,7 +69,7 @@ class RepliesLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, server_id, COUNT(*) as count
+        const selectSQL = `SELECT user_id, server_id, COUNT(*) AS count
             FROM messages
             WHERE server_id = $1 AND reply_to IS NOT NULL
             GROUP BY user_id, server_id

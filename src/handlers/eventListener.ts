@@ -87,7 +87,7 @@ export class EventListener {
                         return;
                     }
                     if (newMessage.channel.type !== ChannelType.DM && newMessage.content !== null) {
-                        const botMsg = toBotMessage(newMessage as discord.Message);
+                        const botMsg = toBotMessage(newMessage);
                         await db.updateMessage(botMsg);
                         emoteInjector.handleMessage(botMsg);
                     }
@@ -104,7 +104,7 @@ export class EventListener {
             async (reaction: discord.MessageReaction | discord.PartialMessageReaction) => {
                 try {
                     const botReaction = toBotReaction(reaction);
-                    const botMessage = toBotMessage(reaction.message as discord.Message);
+                    const botMessage = toBotMessage(reaction.message);
                     await reactionHandler.process(botReaction, false, botMessage);
                 } catch (err) {
                     logger.error(toError(err));

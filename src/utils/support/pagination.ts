@@ -54,11 +54,7 @@ export class Pagination {
         const getPageContent = (index: number): MessageContent => {
             const page = pages[index];
             const base: PageObject =
-                typeof page === "string"
-                    ? { content: page }
-                    : page instanceof EmbedBuilder
-                      ? { embeds: [page] }
-                      : (page as PageObject);
+                typeof page === "string" ? { content: page } : page instanceof EmbedBuilder ? { embeds: [page] } : page;
 
             return { ...base, components: [getButtons()] };
         };
@@ -77,7 +73,7 @@ export class Pagination {
                 return interaction.reply({
                     content: "These buttons aren't for you!",
                     ephemeral: true,
-                } as MessageContent);
+                });
             }
             if (interaction.customId === "prev") {
                 currentPage = Math.max(0, currentPage - 1);
@@ -91,7 +87,7 @@ export class Pagination {
             try {
                 await this.messageHandler.edit(sentMessage, {
                     components: [getButtons(true)],
-                } as MessageContent);
+                });
             } catch (err) {
                 this.logger.error(toError(err));
             }

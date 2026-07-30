@@ -65,7 +65,7 @@ export class ReminderScheduler {
             const channel = await this.client.channels.fetch(row.channel_id);
 
             if (channel?.isTextBased() && "send" in channel) {
-                await (channel as discord.TextChannel).send(`<@${row.user_id}> ⏰ Reminder: ${row.reminder_message}`);
+                await channel.send(`<@${row.user_id}> ⏰ Reminder: ${row.reminder_message}`);
             } else {
                 const user = await this.client.users.fetch(row.user_id);
                 await user.send(`⏰ Reminder: ${row.reminder_message}`);

@@ -123,7 +123,7 @@ async function findRandom(message: BotMessage, context: IBotContext): Promise<vo
 
 async function findTopic(message: BotMessage, topic: string, context: IBotContext): Promise<void> {
     const rows = await context.database.query<{ message: string }>(
-        `SELECT LOWER(message) as message
+        `SELECT LOWER(message) AS message
         FROM messages
         WHERE (message LIKE $1 OR message LIKE $2)
         AND message NOT LIKE '%<%' AND LENGTH(message) > 10

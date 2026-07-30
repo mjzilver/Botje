@@ -1,6 +1,8 @@
 import * as discord from "discord.js";
 import { ApplicationCommandOptionType } from "discord.js";
 import type {
+    BotChannel,
+    BotGuild,
     BotGuildTextChannel,
     BotMessage,
     BotReaction,
@@ -9,7 +11,7 @@ import type {
     MessageContent,
 } from "../interfaces/discord";
 
-export function toBotMessage(message: discord.Message): BotMessage {
+export function toBotMessage(message: discord.Message | discord.PartialMessage): BotMessage {
     return message as BotMessage;
 }
 
@@ -17,8 +19,8 @@ export function toBotReaction(reaction: discord.MessageReaction | discord.Partia
     return reaction as BotReaction;
 }
 
-export function toBotChannel(channel: discord.TextBasedChannel | null): BotMessage["channel"] {
-    return channel as BotMessage["channel"];
+export function toBotChannel(channel: discord.TextBasedChannel | null): BotChannel {
+    return channel as BotChannel;
 }
 
 function isDiscordTextChannel(channel: discord.Channel): channel is discord.TextChannel {
@@ -109,7 +111,7 @@ export function cliToMessage(channel: BotGuildTextChannel, client: discord.Clien
         cleanContent: content,
         author: botUser,
         channel: botChannel,
-        guild: channel.guild as BotMessage["guild"],
+        guild: channel.guild as BotGuild,
         member: null,
         mentions: { users: Object.assign(new Map<string, BotUser>(), { first: (): BotUser | null => null }) },
         createdAt: new Date(),
@@ -140,7 +142,7 @@ export function interactionToMessage(
         cleanContent: fullContent,
         author: interaction.user as BotUser,
         channel: toBotChannel(interaction.channel),
-        guild: interaction.guild as BotMessage["guild"],
+        guild: interaction.guild as BotGuild | null,
         member: null,
         mentions: { users: mentions },
         createdTimestamp: interaction.createdTimestamp,

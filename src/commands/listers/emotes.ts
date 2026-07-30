@@ -10,7 +10,7 @@ class EmotesLister extends Lister {
                 WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
                 AND server_id = $1
             )
-            SELECT message, COUNT(*) as count
+            SELECT message, COUNT(*) AS count
             FROM normalized
             GROUP BY message
             HAVING COUNT(*) > 1
@@ -40,7 +40,7 @@ class EmotesLister extends Lister {
                 WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
                 AND server_id = $1 AND user_id = $2
             )
-            SELECT message, COUNT(*) as count
+            SELECT message, COUNT(*) AS count
             FROM normalized
             GROUP BY message
             HAVING COUNT(*) > 1
@@ -62,7 +62,7 @@ class EmotesLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, server_id, COUNT(*) as count
+        const selectSQL = `SELECT user_id, server_id, COUNT(*) AS count
             FROM messages
             WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
             AND server_id = $1
