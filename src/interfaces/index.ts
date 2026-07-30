@@ -1,36 +1,33 @@
-import type { BotMessage } from "./discord";
 import type { Client, SlashCommandBuilder } from "discord.js";
-import type { BotConfig } from "./config";
-import type { LoadedCommands } from "../handlers/commandLoader";
-import type { SqlParam, IDatabase, ReminderRow } from "../infrastructure/database";
-import type { IMessageHandler } from "../handlers/messageHandler";
-import type { LogEntry, ILogger } from "../infrastructure/logger";
-import type { IUserHandler } from "../handlers/userHandler";
-import type { IPagination } from "../utils/support/pagination";
 import type { IBackupHandler } from "../features/backup/backupHandler";
 import type { IHangman } from "../features/hangman/hangman";
-import type { ILlmService } from "../services/llm";
 import type { IDictionary } from "../features/nlp/dictionary";
-import type { Settings } from "../infrastructure/settings";
 import type { ReminderScheduler } from "../features/reminders/reminderScheduler";
+import type { LoadedCommands } from "../handlers/commandLoader";
+import type { IMessageHandler } from "../handlers/messageHandler";
+import type { IUserHandler } from "../handlers/userHandler";
+import type { IDatabase, ReminderRow, SqlParam } from "../infrastructure/database";
+import type { ILogger, LogEntry } from "../infrastructure/logger";
+import type { Settings } from "../infrastructure/settings";
+import type { ILlmService } from "../services/llm";
+import type { IPagination } from "../utils/support/pagination";
+import type { BotConfig } from "./config";
+import type { BotMessage } from "./discord";
 
-export type { SqlParam, IDatabase, ReminderRow };
-
-export type { IMessageHandler };
-
-export type { LogEntry, ILogger };
-
-export type { IUserHandler };
-
-export type { IPagination };
-
-export type { IBackupHandler };
-
-export type { IHangman };
-
-export type { ILlmService };
-
-export type { IDictionary };
+export type {
+    IBackupHandler,
+    IDatabase,
+    IDictionary,
+    IHangman,
+    ILlmService,
+    ILogger,
+    IMessageHandler,
+    IPagination,
+    IUserHandler,
+    LogEntry,
+    ReminderRow,
+    SqlParam,
+};
 
 export interface IWebhookService {
     sendMessage(channelId: string, text: string, userId: string): Promise<boolean>;
