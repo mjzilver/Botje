@@ -1,6 +1,6 @@
 import type { ICommand } from "../interfaces";
 import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
-import { toError } from "../utils";
+import { sqlText, toError } from "../utils";
 import { colorHex, formatDate } from "../utils/helpers/stringHelpers";
 
 type QuoteRow = { id: string; user_id: string; message: string; datetime: string };
@@ -28,26 +28,60 @@ export default {
         let params: (string | number)[];
 
         if (mention) {
-            sql = `SELECT id, user_id, message, datetime FROM messages
-                   WHERE server_id = $1 AND user_id = $2
-                   AND LENGTH(message) > 10
-                   AND regexp_replace(message, '<[^>]+>|https?://\\S+|www\\.\\S+', '', 'g') ~ '\\w{4,}'
-                   ORDER BY RANDOM() LIMIT 1`;
+             sql = sqlText`
+                 SELECT
+                     id,
+                     user_id,
+                     message,
+                     datetime
+                 FROM
+                     messages
+                 WHERE
+                     server_id = $1
+                     AND user_id = $2
+                     AND LENGTH(message) > 10
+                     AND regexp_replace(message, '<[^>]+>|https?://S+|www.S+', '', 'g') ~ 'w{4,}'
+                 ORDER BY
+                     RANDOM()
+                 LIMIT
+                     1`;
             params = [message.guild.id, mention.id];
         } else if (keyword) {
-            sql = `SELECT id, user_id, message, datetime FROM messages
-                   WHERE server_id = $1
-                   AND message ILIKE $2
-                   AND LENGTH(message) > 10
-                   AND regexp_replace(message, '<[^>]+>|https?://\\S+|www\\.\\S+', '', 'g') ~ '\\w{4,}'
-                   ORDER BY RANDOM() LIMIT 1`;
+             sql = sqlText`
+                 SELECT
+                     id,
+                     user_id,
+                     message,
+                     datetime
+                 FROM
+                     messages
+                 WHERE
+                     server_id = $1
+                     AND message ILIKE $2
+                     AND LENGTH(message) > 10
+                     AND regexp_replace(message, '<[^>]+>|https?://S+|www.S+', '', 'g') ~ 'w{4,}'
+                 ORDER BY
+                     RANDOM()
+                 LIMIT
+                     1`;
             params = [message.guild.id, `%${keyword}%`];
         } else {
-            sql = `SELECT id, user_id, message, datetime FROM messages
-                   WHERE server_id = $1
-                   AND LENGTH(message) > 10
-                   AND regexp_replace(message, '<[^>]+>|https?://\\S+|www\\.\\S+', '', 'g') ~ '\\w{4,}'
-                   ORDER BY RANDOM() LIMIT 1`;
+             sql = sqlText`
+                 SELECT
+                     id,
+                     user_id,
+                     message,
+                     datetime
+                 FROM
+                     messages
+                 WHERE
+                     server_id = $1
+                     AND LENGTH(message) > 10
+                     AND regexp_replace(message, '<[^>]+>|https?://S+|www.S+', '', 'g') ~ 'w{4,}'
+                 ORDER BY
+                     RANDOM()
+                 LIMIT
+                     1`;
             params = [message.guild.id];
         }
 

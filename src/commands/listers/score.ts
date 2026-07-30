@@ -1,6 +1,7 @@
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import { CacheKey, queryCache } from "../../services/queryCache";
+import { sqlText } from "../../utils";
 import { Lister } from "./lister";
 
 type ScoreRow = { user_id: string; total_chars: string };
@@ -15,9 +16,17 @@ class ScoreLister extends Lister {
     ): Promise<void> {
         const rows = await queryCache(CacheKey.scoreUser(message.guild.id, mentioned.id), () =>
             context.database.query<ScoreRow>(
-                `SELECT user_id, SUM(LENGTH(message)) AS total_chars
-                 FROM messages WHERE server_id = $1 AND user_id = $2
-                 GROUP BY user_id`,
+                sqlText`
+                    SELECT
+                        user_id,
+                        SUM(LENGTH(message)) AS total_chars
+                    FROM
+                        messages
+                    WHERE
+                        server_id = $1
+                        AND user_id = $2
+                    GROUP BY
+                        user_id`,
                 [message.guild.id, mentioned.id],
             ),
         );
@@ -29,10 +38,18 @@ class ScoreLister extends Lister {
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const rows = await queryCache(CacheKey.scoreServer(message.guild.id), () =>
             context.database.query<ScoreRow>(
-                `SELECT user_id, SUM(LENGTH(message)) AS total_chars
-                 FROM messages WHERE server_id = $1
-                 GROUP BY user_id
-                 ORDER BY total_chars DESC`,
+                sqlText`
+                    SELECT
+                        user_id,
+                        SUM(LENGTH(message)) AS total_chars
+                    FROM
+                        messages
+                    WHERE
+                        server_id = $1
+                    GROUP BY
+                        user_id
+                    ORDER BY
+                        total_chars DESC`,
                 [message.guild.id],
             ),
         );

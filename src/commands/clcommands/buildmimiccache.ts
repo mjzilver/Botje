@@ -1,6 +1,7 @@
 import { DELETED_USER_RE } from "../../features/mimic/mimicBuilder";
 import { mimicCache } from "../../features/mimic/mimicCache";
 import type { IBotContext, IClCommand } from "../../interfaces";
+import { sqlText } from "../../utils";
 
 export default {
     name: "buildmimiccache",
@@ -8,9 +9,13 @@ export default {
     format: "buildmimiccache",
     async function(_input: string[], context: IBotContext) {
         const rows = await context.database.query<{ user_id: string }>(
-            `SELECT DISTINCT user_id::text
-             FROM messages
-             WHERE LENGTH(message) > 15`,
+            sqlText`
+                SELECT DISTINCT
+                    user_id::text
+                FROM
+                    messages
+                WHERE
+                    LENGTH(message) > 15`,
             [],
         );
 

@@ -1,6 +1,6 @@
 import type { IBotContext, ICommand } from "../interfaces";
 import { type BotGuild, type BotMessage, EmbedBuilder, isGuildMessage } from "../interfaces/discord";
-import { toError } from "../utils";
+import { sqlText, toError } from "../utils";
 import { colorHex, formatDate } from "../utils/helpers/stringHelpers";
 
 type SourceRow = { user_id: string; message: string; datetime: string };
@@ -68,11 +68,19 @@ async function handleReplyLookup(
 
     try {
         const rows = await context.database.query<SourceRow>(
-            `SELECT user_id::text, message, datetime::text
-             FROM messages
-             WHERE message = $1
-             ORDER BY datetime ASC
-             LIMIT 10`,
+            sqlText`
+                SELECT
+                    user_id::text,
+                    message,
+                    datetime::text
+                FROM
+                    messages
+                WHERE
+                    message = $1
+                ORDER BY
+                    datetime ASC
+                LIMIT
+                    10`,
             [repliedContent],
         );
 
@@ -120,12 +128,22 @@ async function handleTextSearch(
 ): Promise<void> {
     try {
         const countRows = await context.database.query<CountRow>(
-            `SELECT user_id::text, COUNT(*) AS times, MAX(message) AS sample, MAX(datetime)::text AS last_seen
-             FROM messages
-             WHERE message ILIKE $1
-             GROUP BY user_id
-             ORDER BY times DESC
-             LIMIT 20`,
+            sqlText`
+                SELECT
+                    user_id::text,
+                    COUNT(*) AS times,
+                    MAX(message) AS sample,
+                    MAX(datetime)::text AS last_seen
+                FROM
+                    messages
+                WHERE
+                    message ILIKE $1
+                GROUP BY
+                    user_id
+                ORDER BY
+                    times DESC
+                LIMIT
+                    20`,
             [`%${searchText}%`],
         );
 

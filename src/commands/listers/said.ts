@@ -1,6 +1,7 @@
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import { EmbedBuilder } from "../../interfaces/discord";
+import { sqlText } from "../../utils";
 import { Lister } from "./lister";
 
 class SaidLister extends Lister {
@@ -9,17 +10,30 @@ class SaidLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `WITH normalized AS (
-                SELECT LOWER(message) AS message
-                FROM messages
-                WHERE message NOT LIKE '%<%' AND server_id = $1
-            )
-            SELECT message, COUNT(*) AS count
-            FROM normalized
-            GROUP BY message
-            HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC
-            LIMIT 100`;
+        const selectSQL = sqlText`
+            WITH
+                normalized AS (
+                    SELECT
+                        LOWER(message) AS message
+                    FROM
+                        messages
+                    WHERE
+                        message NOT LIKE '%<%'
+                        AND server_id = $1
+                )
+            SELECT
+                message,
+                COUNT(*) AS count
+            FROM
+                normalized
+            GROUP BY
+                message
+            HAVING
+                COUNT(*) > 1
+            ORDER BY
+                COUNT(*) DESC
+            LIMIT
+                100`;
         const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [message.guild.id]);
         await this.sendPaginatedRows(
             message,
@@ -38,18 +52,32 @@ class SaidLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `WITH normalized AS (
-                SELECT LOWER(message) AS message
-                FROM messages
-                WHERE message NOT LIKE '%<%' AND message NOT LIKE '%:%'
-                AND server_id = $1 AND user_id = $2
-            )
-            SELECT message, COUNT(*) AS count
-            FROM normalized
-            GROUP BY message
-            HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC
-            LIMIT 10`;
+        const selectSQL = sqlText`
+            WITH
+                normalized AS (
+                    SELECT
+                        LOWER(message) AS message
+                    FROM
+                        messages
+                    WHERE
+                        message NOT LIKE '%<%'
+                        AND message NOT LIKE '%:%'
+                        AND server_id = $1
+                        AND user_id = $2
+                )
+            SELECT
+                message,
+                COUNT(*) AS count
+            FROM
+                normalized
+            GROUP BY
+                message
+            HAVING
+                COUNT(*) > 1
+            ORDER BY
+                COUNT(*) DESC
+            LIMIT
+                10`;
         const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [
             message.guild.id,
             mentioned.id,

@@ -1,7 +1,7 @@
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { BotMessage, GuildBotMessage } from "../../interfaces/discord";
 import { isGuildMessage } from "../../interfaces/discord";
-import { toError } from "../../utils";
+import { sqlText, toError } from "../../utils";
 import { removeQuotes } from "../../utils/helpers/stringHelpers";
 import { Lister } from "./lister";
 
@@ -45,12 +45,23 @@ class PhraseLister extends Lister {
     }
 
     private async phraseLeaderboard(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, server_id, COUNT(message) AS count
-            FROM messages
-            WHERE message ILIKE $1 AND server_id = $2
-            GROUP BY user_id, server_id
-            HAVING COUNT(message) > 1
-            ORDER BY COUNT(message) DESC`;
+        const selectSQL = sqlText`
+            SELECT
+                user_id,
+                server_id,
+                COUNT(message) AS count
+            FROM
+                messages
+            WHERE
+                message ILIKE $1
+                AND server_id = $2
+            GROUP BY
+                user_id,
+                server_id
+            HAVING
+                COUNT(message) > 1
+            ORDER BY
+                COUNT(message) DESC`;
         const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
             `%${word}%`,
             message.guild.id,
@@ -75,7 +86,14 @@ class PhraseLister extends Lister {
     }
 
     private async phraseTotal(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
-        const selectSQL = "SELECT COUNT(*) AS count FROM messages WHERE message ILIKE $1 AND server_id = $2";
+        const selectSQL = sqlText`
+            SELECT
+                COUNT(*) AS count
+            FROM
+                messages
+            WHERE
+                message ILIKE $1
+                AND server_id = $2`;
         const rows = await context.database.query<{ count: string }>(selectSQL, [`%${word}%`, message.guild.id]);
         await context.messageHandler.send(
             message,
@@ -89,8 +107,15 @@ class PhraseLister extends Lister {
         word: string,
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL =
-            "SELECT COUNT(*) AS count FROM messages WHERE message ILIKE $1 AND server_id = $2 AND user_id = $3";
+        const selectSQL = sqlText`
+            SELECT
+                COUNT(*) AS count
+            FROM
+                messages
+            WHERE
+                message ILIKE $1
+                AND server_id = $2
+                AND user_id = $3`;
         const rows = await context.database.query<{ count: string }>(selectSQL, [
             `%${word}%`,
             message.guild.id,
@@ -104,22 +129,48 @@ class PhraseLister extends Lister {
     }
 
     private async phrasePercentage(message: GuildBotMessage, word: string, context: IBotContext): Promise<void> {
-        const selectSQL = `WITH filtered AS (
-                SELECT user_id, server_id, COUNT(*) AS count
-                FROM messages
-                WHERE message ILIKE $1 AND server_id = $2
-                GROUP BY user_id, server_id
-                HAVING COUNT(*) > 1
-            ), totals AS (
-                SELECT user_id, server_id, COUNT(*) AS total
-                FROM messages
-                WHERE server_id = $2
-                GROUP BY user_id, server_id
-            )
-            SELECT filtered.user_id, filtered.server_id, filtered.count, totals.total
-            FROM filtered
-            JOIN totals ON filtered.user_id = totals.user_id AND filtered.server_id = totals.server_id
-            ORDER BY filtered.count DESC`;
+        const selectSQL = sqlText`
+            WITH
+                filtered AS (
+                    SELECT
+                        user_id,
+                        server_id,
+                        COUNT(*) AS count
+                    FROM
+                        messages
+                    WHERE
+                        message ILIKE $1
+                        AND server_id = $2
+                    GROUP BY
+                        user_id,
+                        server_id
+                    HAVING
+                        COUNT(*) > 1
+                ),
+                totals AS (
+                    SELECT
+                        user_id,
+                        server_id,
+                        COUNT(*) AS total
+                    FROM
+                        messages
+                    WHERE
+                        server_id = $2
+                    GROUP BY
+                        user_id,
+                        server_id
+                )
+            SELECT
+                filtered.user_id,
+                filtered.server_id,
+                filtered.count,
+                totals.total
+            FROM
+                filtered
+                JOIN totals ON filtered.user_id = totals.user_id
+                AND filtered.server_id = totals.server_id
+            ORDER BY
+                filtered.count DESC`;
         const rows = await context.database.query<{
             user_id: string;
             server_id: string;

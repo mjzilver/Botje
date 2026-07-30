@@ -2,6 +2,7 @@ import { scoreMessages } from "../features/nlp/sentimentAnalyzer";
 import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
+import { sqlText } from "../utils";
 import { colorHex } from "../utils/helpers/stringHelpers";
 
 const PROFILE_FETCH_LIMIT = 100000;
@@ -41,12 +42,23 @@ export default {
         const targetUser = message.mentions.users.first() ?? message.author;
 
         const allRows = await context.database.query<MessageRow>(
-            `SELECT message, datetime FROM messages
-            WHERE server_id = $1 AND user_id = $2
-            AND message NOT LIKE '%http%' AND message NOT LIKE '%<%'
-            AND LENGTH(message) > 3
-            AND datetime > $3
-            ORDER BY datetime DESC LIMIT $4`,
+            sqlText`
+                SELECT
+                    message,
+                    datetime
+                FROM
+                    messages
+                WHERE
+                    server_id = $1
+                    AND user_id = $2
+                    AND message NOT LIKE '%http%'
+                    AND message NOT LIKE '%<%'
+                    AND LENGTH(message) > 3
+                    AND datetime > $3
+                ORDER BY
+                    datetime DESC
+                LIMIT
+                    $4`,
             [message.guild.id, targetUser.id, Date.now() - PROFILE_LOOKBACK_MS, PROFILE_FETCH_LIMIT],
         );
 

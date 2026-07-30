@@ -2,6 +2,7 @@ import fs from "node:fs";
 import Jimp from "jimp";
 import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
+import { sqlText } from "../utils";
 import { replaceFancyQuotes, resolveImageUrl } from "../utils/helpers/stringHelpers";
 
 async function processPicture(
@@ -63,9 +64,16 @@ export default {
                 keyword = args[1];
             }
 
-            const selectSQL = `SELECT message FROM messages
-                WHERE message LIKE $1 AND message NOT LIKE '%http%'
-                AND message NOT LIKE '%<%' AND LENGTH(message) < 70`;
+            const selectSQL = sqlText`
+                SELECT
+                    message
+                FROM
+                    messages
+                WHERE
+                    message LIKE $1
+                    AND message NOT LIKE '%http%'
+                    AND message NOT LIKE '%<%'
+                    AND LENGTH(message) < 70`;
             const rows = await context.database.queryRandomMessage<{ message: string }>(selectSQL, [`%${keyword}%`]);
             if (rows?.[0]) {
                 const content = rows[0].message;

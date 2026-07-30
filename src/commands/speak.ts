@@ -1,7 +1,7 @@
 import nlp from "compromise";
 import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { levenshtein, pickRandomItem, randomBetween } from "../utils";
+import { levenshtein, pickRandomItem, randomBetween, sqlText } from "../utils";
 import { countVowelGroups, makeStringHelpers, normalizeSpaces, textOnly } from "../utils/helpers/stringHelpers";
 
 const TOPIC_QUERY_LIMIT = 15;
@@ -48,11 +48,21 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
             words.sort((a, b) => countVowelGroups(b) - countVowelGroups(a));
         }
         if (words.length > 1) {
-            const selectSQL = `SELECT message FROM messages
-                WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
-                AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-                AND LENGTH(message) < 150 AND LENGTH(message) > 10
-                AND datetime < $1 AND datetime < $2`;
+            const selectSQL = sqlText`
+                SELECT
+                    message
+                FROM
+                    messages
+                WHERE
+                    message NOT LIKE '%http%'
+                    AND message NOT LIKE '%www%'
+                    AND message NOT LIKE '%bot%'
+                    AND message LIKE '%_ _%'
+                    AND message LIKE '%_ _%_%'
+                    AND LENGTH(message) < 150
+                    AND LENGTH(message) > 10
+                    AND datetime < $1
+                    AND datetime < $2`;
             const rows = await context.database.query<{
                 message: string;
             }>(selectSQL, [message.createdAt.getTime(), earliest.getTime()]);
@@ -87,11 +97,21 @@ async function findByWord(message: BotMessage, context: IBotContext): Promise<vo
                 }
             }
         } else {
-            const selectSQL = `SELECT message FROM messages
-                WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
-                AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-                AND message LIKE $1 AND LENGTH(message) > 10
-                AND datetime < $2 AND datetime < $3`;
+            const selectSQL = sqlText`
+                SELECT
+                    message
+                FROM
+                    messages
+                WHERE
+                    message NOT LIKE '%http%'
+                    AND message NOT LIKE '%www%'
+                    AND message NOT LIKE '%bot%'
+                    AND message LIKE '%_ _%'
+                    AND message LIKE '%_ _%_%'
+                    AND message LIKE $1
+                    AND LENGTH(message) > 10
+                    AND datetime < $2
+                    AND datetime < $3`;
             const rows = await context.database.queryRandomMessage<{
                 message: string;
             }>(selectSQL, [`%${words[0]}%`, message.createdAt.getTime(), earliest.getTime()]);
@@ -109,10 +129,19 @@ async function findRandom(message: BotMessage, context: IBotContext): Promise<vo
     context.logger.debug("Sending randomly selected message");
     const earliest = new Date();
     earliest.setMonth(earliest.getMonth() - 5);
-    const selectSQL = `SELECT message FROM messages
-        WHERE message NOT LIKE '%http%' AND message NOT LIKE '%www%' AND message NOT LIKE '%bot%'
-        AND message LIKE '%_ _%' AND message LIKE '%_ _%_%'
-        AND datetime < $1 AND LENGTH(message) > 10`;
+    const selectSQL = sqlText`
+        SELECT
+            message
+        FROM
+            messages
+        WHERE
+            message NOT LIKE '%http%'
+            AND message NOT LIKE '%www%'
+            AND message NOT LIKE '%bot%'
+            AND message LIKE '%_ _%'
+            AND message LIKE '%_ _%_%'
+            AND datetime < $1
+            AND LENGTH(message) > 10`;
     const rows = await context.database.queryRandomMessage<{
         message: string;
     }>(selectSQL, [earliest.getTime()]);
@@ -123,12 +152,21 @@ async function findRandom(message: BotMessage, context: IBotContext): Promise<vo
 
 async function findTopic(message: BotMessage, topic: string, context: IBotContext): Promise<void> {
     const rows = await context.database.query<{ message: string }>(
-        `SELECT LOWER(message) AS message
-        FROM messages
-        WHERE (message LIKE $1 OR message LIKE $2)
-        AND message NOT LIKE '%<%' AND LENGTH(message) > 10
-        LIMIT ${TOPIC_QUERY_LIMIT}`,
-        [`%${topic} is%`, `%${topic} are%`],
+        sqlText`
+            SELECT
+                LOWER(message) AS message
+            FROM
+                messages
+            WHERE
+                (
+                    message LIKE $1
+                    OR message LIKE $2
+                )
+                AND message NOT LIKE '%<%'
+                AND LENGTH(message) > 10
+            LIMIT
+                $3`,
+        [`%${topic} is%`, `%${topic} are%`, TOPIC_QUERY_LIMIT],
     );
 
     const sentences = extractTopicSentences(

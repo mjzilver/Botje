@@ -1,5 +1,6 @@
 import os from "node:os";
 import type { IBotContext } from "../../interfaces";
+import { sqlText } from "../../utils";
 import { formatUptime } from "../utils";
 
 const formatter = new Intl.NumberFormat("en-GB");
@@ -24,7 +25,12 @@ export async function getReportRows(context: IBotContext): Promise<ReportRow[] |
         ["Memory: heapTotal", `${Math.round((heapTotal / 1024 / 1024) * 100) / 100} MB`],
         ["Uptime", formattedUptime],
     ];
-    const sql = "SELECT pg_size_pretty(pg_database_size('botdb')) AS size, COUNT(messages.id) AS count FROM messages";
+    const sql = sqlText`
+        SELECT
+            pg_size_pretty(pg_database_size('botdb')) AS size,
+            COUNT(messages.id) AS count
+        FROM
+            messages`;
     const rows = await context.database.query<{ size: string; count: string }>(sql, []);
     if (rows.length === 0) {
         return null;

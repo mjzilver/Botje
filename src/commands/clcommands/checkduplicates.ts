@@ -1,4 +1,5 @@
 import type { IBotContext, IClCommand } from "../../interfaces";
+import { sqlText } from "../../utils";
 
 export default {
     name: "checkdupes",
@@ -7,11 +8,20 @@ export default {
     async function(_input: string[], context: IBotContext) {
         context.logger.info("Checking for duplicate entries in the database...");
         try {
-            const sql = `SELECT message, datetime, COUNT(message) AS count
-                FROM messages
-                GROUP BY message, datetime
-                HAVING COUNT(message) >= 2
-                ORDER BY COUNT(message) DESC;`;
+            const sql = sqlText`
+                SELECT
+                    message,
+                    datetime,
+                    COUNT(message) AS count
+                FROM
+                    messages
+                GROUP BY
+                    message,
+                    datetime
+                HAVING
+                    COUNT(message) >= 2
+                ORDER BY
+                    COUNT(message) DESC`;
             const rows = await context.database.query<{
                 message: string;
                 datetime: number;

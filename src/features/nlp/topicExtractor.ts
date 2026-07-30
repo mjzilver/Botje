@@ -2,7 +2,7 @@ import nlp from "compromise";
 import type { IDatabase } from "../../infrastructure/database";
 import type { IBotContext } from "../../interfaces";
 import type { BotChannel, BotMessage } from "../../interfaces/discord";
-import { toError } from "../../utils";
+import { sqlText, toError } from "../../utils";
 import type { IDictionary } from "./dictionary";
 
 const MIN_WORD_LENGTH = 4;
@@ -107,9 +107,16 @@ export async function extractTopics(
 
     const scored: { word: string; score: number }[] = [];
     for (const word of candidates) {
-        const rows = await db.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM messages WHERE message ILIKE $1", [
-            `%${word}%`,
-        ]);
+        const rows = await db.query<{ cnt: string }>(
+            sqlText`
+                SELECT
+                    COUNT(*) AS cnt
+                FROM
+                    messages
+                WHERE
+                    message ILIKE $1`,
+            [`%${word}%`],
+        );
         const df = parseInt(rows[0]?.cnt ?? "1", 10);
         if (df < MIN_DOC_FREQUENCY) {
             continue;

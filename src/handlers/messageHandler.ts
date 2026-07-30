@@ -4,7 +4,7 @@ import type { IDatabase } from "../infrastructure/database";
 import type { ILogger } from "../infrastructure/logger";
 import type { BotConfig } from "../interfaces/config";
 import type { BotMessage, MessageContent } from "../interfaces/discord";
-import { ONE_DAY_MS, toError } from "../utils";
+import { ONE_DAY_MS, sqlText, toError } from "../utils";
 
 export interface IMessageHandler {
     send(call: BotMessage, content: MessageContent): Promise<BotMessage | null>;
@@ -17,9 +17,14 @@ export interface IMessageHandler {
     findFromReply(replyMessage: BotMessage): string | null;
 }
 
-const COMMAND_CALL_SQL = `INSERT INTO command_calls (call_id, reply_id, timestamp)
-        VALUES ($1::bigint, $2::bigint, $3::bigint)
-        ON CONFLICT (call_id) DO UPDATE SET reply_id = EXCLUDED.reply_id;`;
+const COMMAND_CALL_SQL = sqlText`
+    INSERT INTO
+        command_calls (call_id, reply_id, timestamp)
+    VALUES
+        ($1::bigint, $2::bigint, $3::bigint)
+    ON CONFLICT (call_id) DO UPDATE
+    SET
+        reply_id = EXCLUDED.reply_id`;
 
 export class MessageHandler implements IMessageHandler {
     private db: IDatabase;
@@ -150,9 +155,16 @@ export class MessageHandler implements IMessageHandler {
 
     async loadCommandCalls(): Promise<void> {
         const since = Date.now() - ONE_DAY_MS;
-        const sql = `SELECT call_id, reply_id FROM command_calls
-        WHERE timestamp > $1
-        ORDER BY timestamp DESC`;
+        const sql = sqlText`
+            SELECT
+                call_id,
+                reply_id
+            FROM
+                command_calls
+            WHERE
+                timestamp > $1
+            ORDER BY
+                timestamp DESC`;
         try {
             const rows = await this.db.query<{
                 call_id: string;

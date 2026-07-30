@@ -1,16 +1,27 @@
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
+import { sqlText } from "../../utils";
 import { Lister } from "./lister";
 
 class RepliesLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT m.user_id AS from_user, t.user_id AS to_user, COUNT(*) AS count
-            FROM messages m
-            JOIN messages t ON m.reply_to = t.id
-            WHERE m.server_id = $1
-            GROUP BY m.user_id, t.user_id
-            HAVING COUNT(*) > 0
-            ORDER BY COUNT(*) DESC`;
+        const selectSQL = sqlText`
+            SELECT
+                m.user_id AS from_user,
+                t.user_id AS to_user,
+                COUNT(*) AS count
+            FROM
+                messages m
+                JOIN messages t ON m.reply_to = t.id
+            WHERE
+                m.server_id = $1
+            GROUP BY
+                m.user_id,
+                t.user_id
+            HAVING
+                COUNT(*) > 0
+            ORDER BY
+                COUNT(*) DESC`;
         const rows = await context.database.query<{ from_user: string; to_user: string; count: string }>(selectSQL, [
             message.guild.id,
         ]);
@@ -41,14 +52,24 @@ class RepliesLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `SELECT t.user_id AS to_user, COUNT(*) AS count
-            FROM messages m
-            JOIN messages t ON m.reply_to = t.id
-            WHERE m.server_id = $1 AND m.user_id = $2
-            GROUP BY t.user_id
-            HAVING COUNT(*) > 0
-            ORDER BY COUNT(*) DESC
-            LIMIT 10`;
+        const selectSQL = sqlText`
+            SELECT
+                t.user_id AS to_user,
+                COUNT(*) AS count
+            FROM
+                messages m
+                JOIN messages t ON m.reply_to = t.id
+            WHERE
+                m.server_id = $1
+                AND m.user_id = $2
+            GROUP BY
+                t.user_id
+            HAVING
+                COUNT(*) > 0
+            ORDER BY
+                COUNT(*) DESC
+            LIMIT
+                10`;
         const rows = await context.database.query<{ to_user: string; count: string }>(selectSQL, [
             message.guild.id,
             mentioned.id,
@@ -69,12 +90,23 @@ class RepliesLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, server_id, COUNT(*) AS count
-            FROM messages
-            WHERE server_id = $1 AND reply_to IS NOT NULL
-            GROUP BY user_id, server_id
-            HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC`;
+        const selectSQL = sqlText`
+            SELECT
+                user_id,
+                server_id,
+                COUNT(*) AS count
+            FROM
+                messages
+            WHERE
+                server_id = $1
+                AND reply_to IS NOT NULL
+            GROUP BY
+                user_id,
+                server_id
+            HAVING
+                COUNT(*) > 1
+            ORDER BY
+                COUNT(*) DESC`;
         const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
             message.guild.id,
         ]);

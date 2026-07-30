@@ -1,6 +1,7 @@
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import { CacheKey, queryCache } from "../../services/queryCache";
+import { sqlText } from "../../utils";
 import { Lister } from "./lister";
 
 class QualityLister extends Lister {
@@ -13,15 +14,24 @@ class QualityLister extends Lister {
     ): Promise<void> {
         const rows = await queryCache(CacheKey.qualityUser(message.guild.id, mentioned.id), () =>
             context.database.query<{ user_id: string; percentage_unique: string }>(
-                `SELECT user_id,
-                COUNT(*) AS total_messages,
-                COUNT(DISTINCT message) AS unique_messages,
-                (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
-            FROM messages m
-            WHERE server_id = $1 AND user_id = $2
-            GROUP BY user_id
-            HAVING COUNT(*) > 1000
-            ORDER BY percentage_unique DESC, user_id`,
+                sqlText`
+                    SELECT
+                        user_id,
+                        COUNT(*) AS total_messages,
+                        COUNT(DISTINCT message) AS unique_messages,
+                        (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
+                    FROM
+                        messages m
+                    WHERE
+                        server_id = $1
+                        AND user_id = $2
+                    GROUP BY
+                        user_id
+                    HAVING
+                        COUNT(*) > 1000
+                    ORDER BY
+                        percentage_unique DESC,
+                        user_id`,
                 [message.guild.id, mentioned.id],
             ),
         );
@@ -39,15 +49,23 @@ class QualityLister extends Lister {
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const rows = await queryCache(CacheKey.qualityServer(message.guild.id), () =>
             context.database.query<{ user_id: string; percentage_unique: string }>(
-                `SELECT user_id,
-            COUNT(*) AS total_messages,
-            COUNT(DISTINCT message) AS unique_messages,
-            (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
-        FROM messages m
-        WHERE server_id = $1
-        GROUP BY user_id
-        HAVING COUNT(*) > 1000
-        ORDER BY percentage_unique DESC, user_id`,
+                sqlText`
+                    SELECT
+                        user_id,
+                        COUNT(*) AS total_messages,
+                        COUNT(DISTINCT message) AS unique_messages,
+                        (COUNT(DISTINCT message) * 100.0 / COUNT(*)) AS percentage_unique
+                    FROM
+                        messages m
+                    WHERE
+                        server_id = $1
+                    GROUP BY
+                        user_id
+                    HAVING
+                        COUNT(*) > 1000
+                    ORDER BY
+                        percentage_unique DESC,
+                        user_id`,
                 [message.guild.id],
             ),
         );

@@ -1,10 +1,10 @@
 import type { QueryResultRow } from "pg";
 import { DatabaseError, Pool } from "pg";
-import format from "pg-format";
+import { format as formatSql } from "sql-formatter";
 import type { BotConfig } from "../interfaces/config";
 import type { BotMessage, BotReaction, GuildBotMessage } from "../interfaces/discord";
 import { isGuildMessage } from "../interfaces/discord";
-import { toError } from "../utils";
+import { sqlText, toError } from "../utils";
 import type { ILogger } from "./logger";
 
 export type SqlParam = string | number | boolean | null | Date | Buffer;
@@ -104,6 +104,22 @@ export class Database implements IDatabase {
         return pg ? `${base}\n${pg}` : base;
     }
 
+    private formatDebugQuery(sql: string, params: SqlParam[]): string {
+        let formattedSql = sql;
+        try {
+            formattedSql = formatSql(sql, {
+                language: "postgresql",
+                keywordCase: "upper",
+                tabWidth: 4,
+                linesBetweenQueries: 1,
+            });
+        } catch {
+            formattedSql = sql;
+        }
+
+        return `${formattedSql}\nparams=${this.formatSqlParams(params)}`;
+    }
+
     private async wait(ms: number): Promise<void> {
         await new Promise<void>((resolve) => {
             setTimeout(resolve, ms);
@@ -132,9 +148,11 @@ export class Database implements IDatabase {
     }
 
     private async initializeSchema(): Promise<void> {
-        await this.query("CREATE EXTENSION IF NOT EXISTS pg_trgm");
-        await this.query("CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)");
-        await this.query(`
+        await this.query(sqlText`
+            CREATE EXTENSION IF NOT EXISTS pg_trgm`);
+        await this.query(sqlText`
+            CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)`);
+        await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS messages (
                 id bigint PRIMARY KEY,
                 user_id bigint,
@@ -143,66 +161,51 @@ export class Database implements IDatabase {
                 channel_id bigint,
                 server_id bigint,
                 reply_to bigint NULL
-            )
-        `);
-        await this.query(`
-            CREATE INDEX IF NOT EXISTS idx_message_trgm ON messages 
-            USING gin(message gin_trgm_ops)
-        `);
-        await this.query(`
-            CREATE INDEX IF NOT EXISTS idx_messages_server_user ON messages (server_id, user_id)
-        `);
-        await this.query(`
-            CREATE INDEX IF NOT EXISTS idx_messages_server_datetime ON messages (server_id, datetime)
-        `);
-        await this.query(`
-            CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages (reply_to)
-        `);
-        await this.query(`
+            )`);
+        await this.query(sqlText`
+            CREATE INDEX IF NOT EXISTS idx_message_trgm ON messages USING gin (message gin_trgm_ops)`);
+        await this.query(sqlText`
+            CREATE INDEX IF NOT EXISTS idx_messages_server_user ON messages (server_id, user_id)`);
+        await this.query(sqlText`
+            CREATE INDEX IF NOT EXISTS idx_messages_server_datetime ON messages (server_id, datetime)`);
+        await this.query(sqlText`
+            CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages (reply_to)`);
+        await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS command_calls (
                 call_id bigint PRIMARY KEY,
                 reply_id bigint NULL,
                 timestamp bigint
-            )
-        `);
-        await this.query(`
+            )`);
+        await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS reactions (
                 message_id bigint,
                 user_id bigint,
                 emoji text,
                 timestamp bigint,
-                PRIMARY KEY(message_id, user_id, emoji)
-            )
-        `);
-        await this.query(`
-            CREATE INDEX IF NOT EXISTS idx_reactions_user_message ON reactions (user_id, message_id)
-        `);
-        await this.query(`
-            CREATE INDEX IF NOT EXISTS idx_reactions_message_emoji ON reactions (message_id, emoji)
-        `);
-        await this.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                user_id bigint PRIMARY KEY
-            )
-        `);
-        await this.query(`
+                PRIMARY KEY (message_id, user_id, emoji)
+            )`);
+        await this.query(sqlText`
+            CREATE INDEX IF NOT EXISTS idx_reactions_user_message ON reactions (user_id, message_id)`);
+        await this.query(sqlText`
+            CREATE INDEX IF NOT EXISTS idx_reactions_message_emoji ON reactions (message_id, emoji)`);
+        await this.query(sqlText`
+            CREATE TABLE IF NOT EXISTS users (user_id bigint PRIMARY KEY)`);
+        await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS usernames (
                 user_id bigint,
                 server_id bigint,
                 user_name text,
                 timestamp bigint,
-                PRIMARY KEY(user_id, server_id, user_name)
-            )
-        `);
-        await this.query(`
+                PRIMARY KEY (user_id, server_id, user_name)
+            )`);
+        await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS reminders (
                 id serial PRIMARY KEY,
                 user_id bigint NOT NULL,
                 channel_id bigint NOT NULL,
                 reminder_message text NOT NULL,
                 trigger_at bigint NOT NULL
-            )
-        `);
+            )`);
     }
 
     async query<T extends QueryResultRow = QueryResultRow>(sql: string, params: SqlParam[] = []): Promise<T[]> {
@@ -216,14 +219,7 @@ export class Database implements IDatabase {
                 if (DEBUG_SQL && start !== null) {
                     const duration = Date.now() - start;
                     if (duration > 1000) {
-                        let interpolated: string;
-                        try {
-                            interpolated = format.withArray(sql.replace(/\$(\d+)/g, "%L"), params);
-                        } catch (e) {
-                            interpolated = `[pg-format error] ${toError(e).message}`;
-                        }
-
-                        this.logger.warn(`[Slow Query] (${duration} ms) ${interpolated}`);
+                        this.logger.warn(`[Slow Query] (${duration} ms) ${this.formatDebugQuery(sql, params)}`);
                     }
                 }
 
@@ -260,12 +256,20 @@ export class Database implements IDatabase {
         serverId: string | null,
         displayName: string | null = null,
     ): Promise<void> {
-        await this.query("INSERT INTO users (user_id) VALUES ($1::bigint) ON CONFLICT DO NOTHING", [user.id]);
+        await this.query(sqlText`
+            INSERT INTO
+                users (user_id)
+            VALUES
+                ($1::bigint)
+            ON CONFLICT DO NOTHING`, [user.id]);
         if (serverId && displayName) {
             await this.query(
-                `INSERT INTO usernames (user_id, server_id, user_name, timestamp)
-                 VALUES ($1::bigint, $2::bigint, $3, $4::bigint)
-                 ON CONFLICT DO NOTHING`,
+                sqlText`
+                    INSERT INTO
+                        usernames (user_id, server_id, user_name, timestamp)
+                    VALUES
+                        ($1::bigint, $2::bigint, $3, $4::bigint)
+                    ON CONFLICT DO NOTHING`,
                 [user.id, serverId, displayName, Date.now()],
             );
         }
@@ -275,10 +279,18 @@ export class Database implements IDatabase {
         const rows = await this.query<{
             user_name: string;
         }>(
-            `SELECT user_name FROM usernames
-             WHERE user_id = $1 AND server_id = $2
-             ORDER BY timestamp DESC
-             LIMIT 1`,
+            sqlText`
+                SELECT
+                    user_name
+                FROM
+                    usernames
+                WHERE
+                    user_id = $1
+                    AND server_id = $2
+                ORDER BY
+                    timestamp DESC
+                LIMIT
+                    1`,
             [userId, serverId],
         );
 
@@ -336,7 +348,12 @@ export class Database implements IDatabase {
 
     async updateMessage(message: BotMessage): Promise<void> {
         try {
-            await this.query("UPDATE messages SET message = $1 WHERE id = $2::bigint", [
+            await this.query(sqlText`
+                UPDATE messages
+                SET
+                    message = $1
+                WHERE
+                    id = $2::bigint`, [
                 message.cleanContent,
                 message.id,
             ]);
@@ -367,9 +384,12 @@ export class Database implements IDatabase {
             }
             try {
                 await this.query(
-                    `INSERT INTO reactions (message_id, user_id, emoji, timestamp)
-                     VALUES ($1::bigint, $2::bigint, $3, $4::bigint)
-                     ON CONFLICT DO NOTHING`,
+                    sqlText`
+                        INSERT INTO
+                            reactions (message_id, user_id, emoji, timestamp)
+                        VALUES
+                            ($1::bigint, $2::bigint, $3, $4::bigint)
+                        ON CONFLICT DO NOTHING`,
                     [reaction.message.id, user.id, emojiName, Date.now()],
                 );
             } catch (err) {
@@ -394,10 +414,30 @@ export class Database implements IDatabase {
         }
 
         await this.query(
-            `INSERT INTO messages
-            (id, user_id, message, channel_id, server_id, datetime, reply_to)
-            VALUES ($1::bigint, $2::bigint, $3, $4::bigint, $5::bigint, $6::bigint, $7::bigint)
-            ON CONFLICT (id) DO UPDATE SET reply_to = EXCLUDED.reply_to`,
+            sqlText`
+                INSERT INTO
+                    messages (
+                        id,
+                        user_id,
+                        message,
+                        channel_id,
+                        server_id,
+                        datetime,
+                        reply_to
+                    )
+                VALUES
+                    (
+                        $1::bigint,
+                        $2::bigint,
+                        $3,
+                        $4::bigint,
+                        $5::bigint,
+                        $6::bigint,
+                        $7::bigint
+                    )
+                ON CONFLICT (id) DO UPDATE
+                SET
+                    reply_to = EXCLUDED.reply_to`,
             [
                 message.id,
                 message.author.id,
@@ -422,9 +462,13 @@ export class Database implements IDatabase {
         triggerAt: number,
     ): Promise<number> {
         const rows = await this.query<{ id: number }>(
-            `INSERT INTO reminders (user_id, channel_id, reminder_message, trigger_at)
-             VALUES ($1::bigint, $2::bigint, $3, $4::bigint)
-             RETURNING id`,
+            sqlText`
+                INSERT INTO
+                    reminders (user_id, channel_id, reminder_message, trigger_at)
+                VALUES
+                    ($1::bigint, $2::bigint, $3, $4::bigint)
+                RETURNING
+                    id`,
             [userId, channelId, reminderMessage, triggerAt],
         );
 
@@ -432,14 +476,25 @@ export class Database implements IDatabase {
     }
 
     async deleteReminder(id: number): Promise<void> {
-        await this.query("DELETE FROM reminders WHERE id = $1", [id]);
+        await this.query(sqlText`
+            DELETE FROM reminders
+            WHERE
+                id = $1`, [id]);
     }
 
     async getPendingReminders(): Promise<ReminderRow[]> {
         return this.query<ReminderRow>(
-            `SELECT id, user_id::text, channel_id::text, reminder_message, trigger_at
-             FROM reminders
-             WHERE trigger_at > $1`,
+            sqlText`
+                SELECT
+                    id,
+                    user_id::text,
+                    channel_id::text,
+                    reminder_message,
+                    trigger_at
+                FROM
+                    reminders
+                WHERE
+                    trigger_at > $1`,
             [Date.now()],
         );
     }

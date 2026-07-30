@@ -1,4 +1,5 @@
 import type { IBotContext } from "../../interfaces";
+import { sqlText } from "../../utils";
 import type { CachedProfile } from "./mimicBuilder";
 import {
     buildChain,
@@ -27,11 +28,18 @@ export async function generateMimicMessage(targetId: string, context: IBotContex
     }
 
     const rows = await context.database.query<{ message: string }>(
-        `SELECT message FROM messages
-         WHERE user_id = $1
-         AND LENGTH(message) > 15
-         ORDER BY RANDOM()
-         LIMIT 5000`,
+        sqlText`
+            SELECT
+                message
+            FROM
+                messages
+            WHERE
+                user_id = $1
+                AND LENGTH(message) > 15
+            ORDER BY
+                RANDOM()
+            LIMIT
+                5000`,
         [targetId],
     );
 
@@ -64,8 +72,29 @@ export async function generateMimicMessage(targetId: string, context: IBotContex
 
 export async function generateTalkMessage(context: IBotContext, userId?: string): Promise<string | null> {
     const sql = userId
-        ? "SELECT message FROM messages WHERE message NOT LIKE '%<%' AND user_id = $1 ORDER BY RANDOM() LIMIT 5000"
-        : "SELECT message FROM messages WHERE message NOT LIKE '%<%' ORDER BY RANDOM() LIMIT 5000";
+        ? sqlText`
+            SELECT
+                message
+            FROM
+                messages
+            WHERE
+                message NOT LIKE '%<%'
+                AND user_id = $1
+            ORDER BY
+                RANDOM()
+            LIMIT
+                5000`
+        : sqlText`
+            SELECT
+                message
+            FROM
+                messages
+            WHERE
+                message NOT LIKE '%<%'
+            ORDER BY
+                RANDOM()
+            LIMIT
+                5000`;
 
     const rows = await context.database.query<{ message: string }>(sql, userId ? [userId] : []);
 

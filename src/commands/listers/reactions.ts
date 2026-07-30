@@ -1,19 +1,28 @@
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import { CacheKey, queryCache } from "../../services/queryCache";
+import { sqlText } from "../../utils";
 import { Lister } from "./lister";
 
 class ReactionsLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const rows = await queryCache(CacheKey.reactionsServer(message.guild.id), () =>
             context.database.query<{ emoji: string; count: string }>(
-                `SELECT r.emoji AS emoji, COUNT(*) AS count
-                FROM reactions r
-                JOIN messages m ON r.message_id = m.id
-                WHERE m.server_id = $1
-                GROUP BY r.emoji
-                HAVING COUNT(*) > 1
-                ORDER BY COUNT(*) DESC`,
+                sqlText`
+                    SELECT
+                        r.emoji AS emoji,
+                        COUNT(*) AS count
+                    FROM
+                        reactions r
+                        JOIN messages m ON r.message_id = m.id
+                    WHERE
+                        m.server_id = $1
+                    GROUP BY
+                        r.emoji
+                    HAVING
+                        COUNT(*) > 1
+                    ORDER BY
+                        COUNT(*) DESC`,
                 [message.guild.id],
             ),
         );
@@ -41,13 +50,22 @@ class ReactionsLister extends Lister {
     ): Promise<void> {
         const rows = await queryCache(CacheKey.reactionsMentionUser(message.guild.id, mentioned.id), () =>
             context.database.query<{ emoji: string; count: string }>(
-                `SELECT r.emoji AS emoji, COUNT(*) AS count
-                FROM reactions r
-                JOIN messages m ON r.message_id = m.id
-                WHERE m.server_id = $1 AND r.user_id = $2
-                GROUP BY r.emoji
-                HAVING COUNT(*) > 1
-                ORDER BY COUNT(*) DESC`,
+                sqlText`
+                    SELECT
+                        r.emoji AS emoji,
+                        COUNT(*) AS count
+                    FROM
+                        reactions r
+                        JOIN messages m ON r.message_id = m.id
+                    WHERE
+                        m.server_id = $1
+                        AND r.user_id = $2
+                    GROUP BY
+                        r.emoji
+                    HAVING
+                        COUNT(*) > 1
+                    ORDER BY
+                        COUNT(*) DESC`,
                 [message.guild.id, mentioned.id],
             ),
         );
@@ -70,13 +88,23 @@ class ReactionsLister extends Lister {
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
         const rows = await queryCache(CacheKey.reactionsPerPerson(message.guild.id), () =>
             context.database.query<{ user_id: string; server_id: string; count: string }>(
-                `SELECT r.user_id, m.server_id, COUNT(*) AS count
-                FROM reactions r
-                JOIN messages m ON r.message_id = m.id
-                WHERE m.server_id = $1
-                GROUP BY r.user_id, m.server_id
-                HAVING COUNT(*) > 1
-                ORDER BY COUNT(*) DESC`,
+                sqlText`
+                    SELECT
+                        r.user_id,
+                        m.server_id,
+                        COUNT(*) AS count
+                    FROM
+                        reactions r
+                        JOIN messages m ON r.message_id = m.id
+                    WHERE
+                        m.server_id = $1
+                    GROUP BY
+                        r.user_id,
+                        m.server_id
+                    HAVING
+                        COUNT(*) > 1
+                    ORDER BY
+                        COUNT(*) DESC`,
                 [message.guild.id],
             ),
         );

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { IDatabase, ILogger } from "../../interfaces";
-import { toError } from "../../utils";
+import { sqlText, toError } from "../../utils";
 import type { CachedProfile } from "./mimicBuilder";
 import { buildChain, buildStyleProfile, cleanMessage, MIN_MESSAGES } from "./mimicBuilder";
 
@@ -101,7 +101,17 @@ export class MimicCache {
         }
         try {
             const nameRows = await db.query<{ user_name: string }>(
-                "SELECT user_name FROM usernames WHERE user_id = $1 ORDER BY timestamp DESC LIMIT 1",
+                sqlText`
+                    SELECT
+                        user_name
+                    FROM
+                        usernames
+                    WHERE
+                        user_id = $1
+                    ORDER BY
+                        timestamp DESC
+                    LIMIT
+                        1`,
                 [userId],
             );
             const displayName = nameRows[0]?.user_name ?? userId;
@@ -112,11 +122,18 @@ export class MimicCache {
             }
 
             const rows = await db.query<{ message: string }>(
-                `SELECT message FROM messages
-                 WHERE user_id = $1
-                 AND LENGTH(message) > 15
-                 ORDER BY datetime DESC
-                 LIMIT $2`,
+                sqlText`
+                    SELECT
+                        message
+                    FROM
+                        messages
+                    WHERE
+                        user_id = $1
+                        AND LENGTH(message) > 15
+                    ORDER BY
+                        datetime DESC
+                    LIMIT
+                        $2`,
                 [userId, BUILD_MESSAGE_LIMIT],
             );
             const cleaned = rows.map((r) => cleanMessage(r.message, prefix)).filter((m): m is string => m !== null);

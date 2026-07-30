@@ -2,7 +2,7 @@ import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { EmbedBuilder, isGuildMessage } from "../interfaces/discord";
 import { CacheKey, queryCache } from "../services/queryCache";
-import { toError } from "../utils";
+import { sqlText, toError } from "../utils";
 import { colorHex, formatDate, formatHour } from "../utils/helpers/stringHelpers";
 
 interface StatsData {
@@ -18,31 +18,59 @@ async function fetchStats(userId: string, serverId: string, context: IBotContext
         context.logger.debug(`Fetching stats for user ${userId} in server ${serverId}`);
         const [msgRows, reactGivenRows, reactReceivedRows, peakHourRows] = await Promise.all([
             context.database.query<{ count: string; first_seen: string }>(
-                `SELECT COUNT(*) AS count, MIN(datetime) AS first_seen
-             FROM messages
-             WHERE server_id = $1 AND user_id = $2`,
+                sqlText`
+                    SELECT
+                        COUNT(*) AS count,
+                        MIN(datetime) AS first_seen
+                    FROM
+                        messages
+                    WHERE
+                        server_id = $1
+                        AND user_id = $2`,
                 [serverId, userId],
             ),
             context.database.query<{ count: string }>(
-                `SELECT COUNT(*) AS count
-             FROM reactions
-             WHERE user_id = $1`,
+                sqlText`
+                    SELECT
+                        COUNT(*) AS count
+                    FROM
+                        reactions
+                    WHERE
+                        user_id = $1`,
                 [userId],
             ),
             context.database.query<{ count: string }>(
-                `SELECT COUNT(*) AS count
-             FROM reactions r
-             JOIN messages m ON m.id = r.message_id
-             WHERE m.user_id = $1 AND m.server_id = $2`,
+                sqlText`
+                    SELECT
+                        COUNT(*) AS count
+                    FROM
+                        reactions r
+                        JOIN messages m ON m.id = r.message_id
+                    WHERE
+                        m.user_id = $1
+                        AND m.server_id = $2`,
                 [userId, serverId],
             ),
             context.database.query<{ hour: string; count: string }>(
-                `SELECT EXTRACT(HOUR FROM to_timestamp(datetime / 1000)) AS hour, COUNT(*) AS count
-             FROM messages
-             WHERE server_id = $1 AND user_id = $2
-             GROUP BY hour
-             ORDER BY count DESC
-             LIMIT 1`,
+                sqlText`
+                    SELECT
+                        EXTRACT(
+                            HOUR
+                            FROM
+                                to_timestamp(datetime / 1000)
+                        ) AS HOUR,
+                        COUNT(*) AS count
+                    FROM
+                        messages
+                    WHERE
+                        server_id = $1
+                        AND user_id = $2
+                    GROUP BY
+                        HOUR
+                    ORDER BY
+                        count DESC
+                    LIMIT
+                        1`,
                 [serverId, userId],
             ),
         ]);

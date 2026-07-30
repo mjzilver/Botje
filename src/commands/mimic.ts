@@ -2,7 +2,7 @@ import { isEligibleMimicTarget } from "../features/mimic/mimicBuilder";
 import { generateMimicMessage } from "../features/mimic/textGenerationService";
 import type { ICommand } from "../interfaces";
 import { isGuildMessage } from "../interfaces/discord";
-import { pickRandomItem, toError } from "../utils";
+import { pickRandomItem, sqlText, toError } from "../utils";
 
 export default {
     name: "mimic",
@@ -30,13 +30,23 @@ export default {
             targetId = mentioned.id;
         } else {
             const candidates = await context.database.query<{ user_id: string }>(
-                `SELECT user_id FROM (
-                     SELECT DISTINCT user_id FROM messages
-                     WHERE server_id = $1
-                     AND LENGTH(message) > 15
-                 ) t
-                 ORDER BY RANDOM()
-                 LIMIT 20`,
+                sqlText`
+                    SELECT
+                        user_id
+                    FROM
+                        (
+                            SELECT DISTINCT
+                                user_id
+                            FROM
+                                messages
+                            WHERE
+                                server_id = $1
+                                AND LENGTH(message) > 15
+                        ) t
+                    ORDER BY
+                        RANDOM()
+                    LIMIT
+                        20`,
                 [message.guild.id],
             );
 

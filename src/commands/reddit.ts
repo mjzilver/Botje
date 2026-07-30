@@ -3,7 +3,7 @@ import stealth from "puppeteer-extra-plugin-stealth";
 import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { EmbedBuilder } from "../interfaces/discord";
-import { pickRandomItem, toError } from "../utils";
+import { pickRandomItem, sqlText, toError } from "../utils";
 import { colorHex, isImage, isLink } from "../utils/helpers/stringHelpers";
 
 interface RedditPost {
@@ -114,7 +114,13 @@ async function handleRedditImages(
     children: RedditPost[],
     context: IBotContext,
 ): Promise<void> {
-    const selectSQL = "SELECT * FROM images WHERE sub = $1";
+    const selectSQL = sqlText`
+        SELECT
+            *
+        FROM
+            images
+        WHERE
+            sub = $1`;
     const foundImages: Record<string, boolean> = {};
 
     try {
@@ -214,8 +220,14 @@ async function handleRedirect(message: BotMessage, post: RedditPost, context: IB
 }
 
 async function insertPost(post: RedditPost, sub: string, context: IBotContext): Promise<void> {
-    const insertSQL =
-        "INSERT INTO images (link, sub) VALUES ($1, $2) ON CONFLICT (link) DO UPDATE SET sub = EXCLUDED.sub;";
+    const insertSQL = sqlText`
+        INSERT INTO
+            images (link, sub)
+        VALUES
+            ($1, $2)
+        ON CONFLICT (link) DO UPDATE
+        SET
+            sub = EXCLUDED.sub`;
     try {
         await context.database.insert(insertSQL, [post.url, sub]);
         context.logger.debug(`inserted: ${post.url} - ${sub}`);

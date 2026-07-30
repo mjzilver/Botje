@@ -1,6 +1,7 @@
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
 import { CacheKey, queryCache } from "../../services/queryCache";
+import { sqlText } from "../../utils";
 import { countVowelGroups } from "../../utils/helpers/stringHelpers";
 import { Lister } from "./lister";
 
@@ -17,7 +18,17 @@ class SyllableLister extends Lister {
         const userdata = { syllables: 0, total: 0, average: 0 };
         const rows = await queryCache(CacheKey.msgRowsUser(message.guild.id, mentioned.id), () =>
             context.database.query<MessageRow>(
-                "SELECT user_id, message FROM messages WHERE server_id = $1 AND user_id = $2 LIMIT 50000",
+                sqlText`
+                    SELECT
+                        user_id,
+                        message
+                    FROM
+                        messages
+                    WHERE
+                        server_id = $1
+                        AND user_id = $2
+                    LIMIT
+                        50000`,
                 [message.guild.id, mentioned.id],
             ),
         );
@@ -41,7 +52,16 @@ class SyllableLister extends Lister {
         const userdata: Record<string, { syllables: number; total: number; average: number }> = {};
         const rows = await queryCache(CacheKey.msgRowsServer(message.guild.id), () =>
             context.database.query<MessageRow>(
-                "SELECT user_id, message FROM messages WHERE server_id = $1 LIMIT 50000",
+                sqlText`
+                    SELECT
+                        user_id,
+                        message
+                    FROM
+                        messages
+                    WHERE
+                        server_id = $1
+                    LIMIT
+                        50000`,
                 [message.guild.id],
             ),
         );

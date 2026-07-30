@@ -1,21 +1,35 @@
 import type { IBotContext, ICommand } from "../../interfaces";
 import type { GuildBotMessage } from "../../interfaces/discord";
+import { sqlText } from "../../utils";
 import { Lister } from "./lister";
 
 class EmotesLister extends Lister {
     override async total(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `WITH normalized AS (
-                SELECT LOWER(message) AS message
-                FROM messages
-                WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
-                AND server_id = $1
-            )
-            SELECT message, COUNT(*) AS count
-            FROM normalized
-            GROUP BY message
-            HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC
-            LIMIT 100`;
+        const selectSQL = sqlText`
+            WITH
+                normalized AS (
+                    SELECT
+                        LOWER(message) AS message
+                    FROM
+                        messages
+                    WHERE
+                        (message LIKE '%<%')
+                        AND message NOT LIKE '%@%'
+                        AND server_id = $1
+                )
+            SELECT
+                message,
+                COUNT(*) AS count
+            FROM
+                normalized
+            GROUP BY
+                message
+            HAVING
+                COUNT(*) > 1
+            ORDER BY
+                COUNT(*) DESC
+            LIMIT
+                100`;
         const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [message.guild.id]);
         await this.sendPaginatedRows(
             message,
@@ -34,18 +48,32 @@ class EmotesLister extends Lister {
         },
         context: IBotContext,
     ): Promise<void> {
-        const selectSQL = `WITH normalized AS (
-                SELECT LOWER(message) AS message
-                FROM messages
-                WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
-                AND server_id = $1 AND user_id = $2
-            )
-            SELECT message, COUNT(*) AS count
-            FROM normalized
-            GROUP BY message
-            HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC
-            LIMIT 1000`;
+        const selectSQL = sqlText`
+            WITH
+                normalized AS (
+                    SELECT
+                        LOWER(message) AS message
+                    FROM
+                        messages
+                    WHERE
+                        (message LIKE '%<%')
+                        AND message NOT LIKE '%@%'
+                        AND server_id = $1
+                        AND user_id = $2
+                )
+            SELECT
+                message,
+                COUNT(*) AS count
+            FROM
+                normalized
+            GROUP BY
+                message
+            HAVING
+                COUNT(*) > 1
+            ORDER BY
+                COUNT(*) DESC
+            LIMIT
+                1000`;
         const rows = await context.database.query<{ message: string; count: string }>(selectSQL, [
             message.guild.id,
             mentioned.id,
@@ -62,13 +90,24 @@ class EmotesLister extends Lister {
     }
 
     override async perPerson(message: GuildBotMessage, context: IBotContext): Promise<void> {
-        const selectSQL = `SELECT user_id, server_id, COUNT(*) AS count
-            FROM messages
-            WHERE (message LIKE '%<%') AND message NOT LIKE '%@%'
-            AND server_id = $1
-            GROUP BY user_id, server_id
-            HAVING COUNT(*) > 1
-            ORDER BY COUNT(*) DESC`;
+        const selectSQL = sqlText`
+            SELECT
+                user_id,
+                server_id,
+                COUNT(*) AS count
+            FROM
+                messages
+            WHERE
+                (message LIKE '%<%')
+                AND message NOT LIKE '%@%'
+                AND server_id = $1
+            GROUP BY
+                user_id,
+                server_id
+            HAVING
+                COUNT(*) > 1
+            ORDER BY
+                COUNT(*) DESC`;
         const rows = await context.database.query<{ user_id: string; server_id: string; count: string }>(selectSQL, [
             message.guild.id,
         ]);
