@@ -14,6 +14,7 @@ describe("createSilentLogger", () => {
         expect(typeof logger.printColumns).toBe("function");
         expect(typeof logger.printRows).toBe("function");
     });
+
     it("does not throw when logging at any level", () => {
         const logger = createSilentLogger();
         expect(() => logger.info("info msg")).not.toThrow();
@@ -23,11 +24,13 @@ describe("createSilentLogger", () => {
         expect(() => logger.debug("debug msg")).not.toThrow();
     });
 });
+
 describe("logger.printColumns", () => {
     it("does not throw on empty arrays", () => {
         const logger = createSilentLogger();
         expect(() => logger.printColumns([])).not.toThrow();
     });
+
     it("does not throw with data and no headers", () => {
         const logger = createSilentLogger();
         expect(() =>
@@ -37,6 +40,7 @@ describe("logger.printColumns", () => {
             ]),
         ).not.toThrow();
     });
+
     it("does not throw with data and headers", () => {
         const logger = createSilentLogger();
         expect(() =>
@@ -49,6 +53,7 @@ describe("logger.printColumns", () => {
             ),
         ).not.toThrow();
     });
+
     it("calls custom logFn with formatted columns when headers provided", () => {
         const logger = createSilentLogger();
         const output: string[] = [];
@@ -63,11 +68,13 @@ describe("logger.printColumns", () => {
         expect(output[0]).toMatch(/Name/);
     });
 });
+
 describe("logger.printRows", () => {
     it("does not throw on empty array", () => {
         const logger = createSilentLogger();
         expect(() => logger.printRows([])).not.toThrow();
     });
+
     it("formats rows with correct padding", () => {
         const logger = createSilentLogger();
         const lines: string[] = [];
@@ -82,22 +89,26 @@ describe("logger.printRows", () => {
         expect(lines).toHaveLength(3);
         expect(lines[0].length).toBe(lines[1].length);
     });
+
     it("uses custom logFn if provided", () => {
         const logger = createSilentLogger();
         const captured: string[] = [];
         logger.printRows([["a", "b"]], (line) => captured.push(line));
         expect(captured).toHaveLength(1);
     });
+
     it("uses default console output when no logFn provided", () => {
         const logger = createSilentLogger();
         expect(() => logger.printRows([["a", "b"]])).not.toThrow();
     });
 });
+
 describe("logger.error", () => {
     it("handles Error objects without throwing", () => {
         const logger = createSilentLogger();
         expect(() => logger.error(new Error("boom"))).not.toThrow();
     });
+
     it("handles non-Error messages without throwing", () => {
         const logger = createSilentLogger();
         expect(() => logger.error("plain message")).not.toThrow();

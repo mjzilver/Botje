@@ -38,6 +38,7 @@ describe("loadCommands – basic loading", () => {
         fs.mkdirSync(path.join(baseDir, "commands"), { recursive: true });
     });
     afterEach(() => teardown(baseDir));
+
     it("loads a single command", () => {
         writeCommand(path.join(baseDir, "commands"), "ping.js", {
             name: "ping",
@@ -49,6 +50,7 @@ describe("loadCommands – basic loading", () => {
         expect(result.commands.ping).toBeDefined();
         expect(result.commands.ping.name).toBe("ping");
     });
+
     it("skips disabled commands", () => {
         writeCommand(path.join(baseDir, "commands"), "disabled.js", {
             name: "disabled",
@@ -60,6 +62,7 @@ describe("loadCommands – basic loading", () => {
         const result = loadCommands(baseDir, logger);
         expect(result.commands.disabled).toBeUndefined();
     });
+
     it("registers aliases", () => {
         writeCommand(path.join(baseDir, "commands"), "help.js", {
             name: "help",
@@ -73,6 +76,7 @@ describe("loadCommands – basic loading", () => {
         expect(result.commands["?"]).toBeDefined();
         expect(result.commands.h).toBe(result.commands.help);
     });
+
     it("skips non-js/ts files", () => {
         fs.writeFileSync(path.join(baseDir, "commands", "readme.md"), "# readme");
         const result = loadCommands(baseDir, logger);
@@ -88,6 +92,7 @@ describe("loadCommands – admin + cl + dm sub-directories", () => {
         fs.mkdirSync(path.join(baseDir, "commands", "dmcommands"), { recursive: true });
     });
     afterEach(() => teardown(baseDir));
+
     it("loads admin commands into admincommands map", () => {
         writeCommand(path.join(baseDir, "commands", "admincommands"), "nuke.js", {
             name: "nuke",
@@ -99,6 +104,7 @@ describe("loadCommands – admin + cl + dm sub-directories", () => {
         expect(result.admincommands.nuke).toBeDefined();
         expect(result.commands.nuke).toBeUndefined();
     });
+
     it("loads cl commands into clcommands map", () => {
         writeCommand(path.join(baseDir, "commands", "clcommands"), "save.js", {
             name: "save",
@@ -109,6 +115,7 @@ describe("loadCommands – admin + cl + dm sub-directories", () => {
         const result = loadCommands(baseDir, logger);
         expect(result.clcommands.save).toBeDefined();
     });
+
     it("loads dm commands into dmcommands map", () => {
         writeCommand(path.join(baseDir, "commands", "dmcommands"), "help.js", {
             name: "help",
@@ -127,6 +134,7 @@ describe("loadCommands – alias edge cases", () => {
         fs.mkdirSync(path.join(baseDir, "commands"), { recursive: true });
     });
     afterEach(() => teardown(baseDir));
+
     it("handles empty alias segments gracefully", () => {
         writeCommand(path.join(baseDir, "commands"), "cmd.js", {
             name: "cmd",

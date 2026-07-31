@@ -9,6 +9,7 @@ describe("LimitedList", () => {
         list.push(3);
         expect(list.length).toBe(3);
     });
+
     it("evicts oldest item when over limit", () => {
         const list = new LimitedList<number>(3);
         list.push(1);
@@ -18,16 +19,19 @@ describe("LimitedList", () => {
         expect(list.length).toBe(3);
         expect(list.toArray()).toEqual([2, 3, 4]);
     });
+
     it("get returns last inserted item", () => {
         const list = new LimitedList<string>(5);
         list.push("a");
         list.push("b");
         expect(list.get()).toBe("b");
     });
+
     it("get returns null when empty", () => {
         const list = new LimitedList<string>(5);
         expect(list.get()).toBeNull();
     });
+
     it("remove deletes specific item", () => {
         const list = new LimitedList<number>(5);
         list.push(1);

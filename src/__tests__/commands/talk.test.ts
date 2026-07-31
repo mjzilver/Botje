@@ -18,7 +18,7 @@ describe("talk command – execution", () => {
 
         const sql: string = (context.database.query as ReturnType<typeof vi.fn>).mock.calls[0][0];
         expect(sql).not.toContain("user_id = $1");
-        expect(sql).toContain("LIMIT 5000");
+        expect(sql).toMatch(/LIMIT\s+5000/);
     });
 
     it("queries with user_id filter when mention is present", async () => {

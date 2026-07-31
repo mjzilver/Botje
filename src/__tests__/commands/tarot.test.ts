@@ -13,6 +13,7 @@ describe("guessFilename – major arcana", () => {
         });
         expect(result).toBe("00-TheFool.png");
     });
+
     it("formats double-digit value normally", () => {
         const result = guessFilename({
             type: "major",
@@ -24,6 +25,7 @@ describe("guessFilename – major arcana", () => {
         });
         expect(result).toBe("14-Temperance.png");
     });
+
     it("strips special characters from name", () => {
         const result = guessFilename({
             type: "major",
@@ -49,6 +51,7 @@ describe("guessFilename – minor arcana", () => {
         });
         expect(result).toBe("Cups03.png");
     });
+
     it("handles two-digit values", () => {
         const result = guessFilename({
             type: "minor",
@@ -61,6 +64,7 @@ describe("guessFilename – minor arcana", () => {
         });
         expect(result).toBe("Wands14.png");
     });
+
     it("returns null when suit is missing", () => {
         const result = guessFilename({
             type: "minor",
