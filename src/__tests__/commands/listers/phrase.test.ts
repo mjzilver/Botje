@@ -43,6 +43,7 @@ describe("phrase lister", () => {
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("17")),
         );
+
         expect(context.database.query).toHaveBeenCalledWith(
             expect.stringContaining("ILIKE"),
             expect.arrayContaining(["%hello%", "guild-id"]),
@@ -74,6 +75,7 @@ describe("phrase lister", () => {
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("3")),
         );
+
         expect(context.database.query).toHaveBeenCalledWith(
             expect.stringContaining("user_id"),
             expect.arrayContaining(["%hello%", "guild-id", "user-88"]),

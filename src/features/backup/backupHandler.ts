@@ -92,6 +92,7 @@ export class BackupHandler {
                 writeStream.destroy();
                 reject(err);
             });
+
             dump.stderr.on("data", (chunk: Buffer) => {
                 this.logger.error(`pg_dump stderr: ${chunk.toString()}`);
             });

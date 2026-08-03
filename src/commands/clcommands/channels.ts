@@ -27,6 +27,7 @@ export default {
 
             return 0;
         });
+
         context.logger.printColumns(
             [
                 channels.map(({ channelId }) => channelId),

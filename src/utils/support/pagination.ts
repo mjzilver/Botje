@@ -83,6 +83,7 @@ export class Pagination {
 
             await interaction.update(getPageContent(currentPage));
         });
+
         collector.on("end", async () => {
             try {
                 await this.messageHandler.edit(sentMessage, {

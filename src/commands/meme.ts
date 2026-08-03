@@ -32,6 +32,7 @@ async function processPicture(
         image.bitmap.width,
         image.bitmap.height * 0.1,
     );
+
     image.print(
         font,
         0,

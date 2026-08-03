@@ -64,6 +64,7 @@ describe("who command", () => {
             (msg.channel.messages.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
                 content: "hello world",
             });
+
             vi.mocked(context.database.query).mockResolvedValueOnce([
                 { user_id: "u1", message: "hello world", datetime: "1000000000000" },
             ]);

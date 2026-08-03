@@ -78,6 +78,7 @@ async function getRedditImage(message: BotMessage, context: IBotContext): Promis
             waitUntil: "networkidle",
             timeout: 30000,
         });
+
         await page.waitForSelector("shreddit-post", {
             timeout: 15000,
         });

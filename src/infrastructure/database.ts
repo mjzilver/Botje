@@ -150,8 +150,10 @@ export class Database implements IDatabase {
     private async initializeSchema(): Promise<void> {
         await this.query(sqlText`
             CREATE EXTENSION IF NOT EXISTS pg_trgm`);
+
         await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS images (link text PRIMARY KEY, sub text)`);
+
         await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS messages (
                 id bigint PRIMARY KEY,
@@ -162,20 +164,26 @@ export class Database implements IDatabase {
                 server_id bigint,
                 reply_to bigint NULL
             )`);
+
         await this.query(sqlText`
             CREATE INDEX IF NOT EXISTS idx_message_trgm ON messages USING gin (message gin_trgm_ops)`);
+
         await this.query(sqlText`
             CREATE INDEX IF NOT EXISTS idx_messages_server_user ON messages (server_id, user_id)`);
+
         await this.query(sqlText`
             CREATE INDEX IF NOT EXISTS idx_messages_server_datetime ON messages (server_id, datetime)`);
+
         await this.query(sqlText`
             CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages (reply_to)`);
+
         await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS command_calls (
                 call_id bigint PRIMARY KEY,
                 reply_id bigint NULL,
                 timestamp bigint
             )`);
+
         await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS reactions (
                 message_id bigint,
@@ -184,12 +192,16 @@ export class Database implements IDatabase {
                 timestamp bigint,
                 PRIMARY KEY (message_id, user_id, emoji)
             )`);
+
         await this.query(sqlText`
             CREATE INDEX IF NOT EXISTS idx_reactions_user_message ON reactions (user_id, message_id)`);
+
         await this.query(sqlText`
             CREATE INDEX IF NOT EXISTS idx_reactions_message_emoji ON reactions (message_id, emoji)`);
+
         await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS users (user_id bigint PRIMARY KEY)`);
+
         await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS usernames (
                 user_id bigint,
@@ -198,6 +210,7 @@ export class Database implements IDatabase {
                 timestamp bigint,
                 PRIMARY KEY (user_id, server_id, user_name)
             )`);
+
         await this.query(sqlText`
             CREATE TABLE IF NOT EXISTS reminders (
                 id serial PRIMARY KEY,

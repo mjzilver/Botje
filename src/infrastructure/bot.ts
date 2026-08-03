@@ -43,6 +43,7 @@ export class Bot {
             ],
             partials: [discord.Partials.Channel],
         });
+
         this.client.once("clientReady", async () => {
             await this.loadSystems();
             this.client.user?.setPresence({

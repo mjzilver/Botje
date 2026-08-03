@@ -90,6 +90,7 @@ export class SystemRegistry implements IBotContext {
             this.logger,
             () => this.client.user?.id ?? null,
         );
+
         this.eventListener = new EventListener(
             this.client,
             this.database,

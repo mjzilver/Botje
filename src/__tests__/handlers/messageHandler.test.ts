@@ -86,7 +86,7 @@ describe("MessageHandler", () => {
             await expect(handler.react(msg, "👍")).resolves.toBeUndefined();
             expect(logger.debug).toHaveBeenCalled();
         });
-    });
+    })
 
     describe("edit", () => {
         it("calls message.edit with the new content", async () => {

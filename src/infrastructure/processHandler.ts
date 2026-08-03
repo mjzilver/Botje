@@ -24,6 +24,7 @@ export function registerProcessHandlers(
     process.on("uncaughtException", (error: Error) => {
         handleError(error, "An error occured, this is probably your fault!");
     });
+
     process.on("unhandledRejection", (error: unknown) => {
         handleError(error, "An error occured, this is probably your fault, do not @me!");
     });

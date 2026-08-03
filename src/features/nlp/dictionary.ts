@@ -39,11 +39,13 @@ export class Dictionary {
         stream.on("data", (chunk: string | Buffer) => {
             rawData += chunk.toString();
         });
+
         stream.on("end", () => {
             this.words = JSON.parse(rawData) as WordEntry[];
             this.stopWordsCache = null;
             this.stopWordsSet = null;
         });
+
         stream.on("error", (err) => {
             this.logger.error(toError(err));
         });

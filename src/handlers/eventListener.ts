@@ -38,6 +38,7 @@ export class EventListener {
         client.on(Events.ShardError, (err: Error) => {
             logger.error(`Shard error: ${err.message}`);
         });
+
         client.on(Events.Error, (err: Error) => {
             logger.error(`Client error: ${err.message}`);
         });
@@ -76,6 +77,7 @@ export class EventListener {
                 logger.error(toError(err));
             }
         });
+
         client.on(
             Events.MessageUpdate,
             async (
@@ -117,9 +119,11 @@ export class EventListener {
         client.on(Events.GuildEmojiCreate, (emoji: EmojiLike) => {
             backupHandler.saveEmoji(emoji, emoji.guild.name);
         });
+
         client.on(Events.GuildEmojiDelete, (emoji: EmojiLike) => {
             backupHandler.saveEmoji(emoji, emoji.guild.name, "_deleted");
         });
+
         client.on(Events.GuildEmojiUpdate, (oldEmoji: EmojiLike, newEmoji: EmojiLike) => {
             backupHandler.saveEmoji(oldEmoji, oldEmoji.guild.name, "_old");
             backupHandler.saveEmoji(newEmoji, newEmoji.guild.name);

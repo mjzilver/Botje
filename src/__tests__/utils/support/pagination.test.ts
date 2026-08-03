@@ -56,6 +56,7 @@ describe("Pagination.createPages", () => {
 
             return new EmbedBuilder();
         });
+
         expect(received).toEqual([
             { pageNum: 1, totalPages: 3 },
             { pageNum: 2, totalPages: 3 },

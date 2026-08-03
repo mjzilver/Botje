@@ -36,6 +36,7 @@ describe("count lister", () => {
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("42")),
         );
+
         expect(context.database.query).toHaveBeenCalledWith(
             expect.stringContaining("COUNT(*)"),
             expect.arrayContaining(["guild-id"]),
@@ -52,6 +53,7 @@ describe("count lister", () => {
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("7")),
         );
+
         expect(context.database.query).toHaveBeenCalledWith(
             expect.stringContaining("user_id"),
             expect.arrayContaining(["guild-id", "user-99"]),

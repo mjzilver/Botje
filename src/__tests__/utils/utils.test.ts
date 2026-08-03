@@ -23,6 +23,7 @@ describe("levenshtein", () => {
         expect(levenshtein("kitten", "sitting")).toBe(3);
     });
 });
+
 describe("findClosestMatchInList", () => {
     it("finds exact match", () => {
         expect(findClosestMatchInList("cat", ["cat", "dog", "bird"])).toBe("cat");
@@ -55,6 +56,7 @@ describe("findClosestMatchInList", () => {
         expect(findClosestMatchInList("hello", ["world"])).toBe("world");
     });
 });
+
 describe("formatUptime", () => {
     it("shows only seconds for short durations", () => {
         expect(formatUptime(5000)).toBe("5 seconds");
@@ -72,6 +74,7 @@ describe("formatUptime", () => {
         expect(formatUptime(86400000 + 3600000)).toBe("1 days, 1 hours, 0 seconds");
     });
 });
+
 describe("randomBetween", () => {
     it("returns value within inclusive range", () => {
         for (let i = 0; i < 100; i++) {
@@ -85,6 +88,7 @@ describe("randomBetween", () => {
         expect(randomBetween(3, 3)).toBe(3);
     });
 });
+
 describe("pickRandomItem", () => {
     it("returns an item from the array", () => {
         const arr = [1, 2, 3, 4, 5];

@@ -38,6 +38,7 @@ describe("guessFilename – major arcana", () => {
         expect(result).toBe("01-TheMagician.png");
     });
 });
+
 describe("guessFilename – minor arcana", () => {
     it("capitalises suit and pads value", () => {
         const result = guessFilename({

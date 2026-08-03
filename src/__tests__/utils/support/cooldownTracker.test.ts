@@ -7,6 +7,7 @@ describe("CooldownTracker", () => {
         tracker = new CooldownTracker();
         vi.useFakeTimers();
     });
+
     afterEach(() => {
         vi.useRealTimers();
     });

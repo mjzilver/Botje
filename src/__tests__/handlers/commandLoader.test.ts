@@ -31,6 +31,7 @@ describe("loadCommands – non-existent dir", () => {
         expect(Object.keys(result.dmcommands)).toHaveLength(0);
     });
 });
+
 describe("loadCommands – basic loading", () => {
     let baseDir: string;
     beforeEach(() => {
@@ -83,6 +84,7 @@ describe("loadCommands – basic loading", () => {
         expect(Object.keys(result.commands)).toHaveLength(0);
     });
 });
+
 describe("loadCommands – admin + cl + dm sub-directories", () => {
     let baseDir: string;
     beforeEach(() => {
@@ -127,6 +129,7 @@ describe("loadCommands – admin + cl + dm sub-directories", () => {
         expect(result.dmcommands.help).toBeDefined();
     });
 });
+
 describe("loadCommands – alias edge cases", () => {
     let baseDir: string;
     beforeEach(() => {
