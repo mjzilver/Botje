@@ -1,16 +1,6 @@
-import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
+import { makeMentionedMessage, makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import phraseCommand from "../../../commands/listers/phrase";
-import type { BotUser } from "../../../interfaces/discord";
-
-function withMention(content: string, mentionId: string, username: string) {
-    const mention = { id: mentionId, username } as BotUser;
-    const msg = makeMessage(content);
-
-    msg.mentions = { ...msg.mentions, users: Object.assign(new Map([[mentionId, mention]]), { first: () => mention }) };
-
-    return msg;
-}
 
 describe("phrase lister", () => {
     beforeEach(() => vi.clearAllMocks());
@@ -70,7 +60,7 @@ describe("phrase lister", () => {
         vi.mocked(context.database.query).mockResolvedValueOnce([{ count: "3" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Mia");
 
-        phraseCommand.function(withMention("!phrase <@user-88> hello", "user-88", "Mia"), context);
+        phraseCommand.function(makeMentionedMessage("!phrase <@user-88> hello", "user-88", "Mia"), context);
 
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("3")),

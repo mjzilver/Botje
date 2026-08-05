@@ -1,16 +1,6 @@
-import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
+import { makeMentionedMessage, makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import repliesCommand from "../../../commands/listers/replies";
-import type { BotUser } from "../../../interfaces/discord";
-
-function withMention(content: string, mentionId: string, username: string) {
-    const mention = { id: mentionId, username } as BotUser;
-    const msg = makeMessage(content);
-
-    msg.mentions = { ...msg.mentions, users: Object.assign(new Map([[mentionId, mention]]), { first: () => mention }) };
-
-    return msg;
-}
 
 describe("replies lister", () => {
     beforeEach(() => vi.clearAllMocks());
@@ -60,7 +50,7 @@ describe("replies lister", () => {
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValue("Dave");
         vi.mocked(context.pagination.createPages).mockResolvedValueOnce([]);
 
-        repliesCommand.function(withMention("!replies @Dave", "user-55", "Dave"), context);
+        repliesCommand.function(makeMentionedMessage("!replies @Dave", "user-55", "Dave"), context);
 
         await vi.waitFor(() => expect(context.pagination.sendPaginatedEmbed).toHaveBeenCalled());
         expect(context.database.query).toHaveBeenCalledWith(

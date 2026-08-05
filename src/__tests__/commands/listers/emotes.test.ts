@@ -1,16 +1,6 @@
-import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
+import { makeMentionedMessage, makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import emotesCommand from "../../../commands/listers/emotes";
-import type { BotUser } from "../../../interfaces/discord";
-
-function withMention(content: string, mentionId: string, username: string) {
-    const mention = { id: mentionId, username } as BotUser;
-    const msg = makeMessage(content);
-
-    msg.mentions = { ...msg.mentions, users: Object.assign(new Map([[mentionId, mention]]), { first: () => mention }) };
-
-    return msg;
-}
 
 describe("emotes lister", () => {
     beforeEach(() => vi.clearAllMocks());
@@ -63,7 +53,7 @@ describe("emotes lister", () => {
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Grace");
         vi.mocked(context.pagination.createPages).mockResolvedValueOnce([]);
 
-        emotesCommand.function(withMention("!emotes @Grace", "user-33", "Grace"), context);
+        emotesCommand.function(makeMentionedMessage("!emotes @Grace", "user-33", "Grace"), context);
 
         await vi.waitFor(() => expect(context.pagination.sendPaginatedEmbed).toHaveBeenCalled());
         expect(context.database.query).toHaveBeenCalledWith(

@@ -8,18 +8,8 @@ vi.mock("../../../systems/queryCache", () => ({
     },
 }));
 
-import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
+import { makeMentionedMessage, makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import scoreCommand from "../../../commands/listers/score";
-import type { BotUser } from "../../../interfaces/discord";
-
-function withMention(content: string, mentionId: string, username: string) {
-    const mention = { id: mentionId, username } as BotUser;
-    const msg = makeMessage(content);
-
-    msg.mentions = { ...msg.mentions, users: Object.assign(new Map([[mentionId, mention]]), { first: () => mention }) };
-
-    return msg;
-}
 
 describe("score lister", () => {
     beforeEach(() => vi.clearAllMocks());
@@ -40,7 +30,7 @@ describe("score lister", () => {
         vi.mocked(context.database.query).mockResolvedValueOnce([{ user_id: "user-44", total_chars: "12345" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Hank");
 
-        scoreCommand.function(withMention("!score @Hank", "user-44", "Hank"), context);
+        scoreCommand.function(makeMentionedMessage("!score @Hank", "user-44", "Hank"), context);
 
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(
@@ -55,7 +45,7 @@ describe("score lister", () => {
         vi.mocked(context.database.query).mockResolvedValueOnce([]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Ida");
 
-        scoreCommand.function(withMention("!score @Ida", "user-45", "Ida"), context);
+        scoreCommand.function(makeMentionedMessage("!score @Ida", "user-45", "Ida"), context);
 
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("0")),

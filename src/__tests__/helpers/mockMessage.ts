@@ -95,6 +95,18 @@ export function makeMessage(content: string, opts: MessageOptions = {}): BotMess
     } as BotMessage;
 }
 
+export function makeMentionedMessage(content: string, mentionId: string, username: string): BotMessage {
+    const mention = makeBotUser({ id: mentionId, username });
+    const message = makeMessage(content);
+
+    message.mentions = {
+        ...message.mentions,
+        users: Object.assign(new Map([[mentionId, mention]]), { first: () => mention }),
+    };
+
+    return message;
+}
+
 export function makeNoGuildMessage(content: string): BotMessage {
     return { ...makeMessage(content), guild: null } as BotMessage;
 }

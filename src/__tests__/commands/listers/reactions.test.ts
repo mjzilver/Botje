@@ -9,18 +9,8 @@ vi.mock("../../../services/queryCache", () => ({
     },
 }));
 
-import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
+import { makeMentionedMessage, makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import reactionsCommand from "../../../commands/listers/reactions";
-import type { BotUser } from "../../../interfaces/discord";
-
-function withMention(content: string, mentionId: string, username: string) {
-    const mention = { id: mentionId, username } as BotUser;
-    const msg = makeMessage(content);
-
-    msg.mentions = { ...msg.mentions, users: Object.assign(new Map([[mentionId, mention]]), { first: () => mention }) };
-
-    return msg;
-}
 
 describe("reactions lister", () => {
     beforeEach(() => vi.clearAllMocks());
@@ -73,7 +63,7 @@ describe("reactions lister", () => {
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Carol");
         vi.mocked(context.pagination.createPages).mockResolvedValueOnce([]);
 
-        reactionsCommand.function(withMention("!reactions @Carol", "user-77", "Carol"), context);
+        reactionsCommand.function(makeMentionedMessage("!reactions @Carol", "user-77", "Carol"), context);
 
         await vi.waitFor(() => expect(context.pagination.sendPaginatedEmbed).toHaveBeenCalled());
         expect(context.database.query).toHaveBeenCalledWith(

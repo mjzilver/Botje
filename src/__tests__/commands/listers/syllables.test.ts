@@ -8,18 +8,8 @@ vi.mock("../../../systems/queryCache", () => ({
     },
 }));
 
-import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
+import { makeMentionedMessage, makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import syllablesCommand from "../../../commands/listers/syllables";
-import type { BotUser } from "../../../interfaces/discord";
-
-function withMention(content: string, mentionId: string, username: string) {
-    const mention = { id: mentionId, username } as BotUser;
-    const msg = makeMessage(content);
-
-    msg.mentions = { ...msg.mentions, users: Object.assign(new Map([[mentionId, mention]]), { first: () => mention }) };
-
-    return msg;
-}
 
 describe("syllables lister", () => {
     beforeEach(() => vi.clearAllMocks());
@@ -43,7 +33,7 @@ describe("syllables lister", () => {
         ]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Jake");
 
-        syllablesCommand.function(withMention("!syllables @Jake", "user-66", "Jake"), context);
+        syllablesCommand.function(makeMentionedMessage("!syllables @Jake", "user-66", "Jake"), context);
 
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(

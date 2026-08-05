@@ -1,17 +1,6 @@
-import { makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
+import { makeMentionedMessage, makeMessage, makeMockContext, makeNoGuildMessage } from "@test/helpers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import countCommand from "../../../commands/listers/count";
-import type { BotUser } from "../../../interfaces/discord";
-
-function withMention(content: string, mentionId: string, username: string) {
-    const mention = { id: mentionId, username } as BotUser;
-    const msg = makeMessage(content);
-
-    msg.mentions.users.set(mentionId, mention);
-    msg.mentions = { ...msg.mentions, users: Object.assign(new Map([[mentionId, mention]]), { first: () => mention }) };
-
-    return msg;
-}
 
 describe("count lister", () => {
     beforeEach(() => vi.clearAllMocks());
@@ -48,7 +37,7 @@ describe("count lister", () => {
         vi.mocked(context.database.query).mockResolvedValueOnce([{ count: "7" }]);
         vi.mocked(context.userHandler.getDisplayName).mockResolvedValueOnce("Alice");
 
-        countCommand.function(withMention("!count @Alice", "user-99", "Alice"), context);
+        countCommand.function(makeMentionedMessage("!count @Alice", "user-99", "Alice"), context);
 
         await vi.waitFor(() =>
             expect(context.messageHandler.send).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("7")),
