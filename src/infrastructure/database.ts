@@ -269,12 +269,15 @@ export class Database implements IDatabase {
         serverId: string | null,
         displayName: string | null = null,
     ): Promise<void> {
-        await this.query(sqlText`
-            INSERT INTO
-                users (user_id)
-            VALUES
-                ($1::bigint)
-            ON CONFLICT DO NOTHING`, [user.id]);
+        await this.query(
+            sqlText`
+                INSERT INTO
+                    users (user_id)
+                VALUES
+                    ($1::bigint)
+                ON CONFLICT DO NOTHING`,
+            [user.id],
+        );
         if (serverId && displayName) {
             await this.query(
                 sqlText`
@@ -361,15 +364,15 @@ export class Database implements IDatabase {
 
     async updateMessage(message: BotMessage): Promise<void> {
         try {
-            await this.query(sqlText`
-                UPDATE messages
-                SET
-                    message = $1
-                WHERE
-                    id = $2::bigint`, [
-                message.cleanContent,
-                message.id,
-            ]);
+            await this.query(
+                sqlText`
+                    UPDATE messages
+                    SET
+                        message = $1
+                    WHERE
+                        id = $2::bigint`,
+                [message.cleanContent, message.id],
+            );
         } catch {
             this.logger.error(`Failed to update: ${message.content}`);
         }
@@ -489,10 +492,13 @@ export class Database implements IDatabase {
     }
 
     async deleteReminder(id: number): Promise<void> {
-        await this.query(sqlText`
-            DELETE FROM reminders
-            WHERE
-                id = $1`, [id]);
+        await this.query(
+            sqlText`
+                DELETE FROM reminders
+                WHERE
+                    id = $1`,
+            [id],
+        );
     }
 
     async getPendingReminders(): Promise<ReminderRow[]> {

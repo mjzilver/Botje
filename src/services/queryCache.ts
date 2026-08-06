@@ -4,7 +4,11 @@ type CacheValue = boolean | number | string | null | object;
 
 const cache = new Map<string, { promise: Promise<CacheValue>; expiry: number }>();
 
-export function queryCache<T extends CacheValue>(key: string, factory: () => Promise<T>, ttl = CACHE_TTL_MS): Promise<T> {
+export function queryCache<T extends CacheValue>(
+    key: string,
+    factory: () => Promise<T>,
+    ttl = CACHE_TTL_MS,
+): Promise<T> {
     const entry = cache.get(key);
     if (entry && entry.expiry > Date.now()) {
         return entry.promise as Promise<T>;

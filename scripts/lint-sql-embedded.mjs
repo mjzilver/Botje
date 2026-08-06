@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import ts from "typescript";
 import { format } from "sql-formatter";
+import ts from "typescript";
 
 const args = new Set(process.argv.slice(2));
 const fixMode = args.has("--fix");
@@ -58,7 +58,9 @@ function lintTaggedTemplate(filePath, sourceFile, node, issues, edits) {
 
     const sqlText = node.template.text;
     try {
-        const formatted = stripTrailingSemicolon(formatSql(sqlText)).split("\n").map((line) => line.trimEnd());
+        const formatted = stripTrailingSemicolon(formatSql(sqlText))
+            .split("\n")
+            .map((line) => line.trimEnd());
         const starts = sourceFile.getLineStarts();
         const pos = node.getStart(sourceFile);
         const { line } = sourceFile.getLineAndCharacterOfPosition(pos);
@@ -69,7 +71,14 @@ function lintTaggedTemplate(filePath, sourceFile, node, issues, edits) {
         const expectedSql = expectedSource.slice("sqlText`\n".length, -1);
 
         if (normalizeSql(sqlText) !== normalizeSql(expectedSql)) {
-            addIssue(issues, filePath, sourceFile, node, "format", "sqlText template should match sql-formatter output");
+            addIssue(
+                issues,
+                filePath,
+                sourceFile,
+                node,
+                "format",
+                "sqlText template should match sql-formatter output",
+            );
         }
 
         if (fixMode && currentSource !== expectedSource) {
@@ -112,9 +121,9 @@ function lintFile(filePath, issues) {
 
 function runLintPass() {
     const issues = [];
-    issues.seen = new Set();    
+    issues.seen = new Set();
     let fixedFiles = 0;
-    
+
     for (const filePath of files) {
         fixedFiles += lintFile(filePath, issues);
     }

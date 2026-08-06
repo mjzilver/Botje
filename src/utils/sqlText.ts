@@ -1,5 +1,5 @@
 export function sqlText(
-    strings: TemplateStringsArray, 
+    strings: TemplateStringsArray,
     ...values: readonly (string | number | boolean | null)[]
 ): string {
     let result = strings[0] ?? "";
