@@ -1,7 +1,8 @@
 import Jimp from "jimp";
+import { readGuildEmoteDir } from "../features/emoji/emoteDirectory";
 import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
-import { findClosestMatchInList, pickRandomItem, readGuildEmoteDir } from "../utils";
+import { findClosestMatchInList, pickRandomItem } from "../utils";
 
 const emoteParser = /:(.+?)(~.*)?:[0-9]*/;
 

@@ -1,4 +1,3 @@
-import { getBotContext } from "../infrastructure/botContext";
 import type { ICommand } from "../interfaces";
 import { toError } from "../utils";
 
@@ -39,8 +38,7 @@ export default {
     name: "remind",
     description: "schedules a reminder for a given duration",
     format: "remind [duration] [message]",
-    async function(message) {
-        const context = getBotContext();
+    async function(message, context) {
         const args = message.content.split(/\s+/).slice(1);
 
         if (args.length < 2) {

@@ -1,7 +1,8 @@
 import fs from "node:fs";
+import { readGuildEmoteDir } from "../features/emoji/emoteDirectory";
 import type { ICommand } from "../interfaces";
 import { EmbedBuilder } from "../interfaces/discord";
-import { findClosestMatchInList, readGuildEmoteDir } from "../utils";
+import { findClosestMatchInList } from "../utils";
 
 export default {
     name: "getemote",

@@ -1,6 +1,7 @@
-import { cliToMessage, findChannel, getTextChannels } from "../../adapters/messageAdapter";
+import { cliToMessage, findChannel } from "../../adapters/messageAdapter";
 import type { CommandOption, IBotContext, IClCommand, ICommand } from "../../interfaces";
 import { toError } from "../../utils";
+import { completeTextChannelNames } from "./completerHelpers";
 
 const CALL_DELAY_MS = 800;
 const SKIP_COMMANDS = new Set(["ask", "tarot", "hangman"]);
@@ -124,7 +125,7 @@ export default {
     },
     completer(argIndex: number, context: IBotContext, _input: string[]): string[] {
         if (argIndex === 0) {
-            return getTextChannels(context.client).map((ch) => ch.name);
+            return completeTextChannelNames(context);
         }
 
         return [];

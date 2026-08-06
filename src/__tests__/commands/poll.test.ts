@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../infrastructure/botContext");
-
 import { makeMessage, makeMockContext } from "@test/helpers";
 import pollCommand from "../../commands/poll";
-import { getBotContext } from "../../infrastructure/botContext";
-import type { SystemRegistry } from "../../infrastructure/systemRegistry";
 import type { ICommand } from "../../interfaces";
 
 const runPoll = (pollCommand as ICommand).function.bind(pollCommand);
@@ -16,8 +12,6 @@ describe("poll command", () => {
     it("replies usage when question is not wrapped in quotes", async () => {
         const context = makeMockContext();
 
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
-
         await runPoll(makeMessage("!poll no quotes here"), context);
 
         expect(context.messageHandler.reply).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("Usage"));
@@ -25,8 +19,6 @@ describe("poll command", () => {
 
     it("replies error when fewer than 2 options are given", async () => {
         const context = makeMockContext();
-
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
 
         await runPoll(makeMessage('!poll "Question?" alone'), context);
 
@@ -39,8 +31,6 @@ describe("poll command", () => {
     it("replies error when more than 5 options are given", async () => {
         const context = makeMockContext();
 
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
-
         await runPoll(makeMessage('!poll "Q?" a b c d e f'), context);
 
         expect(context.messageHandler.reply).toHaveBeenCalledWith(
@@ -51,8 +41,6 @@ describe("poll command", () => {
 
     it("sends an embed for a valid poll", async () => {
         const context = makeMockContext();
-
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
 
         const sentMsg = makeMessage("poll embed");
 
@@ -65,8 +53,6 @@ describe("poll command", () => {
 
     it("reacts with numbered emojis for each option", async () => {
         const context = makeMockContext();
-
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
 
         const sentMsg = makeMessage("poll embed");
 
@@ -81,8 +67,6 @@ describe("poll command", () => {
 
     it("skips reactions when send returns undefined", async () => {
         const context = makeMockContext();
-
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
         vi.mocked(context.messageHandler.send).mockResolvedValueOnce(null);
 
         await runPoll(makeMessage('!poll "Question?" yes no'), context);

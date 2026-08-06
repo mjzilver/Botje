@@ -52,11 +52,7 @@ export class MessageIterator {
     async iterate(channel: FetchableChannel, startMessageId?: string | null): Promise<void> {
         const messageId = startMessageId ?? channel.lastMessageId;
         if (!messageId) {
-            if (this.logProgress) {
-                this.logger.console(`No messages found in ${channel.name ?? "channel"}`);
-            }
-
-            this.onComplete?.(this.stats);
+            this.complete(`No messages found in ${channel.name ?? "channel"}`);
 
             return;
         }
@@ -64,55 +60,74 @@ export class MessageIterator {
         await this.fetchBatch(channel, messageId);
     }
 
+    private complete(logLine?: string): void {
+        if (this.logProgress && logLine) {
+            this.logger.console(logLine);
+        }
+
+        this.onComplete?.(this.stats);
+    }
+
+    private shouldContinue(messages: Map<string, IterableMessage>): boolean {
+        return messages.size === 100 && this.stats.totalProcessed < this.limit;
+    }
+
+    private async processMessages(
+        messages: Map<string, IterableMessage>,
+        initialMessageId: string,
+    ): Promise<{ lastId: string; size: number }> {
+        let lastId = initialMessageId;
+        for (const [id, message] of messages) {
+            await this.onMessage(message);
+            lastId = id;
+            this.stats.totalProcessed++;
+        }
+
+        return { lastId, size: messages.size };
+    }
+
+    private logBatchProgress(channel: FetchableChannel, size: number): void {
+        if (this.logProgress && size === 100) {
+            this.logger.console(
+                `${this.stats.totalProcessed} messages from ${channel.name} in ${channel.guild?.name ?? "DM"}`,
+            );
+        }
+    }
+
     private async fetchBatch(channel: FetchableChannel, messageId: string): Promise<void> {
         const remaining = this.limit - this.stats.totalProcessed;
         if (remaining <= 0) {
-            if (this.logProgress) {
-                this.logger.console(`Limit reached: ${this.stats.totalProcessed} messages from ${channel.name}`);
-            }
-
-            this.onComplete?.(this.stats);
+            this.complete(`Limit reached: ${this.stats.totalProcessed} messages from ${channel.name}`);
 
             return;
         }
 
         const fetchLimit = Math.min(100, remaining);
+        let messages: Map<string, IterableMessage>;
         try {
-            const messages = await channel.messages.fetch({ limit: fetchLimit, before: messageId });
-            if (messages.size === 0) {
-                if (this.logProgress) {
-                    this.logger.console(`End reached: ${this.stats.totalProcessed} messages from ${channel.name}`);
-                }
-
-                this.onComplete?.(this.stats);
-
-                return;
-            }
-
-            let lastId = messageId;
-            for (const [id, message] of messages) {
-                await this.onMessage(message);
-                lastId = id;
-                this.stats.totalProcessed++;
-            }
-
-            if (this.logProgress && messages.size === 100) {
-                this.logger.console(
-                    `${this.stats.totalProcessed} messages from ${channel.name} in ${channel.guild?.name ?? "DM"}`,
-                );
-            }
-            if (messages.size === 100 && this.stats.totalProcessed < this.limit) {
-                await this.fetchBatch(channel, lastId);
-            } else {
-                if (this.logProgress) {
-                    this.logger.console(`Done: ${this.stats.totalProcessed} messages from ${channel.name}`);
-                }
-
-                this.onComplete?.(this.stats);
-            }
+            messages = await channel.messages.fetch({ limit: fetchLimit, before: messageId });
         } catch (err) {
             this.logger.error(`Error fetching from ${channel.name}: ${toError(err).message}`);
-            this.onComplete?.(this.stats);
+            this.complete();
+
+            return;
         }
+
+        if (messages.size === 0) {
+            this.complete(`End reached: ${this.stats.totalProcessed} messages from ${channel.name}`);
+
+            return;
+        }
+
+        const { lastId, size } = await this.processMessages(messages, messageId);
+        this.logBatchProgress(channel, size);
+
+        if (this.shouldContinue(messages)) {
+            await this.fetchBatch(channel, lastId);
+
+            return;
+        }
+
+        this.complete(`Done: ${this.stats.totalProcessed} messages from ${channel.name}`);
     }
 }

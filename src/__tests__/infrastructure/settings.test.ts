@@ -5,9 +5,41 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { Settings } from "../../infrastructure/settings";
 import type { BotConfig } from "../../interfaces/config";
 
-const MINIMAL_CONFIG: Partial<BotConfig> = {
+const VALID_CONFIG: BotConfig = {
     prefix: "!",
+    botName: "botje",
+    discordApiKey: "discord",
+    discordApiKeyBeta: "discord-beta",
+    weatherApiKey: "weather",
+    youtubeApiKey: "youtube",
+    owner: "owner-id",
+    speakEvery: 20,
+    speakMinTimeoutMinutes: 20,
+    speakMaxTimeoutMinutes: 60,
+    speakRandomChance: 20,
+    downvoteThreshold: 3,
     timeoutDuration: 30,
+    colorHex: "#bab3be",
+    positiveEmoji: "⬆️",
+    negativeEmoji: "⬇️",
+    redoEmoji: "🔁",
+    db: {
+        user: "botje",
+        host: "localhost",
+        database: "botdb",
+        password: "pw",
+        port: 5432,
+        poolSize: 25,
+    },
+    llm: {
+        model: "model",
+        api: "http://localhost",
+        basePrompt: "base",
+        conversationPrompt: "conversation",
+        tarotPrompt: "tarot",
+        maxConcurrentRequests: 3,
+    },
+    shouldScanOnStartup: true,
 };
 const noop = { error: () => {} };
 
@@ -21,7 +53,7 @@ function writeTempConfig(data: object): string {
 describe("Settings", () => {
     let tmpFile: string;
     beforeEach(() => {
-        tmpFile = writeTempConfig(MINIMAL_CONFIG);
+        tmpFile = writeTempConfig(VALID_CONFIG);
     });
 
     afterEach(() => {
@@ -36,15 +68,25 @@ describe("Settings", () => {
         expect(settings.config.timeoutDuration).toBe(30);
     });
 
-    it("returns an empty object when the file does not exist", () => {
-        const settings = new Settings(noop, "/nonexistent/path/config.json");
-        expect(settings.config).toEqual({});
+    it("throws when the file does not exist", () => {
+        expect(() => new Settings(noop, "/nonexistent/path/config.json")).toThrow("Invalid config file");
+    });
+
+    it("throws when a required field is missing", () => {
+        const invalidFile = writeTempConfig({ prefix: "!" });
+
+        expect(() => new Settings(noop, invalidFile)).toThrow("Invalid config file");
+
+        if (fs.existsSync(invalidFile)) {
+            fs.unlinkSync(invalidFile);
+        }
     });
 
     it("logs an error when the file does not exist", () => {
         const errors: string[] = [];
         const logger = { error: (msg: string) => errors.push(msg) };
-        new Settings(logger, "/nonexistent/path/config.json");
+
+        expect(() => new Settings(logger, "/nonexistent/path/config.json")).toThrow("Invalid config file");
         expect(errors.length).toBe(1);
         expect(errors[0]).toContain("Error loading config file");
     });

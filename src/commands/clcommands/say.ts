@@ -1,6 +1,7 @@
-import { findChannel, getTextChannels } from "../../adapters/messageAdapter";
+import { findChannel } from "../../adapters/messageAdapter";
 import { generateMimicMessage } from "../../features/mimic/textGenerationService";
 import type { IBotContext, IClCommand } from "../../interfaces";
+import { completeTextChannelNames } from "./completerHelpers";
 
 function findUserId(input: string, guildId: string, context: IBotContext): string | null {
     const guild = context.client.guilds.cache.get(guildId);
@@ -77,7 +78,7 @@ export default {
     },
     completer(argIndex: number, context: IBotContext, input: string[]): string[] {
         if (argIndex === 0) {
-            return getTextChannels(context.client).map((ch) => ch.name);
+            return completeTextChannelNames(context);
         }
 
         if (argIndex === 1) {

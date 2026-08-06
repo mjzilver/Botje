@@ -1,5 +1,3 @@
-import fs from "node:fs";
-
 export function levenshtein(a: string, b: string): number {
     if (a.length === 0) {
         return b.length;
@@ -92,9 +90,3 @@ export function toError(err: unknown): Error {
 }
 
 export const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
-export function readGuildEmoteDir(guildId: string | null): { path: string; files: string[] } {
-    const path = `backups/emotes/${guildId}/`;
-
-    return { path, files: fs.readdirSync(path) };
-}

@@ -52,8 +52,7 @@ export class SystemRegistry implements IBotContext {
         this.client = client;
     }
 
-    async initialize(disallowed: Record<string, boolean>): Promise<void> {
-        this.disallowed = disallowed;
+    private async initializeCoreServices(): Promise<void> {
         this.database = Database.fromConfig(this.config, this.logger);
         await this.database.initialize();
         this.messageHandler = new MessageHandler(this.database, this.logger, this.config);
@@ -63,8 +62,9 @@ export class SystemRegistry implements IBotContext {
         this.hangman = new HangmanGame(this.messageHandler, this.dictionary, this.config, this.logger);
         this.pagination = new Pagination(this.messageHandler, this.logger);
         this.llm = new LlmService(this.config.llm, this.logger, this.messageHandler);
-        const loadedCommands = loadCommands(path.resolve(__dirname, ".."), this.logger);
-        this.loadedCommands = loadedCommands;
+    }
+
+    private initializeCommandHandler(loadedCommands: LoadedCommands): void {
         this.commandHandler = new CommandHandler({
             commands: loadedCommands,
             messageHandler: this.messageHandler,
@@ -76,12 +76,16 @@ export class SystemRegistry implements IBotContext {
             context: this,
         });
         this.messageHandler.setCommandListRemover((msg) => this.commandHandler.commandList.remove(msg));
+    }
+
+    private initializeSupportServices(): void {
         this.webhook = new WebhookService(this.logger, this.client, this.config);
         this.emoteInjector = new EmoteInjector(this.webhook, this.messageHandler, this.client);
         this.userHandler = new UserHandler(this.database, this.logger, this.client);
         this.backupHandler = new BackupHandler(this.logger, this.config, this.client);
-        this.slashHandler = new SlashHandler(this.logger, this.client, this);
-        await this.slashHandler.registerCommands(loadedCommands.commands);
+    }
+
+    private initializeEventServices(): void {
         this.reactionHandler = new ReactionHandler(
             this.database,
             this.commandHandler,
@@ -102,7 +106,23 @@ export class SystemRegistry implements IBotContext {
             this.disallowed,
             this.reactionHandler,
         );
+    }
+
+    private async initializeSlashAndReminders(loadedCommands: LoadedCommands): Promise<void> {
+        this.slashHandler = new SlashHandler(this.logger, this.client, this);
+        await this.slashHandler.registerCommands(loadedCommands.commands);
         this.reminderScheduler = new ReminderScheduler(this.client, this.database, this.logger);
         await this.reminderScheduler.loadPending();
+    }
+
+    async initialize(disallowed: Record<string, boolean>): Promise<void> {
+        this.disallowed = disallowed;
+        await this.initializeCoreServices();
+        const loadedCommands = loadCommands(path.resolve(__dirname, ".."), this.logger);
+        this.loadedCommands = loadedCommands;
+        this.initializeCommandHandler(loadedCommands);
+        this.initializeSupportServices();
+        await this.initializeSlashAndReminders(loadedCommands);
+        this.initializeEventServices();
     }
 }

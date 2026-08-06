@@ -3,7 +3,7 @@ import { pipeline } from "node:stream/promises";
 import axios from "axios";
 import type { ICommand } from "../../interfaces";
 import { toError } from "../../utils";
-import { resolveImageUrl } from "../../utils/helpers/stringHelpers";
+import { resolveImageUrl } from "../../utils/support/messageMedia";
 
 export default {
     name: "addmeme",

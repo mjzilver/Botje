@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../infrastructure/botContext");
-
 import { makeMessage, makeMockContext } from "@test/helpers";
 import remindCommand from "../../commands/remind";
-import { getBotContext } from "../../infrastructure/botContext";
-import type { SystemRegistry } from "../../infrastructure/systemRegistry";
 import type { ICommand } from "../../interfaces";
 
 const runRemind = (remindCommand as ICommand).function.bind(remindCommand);
@@ -16,8 +12,6 @@ describe("remind command", () => {
     it("replies usage when fewer than 2 args are given", async () => {
         const context = makeMockContext();
 
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
-
         await runRemind(makeMessage("!remind"), context);
 
         expect(context.messageHandler.reply).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("Usage"));
@@ -25,8 +19,6 @@ describe("remind command", () => {
 
     it("replies format error for an invalid duration string", async () => {
         const context = makeMockContext();
-
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
 
         await runRemind(makeMessage("!remind soon feed the cat"), context);
 
@@ -39,8 +31,6 @@ describe("remind command", () => {
     it("replies cap message when duration exceeds 24 hours", async () => {
         const context = makeMockContext();
 
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
-
         await runRemind(makeMessage("!remind 25h too long"), context);
 
         expect(context.messageHandler.reply).toHaveBeenCalledWith(
@@ -51,8 +41,6 @@ describe("remind command", () => {
 
     it("schedules reminder and confirms in seconds", async () => {
         const context = makeMockContext();
-
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
         vi.mocked(context.reminderScheduler.schedule).mockResolvedValueOnce(undefined);
 
         await runRemind(makeMessage("!remind 30s water the plants"), context);
@@ -63,8 +51,6 @@ describe("remind command", () => {
 
     it("confirms reminder with 'minute(s)' for a minute-based duration", async () => {
         const context = makeMockContext();
-
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
         vi.mocked(context.reminderScheduler.schedule).mockResolvedValueOnce(undefined);
 
         await runRemind(makeMessage("!remind 15m stand up"), context);
@@ -74,8 +60,6 @@ describe("remind command", () => {
 
     it("confirms reminder with 'hour(s)' for an hour-based duration", async () => {
         const context = makeMockContext();
-
-        vi.mocked(getBotContext).mockReturnValue(context as unknown as SystemRegistry);
         vi.mocked(context.reminderScheduler.schedule).mockResolvedValueOnce(undefined);
 
         await runRemind(makeMessage("!remind 2h call mum"), context);

@@ -3,7 +3,8 @@ import Jimp from "jimp";
 import type { IBotContext, ICommand } from "../interfaces";
 import type { BotMessage } from "../interfaces/discord";
 import { sqlText } from "../utils";
-import { replaceFancyQuotes, resolveImageUrl } from "../utils/helpers/stringHelpers";
+import { replaceFancyQuotes } from "../utils/helpers/stringHelpers";
+import { resolveImageUrl } from "../utils/support/messageMedia";
 
 async function processPicture(
     url: string | null,

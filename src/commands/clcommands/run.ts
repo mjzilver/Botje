@@ -1,5 +1,6 @@
-import { cliToMessage, findChannel, getTextChannels } from "../../adapters/messageAdapter";
+import { cliToMessage, findChannel } from "../../adapters/messageAdapter";
 import type { IBotContext, IClCommand } from "../../interfaces";
+import { completeTextChannelNames } from "./completerHelpers";
 
 export default {
     name: "run",
@@ -42,7 +43,7 @@ export default {
     },
     completer(argIndex: number, context: IBotContext, _input: string[]): string[] {
         if (argIndex === 0) {
-            return getTextChannels(context.client).map((ch) => ch.name);
+            return completeTextChannelNames(context);
         }
         if (argIndex === 1) {
             return [

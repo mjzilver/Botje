@@ -1,4 +1,3 @@
-import { getBotContext } from "../infrastructure/botContext";
 import type { ICommand } from "../interfaces";
 import { EmbedBuilder } from "../interfaces/discord";
 import { toError } from "../utils";
@@ -11,8 +10,7 @@ export default {
     name: "poll",
     description: "creates a reaction-based poll",
     format: 'poll "[question]" [option] [option] (option) ...',
-    async function(message) {
-        const context = getBotContext();
+    async function(message, context) {
         const raw = message.content.slice(message.content.indexOf(" ") + 1).trim();
         const questionMatch = /^"([^"]+)"(.*)$/.exec(raw);
 

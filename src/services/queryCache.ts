@@ -1,8 +1,10 @@
 export const CACHE_TTL_MS = 5 * 60 * 1000;
 
-const cache = new Map<string, { promise: Promise<unknown>; expiry: number }>();
+type CacheValue = boolean | number | string | null | object;
 
-export function queryCache<T>(key: string, factory: () => Promise<T>, ttl = CACHE_TTL_MS): Promise<T> {
+const cache = new Map<string, { promise: Promise<CacheValue>; expiry: number }>();
+
+export function queryCache<T extends CacheValue>(key: string, factory: () => Promise<T>, ttl = CACHE_TTL_MS): Promise<T> {
     const entry = cache.get(key);
     if (entry && entry.expiry > Date.now()) {
         return entry.promise as Promise<T>;
