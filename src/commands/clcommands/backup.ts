@@ -6,7 +6,7 @@ import type { IBotContext, IClCommand } from "../../interfaces";
 
 export default {
     name: "backup",
-    description: "backs up config, database and emotes into a zip file",
+    description: "backs up config, database, emotes and meme templates into a zip file",
     format: "backup [destination path]",
     async function(input: string[], context: IBotContext) {
         const destination = input[0] ? path.resolve(input[0]) : path.resolve("backups");
@@ -29,6 +29,8 @@ export default {
             await context.backupHandler.backupConfig(backupDir);
             await context.backupHandler.backupDatabase(backupDir);
             await context.backupHandler.backupAllEmotes(path.join(backupDir, "emotes"));
+            fs.cpSync("assets/meme_templates", path.join(backupDir, "meme_templates"), { recursive: true });
+            
             const zipName = `backup-${Date.now()}.zip`;
             const zipPath = path.join(destination, zipName);
             execSync(`cd "${backupDir}" && zip -r "${zipPath}" .`, { stdio: "ignore" });
