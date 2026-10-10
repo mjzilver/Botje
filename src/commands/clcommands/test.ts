@@ -4,7 +4,7 @@ import { toError } from "../../utils";
 import { completeTextChannelNames } from "./completerHelpers";
 
 const CALL_DELAY_MS = 800;
-const SKIP_COMMANDS = new Set(["ask", "tarot", "hangman"]);
+const SKIP_COMMANDS = new Set(["ask", "tarot", "hangman", "reddit"]);
 
 function delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));

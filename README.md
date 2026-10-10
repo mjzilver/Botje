@@ -2,6 +2,23 @@
 
 A Discord bot made for myself and friends. Not intended for public use.
 
+## Running with Docker
+
+1. Set `POSTGRES_PASSWORD` in the root `.env` file. Use the same value as `db.password` in `config.json`.
+2. Start the database and bot:
+
+   ```powershell
+   docker compose up -d --build
+   ```
+
+The bot service keeps stdin open and allocates a TTY for its built-in console. Connect to it with:
+
+```powershell
+docker compose attach bot
+```
+
+Enter `help` to list console commands or `commands` to list Discord commands. Detach without stopping the bot by pressing **Ctrl+P**, then **Ctrl+Q**.
+
 ## Commands
 
 ### Stats

@@ -4,13 +4,12 @@ import type { ILogger } from "../../infrastructure/logger";
 import type { BotConfig } from "../../interfaces/config";
 import type { BotMessage } from "../../interfaces/discord";
 import { AttachmentBuilder, EmbedBuilder } from "../../interfaces/discord";
-import wordsJson from "../../json/words.json";
 import { pickRandomItem } from "../../utils";
 import { replaceAt as replaceAtHelper, textOnly as textOnlyHelper } from "../../utils/helpers/stringHelpers";
-import type { Dictionary } from "../nlp/dictionary";
+import { DICTIONARY_TOP_WORDS, type Dictionary } from "../nlp/dictionary";
 
 export interface IHangman {
-    run(message: BotMessage): void;
+    run(message: BotMessage): Promise<void>;
 }
 
 export class HangmanGame {
@@ -39,8 +38,12 @@ export class HangmanGame {
         this.assetsDir = assetsDir;
     }
 
-    run(message: BotMessage): void {
+    async run(message: BotMessage): Promise<void> {
         const args = message.cleanContent.toLowerCase().split(" ");
+        if (args[1] === "start") {
+            await this.dictionary.ensureWordsLoaded();
+        }
+
         switch (args[1]) {
             case "start":
                 this.start(message);
@@ -64,7 +67,13 @@ export class HangmanGame {
         this.visibleWord = "";
         this.tries = 0;
         this.alreadyGuessed = [];
-        const words = wordsJson as [string, number][];
+        const words = this.dictionary.words.slice(0, DICTIONARY_TOP_WORDS);
+        if (words.length === 0) {
+            this.messageHandler.send(message, "There are no words available for a hangman game yet.");
+
+            return;
+        }
+
         const nonSelectors = this.dictionary.getStopWordsRegex();
         while (this.word === "") {
             const candidate = pickRandomItem(words);

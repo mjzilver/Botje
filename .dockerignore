@@ -1,0 +1,7 @@
+.git
+.env
+config.json
+node_modules
+dist
+coverage
+backup-*/

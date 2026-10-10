@@ -11,44 +11,44 @@ export interface IDictionary {
 }
 
 type WordEntry = [word: string, frequency: number];
-const DICTIONARY_TOP_WORDS = 200;
+export const DICTIONARY_TOP_WORDS = 200;
 const MIN_WORD_FREQUENCY = 20;
+const WORDS_PATH = path.resolve(__dirname, "../../json/words.json");
 
 export class Dictionary {
     words: WordEntry[] = [];
+    private wordsReady: Promise<void>;
     private wordsPath: string;
     private db: IDatabase;
     private logger: ILogger;
     private stopWordsCache: RegExp | null = null;
     private stopWordsSet: Set<string> | null = null;
-    constructor(db: IDatabase, logger: ILogger, wordsPath = path.resolve(__dirname, "../../json/words.json")) {
+
+    constructor(db: IDatabase, logger: ILogger, wordsPath = WORDS_PATH) {
         this.db = db;
         this.logger = logger;
         this.wordsPath = wordsPath;
         if (fs.existsSync(this.wordsPath)) {
-            this.loadWordsFromFile();
+            this.wordsReady = this.loadWordsFromFile();
         } else {
             this.logger.console("words.json not found, generating new file");
-            this.generateWordsFile();
+            this.wordsReady = this.generateWordsFile();
         }
     }
 
-    private loadWordsFromFile(): void {
-        const stream = fs.createReadStream(this.wordsPath, { encoding: "utf8" });
-        let rawData = "";
-        stream.on("data", (chunk: string | Buffer) => {
-            rawData += chunk.toString();
-        });
-
-        stream.on("end", () => {
+    private async loadWordsFromFile(): Promise<void> {
+        try {
+            const rawData = await fs.promises.readFile(this.wordsPath, "utf8");
             this.words = JSON.parse(rawData) as WordEntry[];
             this.stopWordsCache = null;
             this.stopWordsSet = null;
-        });
-
-        stream.on("error", (err) => {
+        } catch (err) {
             this.logger.error(toError(err));
-        });
+        }
+    }
+
+    ensureWordsLoaded(): Promise<void> {
+        return this.wordsReady;
     }
 
     async generateWordsFile(): Promise<void> {
@@ -73,11 +73,7 @@ export class Dictionary {
             this.stopWordsCache = null;
             this.stopWordsSet = null;
             const shortList = this.words.slice(0, DICTIONARY_TOP_WORDS);
-            fs.writeFile(this.wordsPath, JSON.stringify(shortList), (err) => {
-                if (err) {
-                    this.logger.error(toError(err));
-                }
-            });
+            await fs.promises.writeFile(this.wordsPath, JSON.stringify(shortList));
         } catch (err) {
             this.logger.error(toError(err));
         }

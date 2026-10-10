@@ -13,7 +13,7 @@ export default {
         },
         { name: "help", description: "Show the current game state or start a new game" },
     ],
-    function(message, context) {
-        context.hangman.run(message);
+    async function(message, context) {
+        await context.hangman.run(message);
     },
 } satisfies ICommand;
